@@ -1,401 +1,75 @@
 <!DOCTYPE html>
-
-<html lang="pt-br">
-
+<html lang="pt-BR">
 <head>
-
     <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-    <title>SISTEMA JOAQUIM - 18 PEÇAS COMPLETAS</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador OAB 2ª Fase - Diagnóstico</title>
     <style>
-
-        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; --sidebar-bg: #1e293b; --fgv-color: #e11d48; }
-
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #334155; }
-
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-
-        #main-app { display: none; }
-
-        header { background: var(--primary); color: white; padding: 18px; text-align: center; font-weight: 800; border-bottom: 4px solid var(--accent); position: sticky; top: 0; z-index: 100; }
-
-        .main-layout { display: flex; flex-direction: column; min-height: 100vh; }
-
-        @media (min-width: 768px) { .main-layout { flex-direction: row; } .sidebar { width: 320px; height: 100vh; position: sticky; top: 0; } }
-
-        .sidebar { background: var(--sidebar-bg); color: white; padding: 15px; overflow-y: auto; }
-
-        .nav-btn { width: 100%; text-align: left; padding: 12px; margin-bottom: 5px; border: none; background: rgba(255,255,255,0.08); color: #f8fafc; cursor: pointer; border-radius: 6px; font-size: 0.8rem; }
-
-        .nav-btn.active { background: var(--accent); font-weight: bold; border-left: 4px solid #fff; }
-
-        .content-area { padding: 15px; flex-grow: 1; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-
-        #joaquim { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); min-height: 70vh; border: 1px solid #e2e8f0; font-family: 'Times New Roman', serif; line-height: 1.5; }
-
-        .gabarito-panel { background: #f1f5f9; border: 2px solid var(--accent); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-family: 'Segoe UI', sans-serif; }
-
-        .gab-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
-
-        .gab-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
-
-        .gab-content { display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd; font-size: 0.9rem; white-space: pre-wrap; color: #1e293b; }
-
-        .copy-btn { width: 100%; margin-bottom: 20px; background: #10b981; color: white; border: none; padding: 18px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-
-        .peca-header { text-align: center; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px solid #eee; padding-bottom: 15px; }
-
-        #texto-final { outline: none; min-height: 200px; white-space: pre-wrap; }
-
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; }
+        main { display: flex; flex: 1; overflow: hidden; padding: 10px; gap: 10px; }
+        .sidebar { background: white; padding: 15px; width: 250px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .content { flex: 1; background: white; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; }
+        #gabarito-container { flex: 1; border: 2px solid #ddd; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 10px; }
+        .debug-link { margin-bottom: 10px; color: #d9534f; font-weight: bold; }
     </style>
-
 </head>
-
 <body>
 
+<header>
+    <span>⚖️ Simulador OAB</span>
+    <div id="timer">05:00:00</div>
+</header>
 
-<div id="login-screen">
+<main>
+    <nav class="sidebar">
+        <h3>Peças</h3>
+        <button onclick="carregar('ro35.pdf', 'Recurso Ordinário XXXV')">Abrir RO XXXV</button>
+    </nav>
 
-    <button onclick="liberar()" style="padding:20px; cursor:pointer; font-weight:bold; border-radius:8px; border:none; background:var(--accent); color:white;">ACESSAR SISTEMA (JOAQUIM)</button>
-
-</div>
-
-
-<div id="main-app">
-
-    <header>PRÁTICA 2ª FASE DIREITO DO TRABALHO</header>
-
-    <div class="main-layout">
-
-        <nav class="sidebar" id="menuLateral"></nav>
-
-        <main class="content-area">
-
-            <div id="joaquim"></div>
-
-        </main>
-
-    </div>
-
-</div>
-
+    <section class="content">
+        <h2 id="titulo">Selecione uma peça</h2>
+        <div id="debug-area" class="debug-link"></div>
+        <div id="gabarito-container">
+            <iframe id="viewer" src=""></iframe>
+        </div>
+    </section>
+</main>
 
 <script>
+    function carregar(arquivo, nome) {
+        const viewer = document.getElementById('viewer');
+        const titulo = document.getElementById('titulo');
+        const debug = document.getElementById('debug-area');
+        
+        // Caminho absoluto baseado na sua URL atual para evitar erros de pasta
+        const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+        const urlFinal = urlBase + arquivo;
 
-    const dbGabaritos = {
+        titulo.innerText = nome;
+        viewer.src = urlFinal;
 
-        'rt': { 
-
-            1: "1.2.EXERCÍCIO I DE RECLAMAÇÃO TRABALHISTA
-José Fininho foi contratado pela empresa Heart Attack Grill Ltda., para
-trabalhar na cidade de Florianópolis/SC, como garçom, mediante salário de
-R$ 2.000,00.
-O empregado afirma que uma das especialidades da Lanchonete era o
-sanduíche denominado quadruple bypass com 4 hambúrgueres: 1 quilo de carne
-e 8.000 calorias.
-Relata que foi contratado no mesmo dia em que Juan para exercer a mesma
-função, na mesma filial. O trabalho se dava com a mesma perfeição técnica e
-produtividade, porém Juan recebia salário fixo de R$ 2.500,00 por mês.
-
-P á g i n a 9 | 551
-@aryannalinhares @professoraaryannalinhares
-O senhor Fininho conta que, em janeiro do ano da extinção do contrato, faltou
-ao trabalho por um dia para comparecer em juízo como parte no processo em que
-litigava contra seu ex-empregador. Embora tenha apresentado a certidão da
-Justiça do Trabalho confirmando suas alegações, o dia foi descontado do seu
-salário.
-O empregado comenta também que trabalhava 8 horas diárias de segunda
-a sexta-feira e usufruía de apenas 30 minutos de intervalo intrajornada.
-No curso do contrato, o empregador depositava apenas 4% do valor da
-remuneração a título de FGTS, pois havia acordo coletivo de trabalho autorizando
-o recolhimento de apenas metade do valor.
-Na qualidade de advogado(a) do reclamante, apresente a medida
-processual cabível para a defesa de seus direitos.
-Nos casos em que a lei exigir liquidação de valores, não se faz necessária
-sua apresentação pelo Examinando, pois admite-se que o escritório possui setor
-próprio ou contratado especificamente para tal fim. (Valor: 5,00)
-
-RESOLUÇÃO
-AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE
-FLORIANÓPOLIS/SC
-JOSÉ FININHO, garçom, qualificação e endereço completos, vem,
-respeitosamente, perante Vossa Excelência, por intermédio de seu
-advogado adiante assinado (procuração anexa), com escritório
-profissional no endereço completo, onde recebe intimações ou
-notificações, com fulcro no art. 840, caput e § 1o, da CLT, PROPOR:
-
-RECLAMAÇÃO TRABALHISTA, pelo rito (...)
-
-em face de HEART ATTACK GRILL LTDA., qualificação e endereço
-completos, e SINDICATO DOS EMPREGADOS ..., qualificação e
-
-P á g i n a 10 | 551
-@aryannalinhares @professoraaryannalinhares
-endereço completos, pelas razões de fato e de direito a seguir expostas.
-I – MÉRITO
-1. Equiparação salarial
-O reclamante foi contratado pela reclamada no mesmo dia em que Juan
-para exercer a mesma função, na mesma filial, com a mesma
-produtividade e perfeição técnica, porém, enquanto recebia R$ 2.000,00,
-o seu colega recebia salário fixo de R$ 2.500,00 por mês.
-Nos termos do art. 461, caput e § 1o, da CLT, é devido o mesmo salário
-aos empregados do mesmo empregador que exerçam a mesma função,
-no mesmo estabelecimento comercial, com a mesma produtividade e
-perfeição técnica e cuja diferença de tempo de serviço para o mesmo
-empregador não seja superior a quatro anos e de tempo na função não
-seja superior a dois anos.
-Diante do exposto, requer a condenação da reclamada ao pagamento
-das diferenças salariais, bem como de seus reflexos nas verbas
-contratuais e rescisórias (aviso prévio, décimo terceiro, férias acrescidas
-de 1/3 e FGTS - depósitos e multa de 40%).
-Por fim, requer a retificação da CTPS do empregado para constar o seu
-real salário, no valor e R$ 2.500,00, nos termos do art. 29, § 1o, da CLT.
-R$
-2. Devolução do desconto
-A reclamada descontou do salário do reclamante um dia de trabalho no
-mês de janeiro do ano da extinção do contrato, em razão de o reclamante
-ter faltado ao trabalho para comparecer em juízo como parte no processo
-em que litigava contra seu antigo empregador, muito embora tivesse
-apresentado certidão da Justiça do Trabalho confirmando suas
-alegações.
-
-P á g i n a 11 | 551
-@aryannalinhares @professoraaryannalinhares
-Com base no art. 473, VIII, da CLT e súmula 155, TST, o empregado
-poderá deixar de comparecer ao serviço para comparecimento como
-parte na Justiça do Trabalho.
-Diante do exposto, requer a condenação da reclamada à devolução do
-dia de trabalho descontado de seu salário. R$
-3. Intervalo intrajornada
-O reclamante trabalhava 8 horas diárias de segunda a sexta-feira e
-usufruía de apenas 30 minutos de intervalo intrajornada.
-Nos termos do art. 71, caput, da CLT, aqueles que laboram mais de 6
-horas diárias fazem jus a um intervalo intrajornada de, no mínimo, 1 hora,
-o qual não era observado.
-Diante do exposto, requer a condenação da reclamada ao pagamento do
-período suprimido, ou seja, de 30 minutos diários, acrescidos de 50%, à
-luz do art. 71, § 4o, da CLT. R$
-4. Diferenças de FGTS
-No curso do contrato, o empregador depositava apenas 4% do valor da
-remuneração do reclamante a título de FGTS, pois havia acordo coletivo
-de trabalho autorizando o recolhimento de apenas metade do valor.
-Nos termos do art. 611-B, III, da CLT, é ilícita e, portanto, nula a cláusula
-de acordo coletivo de trabalho que implique redução do valor dos
-depósitos mensais do FGTS. Ressalte-se que, o art. 15 da Lei no
-8.036/90 determina que os depósitos do FGTS devem ser de 8% da
-remuneração paga ou devida ao trabalhador no mês anterior.
-Diante do exposto, requer a declaração de nulidade da cláusula do
-acordo coletivo de trabalho que estabelece a redução dos depósitos do
-FGTS e a condenação da reclamada ao pagamento das diferenças
-salariais. R$
-
-P á g i n a 12 | 551
-@aryannalinhares @professoraaryannalinhares
-5. Honorários advocatícios
-Requer a condenação da reclamada ao pagamento de honorários
-advocatícios, no importe de 15%, sobre o valor que resultar da liquidação,
-à luz do art. 791-A da CLT. R$
-II – PEDIDOS
-Diante do exposto, requer:
-a) a condenação da reclamada ao pagamento das diferenças salariais,
-bem como de seus reflexos nas verbas contratuais e rescisórias
-R$ ............................................................................. ;
-b) a condenação da reclamada à devolução do dia de trabalho
-descontado de seu salário ................................. R$ ....;
-c) a condenação da reclamada ao pagamento do período suprimido, ou
-seja, de 30 minutos diários, acrescidos de 50%, nos termos do art.
-71, § 4o, da CLT ............................................. R$....;
-d) a declaração de nulidade da cláusula do acordo coletivo de trabalho
-que institui a redução dos depósitos do FGTS e a condenação da
-reclamada ao pagamento das diferenças salariais;
-e) a condenação da reclamada ao pagamento de honorários
-advocatícios, no importe de 15% sobre o valor que resultar da
-liquidação, à luz do art. 791-A da CLT.
-III – REQUERIMENTOS FINAIS
-Diante do exposto, requer:
-a) a notificação da Reclamada e do Sindicato dos Empregados em...,
-para oferecer resposta à reclamação trabalhista, sob pena de revelia
-e confissão quanto à matéria de fato;
-b) a produção de todos os meios de prova em direito admitidos, em
-especial a prova documental, o depoimento pessoal e a oitiva de
-
-P á g i n a 13 | 551
-@aryannalinhares @professoraaryannalinhares
-testemunhas; e
-c) por fim, a procedência dos pedidos com a condenação da
-reclamada ao pagamento das verbas pleiteadas, acrescidas de
-juros e correção monetária.
-Atribui-se à causa o valor de R$... .
-Nestes termos,
-pede deferimento.
-Local e data.
-Advogado(a)
-OAB no",
-            2: "F5071219 - Gab 2 RT (Vazio)",
-
-            3: "F5071219 - Gab 3 RT"
-
-        },
-
-        'consigna': { 1: "F5071219 - Gab 1 Consignação" },
-
-        'inquerito': { 1: "F5071219 - Gab 1 Inquérito" },
-
-        'cont': { 1: "F5071219 - Gab 1 Contestação" },
-
-        'ed': { 1: "F5071219 - Gab 1 Emb. Declaração" },
-
-        'replica': { 1: "F5071219 - Gab 1 Réplica" },
-
-        'ro': { 1: "F5071219 - Gab 1 Rec. Ordinário" },
-
-        'rade': { 1: "F5071219 - Gab 1 Rec. Adesivo" },
-
-        'ai': { 1: "F5071219 - Gab 1 Agravo Instr." },
-
-        'rr': { 1: "F5071219 - Gab 1 Rec. Revista" },
-
-        'emb_tst': { 1: "F5071219 - Gab 1 Emb. TST" },
-
-        're_stf': { 1: "F5071219 - Gab 1 Rec. Extraordinário" },
-
-        'emb_exec': { 1: "F5071219 - Gab 1 Emb. Execução" },
-
-        'epe': { 1: "F5071219 - Gab 1 Exceção Pré-Exec." },
-
-        'ap': { 1: "F5071219 - Gab 1 Agravo Petição" },
-
-        'emb_terc': { 1: "F5071219 - Gab 1 Emb. Terceiro" },
-
-        'ms': { 1: "F5071219 - Gab 1 Mand. Segurança" },
-
-        'ar': { 1: "F5071219 - Gab 1 Ação Rescisória" }
-
-    };
-
-
-    const nomesPecas = {
-
-        rt: "01. Reclamação Trabalhista", consigna: "02. Consignação em Pagamento", inquerito: "03. Inquérito Falta Grave",
-
-        cont: "04. Contestação", ed: "05. Embargos de Declaração", replica: "06. Réplica",
-
-        ro: "07. Recurso Ordinário", rade: "08. Recurso Adesivo", ai: "09. Agravo de Instrumento",
-
-        rr: "10. Recurso de Revista", emb_tst: "11. Embargos ao TST", re_stf: "12. Recurso Extraordinário",
-
-        emb_exec: "13. Embargos à Execução", epe: "14. Exceção de Pré-Executividade", ap: "15. Agravo de Petição",
-
-        emb_terc: "16. Embargos de Terceiro", ms: "17. Mandado de Segurança", ar: "18. Ação Rescisória"
-
-    };
-
-
-    function liberar() {
-
-        document.getElementById('login-screen').style.display = 'none';
-
-        document.getElementById('main-app').style.display = 'block';
-
-        montarMenu();
-
-        loadPeca('rt');
-
+        // Cria um link de teste para diagnóstico
+        debug.innerHTML = `Link direto do arquivo: <a href="${urlFinal}" target="_blank">${arquivo}</a><br>
+                           <small>(Se clicar no link acima e der 404, o arquivo não foi enviado corretamente ao GitHub)</small>`;
+        
+        console.log("Caminho gerado:", urlFinal);
     }
 
-
-    function montarMenu() {
-
-        document.getElementById('menuLateral').innerHTML = Object.keys(nomesPecas).map(k => 
-
-            `<button class="nav-btn" id="btn_${k}" onclick="loadPeca('${k}')">${nomesPecas[k]}</button>`
-
-        ).join('');
-
+    function startTimer(duration, display) {
+        let timer = duration;
+        setInterval(() => {
+            let h = Math.floor(timer / 3600);
+            let m = Math.floor((timer % 3600) / 60);
+            let s = timer % 60;
+            display.textContent = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            if (--timer < 0) timer = 0;
+        }, 1000);
     }
-
-
-    function loadPeca(key) {
-
-        let botoes = '', blocos = '';
-
-        const lista = dbGabaritos[key] || {};
-
-        for(let i=1; i<=10; i++){
-
-            let id = `${key}_${i}`;
-
-            let texto = lista[i] || `Conteúdo não cadastrado para o Gabarito ${i}.`;
-
-            botoes += `<button class="gab-btn" onclick="toggleG('${id}')">📖 Gabarito ${i}</button>`;
-
-            blocos += `<div id="${id}" class="gab-content"><strong>GABARITO ${i}:</strong>\n\n${texto}</div>`;
-
-        }
-
-        document.getElementById('joaquim').innerHTML = `
-
-            <button class="copy-btn" onclick="copyContent()">COPIAR PETIÇÃO</button>
-
-            <div class="gabarito-panel"><div class="gab-grid">${botoes}</div>${blocos}</div>
-
-            <div class="peca-header">${nomesPecas[key].split('. ')[1]}</div>
-
-            <div id="texto-final" contenteditable="true">ID: 936045\n\n(Digite ou cole sua peça final aqui...)</div>
-
-        `;
-
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-
-        document.getElementById('btn_'+key).classList.add('active');
-
-        window.scrollTo(0,0);
-
-    }
-
-
-    function toggleG(id) {
-
-        const el = document.getElementById(id);
-
-        const v = el.style.display === 'block';
-
-        document.querySelectorAll('.gab-content').forEach(d => d.style.display = 'none');
-
-        el.style.display = v ? 'none' : 'block';
-
-    }
-
-
-    function copyContent() {
-
-        const texto = document.getElementById('texto-final').innerText;
-
-        const titulo = document.querySelector('.peca-header').innerText;
-
-        const areaCopia = document.createElement('textarea');
-
-        areaCopia.value = titulo + "\n\n" + texto;
-
-        document.body.appendChild(areaCopia);
-
-        areaCopia.select();
-
-        document.execCommand('copy');
-
-        document.body.removeChild(areaCopia);
-
-        alert("Petição copiada com sucesso!");
-
-    }
-
+    window.onload = () => startTimer(18000, document.getElementById('timer'));
 </script>
 
 </body>
-
 </html>
-
-

@@ -2,62 +2,182 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador OAB 2ª Fase - Diagnóstico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SISTEMA JOAQUIM - FINAL 2026</title>
     <style>
-        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; height: 100vh; display: flex; flex-direction: column; }
-        header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; }
-        main { display: flex; flex: 1; overflow: hidden; padding: 10px; gap: 10px; }
-        .sidebar { background: white; padding: 15px; width: 250px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .content { flex: 1; background: white; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; }
-        #gabarito-container { flex: 1; border: 2px solid #ddd; position: relative; }
-        iframe { width: 100%; height: 100%; border: none; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 10px; }
-        .debug-link { margin-bottom: 10px; color: #d9534f; font-weight: bold; }
+        :root { 
+            --primary: #1a252f; --accent: #3498db; --bg: #f4f7f6; 
+            --orange: #f39c12; --green: #27ae60; --purple: #8e44ad; 
+            --yellow: #f1c40f; --text: #2c3e50; --header-h: 60px; 
+            --sidebar-w: 260px;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        header { background-color: var(--primary); color: white; height: var(--header-h); padding: 0 15px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; }
+        #timer { font-family: monospace; font-size: 1.2rem; color: var(--yellow); font-weight: bold; }
+        
+        .header-left { display: flex; align-items: center; gap: 10px; }
+        .nav-group { display: flex; gap: 5px; }
+        .dropbtn { color: white; padding: 8px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 0.65rem; text-transform: uppercase; }
+        .btn-struct { background-color: var(--accent); }
+        .btn-correc { background-color: var(--orange); }
+        .btn-postit { background-color: var(--yellow); color: #333; }
+        .btn-dicas { background-color: var(--purple); }
+
+        .dropdown { position: relative; }
+        .dropdown-content { display: none; position: absolute; background: white; min-width: 250px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); right: 0; border-radius: 6px; padding: 8px; z-index: 2000; border: 1px solid #ddd; }
+        .dropdown:hover .dropdown-content { display: block; }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; font-size: 0.8rem; color: #333; cursor: pointer; }
+
+        main { display: flex; flex: 1; overflow: hidden; position: relative; }
+        
+        .sidebar { width: var(--sidebar-w); background: #eaeff2; border-right: 1px solid #ccc; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; transition: width 0.3s; }
+        .sidebar.collapsed { width: 0; overflow: hidden; border: none; }
+        .sidebar-content { padding: 12px; display: flex; flex-direction: column; gap: 15px; }
+        
+        h4 { font-size: 0.65rem; color: #666; text-transform: uppercase; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+        .exame-btn, .nav-btn { background: white; border: 1px solid #ddd; padding: 10px; border-radius: 4px; cursor: pointer; text-align: left; font-size: 0.75rem; font-weight: bold; margin-bottom: 4px; width: 100%; }
+        .exame-btn.active, .nav-btn.active { background: var(--accent); color: white; }
+
+        .mural-item { padding: 8px; border-radius: 4px; font-size: 0.75rem; margin-bottom: 8px; border-left: 5px solid; background: white; box-shadow: 2px 2px 5px rgba(0,0,0,0.05); cursor: pointer; }
+
+        .work-section { width: 40%; display: flex; flex-direction: column; background: white; flex-shrink: 0; border-right: 1px solid #ccc; }
+        #area-peca { flex: 1; padding: 25px; border: none; font-family: 'Courier New', monospace; font-size: 16px; line-height: 1.6; outline: none; background-image: linear-gradient(#f1f1f1 1px, transparent 1px); background-size: 100% 1.6em; resize: none; }
+        #resizer { width: 10px; background: #cbd5e0; cursor: col-resize; z-index: 10; border-left: 1px solid #a0aec0; }
+
+        .pdf-section { flex: 1; background: #525659; display: flex; flex-direction: column; gap: 10px; padding: 10px; overflow-y: auto; }
+        .pdf-box { background: #333; border-radius: 4px; overflow: hidden; }
+        .pdf-header { padding: 6px 10px; color: white; font-size: 0.7rem; display: flex; justify-content: space-between; background: #2c3e50; }
+        .pdf-frame { width: 100%; height: 80vh; border: none; background: white; }
+
+        .btn-action { border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; font-size: 0.7rem; text-transform: uppercase; }
+        #btn-reopen { position: fixed; left: 0; top: 80px; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 0 5px 5px 0; cursor: pointer; display: none; z-index: 900; }
+
+        /* Estilos para a nova seção de anotações na Sidebar */
+        .annotation-section-sidebar { margin-top: 15px; }
+        .note-item { padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 0.75rem; position: relative; }
+        .note-delete { position: absolute; right: 5px; top: 5px; background: none; border: none; color: red; cursor: pointer; }
+        .type-postit { background: var(--yellow); }
+        .type-dicas { background: var(--green); color: white; }
+
+        @media (max-width: 1024px) {
+            /* ... (media queries remain mostly the same) ... */
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <span>⚖️ Simulador OAB</span>
-    <div id="timer">05:00:00</div>
+    <div class="header-left">
+        <button id="mobile-toggle" style="background:#34495e; color:white; border:none; padding:8px; border-radius:4px; display:none;" onclick="toggleSidebarMobile()">☰ MENU</button>
+        <div id="timer">05:00:00</div>
+    </div>
+    <div class="nav-group">
+        <div class="dropdown"><button class="dropbtn btn-struct">📑 Estruturas</button><div class="dropdown-content" id="list-db_estruturas"></div></div>
+        <div class="dropdown"><button class="dropbtn btn-correc">⚖️ Correção</button><div class="dropdown-content" id="list-db_correcoes"></div></div>
+        <div class="dropdown"><button class="dropbtn btn-postit" onclick="focusPanel('annotations-postit')">📌 Post-its</button><div class="dropdown-content" id="list-db_postits"></div></div>
+        <div class="dropdown"><button class="dropbtn btn-dicas" onclick="focusPanel('annotations-dicas')">👩‍🏫 Dicas</button><div class="dropdown-content" id="list-db_dicas"></div></div>
+    </div>
 </header>
 
-<main>
-    <nav class="sidebar">
-        <h3>Peças</h3>
-        <button onclick="carregar('ro35.pdf', 'Recurso Ordinário XXXV')">Abrir RO XXXV</button>
-    </nav>
+<button id="btn-reopen" onclick="toggleSidebarPC()">ABRIR MENU »</button>
 
-    <section class="content">
-        <h2 id="titulo">Selecione uma peça</h2>
-        <div id="debug-area" class="debug-link"></div>
-        <div id="gabarito-container">
-            <iframe id="viewer" src=""></iframe>
+<main id="main-container">
+    <aside class="sidebar" id="sidebar-main">
+        <div class="sidebar-content" id="menuLateral">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <h4>📂 EXAMES OAB</h4>
+                <button onclick="toggleSidebarPC()" class="pc-only" style="border:none; background:none; cursor:pointer; color:red; font-size:0.6rem;">FECHAR</button>
+            </div>
+            <div id="lista-exames">
+                 <!-- Lista de Exames (pecasMenu) será montada aqui pelo JS -->
+            </div>
+            
+            <h4 style="margin-top:15px">💡 MURAL RÁPIDO</h4>
+            <div id="mural-fixacao"></div>
+
+            <!-- Seção de Anotações movida para dentro da Sidebar -->
+            <div class="annotation-section-sidebar" id="annotations-postit">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h4 style="border:none;">📌 POST-ITS</h4>
+                    <button onclick="addNewNotePrompt('postit')" class="btn-action" style="background: var(--yellow); color: black; padding: 4px 8px;">+ Add</button>
+                </div>
+                <div id="content-postit"></div>
+            </div>
+
+            <div class="annotation-section-sidebar" id="annotations-dicas">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h4 style="border:none;">👩‍🏫 DICAS</h4>
+                    <button onclick="addNewNotePrompt('dicas')" class="btn-action" style="background: var(--purple); padding: 4px 8px;">+ Add</button>
+                </div>
+                 <div id="content-dicas"></div>
+            </div>
+            <!-- Fim Seção de Anotações na Sidebar -->
+
+            <h4 style="margin-top:15px">💾 DADOS</h4>
+            <button class="btn-action" style="background:#27ae60; width:100%" onclick="fazerBackup()">EXPORTAR</button>
+            <button class="btn-action" style="background:#2980b9; width:100%; margin-top:5px" onclick="document.getElementById('input-file').click()">IMPORTAR</button>
+            <input type="file" id="input-file" style="display:none" onchange="importarBackup(this)">
+        </div>
+    </aside>
+
+    <section class="work-section" id="editor-area">
+        <div id="aviso-edicao" style="display:none; background:var(--yellow); padding:10px; text-align:center; font-weight:bold;">
+            EDITANDO: <span id="nome-item-editando"></span> 
+            <button class="btn-action" style="background:var(--green); margin-left:10px" onclick="salvarAlteracoes()">SALVAR</button>
+            <button class="btn-action" style="background:#e74c3c; margin-left:5px" onclick="cancelarEdicao()">CANCELAR</button>
+        </div>
+        <div class="editor-header" style="padding:10px; display:flex; justify-content:space-between; align-items:center; background:#eee;">
+            <span id="label-exame" style="font-size:0.7rem; font-weight:bold;">📍 SELECIONE UM EXAME</span>
+            <button class="btn-action" style="background:var(--green)" onclick="exportarTXT()">TXT</button>
+        </div>
+
+        <div id="joaquim" style="flex: 1; overflow-y: auto; padding: 25px; font-family: sans-serif; display: none;">
+             <!-- Conteudo dinamico aparece aqui -->
+        </div>
+        <textarea id="area-peca" placeholder="Escreva aqui..."></textarea>
+        
+    </section>
+
+    <div id="resizer"></div>
+
+    <section class="pdf-section">
+        <div class="pdf-box">
+            <div class="pdf-header"><span>ENUNCIADO</span><button onclick="expandir('v-enu')" style="background:none; border:none; color:white;">🔄</button></div>
+            <iframe id="v-enu" class="pdf-frame" src="about:blank"></iframe>
+        </div>
+        <div class="pdf-box">
+            <div class="pdf-header"><span>PADRÃO DE RESPOSTA</span><button onclick="expandir('v-pad')" style="background:none; border:none; color:white;">🔄</button></div>
+            <iframe id="v-pad" class="pdf-frame" src="about:blank"></iframe>
         </div>
     </section>
+
 </main>
 
 <script>
-    function carregar(arquivo, nome) {
-        const viewer = document.getElementById('viewer');
-        const titulo = document.getElementById('titulo');
-        const debug = document.getElementById('debug-area');
-        
-        // Caminho absoluto baseado na sua URL atual para evitar erros de pasta
-        const urlBase = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-        const urlFinal = urlBase + arquivo;
-
-        titulo.innerText = nome;
-        viewer.src = urlFinal;
-
-        // Cria um link de teste para diagnóstico
-        debug.innerHTML = `Link direto do arquivo: <a href="${urlFinal}" target="_blank">${arquivo}</a><br>
-                           <small>(Se clicar no link acima e der 404, o arquivo não foi enviado corretamente ao GitHub)</small>`;
-        
-        console.log("Caminho gerado:", urlFinal);
+    // URLs de exemplo para os PDFs. SUBSTITUA PELAS SUAS REAIS.
+    const URL_ENUNCIADO = 'enunciado_exemplo.pdf'; 
+    const URL_GABARITO = 'gabarito_exemplo.pdf';
+    
+    // --- Funções Mock (do seu código original) ---
+    function toggleSidebarMobile() {}
+    function toggleSidebarPC() {
+        const sidebar = document.getElementById('sidebar-main');
+        const btnReopen = document.getElementById('btn-reopen');
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            btnReopen.style.display = 'block';
+        } else {
+            btnReopen.style.display = 'none';
+        }
     }
-
+    function fazerBackup() { alert("Backup Exportado (Mock)"); }
+    function importarBackup(input) { alert("Backup Importado (Mock)"); }
+    function salvarAlteracoes() { alert("Alterações Salvas (Mock)"); }
+    function cancelarEdicao() { alert("Edição Cancelada (Mock)"); }
+    function exportarTXT() { alert("Exportando para TXT (Mock)"); }
+    function expandir(id) { alert(`Expandindo PDF ${id} (Mock)`); }
     function startTimer(duration, display) {
         let timer = duration;
         setInterval(() => {
@@ -68,8 +188,136 @@
             if (--timer < 0) timer = 0;
         }, 1000);
     }
-    window.onload = () => startTimer(18000, document.getElementById('timer'));
-</script>
 
+    // --- Seus dados originais (DB e Menu) ---
+    const dbGabaritos = {
+        'ar': { 1: `AO EGRÉGIO TRIBUNAL REGIONAL DO TRABALHO...\n\nAÇÃO RESCISÓRIA\n\nArt. 966 CPC.`, guia: `Prazo de 2 anos.` },
+        'inquerito': { 1: `AO JUÍZO DA ... VARA DO TRABALHO...\n\nINQUÉRITO PARA APURAÇÃO DE FALTA GRAVE\n\nArt. 853 CLT.`, guia: `Empregado estável.` },
+        'cautelar': { 1: `AO JUÍZO DA ... VARA DO TRABALHO...\n\nMEDIDA CAUTELAR\n\nArt. 300 CPC.`, guia: `Urgência e probabilidade.` },
+        'replica': { 1: `AO JUÍZO DA ... VARA DO TRABALHO...\n\nRÉPLICA À CONTESTAÇÃO...`, guia: `Combater preliminares.` },
+        'rade': { 1: `AO JUÍZO DA ... VARA DO TRABALHO...\n\nRECURSO ADESIVO\n\nArt. 997 CPC.`, guia: `Prazo das contrarrazões.` },
+        'emb_tst': { 1: `AO TRIBUNAL SUPERIOR DO TRABALHO...\n\nEMBARGOS AO TST\n\nArt. 894, II CLT.`, guia: `Divergência interna no TST.` },
+        're_stf': { 1: `AO TRIBUNAL SUPERIOR DO TRABALHO...\n\nRECURSO EXTRAORDINÁRIO\n\nArt. 102, III CF.`, guia: `Repercussão geral.` },
+        'emb_terc': { 1: `AO JUÍZO DA ... VARA DO TRABALHO...\n\nEMBARGOS DE TERCEIRO\n\nArt. 674 CPC.`, guia: `Posse ou propriedade de terceiro.` }
+        // Adicione as outras 10 peças aqui (RT, RO, Cont, etc) com seus respectivos gabaritos e guias
+    };
+
+    const pecasMenu = {
+        'rt': '1. Reclamação Trabalhista', 'consigna': '2. Consignação em Pagamento', 'cont': '3. Contestação',
+        'emb_exec': '4. Embargos à Execução', 'ro': '5. Recurso Ordinário', 'ed': '6. Embargos de Declaração',
+        'ap': '7. Agravo de Petição', 'ai': '8. Agravo de Instrumento', 'rr': '9. Recurso de Revista',
+        'epe': '10. Exceção Pré-Executividade', 'ms': '11. Mandado de Segurança', 'ar': '12. Ação Rescisória',
+        'inquerito': '13. Inquérito Falta Grave', 'cautelar': '14. Medida Cautelar', 'replica': '15. Réplica',
+        'rade': '16. Recurso Adesivo', 'emb_tst': '17. Embargos ao TST', 're_stf': '18. Recurso Extraordinário',
+        'emb_terc': '19. Embargos de Terceiro'
+    };
+
+    // --- Funções de Carregamento do Menu Original ---
+
+    function montarMenu() {
+        let h = '';
+        Object.keys(pecasMenu).forEach(k => {
+            h += `<button class="nav-btn" id="btn_${k}" onclick="loadPeca('${k}')">${pecasMenu[k]}</button>`;
+        });
+        document.getElementById('lista-exames').innerHTML = h; 
+    }
+
+    function loadPeca(key) {
+        const dados = dbGabaritos[key];
+        // Mostra a div joaquim e oculta a textarea simples
+        document.getElementById('joaquim').style.display = 'block';
+        document.getElementById('area-peca').style.display = 'none';
+
+        document.getElementById('joaquim').innerHTML = `
+            <button class="copy-btn btn-action" style="background: var(--accent);" onclick="copyText()">COPIAR MINHA PETIÇÃO</button>
+            <div class="gabarito-panel">
+                <h3>Gabarito Completo</h3>
+                <div id="gab_content" class="gab-content" style="border: 1px solid #ccc; padding: 10px; white-space: pre-wrap; font-family: monospace;">${dados[1]}</div>
+                <h3>Dicas de Mentoria</h3>
+                <div id="guia_content" class="guia-content" style="border: 1px solid #ccc; padding: 10px; background: var(--yellow);">${dados.guia}</div>
+            </div>
+            <div id="texto-final" contenteditable="true" style="margin-top: 15px; border: 1px solid #ccc; padding: 15px; min-height: 200px; background: #fff; font-family: 'Courier New', monospace;">f5071219\n\n(Escreva sua peça aqui...)</div>
+        `;
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn_' + key).classList.add('active');
+        document.getElementById('label-exame').textContent = '📍 EDITANDO: ' + pecasMenu[key];
+    }
+
+
+    function copyText() {
+        const t = document.getElementById('texto-final').innerText;
+        navigator.clipboard.writeText(t).then(() => alert("Copiado!"));
+    }
+
+
+    // --- Funções de Anotação (Integradas na Sidebar) ---
+
+    function addNewNotePrompt(type) {
+        const text = prompt(`Digite sua nova anotação (${type}):`);
+        if (text && text.trim() !== '') {
+            saveAnnotation(type, text);
+        }
+    }
+
+    function saveAnnotation(type, text) {
+        const STORAGE_KEY = `sistemaJoaquimNotes_${type}`;
+        let annotations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        
+        const newAnnotation = {
+            id: Date.now(),
+            text: text,
+            date: new Date().toLocaleString('pt-BR')
+        };
+
+        annotations.push(newAnnotation);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(annotations));
+        renderAnnotations(type);
+    }
+
+    function renderAnnotations(type) {
+        const STORAGE_KEY = `sistemaJoaquimNotes_${type}`;
+        const annotations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        const contentAreaId = type === 'postit' ? 'content-postit' : 'content-dicas';
+        const contentArea = document.getElementById(contentAreaId);
+        contentArea.innerHTML = '';
+
+        annotations.forEach(annotation => {
+            const item = document.createElement('div');
+            item.className = `note-item type-${type}`; 
+            item.innerHTML = `
+                <p>${annotation.text}</p>
+                <small>Criado em: ${annotation.date}</small>
+                <button class="note-delete" onclick="deleteAnnotation('${type}', ${annotation.id})">✖️</button>
+            `;
+            contentArea.appendChild(item);
+        });
+    }
+
+    function deleteAnnotation(type, id) {
+        const STORAGE_KEY = `sistemaJoaquimNotes_${type}`;
+        let annotations = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+        annotations = annotations.filter(annotation => annotation.id !== id);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(annotations));
+        renderAnnotations(type); 
+    }
+
+    function focusPanel(panelId) {
+        const panel = document.getElementById(panelId);
+        if (document.getElementById('sidebar-main').classList.contains('collapsed')) {
+             toggleSidebarPC();
+        }
+        panel.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // --- Inicialização ---
+    window.onload = () => {
+       montarMenu(); 
+       renderAnnotations('postit'); 
+       renderAnnotations('dicas'); 
+       document.getElementById('v-enu').src = URL_ENUNCIADO;
+       document.getElementById('v-pad').src = URL_GABARITO;
+       startTimer(18000, document.getElementById('timer')); // 5 horas de timer
+    }
+</script>
 </body>
 </html>

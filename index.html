@@ -19,6 +19,14 @@
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
+        /* Animação do Indicador Verde */
+        @keyframes pulse-discreto {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .sync-success { color: #10b981 !important; animation: pulse-discreto 1.2s infinite; font-weight: 900; }
+
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 1001; }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
@@ -53,8 +61,8 @@
 
 <header>
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
-    <div id="sync-indicator" style="color:var(--gold); font-size:12px; display:flex; align-items:center; gap:5px;">
-        <i class="fas fa-cloud"></i> <span id="sync-text">SYNC ON</span>
+    <div id="sync-indicator" style="color:var(--gold); font-size:12px; display:flex; align-items:center; gap:8px;">
+        <i id="sync-icon" class="fas fa-cloud"></i> <span id="sync-text">SYNC ON</span>
     </div>
 </header>
 
@@ -124,11 +132,8 @@
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
         const syncText = document.getElementById('sync-text');
-        const lines = document.querySelectorAll('.linha-folha');
-        let temConteudo = false;
-        lines.forEach(l => { if(l.value.trim().length > 0) temConteudo = true; });
-        if (!temConteudo) return;
-
+        const syncIcon = document.getElementById('sync-icon');
+        
         syncText.innerText = "SYNCING...";
         try {
             await engineSaveElite(db, window.activeEx, { tipo: 'rascunho' });
@@ -140,12 +145,27 @@
     window.finalizarPeca = async () => {
         if(!confirm("Deseja finalizar a peça e salvar no histórico?")) return;
         isFinalizing = true;
+        
         const syncText = document.getElementById('sync-text');
-        syncText.innerText = "FINALIZANDO...";
+        const syncIndicator = document.getElementById('sync-indicator');
+        const syncIcon = document.getElementById('sync-icon');
+
+        syncText.innerText = "ENVIANDO...";
+        
         try {
             await engineSaveElite(db, window.activeEx, { tipo: 'historico' });
-            syncText.innerText = "HISTÓRICO SALVO ✅";
-            setTimeout(() => { isFinalizing = false; syncText.innerText = "SYNC ON"; }, 5000);
+            
+            // FEEDBACK VISUAL DISCRETO E VERDE
+            syncText.innerText = "HISTÓRICO SALVO";
+            syncIndicator.classList.add('sync-success');
+            syncIcon.className = "fas fa-check-circle";
+
+            setTimeout(() => { 
+                isFinalizing = false; 
+                syncText.innerText = "SYNC ON"; 
+                syncIndicator.classList.remove('sync-success');
+                syncIcon.className = "fas fa-cloud";
+            }, 6000);
         } catch(e) {
             isFinalizing = false;
             syncText.innerText = "SYNC ON";
@@ -218,7 +238,7 @@
     };
 
     window.onload = () => {
-        FolhaEngine.montar('folha-total', 75);
+        FolhaEngine.montar('folha-total');
         setTimeout(window.forcarRadar, 1500); 
         setInterval(window.dispararSalvar, 30000); 
 

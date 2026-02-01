@@ -9,11 +9,12 @@
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 20px; }
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
-        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; }
+        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
         .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
-        .feed { max-height: 250px; overflow-y: auto; margin-top: 10px; }
-        .post-it { padding: 10px; border-radius: 4px; margin-bottom: 10px; color: black; position: relative; }
+        .feed { max-height: 300px; overflow-y: auto; margin-top: 10px; }
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #22c55e; display: flex; justify-content: space-between; align-items: center; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; }
+        .post-it { padding: 10px; border-radius: 4px; margin-bottom: 10px; color: black; position: relative; font-weight: 600; }
     </style>
 </head>
 <body>
@@ -24,32 +25,24 @@
 </header>
 
 <main class="dashboard">
-    <section class="panel" style="grid-column: span 2; border-top-color: #22c55e;">
-        <h3 style="color:#22c55e">HISTÓRICO DE EVOLUÇÃO</h3>
+    <section class="panel" style="grid-column: span 2;">
+        <h3 style="color:#22c55e"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS (EVOLUÇÃO)</h3>
         <div id="feed-producao" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6">INTELIGÊNCIA: NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Título da Pegadinha">
+        <h3 style="color:#f472b6">NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Título">
         <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvar('nc')">GRAVAR</button>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarIntel('nc')">GRAVAR</button>
         <div id="feed-nc" class="feed"></div>
-    </section>
-
-    <section class="panel" style="border-top-color: #fbbf24;">
-        <h3 style="color:#fbbf24">QUAL A PEÇA? (IDENTIFICAÇÃO)</h3>
-        <textarea id="peca-t" placeholder="Fatos do caso..."></textarea>
-        <input id="peca-c" placeholder="Peça correta">
-        <button class="btn" style="background:#fbbf24; color:black" onclick="salvar('peca')">GRAVAR</button>
-        <div id="feed-peca" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
         <h3 style="color:#3b82f6">TESES E PRELIMINARES</h3>
         <input id="tese-t" placeholder="Nome da Tese">
         <textarea id="tese-c" placeholder="Fundamento..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvar('tese')">GRAVAR</button>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarIntel('tese')">GRAVAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 </main>
@@ -67,7 +60,8 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    window.salvar = (type) => {
+    // Salvar Inteligências em nós fixos v13
+    window.salvarIntel = (type) => {
         const t = document.getElementById(type+'-t').value;
         const c = document.getElementById(type+'-c').value;
         if(t && c) push(ref(db, 'v13_'+type), {t, c, ts: serverTimestamp()}).then(() => {
@@ -76,23 +70,27 @@
         });
     };
 
+    // Sincronização em tempo real
     onValue(ref(db), (snap) => {
         const data = snap.val() || {};
         
-        // Histórico de Treinos
-        const fProd = document.getElementById('feed-producao');
-        fProd.innerHTML = "";
-        const pecas = data.producao_v13 || {};
-        Object.keys(pecas).reverse().forEach(id => {
-            fProd.innerHTML += `<div style="padding:10px; border-bottom:1px solid #334155; display:flex; justify-content:space-between;">
-                <span><strong>${pecas[id].peca}</strong> - ${pecas[id].data}</span>
-                <button class="btn" style="width:auto; margin:0" onclick="verEvolucao('${id}')">VER EVOLUÇÃO</button>
+        // Histórico de Treinos (Vindo da index.html)
+        const fP = document.getElementById('feed-producao');
+        fP.innerHTML = "";
+        const treinos = data.producao_v13 || {};
+        Object.keys(treinos).reverse().forEach(id => {
+            fP.innerHTML += `<div class="card-h">
+                <span><strong>${treinos[id].nome}</strong> - ${treinos[id].data}</span>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn" style="width:auto; margin:0; background:#3b82f6; color:white" onclick="abrirTreino('${id}')">VER EVOLUÇÃO</button>
+                    <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white" onclick="remove(ref(db, 'producao_v13/${id}'))">X</button>
+                </div>
             </div>`;
         });
 
         // Inteligências Independentes
-        const colors = { nc: '#f472b6', peca: '#fbbf24', tese: '#3b82f6' };
-        ['nc', 'peca', 'tese'].forEach(type => {
+        const colors = { nc: '#f472b6', tese: '#3b82f6' };
+        ['nc', 'tese'].forEach(type => {
             const f = document.getElementById('feed-'+type);
             f.innerHTML = "";
             const items = data['v13_'+type] || {};
@@ -105,12 +103,12 @@
         });
     });
 
-    window.verEvolucao = (id) => {
-        onValue(ref(db, 'producao_v13/' + id), (snap) => {
-            const d = snap.val();
-            const win = window.open('', '_blank');
-            win.document.write(`<html><body style="font-family:monospace; padding:40px;"><h2>REVISÃO: ${d.peca}</h2><hr>
-                ${d.texto.map((l, i) => `<div><b>${i+1}</b> ${l}</div>`).join('')}</body></html>`);
+    window.abrirTreino = (id) => {
+        onValue(ref(db, 'producao_v13/' + id), (s) => {
+            const p = s.val();
+            const w = window.open('', '_blank');
+            w.document.write(`<html><head><title>REVISÃO</title><style>body{font-family:monospace; padding:40px;} div{border-bottom:1px solid #eee;}</style></head>
+                <body><h2>${p.nome}</h2><p>${p.data}</p><hr>${p.texto.map((l,i)=>`<div><b>${i+1}</b> ${l}</div>`).join('')}</body></html>`);
         }, {onlyOnce: true});
     };
 </script>

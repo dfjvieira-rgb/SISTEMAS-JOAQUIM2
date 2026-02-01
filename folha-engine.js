@@ -34,15 +34,13 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
-            // --- MANTIDO: AJUSTE DE MARGEM (NÃO DEIXA PASSAR DA LINHA VERMELHA) ---
+            // --- REGRA DE OURO: QUEBRA AUTOMÁTICA NA MARGEM ---
             input.addEventListener('input', (e) => {
-                // Se estiver apagando, não faz nada
                 if (e.inputType === 'deleteContentBackward') return;
 
-                // Se o texto atingir o limite OAB (60 caracteres)
                 if (input.value.length >= FolhaEngine.LIMITE_OAB) {
                     const val = input.value;
-                    const lastSpc = val.lastIndexOf(" "); // Acha o último espaço para não cortar a palavra no meio
+                    const lastSpc = val.lastIndexOf(" ");
                     
                     if (lastSpc > 0) {
                         const stays = val.substring(0, lastSpc);
@@ -50,28 +48,27 @@ export const FolhaEngine = {
                         const next = document.getElementById(`L${i + 1}`);
                         
                         if (next) {
-                            input.value = stays; // Mantém o que cabe
-                            // Empurra o resto para a linha de baixo, preservando o que já estava lá
+                            input.value = stays;
                             next.value = (jumps + " " + next.value).trim();
-                            next.focus(); // Pula o cursor para baixo
+                            next.focus();
                         }
                     }
                 }
             });
 
-            // --- NOVO: INTELIGÊNCIA DE NAVEGAÇÃO ---
+            // --- INTELIGÊNCIA DE NAVEGAÇÃO (ENTER, DELETE, SETAS, BACKSPACE) ---
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: Pula linha manualmente
+                // ENTER: Pula para a linha de baixo
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     if (proximo) proximo.focus();
                 }
 
-                // BACKSPACE: Volta para a linha de cima se estiver vazio
+                // BACKSPACE: Se linha estiver vazia, volta para a anterior
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -79,14 +76,24 @@ export const FolhaEngine = {
                     }
                 }
 
-                // SETAS: Navegação rápida
-                if (e.key === 'ArrowUp' && anterior) {
-                    e.preventDefault();
-                    anterior.focus();
+                // DELETE: Se estiver no fim ou linha vazia, foca na próxima linha para facilitar limpeza
+                if (e.key === 'Delete' && input.value === '') {
+                    if (proximo) {
+                        e.preventDefault();
+                        proximo.focus();
+                    }
                 }
-                if (e.key === 'ArrowDown' && proximo) {
+
+                // SETA PARA CIMA
+                if (e.key === 'ArrowUp') {
                     e.preventDefault();
-                    proximo.focus();
+                    if (anterior) anterior.focus();
+                }
+
+                // SETA PARA BAIXO
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (proximo) proximo.focus();
                 }
             });
         }

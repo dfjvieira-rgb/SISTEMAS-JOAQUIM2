@@ -8,10 +8,11 @@
     <style>
         :root {
             --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
-            --paper-color: #ffffff; --text-color: #1e293b; --line-color: #d1d5db;
+            --paper-color: #ffffff; --text-color: #000000; --line-color: #d1d5db;
             --mentoria: #a855f7; --sidebar-w: 240px;
         }
-        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
+        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #ffffff; --text-color: #000000; --line-color: #334155; }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -26,7 +27,7 @@
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
 
-        /* NOVA TOOLBAR DE LIBERDADE */
+        /* TOOLBAR DE LIBERDADE CORRIGIDA */
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
         .btn-lib:hover { background: #f8fafc; color: var(--primary); }
@@ -36,33 +37,31 @@
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #mobile-hub.active .fab-sub { display: flex; }
-        
-        body.pdf-aberto #mobile-hub { display: none !important; }
-        body.digitando #mobile-hub { opacity: 0.1; pointer-events: none; }
 
         @media (max-width: 768px) {
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
             .editor-container { padding: 5px; width: 100vw; }
-            #pdf-split-view.active { position: fixed; inset: 0; width: 100%; z-index: 100000; display: block; }
+        }
+
+        /* ESTILO DA LINHA - FOCO EM NITIDEZ ABNT */
+        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; background: white; }
+        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: #f8fafc; }
+        .linha-folha { 
+            flex: 1; border: none; outline: none; background: transparent !important; 
+            padding: 0 10px; font-size: 19px !important; font-family: 'Courier New', monospace !important; 
+            color: #000000 !important; font-weight: 700 !important; width: 100%; 
         }
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
         #pdf-split-view.active { display: block; }
 
-        /* REGRAS DE IMPRESSÃO - LIMPANDO O PDF */
         @media print {
             header, .sidebar, #mobile-hub, .toolbar-liberdade, .modal, #pdf-split-view { display: none !important; }
-            body { background: white !important; }
             .editor-container { padding: 0 !important; background: white !important; overflow: visible !important; }
             .paper { box-shadow: none !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
-            #identificador-peca { border-bottom: 2px solid #000 !important; }
         }
 
-        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
-        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); }
-        .linha-folha { flex: 1; border: none; outline: none; background: transparent !important; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); width: 100%; }
-        
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
         .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
@@ -72,10 +71,8 @@
 
 <header>
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
-    <div style="display:flex; gap:10px;">
-        <div id="sync-indicator" style="color:var(--gold); font-size:12px; display:flex; align-items:center; gap:5px;">
-            <i class="fas fa-cloud"></i> <span id="sync-text">SYNC ON</span>
-        </div>
+    <div id="sync-indicator" style="color:var(--gold); font-size:12px; display:flex; align-items:center; gap:5px;">
+        <i class="fas fa-cloud"></i> <span id="sync-text">SYNC ON</span>
     </div>
 </header>
 
@@ -99,7 +96,7 @@
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Apagar</button>
                 <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
-                <button class="btn-lib" style="color:var(--mentoria)" onclick="window.open('historico.html')"><i class="fas fa-history"></i> Histórico</button>
+                <button class="btn-lib" style="color:var(--mentoria)" onclick="window.abrirMentoria()"><i class="fas fa-history"></i> Histórico</button>
             </div>
 
             <div id="folha-total"></div>
@@ -143,7 +140,6 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
-    // --- FUNÇÃO LIMPAR (LIBERDADE) ---
     window.limparFolha = () => {
         if(confirm("Deseja apagar sua resposta localmente?")) {
             document.querySelectorAll('.linha-folha').forEach(i => i.value = "");
@@ -156,7 +152,6 @@
         if (dna) {
             const analise = RadarEngine.analisar(dna);
             RadarEngine.renderizar(analise);
-            // Atualiza o texto do identificador com o nome da peça detectada
             document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
         }
     };
@@ -165,13 +160,22 @@
         const syncText = document.getElementById('sync-text');
         syncText.innerText = "SYNCING...";
         try {
-            // Chama a engine do salvar.js que agora cuida do histórico e do PDF
             await engineSaveElite(db, window.activeEx);
             syncText.innerText = "SAVED";
             setTimeout(() => syncText.innerText = "SYNC ON", 2000);
         } catch(e) { 
             syncText.innerText = "OFFLINE"; 
             console.error(e);
+        }
+    };
+
+    window.abrirMentoria = () => {
+        if (window.innerWidth < 768) {
+            window.open('mentoria.html', '_blank');
+        } else {
+            const largura = 500;
+            const esquerda = window.screen.width - largura;
+            window.open('mentoria.html', 'MentoriaElite', `width=${largura},height=${window.screen.height},left=${esquerda},top=0`);
         }
     };
 
@@ -242,12 +246,9 @@
         });
     };
 
-    window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
-
     window.onload = () => {
         FolhaEngine.montar('folha-total', 85);
         setTimeout(window.forcarRadar, 1500); 
-        
         setInterval(window.dispararSalvar, 60000);
 
         setTimeout(() => {

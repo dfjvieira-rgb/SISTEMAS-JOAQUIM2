@@ -3,76 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA ELITE 2026</title>
+    <title>MENTORIA ELITE 2026 | CENTRAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #020617; --gold: #fbbf24; --card-bg: #1e293b; --text: #f8fafc; --success: #16a34a; --purple: #5b21b6; --danger: #dc2626; --blue: #3b82f6; }
+        :root {
+            --primary: #020617; --gold: #fbbf24; --accent: #a855f7;
+            --card-bg: #1e293b; --text: #f8fafc; --success: #16a34a; --purple: #5b21b6; --danger: #dc2626; --blue: #3b82f6;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: var(--text); padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--gold); padding-bottom: 10px; }
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .panel { background: var(--card-bg); border-radius: 10px; border: 1px solid #334155; overflow: hidden; }
-        .panel-header { padding: 10px; background: rgba(255,255,255,0.05); font-size: 0.75rem; font-weight: 800; text-align: center; color: var(--gold); }
-        .panel-body { padding: 12px; }
-        .card { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; position: relative; }
-        .btn-save { width: 100%; padding: 10px; border: none; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; margin-top: 5px; }
-        input, textarea { width: 100%; background: #0f172a; border: 1px solid #334155; color: white; padding: 8px; border-radius: 6px; margin-bottom: 5px; }
-        .actions i { cursor: pointer; margin-left: 12px; transition: 0.2s; }
-        @media (max-width: 800px) { .dashboard { grid-template-columns: 1fr; } }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid var(--gold); padding-bottom: 15px; }
+        .logo { font-size: 1.5rem; font-weight: 900; color: var(--gold); }
+        .btn-voltar { padding: 10px 20px; background: var(--card-bg); border: 1px solid var(--gold); color: var(--gold); border-radius: 8px; cursor: pointer; text-decoration: none; font-weight: bold; font-size: 0.8rem; }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .panel { background: var(--card-bg); border-radius: 12px; border: 1px solid #334155; overflow: hidden; margin-bottom: 10px; border-top: 4px solid var(--gold); }
+        .panel-header { padding: 12px; background: rgba(255,255,255,0.05); font-size: 0.8rem; font-weight: 800; text-align: center; color: var(--gold); }
+        .panel-body { padding: 15px; }
+        .card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; position: relative; }
+        .card-pdf { border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .actions i { cursor: pointer; font-size: 1.1rem; margin-left: 15px; transition: 0.2s; }
+        input, textarea { width: 100%; border: 1px solid #334155; background: rgba(0,0,0,0.2); color: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .btn-save { width: 100%; padding: 12px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; }
+        .hidden-content { display: none; margin-top: 10px; padding: 10px; background: rgba(22, 163, 74, 0.2); border-radius: 6px; color: #4ade80; }
+        @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
         #print-area { display: none; }
-        @media print { body * { display: none !important; } #print-area { display: block !important; color: black; } .ln { display: flex; border-bottom: 1px solid #ddd; } .num { width: 30px; font-size: 9pt; color: gray; } }
+        @media print { body * { display: none !important; } #print-area { display: block !important; color: black; } .ln { display: flex; border-bottom: 1px solid #ddd; } .num { width: 30px; font-size: 8pt; color: gray; } }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight:900; color:var(--gold);">MENTORIA ELITE 2026</div>
-    <a href="index.html" style="color:var(--gold); text-decoration:none; font-weight:bold;"><i class="fas fa-arrow-left"></i> VOLTAR</a>
+    <div class="logo"><i class="fas fa-brain"></i> MENTORIA ELITE</div>
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR À FOLHA</a>
 </header>
 
 <main class="dashboard">
-    <section class="panel" style="grid-column: span 2; border-top: 4px solid var(--gold);">
-        <div class="panel-header">HISTÓRICO DE PRODUÇÃO</div>
-        <div class="panel-body" id="feed-estudos" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:10px;"></div>
+    <section class="panel" style="grid-column: span 2;">
+        <div class="panel-header">HISTÓRICO DE PEÇAS ESCRITAS (FOLHA + PROVA)</div>
+        <div class="panel-body" id="feed-estudos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;"></div>
     </section>
 
-    <section class="panel" style="border-top: 4px solid var(--danger);">
+    <section class="panel" style="border-top-color: var(--danger);">
         <div class="panel-header">INTELIGÊNCIA: NÃO CONFUNDA</div>
         <div class="panel-body">
             <input id="nc-t" placeholder="Conceito A vs B">
-            <textarea id="nc-c" placeholder="A diferença crucial..."></textarea>
-            <button class="btn-save" style="background:var(--danger);" onclick="salvar('nc')">GRAVAR</button>
-            <div id="feed-nc" style="margin-top:10px;"></div>
+            <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
+            <button class="btn-save" style="background: var(--danger);" onclick="salvar('nc')">Gravar Alerta</button>
+            <div id="feed-nc"></div>
         </div>
     </section>
 
-    <section class="panel" style="border-top: 4px solid var(--purple);">
-        <div class="panel-header">QUAL A PEÇA?</div>
+    <section class="panel" style="border-top-color: var(--purple);">
+        <div class="panel-header">QUAL É A PEÇA?</div>
         <div class="panel-body">
-            <textarea id="peca-t" placeholder="Cenário do problema"></textarea>
+            <textarea id="peca-t" placeholder="Fatos identificadores..."></textarea>
             <input id="peca-c" placeholder="Resposta">
-            <button class="btn-save" style="background:var(--purple);" onclick="salvar('peca')">GERAR FLASHCARD</button>
-            <div id="feed-peca" style="margin-top:10px;"></div>
-        </div>
-    </section>
-
-    <section class="panel" style="border-top: 4px solid var(--success);">
-        <div class="panel-header">PRELIMINARES</div>
-        <div class="panel-body">
-            <input id="pre-t" placeholder="Título">
-            <textarea id="pre-c" placeholder="Fundamentação"></textarea>
-            <button class="btn-save" style="background:var(--success);" onclick="salvar('pre')">SALVAR</button>
-            <div id="feed-pre" style="margin-top:10px;"></div>
-        </div>
-    </section>
-
-    <section class="panel" style="border-top: 4px solid var(--blue);">
-        <div class="panel-header">TESÁRIO DE MÉRITO</div>
-        <div class="panel-body">
-            <input id="tese-t" placeholder="Tema">
-            <textarea id="tese-c" placeholder="Estrutura FFP"></textarea>
-            <button class="btn-save" style="background:var(--blue);" onclick="salvar('tese')">SALVAR</button>
-            <div id="feed-tese" style="margin-top:10px;"></div>
+            <button class="btn-save" style="background: var(--purple);" onclick="salvar('peca')">Gerar Flashcard</button>
+            <div id="feed-peca"></div>
         </div>
     </section>
 </main>
@@ -81,7 +68,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -91,58 +78,61 @@
     };
     const app = initializeApp(config);
     const db = getDatabase(app);
-    const paths = { nc: 'v13_nc', peca: 'v13_peca', pre: 'v13_pre', tese: 'v13_tese', estudos: 'estudos' };
+    const paths = { nc: 'v13_nc', peca: 'v13_peca', estudos: 'estudos' };
 
     window.salvar = (type) => {
         const t = document.getElementById(`${type}-t`).value;
         const c = document.getElementById(`${type}-c`).value;
         if(t && c) push(ref(db, paths[type]), { t, c, ts: serverTimestamp() }).then(() => {
-            document.getElementById(`${type}-t`).value = ""; document.getElementById(`${type}-c`).value = "";
+            document.getElementById(`${type}-t`).value = ''; document.getElementById(`${type}-c`).value = '';
         });
     };
 
-    window.excluir = (path, id) => { if(confirm("Excluir?")) remove(ref(db, `${paths[path] || path}/${id}`)); };
+    window.excluir = (p, id) => { if(confirm("Remover?")) remove(ref(db, `${paths[p] || p}/${id}`)); };
 
-    // Função global para imprimir sem quebrar o HTML
-    window.localImprimir = (id) => {
-        onValue(ref(db, 'estudos/' + id), (snap) => {
-            const item = snap.val();
+    window.imprimirFolha = (id) => {
+        get(ref(db, 'estudos/' + id)).then(snap => {
+            const data = snap.val();
             const area = document.getElementById('print-area');
-            area.innerHTML = `<h2 style="text-align:center">${item.pecaNome}</h2><hr>`;
-            item.linhas.forEach((l, i) => { area.innerHTML += `<div class="ln"><div class="num">${i+1}</div><div>${l || ''}</div></div>`; });
+            area.innerHTML = `<h2>${data.pecaNome} - Exame ${data.exame}</h2><hr>`;
+            data.textoEscrito.forEach((l, i) => {
+                area.innerHTML += `<div class="ln"><div class="num">${i+1}</div><div>${l}</div></div>`;
+            });
             window.print();
-        }, { onlyOnce: true });
+        });
     };
 
     onValue(ref(db), (snap) => {
         const data = snap.val() || {};
         
-        // Render Produção
+        // Render Estudos
         const fEstudos = document.getElementById('feed-estudos');
         fEstudos.innerHTML = "";
         const estudos = data.estudos || {};
         Object.keys(estudos).reverse().forEach(id => {
             const it = estudos[id];
-            fEstudos.innerHTML += `<div class="card" style="border-left:5px solid var(--gold)">
-                <div><strong>${it.pecaNome}</strong><br><small>Exame ${it.exame}</small></div>
-                <div class="actions" style="margin-top:10px">
-                    <i class="fas fa-print" style="color:var(--gold)" onclick="localImprimir('${id}')"></i>
-                    <i class="fas fa-file-pdf" style="color:white" onclick="window.open('${it.arquivo}','_blank')"></i>
-                    <i class="fas fa-trash" style="color:var(--danger)" onclick="excluir('estudos','${id}')"></i>
-                </div>
-            </div>`;
+            fEstudos.innerHTML += `
+                <div class="card card-pdf">
+                    <div><strong>${it.pecaNome}</strong><br><small>Exame ${it.exame} - ${it.dataHumanizada}</small></div>
+                    <div class="actions">
+                        <i class="fas fa-print" style="color:var(--gold)" onclick="imprimirFolha('${id}')" title="Imprimir Sua Folha"></i>
+                        <i class="fas fa-file-pdf" style="color:white" onclick="window.open('${it.linkProva}','_blank')" title="Ver PDF da Prova"></i>
+                        <i class="fas fa-trash-alt" style="color:var(--danger)" onclick="excluir('estudos','${id}')"></i>
+                    </div>
+                </div>`;
         });
 
-        // Render Outros
-        ['nc', 'peca', 'pre', 'tese'].forEach(type => {
-            const f = document.getElementById(`feed-${type}`);
-            f.innerHTML = "";
+        // Render Inteligência (NC e Peca)
+        ['nc', 'peca'].forEach(type => {
+            const feed = document.getElementById(`feed-${type}`);
+            feed.innerHTML = "";
             const items = data[paths[type]] || {};
             Object.keys(items).reverse().forEach(id => {
-                const it = items[id];
-                f.innerHTML += `<div class="card">
-                    <i class="fas fa-times" style="position:absolute;right:8px;top:8px;font-size:0.6rem;cursor:pointer" onclick="excluir('${type}','${id}')"></i>
-                    <strong>${it.t}</strong><p style="font-size:0.8rem;opacity:0.8">${it.c}</p>
+                const item = items[id];
+                feed.innerHTML += `<div class="card">
+                    <i class="fas fa-times" style="position:absolute; right:10px; top:10px; cursor:pointer" onclick="excluir('${type}','${id}')"></i>
+                    <strong>${item.t}</strong>
+                    ${type==='peca' ? `<button onclick="this.nextElementSibling.style.display='block'" class="btn-save" style="background:var(--gold); color:black; margin-top:5px;">Ver Gabarito</button><div class="hidden-content">${item.c}</div>` : `<p>${item.c}</p>`}
                 </div>`;
             });
         });

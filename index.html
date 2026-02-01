@@ -6,33 +6,38 @@
     <title>JOAQUIM ELITE 2026 | ENGINE A4</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #020617; --gold: #fbbf24; --bg: #0d1117; --sidebar: #161b22; }
+        :root { --primary: #020617; --gold: #fbbf24; --sidebar: #0f172a; --bg: #020617; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; height: 100vh; overflow: hidden; }
-        
-        /* Barra Lateral Fiel à Imagem */
-        .sidebar { width: 65px; background: var(--sidebar); border-right: 1px solid #30363d; display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 12px; }
-        .radar-box { width: 50px; height: 50px; background: black; border: 2px solid var(--gold); border-radius: 6px; color: var(--gold); font-size: 9px; font-weight: 900; text-align: center; display: flex; flex-direction: column; justify-content: center; line-height: 1; }
-        .btn-side { width: 45px; height: 45px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; transition: 0.2s; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; color: white; }
 
-        .main { flex: 1; display: flex; flex-direction: column; }
-        header { height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); background: var(--bg); }
+        /* Barra Lateral Fiel à Imagem */
+        .sidebar { width: 65px; background: var(--sidebar); border-right: 1px solid #334155; display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 10px; z-index: 100; }
+        .radar-box { width: 52px; height: 52px; background: black; border: 2px solid var(--gold); border-radius: 6px; color: var(--gold); font-size: 8px; font-weight: 900; text-align: center; display: flex; flex-direction: column; justify-content: center; line-height: 1; margin-bottom: 5px; }
+        .btn-side { width: 45px; height: 45px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; transition: 0.2s; }
         
-        .editor-container { flex: 1; overflow-y: auto; padding: 30px; display: flex; justify-content: center; }
-        .paper { background: #1e293b; width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .peca-header { background: white; color: #16a34a; text-align: center; padding: 20px; font-weight: 900; font-size: 1.6rem; text-transform: uppercase; border-bottom: 2px solid var(--gold); }
+        /* Área Principal */
+        .main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        header { height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); background: var(--bg); }
+        .editor { flex: 1; overflow-y: auto; padding: 40px 20px; display: flex; justify-content: center; }
+        
+        .paper { background: #1e293b; width: 100%; max-width: 850px; box-shadow: 0 0 40px rgba(0,0,0,0.6); position: relative; }
+        .peca-header { background: white; color: #16a34a; text-align: center; padding: 15px; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; border-bottom: 2px solid var(--gold); }
         
         .linha-wrapper { display: flex; border-bottom: 1px solid #334155; height: 35px; }
-        .linha-num { width: 45px; color: #64748b; font-size: 11px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #334155; }
-        .linha-input { flex: 1; background: transparent; border: none; color: white; padding: 0 15px; font-family: 'Courier New', monospace; font-size: 18px; outline: none; }
+        .linha-num { width: 45px; color: #64748b; font-size: 11px; display: flex; align-items: center; justify-content: center; border-right: 1px solid #334155; background: rgba(0,0,0,0.2); }
+        .linha-input { flex: 1; background: transparent; border: none; color: white; padding: 0 15px; font-family: 'Courier New', monospace; font-size: 18px; outline: none; width: 100%; }
+
+        /* Botões de Canto */
+        .top-actions { position: absolute; right: 20px; top: 10px; display: flex; gap: 10px; }
+        .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
     <aside class="sidebar">
-        <div class="radar-box">RADAR<br><span id="radar-status">SCAN</span></div>
+        <div class="radar-box">RADAR<br><span id="radar-label" style="font-size:7px">AUTO</span></div>
         <button class="btn-side" style="background: #f59e0b;"><i class="fas fa-bullseye"></i></button>
-        <button class="btn-side" style="background: #22c55e;" onclick="salvarFolhaElite()"><i class="fas fa-save"></i></button>
+        <button class="btn-side" style="background: #3b82f6;" onclick="salvarFolha()"><i class="fas fa-save"></i></button>
         <button class="btn-side" style="background: #f59e0b;"><i class="fas fa-scroll"></i></button>
         <button class="btn-side" style="background: #3b82f6;"><i class="fas fa-gavel"></i></button>
         <button class="btn-side" style="background: #a855f7;" onclick="location.href='mentoria.html'"><i class="fas fa-robot"></i></button>
@@ -40,19 +45,23 @@
             <button class="btn-side" style="background: #ef4444;">P</button>
             <button class="btn-side" style="background: #eab308; color: black;">G</button>
             <button class="btn-side" style="background: #22c55e;">V</button>
+            <button class="btn-side" style="background: #3b82f6;" onclick="window.print()"><i class="fas fa-print"></i></button>
         </div>
     </aside>
 
     <div class="main">
         <header>
-            <div style="font-weight: 900; color: var(--gold);">JOAQUIM <span style="color:white">ELITE 2026</span></div>
-            <div id="status" style="font-size: 0.7rem; color: var(--gold);">PRONTO PARA PRODUÇÃO</div>
+            <div style="font-weight: 900; color: var(--gold); font-size: 1.2rem;">JOAQUIM <span style="color:white">ELITE 2026</span></div>
+            <div class="top-actions">
+                <button class="btn-circle" style="background: #334155;"><i class="fas fa-moon"></i></button>
+                <button class="btn-circle" style="background: #ef4444;" onclick="location.reload()"><i class="fas fa-trash"></i></button>
+            </div>
         </header>
 
-        <section class="editor-container">
+        <section class="editor">
             <div class="paper">
-                <div class="peca-header" id="peca-nome">PEÇA EM ANÁLISE</div>
-                <div id="grid"></div>
+                <div class="peca-header" id="peca-titulo">CONTESTAÇÃO TRABALHISTA</div>
+                <div id="grid-linhas"></div>
             </div>
         </section>
     </div>
@@ -70,35 +79,28 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Gerar Linhas
-    const grid = document.getElementById('grid');
+    const grid = document.getElementById('grid-linhas');
     for(let i=1; i<=150; i++) {
         grid.innerHTML += `<div class="linha-wrapper"><div class="linha-num">${i}</div><input class="linha-input" id="L${i}" spellcheck="false" autocomplete="off"></div>`;
     }
 
-    // Radar Automático
-    document.addEventListener('input', () => {
-        const topo = document.getElementById('L1').value.toUpperCase();
-        if(topo.includes("RECLAMA")) document.getElementById('peca-nome').innerText = "RECLAMATÓRIA TRABALHISTA";
-        if(topo.includes("CONTESTA")) document.getElementById('peca-nome').innerText = "CONTESTAÇÃO";
-        if(topo.includes("ORDINARIO")) document.getElementById('peca-nome').innerText = "RECURSO ORDINÁRIO";
-    });
-
-    window.salvarFolhaElite = () => {
-        const linhas = Array.from(document.querySelectorAll('.linha-input')).map(input => input.value);
-        const nomePeca = document.getElementById('peca-nome').innerText;
-        const idSessao = Date.now();
+    window.salvarFolha = () => {
+        const titulo = document.getElementById('peca-titulo').innerText;
+        const textoArr = Array.from(document.querySelectorAll('.linha-input')).map(input => input.value);
         const exame = localStorage.getItem('activeEx') || "44";
+        const idSessao = Date.now();
 
-        // SALVA O ARRAY COMPLETO NO NÓ 'estudos_v2'
-        set(ref(db, 'estudos_v2/' + idSessao), {
-            nome: nomePeca,
-            conteudo: linhas,
+        // O SEGREDO: Salvar o array de linhas e o link no mesmo objeto
+        set(ref(db, 'producao_elite/' + idSessao), {
+            peca: titulo,
+            linhas: textoArr,
             exame: exame,
             data: new Date().toLocaleString(),
-            pdfLink: `https://oab.fgv.br/provas/exame${exame}/peca_pratica.pdf`,
-            ts: serverTimestamp()
-        }).then(() => alert("✅ FOLHA SALVA NO HISTÓRICO ELITE!"));
+            ts: serverTimestamp(),
+            linkPDF: `https://oab.fgv.br/provas/exame${exame}/peca_pratica.pdf`
+        }).then(() => {
+            alert("☁️ FOLHA BLINDADA SALVA NO HISTÓRICO!");
+        });
     };
 </script>
 </body>

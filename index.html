@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - IDENTIFICADOR FIX</title>
+    <title>JOAQUIM ELITE 2026 - MODULAR RADAR</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -12,38 +12,20 @@
             --header-h: 55px; --footer-h-pc: 90px; --footer-h-mob: 75px;
         }
         body.light-mode { --primary: #f8fafc; --bg-paper: #cbd5e1; --gold: #f59e0b; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* HEADER [cite: 2026-01-30] */
         header { background: var(--primary); height: var(--header-h); padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 1000; }
-        .radar-box { border: 1px solid var(--gold); color: var(--gold); padding: 3px 8px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; text-transform: uppercase; }
+        .radar-box { border: 1px solid var(--gold); color: var(--gold); padding: 3px 8px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; text-transform: uppercase; transition: 0.3s; }
 
-        /* EDITOR E FOLHA [cite: 2026-01-30] */
         main { flex: 1; overflow-y: auto; background: var(--bg-paper); display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
         .paper { background: white; width: 100%; max-width: 850px; min-height: 100%; box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; }
         
-        /* IDENTIFICADOR EM VERMELHO (ESTILO DA FOTO) [cite: 2026-01-30] */
-        #identificador-peca { 
-            padding: 25px 15px; text-align: center; color: #ef4444; 
-            font-weight: 900; font-size: 1.4rem; text-transform: uppercase; 
-            border-bottom: 3px double #f1f5f9; min-height: 80px;
-        }
+        #identificador-peca { padding: 25px 15px; text-align: center; color: #ef4444; font-weight: 900; font-size: 1.4rem; text-transform: uppercase; border-bottom: 3px double #f1f5f9; min-height: 80px; }
 
-        /* TOOLBAR HÍBRIDA [cite: 2021-01-20, 2026-01-30] */
-        .toolbar { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: #1e293b; display: grid; grid-template-columns: repeat(6, 1fr); 
-            border-top: 3px solid var(--gold); z-index: 2000;
-        }
-        .btn-tool { 
-            background: transparent; border: none; color: white;
-            display: flex; flex-direction: column; align-items: center; 
-            justify-content: center; cursor: pointer; transition: 0.2s;
-        }
+        .toolbar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; display: grid; grid-template-columns: repeat(6, 1fr); border-top: 3px solid var(--gold); z-index: 2000; }
+        .btn-tool { background: transparent; border: none; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         .btn-tool span { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; }
-        .btn-tool:active { background: var(--gold); color: black; }
 
         @media (max-width: 600px) {
             .toolbar { height: var(--footer-h-mob); }
@@ -53,29 +35,17 @@
         }
         @media (min-width: 601px) {
             .toolbar { height: var(--footer-h-pc); }
-            .btn-tool i { font-size: 1.1rem; }
             .paper { margin-bottom: var(--footer-h-pc); }
         }
 
-        /* ESTILO DA FOLHA [cite: 2026-01-30] */
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
         .linha-num { width: 40px; font-size: 0.65rem; color: #94a3b8; text-align: center; padding-top: 12px; border-right: 1px solid var(--line-color); background: #f8fafc; flex-shrink: 0; }
-        .linha-folha { flex: 1; height: 38px; border: none; outline: none; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; width: 100%; color: var(--text-color); }
+        .linha-folha { flex: 1; height: 38px; border: none; outline: none; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; width: 100%; }
 
-        /* MODAL COM ROLAGEM DESTRAVADA [cite: 2026-01-20, 2026-01-30] */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; align-items: center; justify-content: center; padding: 15px; }
-        .modal-body { 
-            background: white; width: 100%; max-width: 450px; 
-            height: 75vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; 
-        }
-        .modal-scroll { 
-            flex: 1; overflow-y: auto; padding: 15px; display: grid; 
-            grid-template-columns: 1fr; gap: 8px; 
-            -webkit-overflow-scrolling: touch; 
-        }
+        .modal-body { background: white; width: 100%; max-width: 450px; height: 75vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-scroll { flex: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: 1fr; gap: 8px; -webkit-overflow-scrolling: touch; }
         .opt-btn { background: #f1f5f9; padding: 18px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #1e293b; border: 1px solid #cbd5e1; }
-
-        @media print { .toolbar, header, .modal { display: none !important; } .paper { margin: 0; box-shadow: none; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -103,7 +73,6 @@
     <button class="btn-tool" onclick="alert('Injetando Conteúdo...')" style="color:#3b82f6;"><i class="fas fa-gavel"></i><span>Justiça</span></button>
     <button class="btn-tool" onclick="abrirMentoria()" style="color:#a855f7;"><i class="fas fa-robot"></i><span>Mentoria</span></button>
     <button class="btn-tool" onclick="window.print()" style="color:#10b981;"><i class="fas fa-print"></i><span>Imprimir</span></button>
-    
     <button class="btn-tool" onclick="pdf('p')" style="color:#f97316;"><i class="fas fa-file-pdf"></i><span>Peça PDF</span></button>
     <button class="btn-tool" onclick="pdf('g')" style="color:#eab308;"><i class="fas fa-check-circle"></i><span>Gabarito</span></button>
     <button class="btn-tool" onclick="pdf('v')" style="color:#22c55e;"><i class="fas fa-book"></i><span>Vade</span></button>
@@ -124,6 +93,7 @@
     import { db } from './firebase-config.js';
     import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
+    import { RadarEngine } from './radar-engine.js';
     import { pecas } from './estruturas.js';
 
     let activeEx = localStorage.getItem('activeEx') || "44";
@@ -133,8 +103,17 @@
         FolhaEngine.montar('folha-total', 85);
         document.querySelectorAll('.linha-folha').forEach((input, index) => {
             input.onfocus = () => { ultimaLinhaFocada = index + 1; };
+            // Aciona o Radar a cada mudança de texto [cite: 2026-01-30]
+            input.oninput = () => {
+                const linhas = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
+                const detectado = RadarEngine.analisar(linhas);
+                if(detectado !== "IDENTIFICANDO PEÇA...") {
+                    document.getElementById('identificador-peca').innerText = detectado;
+                }
+            };
         });
         carregarDados();
+        RadarEngine.atualizarStatus(true);
     };
 
     window.carregarDados = () => {
@@ -154,22 +133,17 @@
         set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() }).then(() => alert("☁️ Sincronizado!"));
     };
 
-    // FIX IDENTIFICADOR: Agora ele atualiza o texto na folha [cite: 2026-01-30]
     window.abrirModalPecas = () => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-title').innerText = "ESTRUTURAS ANALISADAS";
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div');
-            b.className = 'opt-btn';
-            b.innerText = k;
+            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = k;
             b.onclick = () => {
-                // Injeta o conteúdo da peça
                 pecas[k].split('\n').forEach((t, i) => {
                     const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
                     if(el) el.value = t.substring(0, 85);
                 });
-                // ATUALIZA O IDENTIFICADOR NA FOLHA [cite: 2026-01-30]
                 document.getElementById('identificador-peca').innerText = k;
                 fecharModal();
             };

@@ -34,19 +34,16 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
-            // --- REGRA DE OURO: QUEBRA AUTOMÁTICA NA MARGEM ---
+            // --- QUEBRA AUTOMÁTICA NA MARGEM (MANTIDA) ---
             input.addEventListener('input', (e) => {
                 if (e.inputType === 'deleteContentBackward') return;
-
                 if (input.value.length >= FolhaEngine.LIMITE_OAB) {
                     const val = input.value;
                     const lastSpc = val.lastIndexOf(" ");
-                    
                     if (lastSpc > 0) {
                         const stays = val.substring(0, lastSpc);
                         const jumps = val.substring(lastSpc).trim();
                         const next = document.getElementById(`L${i + 1}`);
-                        
                         if (next) {
                             input.value = stays;
                             next.value = (jumps + " " + next.value).trim();
@@ -56,45 +53,48 @@ export const FolhaEngine = {
                 }
             });
 
-            // --- INTELIGÊNCIA DE NAVEGAÇÃO (ENTER, DELETE, SETAS, BACKSPACE) ---
+            // --- INTELIGÊNCIA DE NAVEGAÇÃO SUPERIOR ---
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: Pula para a linha de baixo
+                // ENTER: Próxima linha
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     if (proximo) proximo.focus();
                 }
 
-                // BACKSPACE: Se linha estiver vazia, volta para a anterior
+                // BACKSPACE: Se vazio, volta para anterior e foca no fim do texto
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
                         anterior.focus();
+                        const len = anterior.value.length;
+                        anterior.setSelectionRange(len, len);
                     }
                 }
 
-                // DELETE: Se estiver no fim ou linha vazia, foca na próxima linha para facilitar limpeza
+                // DELETE: "EXCLUIR LINHA" (Puxa tudo de baixo para cima)
                 if (e.key === 'Delete' && input.value === '') {
-                    if (proximo) {
-                        e.preventDefault();
-                        proximo.focus();
+                    e.preventDefault();
+                    // Loop para deslocar conteúdo de baixo para cima
+                    for (let j = idx; j < 150; j++) {
+                        const atual = document.getElementById(`L${j}`);
+                        const proximaLinha = document.getElementById(`L${j + 1}`);
+                        if (atual && proximaLinha) {
+                            atual.value = proximaLinha.value;
+                        }
                     }
+                    // Limpa a última linha absoluta
+                    const ultima = document.getElementById('L150');
+                    if (ultima) ultima.value = "";
+                    // Mantém o foco na linha atual, agora com o novo texto
                 }
 
-                // SETA PARA CIMA
-                if (e.key === 'ArrowUp') {
-                    e.preventDefault();
-                    if (anterior) anterior.focus();
-                }
-
-                // SETA PARA BAIXO
-                if (e.key === 'ArrowDown') {
-                    e.preventDefault();
-                    if (proximo) proximo.focus();
-                }
+                // SETAS
+                if (e.key === 'ArrowUp') { e.preventDefault(); if (anterior) anterior.focus(); }
+                if (e.key === 'ArrowDown') { e.preventDefault(); if (proximo) proximo.focus(); }
             });
         }
     },

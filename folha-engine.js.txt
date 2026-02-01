@@ -1,51 +1,36 @@
-// folha-engine.js - VERSÃO TURBO ELITE 2026
+// folha-engine.js - Motor de Renderização Elite
 export const FolhaEngine = {
-    montar: (containerId, limiteLinha) => {
+    montar: (containerId, limite) => {
         const container = document.getElementById(containerId);
         if (!container) return;
-        
         container.innerHTML = "";
+        
         for(let i=1; i<=180; i++) {
-            // Cabeçalhos de Seção
             if(i === 1 || i === 51) {
                 const h = document.createElement('div');
-                h.style.cssText = "background:#1e293b; color:#fbbf24; padding:8px; text-align:center; font-size:0.7rem; font-weight:bold; text-transform:uppercase; border-bottom: 1px solid #334155;";
+                h.style.cssText = "background:#1e293b; color:#fbbf24; padding:8px; text-align:center; font-size:0.7rem; font-weight:bold; text-transform:uppercase;";
                 h.innerText = i === 1 ? 'CADERNO DE RESPOSTAS - PEÇA' : 'CADERNO DE RESPOSTAS - QUESTÕES';
                 container.appendChild(h);
             }
-
             const row = document.createElement('div');
             row.className = 'linha-wrapper';
-            row.style.transition = "0.3s";
-            
-            // Renderização da Linha com Contador Invisível
             row.innerHTML = `
-                <div class="linha-num" title="Duplo clique para marcar revisão" 
+                <div class="linha-num" title="Duplo clique para revisão" 
                      ondblclick="this.parentElement.style.background = this.parentElement.style.background === 'rgba(251, 191, 36, 0.2)' ? 'transparent' : 'rgba(251, 191, 36, 0.2)'">
                     ${i}
                 </div>
-                <input class="linha-folha" id="L${i}" maxlength="${limiteLinha}" 
-                       spellcheck="false" autocomplete="off" 
-                       oninput="FolhaEngine.validarLimite(this)">
+                <input class="linha-folha" id="L${i}" maxlength="${limite}" spellcheck="false" autocomplete="off">
             `;
             container.appendChild(row);
-        }
-    },
 
-    // Lógica de alerta visual de limite
-    validarLimite: (input) => {
-        const charCount = input.value.length;
-        const wrapper = input.parentElement;
-        
-        if (charCount >= 80) {
-            input.style.color = "#f87171"; // Vermelho crítico
-            wrapper.style.borderBottom = "1px solid #f87171";
-        } else if (charCount >= 70) {
-            input.style.color = "#fbbf24"; // Alerta laranja/ouro
-            wrapper.style.borderBottom = "1px solid #fbbf24";
-        } else {
-            input.style.color = "var(--text-color)";
-            wrapper.style.borderBottom = "1px solid var(--line-color)";
+            // Adiciona evento de validação de cor dinamicamente
+            const input = row.querySelector('input');
+            input.addEventListener('input', () => {
+                const count = input.value.length;
+                if (count >= 80) input.style.color = "#f87171";
+                else if (count >= 70) input.style.color = "#fbbf24";
+                else input.style.color = "var(--text-color)";
+            });
         }
     }
 };

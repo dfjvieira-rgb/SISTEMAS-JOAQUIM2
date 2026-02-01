@@ -1,1 +1,21 @@
-folha-engine.js
+// folha-engine.js - O motor da sua folha FGV
+export const FolhaEngine = {
+    montar: (containerId, limiteLinha) => {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.innerHTML = "";
+        for(let i=1; i<=180; i++) {
+            if(i === 1 || i === 51) {
+                const h = document.createElement('div');
+                h.style.cssText = "background:#1e293b; color:#fbbf24; padding:8px; text-align:center; font-size:0.7rem; font-weight:bold; text-transform:uppercase;";
+                h.innerText = i === 1 ? 'CADERNO DE RESPOSTAS - PEÇA' : 'CADERNO DE RESPOSTAS - QUESTÕES';
+                container.appendChild(h);
+            }
+            const row = document.createElement('div');
+            row.className = 'linha-wrapper';
+            row.innerHTML = `<div class="linha-num">${i}</div><input class="linha-folha" id="L${i}" maxlength="${limiteLinha}" spellcheck="false" autocomplete="off">`;
+            container.appendChild(row);
+        }
+    }
+};

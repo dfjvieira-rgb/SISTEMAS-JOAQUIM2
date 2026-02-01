@@ -1,5 +1,5 @@
 export const FolhaEngine = {
-    LIMITE_OAB: 60, // Sua margem de segurança absoluta
+    LIMITE_OAB: 60, 
 
     montar: (containerId) => {
         const container = document.getElementById(containerId);
@@ -53,13 +53,13 @@ export const FolhaEngine = {
                 }
             });
 
-            // --- INTELIGÊNCIA DE NAVEGAÇÃO E EDIÇÃO (ENTER, DELETE, BACKSPACE) ---
+            // --- NAVEGAÇÃO E EDIÇÃO AVANÇADA ---
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: EMPURRA O TEXTO PARA BAIXO (ABRE ESPAÇO)
+                // ENTER: EMPURRA O TEXTO PARA BAIXO (SHIFT VERTICAL)
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const pos = input.selectionStart;
@@ -67,7 +67,6 @@ export const FolhaEngine = {
                     const fica = textoAtual.substring(0, pos);
                     const desce = textoAtual.substring(pos);
 
-                    // Desloca todas as linhas de baixo para abrir o buraco
                     for (let j = 150; j > idx + 1; j--) {
                         const linhaAlvo = document.getElementById(`L${j}`);
                         const linhaAcima = document.getElementById(`L${j - 1}`);
@@ -76,13 +75,13 @@ export const FolhaEngine = {
 
                     if (proximo) {
                         input.value = fica.trim();
-                        proximo.value = desce.trim();
+                        proximo.value = (desce.trim() + " " + proximo.value).trim();
                         proximo.focus();
                         proximo.setSelectionRange(0, 0);
                     }
                 }
 
-                // BACKSPACE: Se vazio, volta para anterior
+                // BACKSPACE: VOLTA PARA ANTERIOR SE VAZIO
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -94,13 +93,11 @@ export const FolhaEngine = {
 
                 // DELETE E CTRL+DELETE
                 if (e.key === 'Delete') {
-                    // CTRL+DELETE: Limpa a linha atual instantaneamente
-                    if (e.ctrlKey) {
+                    if (e.ctrlKey) { // CTRL+DEL: LIMPA LINHA
                         e.preventDefault();
                         input.value = "";
                     } 
-                    // DELETE SIMPLES EM LINHA VAZIA: PUXA O TEXTO DE BAIXO (FECHA ESPAÇO)
-                    else if (input.value === '') {
+                    else if (input.value === '') { // DEL EM LINHA VAZIA: PUXA TEXTO DE BAIXO
                         e.preventDefault();
                         for (let j = idx; j < 150; j++) {
                             const atual = document.getElementById(`L${j}`);
@@ -112,7 +109,6 @@ export const FolhaEngine = {
                     }
                 }
 
-                // SETAS
                 if (e.key === 'ArrowUp') { e.preventDefault(); if (anterior) anterior.focus(); }
                 if (e.key === 'ArrowDown') { e.preventDefault(); if (proximo) proximo.focus(); }
             });

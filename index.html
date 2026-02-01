@@ -138,7 +138,7 @@
         } catch(e) { syncText.innerText = "OFFLINE"; }
     };
 
-    // --- FINALIZAR PEÇA ---
+    // --- FINALIZAR PEÇA (SEM ALERTA CHATO) ---
     window.finalizarPeca = async () => {
         if(!confirm("Deseja finalizar a peça e salvar no histórico?")) return;
         isFinalizing = true;
@@ -146,13 +146,16 @@
         syncText.innerText = "FINALIZANDO...";
         try {
             await engineSaveElite(db, window.activeEx, { tipo: 'historico' });
-            syncText.innerText = "CONCLUÍDO ✅";
-            alert("✅ Sincronizado! Sua peça foi enviada para o histórico da mentoria.");
-            setTimeout(() => { isFinalizing = false; syncText.innerText = "SYNC ON"; }, 5000);
+            syncText.innerText = "HISTÓRICO SINCRONIZADO ✅";
+            // Notificação silenciosa por 5 segundos antes de resetar a trava
+            setTimeout(() => { 
+                isFinalizing = false; 
+                syncText.innerText = "SYNC ON"; 
+            }, 5000);
         } catch(e) {
             isFinalizing = false;
-            alert("Erro ao finalizar.");
-            syncText.innerText = "SYNC ON";
+            syncText.innerText = "ERRO AO SALVAR";
+            setTimeout(() => { syncText.innerText = "SYNC ON"; }, 3000);
         }
     };
 

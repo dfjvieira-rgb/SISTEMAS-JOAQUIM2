@@ -4,59 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JOAQUIM ELITE 2026 | FULL ENGINE</title>
-    <link rel="icon" href="data:,"> <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #020617; --gold: #fbbf24; --sidebar: #0f172a; --line: #334155; }
+        :root { --primary: #020617; --gold: #fbbf24; --sidebar: #161e2e; --line: #334155; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); display: flex; height: 100vh; overflow: hidden; color: white; }
         
-        /* SIDEBAR DE 12 BOTÕES */
-        .sidebar { width: 65px; background: var(--sidebar); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 8px; z-index: 100; overflow-y: auto; }
-        .radar-box { width: 52px; height: 52px; background: black; border: 2px solid var(--gold); border-radius: 6px; color: var(--gold); font-size: 8px; font-weight: 900; text-align: center; display: flex; flex-direction: column; justify-content: center; line-height: 1; margin-bottom: 5px; flex-shrink: 0; }
-        .btn-side { width: 45px; height: 45px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; transition: 0.2s; flex-shrink: 0; }
+        /* SIDEBAR IDENTIDADE ELITE - 12 BOTÕES */
+        .sidebar { width: 75px; background: var(--sidebar); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 10px; z-index: 100; overflow-y: auto; }
         
-        .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); background: #020617; }
+        .radar-box { width: 60px; height: 60px; background: black; border: 2px solid var(--gold); border-radius: 8px; color: #22c55e; font-size: 8px; font-weight: 900; text-align: center; display: flex; flex-direction: column; justify-content: center; line-height: 1.2; margin-bottom: 5px; text-transform: uppercase; flex-shrink: 0; }
         
-        /* CONTEÚDO E EXAMES (PERGAMINHO) */
-        .content-area { padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-        .exames-container { width: 100%; max-width: 850px; background: #0f172a; border: 1px solid var(--line); border-radius: 8px; padding: 20px; }
-        .exame-card { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 12px; border-radius: 0 6px 6px 0; }
+        .btn-side { width: 55px; height: 55px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; transition: 0.2s; flex-shrink: 0; }
+        
+        /* CORES ORIGINAIS RESTAURADAS */
+        .btn-target { background: #f59e0b; } /* 2. Alvo */
+        .btn-disk { background: #0ea5e9; }   /* 3. Disquete */
+        .btn-scroll { background: #334155; color: #f59e0b; } /* 4. Pergaminho */
+        .btn-gavel { background: #3b82f6; }   /* 5. Martelo */
+        .btn-robot { background: #a855f7; }   /* 6. Robô */
+        .btn-p { background: #f97316; }       /* 7. P */
+        .btn-g { background: #eab308; color: black; } /* 8. G */
+        .btn-v { background: #10b981; }       /* 9. V */
+        .btn-print { background: #10b981; }    /* 10. Print */
+        .btn-nav { background: #334155; }      /* 11 e 12. Setas */
 
-        /* FOLHA FGV */
-        .paper { background: #1e293b; width: 100%; max-width: 850px; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
-        .peca-header { background: white; color: #16a34a; text-align: center; padding: 15px; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; border-bottom: 2px solid var(--gold); }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        header { height: 60px; padding: 0 25px; display: flex; align-items: center; border-bottom: 2px solid var(--gold); background: #020617; }
+        
+        .editor-scroll { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+        
+        /* PERGAMINHO DE ESTRUTURAS */
+        .pergaminho-container { width: 100%; max-width: 900px; background: #0f172a; border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
+        .exame-header { color: var(--gold); font-weight: 900; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .exame-card { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 12px; }
+
+        /* FOLHA DE RESPOSTAS */
+        .paper { background: #1e293b; width: 100%; max-width: 900px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        .peca-header { background: white; color: #16a34a; text-align: center; padding: 20px; font-weight: 900; font-size: 1.8rem; text-transform: uppercase; border-bottom: 3px solid var(--gold); }
+        
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line); height: 32px; }
-        .linha-num { width: 40px; color: #64748b; font-size: 10px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); background: rgba(0,0,0,0.2); }
-        .linha-input { flex: 1; background: transparent; border: none; color: white; padding: 0 12px; font-family: 'Courier New', monospace; font-size: 17px; outline: none; width: 100%; }
+        .linha-num { width: 45px; color: #64748b; font-size: 11px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); background: rgba(0,0,0,0.3); }
+        .linha-input { flex: 1; background: transparent; border: none; color: white; padding: 0 15px; font-family: 'Courier New', monospace; font-size: 18px; outline: none; width: 100%; }
 
-        @media print { .sidebar, header, .exames-container { display: none !important; } .paper { width: 100%; background: white; } .linha-input { color: black; border-bottom: 1px solid #ccc; } }
+        @media print { .sidebar, header, .pergaminho-container { display: none !important; } .paper { width: 100%; background: white; box-shadow: none; } .linha-input { color: black !important; border-bottom: 1px solid #ccc; } .peca-header { border-bottom: 2px solid black !important; } }
     </style>
 </head>
 <body>
+
     <aside class="sidebar">
-        <div class="radar-box">RADAR<br><span id="radar-label" style="font-size:7px">AUTO</span></div>
+        <div class="radar-box">RADAR<br><span id="radar-label">AUTO</span></div>
         
-        <button id="btn-save" class="btn-side" style="background: #22c55e;" onclick="salvarGeral()" title="Salvar Treino"><i class="fas fa-save"></i></button>
-        <button class="btn-side" style="background: #a855f7;" onclick="location.href='mentoria.html'" title="Mentoria"><i class="fas fa-robot"></i></button>
-        <button class="btn-side" style="background: #3b82f6;" title="Teses Jurídicas"><i class="fas fa-gavel"></i></button>
-        <button class="btn-side" style="background: #f59e0b;" title="Preliminares"><i class="fas fa-shield-alt"></i></button>
-        <button class="btn-side" style="background: #06b6d4;" title="Pedidos"><i class="fas fa-list-check"></i></button>
-        <button class="btn-side" style="background: #64748b;" title="Exames OAB"><i class="fas fa-calendar-alt"></i></button>
+        <button class="btn-side btn-target" title="Escaner Ativo"><i class="fas fa-bullseye"></i></button>
         
-        <div style="flex: 1;"></div> <button class="btn-side" style="background: #ef4444; font-weight: 900;">P</button>
-        <button class="btn-side" style="background: #eab308; color: black; font-weight: 900;">G</button>
-        <button class="btn-side" style="background: #22c55e; font-weight: 900;">V</button>
-        <button class="btn-side" style="background: #475569;" onclick="window.print()"><i class="fas fa-print"></i></button>
-        <button class="btn-side" style="background: #1e293b;"><i class="fas fa-cog"></i></button>
+        <button id="btn-save" class="btn-side btn-disk" onclick="salvarGeral()" title="Salvar Treino"><i class="fas fa-save"></i></button>
+        
+        <button class="btn-side btn-scroll" title="Ver Estruturas"><i class="fas fa-scroll"></i></button>
+        
+        <button class="btn-side btn-gavel" title="Teses Jurídicas"><i class="fas fa-gavel"></i></button>
+        
+        <button class="btn-side btn-robot" onclick="location.href='mentoria.html'" title="Ir para Mentoria"><i class="fas fa-robot"></i></button>
+        
+        <div style="flex: 1;"></div>
+
+        <button class="btn-side btn-p" style="font-weight:900">P</button>
+        <button class="btn-side btn-g" style="font-weight:900">G</button>
+        <button class="btn-side btn-v" style="font-weight:900">V</button>
+        
+        <button class="btn-side btn-print" onclick="window.print()" title="Imprimir PDF"><i class="fas fa-print"></i></button>
+        
+        <button class="btn-side btn-nav"><i class="fas fa-chevron-up"></i></button>
+        <button class="btn-side btn-nav"><i class="fas fa-chevron-down"></i></button>
     </aside>
 
     <div class="main">
-        <header><div style="font-weight: 900; color: var(--gold);">JOAQUIM <span style="color:white">ELITE 2026</span></div></header>
-        
-        <div class="content-area">
-            <section class="exames-container">
-                <h3 style="color:var(--gold); margin-bottom:15px;"><i class="fas fa-scroll"></i> ESTRUTURAS TÉCNICAS DOS EXAMES</h3>
+        <header><div style="font-weight: 900; color: white; font-size: 1.3rem;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div></header>
+
+        <section class="editor-scroll">
+            <div class="pergaminho-container">
+                <div class="exame-header"><i class="fas fa-scroll"></i> ESTRUTURAS TÉCNICAS DOS EXAMES</div>
                 <div class="exame-card">
                     <strong>EXAME XXXV: RECLAMATÓRIA TRABALHISTA</strong>
                     <p style="font-size: 13px; color: #94a3b8; margin-top: 5px;">MÉRITO: Adicional de Periculosidade (Art. 193 CLT), Horas In Itinere e Danos Morais (Art. 223-G CLT).</p>
@@ -65,20 +92,25 @@
                     <strong>EXAME XXXVI: CONTESTAÇÃO</strong>
                     <p style="font-size: 13px; color: #94a3b8; margin-top: 5px;">PRELIMINARES: Inépcia da Inicial (Art. 330, CPC). MÉRITO: Justa Causa e Prescrição Bienal (Art. 7º, XXIX, CF).</p>
                 </div>
-            </section>
+            </div>
 
             <div class="paper">
                 <div class="peca-header" id="peca-titulo">RECLAMATÓRIA TRABALHISTA</div>
                 <div id="grid-linhas"></div>
             </div>
-        </div>
+        </section>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     
-    const config = { apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", authDomain: "masteroab-db5e1.firebaseapp.com", projectId: "masteroab-db5e1", databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" };
+    const config = { 
+        apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
+        authDomain: "masteroab-db5e1.firebaseapp.com", 
+        projectId: "masteroab-db5e1", 
+        databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" 
+    };
     const app = initializeApp(config);
     const db = getDatabase(app);
 
@@ -88,7 +120,7 @@
         grid.innerHTML += `<div class="linha-wrapper"><div class="linha-num">${i}</div><input class="linha-input" id="L${i}" autocomplete="off" spellcheck="false"></div>`;
     }
 
-    // ESCANER RADAR (Funciona na Linha 1)
+    // RADAR / ESCANER - IDENTIFICAÇÃO NA LINHA 1
     document.addEventListener('input', (e) => {
         if(e.target.id === 'L1') {
             const val = e.target.value.toUpperCase();
@@ -97,9 +129,11 @@
             if(val.includes("RECLAMA")) { tit.innerText = "RECLAMATÓRIA TRABALHISTA"; rad.innerText = "RT DETECT"; }
             else if(val.includes("CONTESTA")) { tit.innerText = "CONTESTAÇÃO"; rad.innerText = "CONT DETECT"; }
             else if(val.includes("ORDINARIO")) { tit.innerText = "RECURSO ORDINÁRIO"; rad.innerText = "RO DETECT"; }
+            else if(val.includes("AGRAVO")) { tit.innerText = "AGRAVO DE PETIÇÃO"; rad.innerText = "AP DETECT"; }
         }
     });
 
+    // INTELIGÊNCIA DE SALVAMENTO BLINDADA
     window.salvarGeral = () => {
         const btn = document.getElementById('btn-save');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';

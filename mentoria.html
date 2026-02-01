@@ -3,45 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA ELITE</title>
+    <title>MENTORIA ELITE 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1200px; margin: 0 auto; }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 4px solid var(--gold); padding: 15px; }
-        .card-p { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .btn { background: var(--gold); border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; }
+        .btn { background: var(--gold); border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; color: black; margin-top: 10px; width: 100%; }
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; }
+        .feed { max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem; border-top: 1px solid #334155; padding-top: 10px; }
+        .card-p { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--gold); }
     </style>
 </head>
 <body>
 
-<header style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:10px;">
+<header style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
     <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <button class="btn" onclick="location.href='index.html'">VOLTAR À FOLHA</button>
+    <button class="btn" style="width:auto" onclick="location.href='index.html'">VOLTAR À FOLHA</button>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <h3 style="margin-bottom:15px; font-size: 0.9rem; color:var(--gold)">HISTÓRICO DE PRODUÇÃO REAL</h3>
+        <h3 style="color:var(--gold)">HISTÓRICO DE PRODUÇÃO (FOLHA REAL)</h3>
         <div id="feed-producao"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" style="border-top-color: #ef4444;">
         <h3 style="color:#ef4444">INTELIGÊNCIA NÃO CONFUNDA</h3>
         <input id="nc-t" placeholder="Conceito">
-        <textarea id="nc-c" placeholder="Diferença"></textarea>
-        <button class="btn" style="width:100%; background:#ef4444; color:white;" onclick="salvar('nc')">GRAVAR</button>
-        <div id="feed-nc" style="margin-top:10px"></div>
+        <textarea id="nc-c" placeholder="Diferença crucial"></textarea>
+        <button class="btn" style="background:#ef4444; color:white" onclick="salvar('nc')">SALVAR</button>
+        <div id="feed-nc" class="feed"></div>
     </section>
 
-    <section class="panel">
+    <section class="panel" style="border-top-color: #a855f7;">
         <h3 style="color:#a855f7">QUAL A PEÇA?</h3>
         <textarea id="peca-t" placeholder="Fatos"></textarea>
         <input id="peca-c" placeholder="Gabarito">
-        <button class="btn" style="width:100%; background:#a855f7; color:white;" onclick="salvar('peca')">GERAR</button>
-        <div id="feed-peca" style="margin-top:10px"></div>
+        <button class="btn" style="background:#a855f7; color:white" onclick="salvar('peca')">SALVAR</button>
+        <div id="feed-peca" class="feed"></div>
+    </section>
+
+    <section class="panel" style="border-top-color: #3b82f6;">
+        <h3 style="color:#3b82f6">PRELIMINARES E TESES</h3>
+        <input id="tese-t" placeholder="Título">
+        <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido"></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvar('tese')">SALVAR</button>
+        <div id="feed-tese" class="feed"></div>
     </section>
 </main>
 
@@ -58,39 +67,61 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Renderizar Produção Real
-    onValue(ref(db, 'producao_v13'), (snap) => {
-        const feed = document.getElementById('feed-producao');
-        feed.innerHTML = "";
-        const data = snap.val() || {};
-        Object.keys(data).reverse().forEach(id => {
-            const item = data[id];
-            feed.innerHTML += `
-                <div class="card-p">
-                    <div><strong>${item.peca}</strong><br><small>${item.data}</small></div>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn" onclick="verTexto('${id}')">VER RESPOSTA</button>
-                        <button class="btn" style="background:white" onclick="window.open('${item.pdf}')">PROVA</button>
-                        <button class="btn" style="background:#ef4444; color:white" onclick="remove(ref(db, 'producao_v13/${id}'))">X</button>
-                    </div>
-                </div>`;
-        });
-    });
-
-    window.verTexto = (id) => {
-        onValue(ref(db, 'producao_v13/' + id), (snap) => {
-            const d = snap.val();
-            const win = window.open('', '_blank');
-            win.document.write(`<html><body style="font-family:monospace; padding:30px;"><h2>${d.peca}</h2><hr>`);
-            d.texto.forEach((l, i) => { if(l) win.document.write(`<p><b>${i+1}</b> ${l}</p>`); });
-            win.document.write(`</body></html>`);
-        }, { onlyOnce: true });
-    };
-
+    // FUNÇÃO SALVAR INTELIGÊNCIA
     window.salvar = (type) => {
         const t = document.getElementById(type+'-t').value;
         const c = document.getElementById(type+'-c').value;
-        if(t && c) push(ref(db, 'v13_'+type), {t, c, ts: serverTimestamp()});
+        if(t && c) {
+            push(ref(db, 'v13_'+type), {t, c, ts: serverTimestamp()}).then(() => {
+                document.getElementById(type+'-t').value = "";
+                document.getElementById(type+'-c').value = "";
+            });
+        }
+    };
+
+    // ESCUTA EM TEMPO REAL
+    onValue(ref(db), (snap) => {
+        const data = snap.val() || {};
+        
+        // Renderizar Produção Real
+        const fProd = document.getElementById('feed-producao');
+        fProd.innerHTML = "";
+        const producoes = data.producao_v13 || {};
+        Object.keys(producoes).reverse().forEach(id => {
+            const it = producoes[id];
+            fProd.innerHTML += `
+                <div class="card-p">
+                    <div><strong>${it.peca}</strong> - <small>${it.data}</small></div>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn" style="width:auto; margin:0" onclick="verResposta('${id}')">VER FOLHA</button>
+                        <button class="btn" style="width:auto; margin:0; background:white" onclick="window.open('${it.pdf}')">PDF</button>
+                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white" onclick="remove(ref(db, 'producao_v13/${id}'))">X</button>
+                    </div>
+                </div>`;
+        });
+
+        // Renderizar Inteligências
+        ['nc', 'peca', 'tese'].forEach(type => {
+            const feed = document.getElementById('feed-'+type);
+            feed.innerHTML = "";
+            const items = data['v13_'+type] || {};
+            Object.keys(items).reverse().forEach(id => {
+                feed.innerHTML += `<div style="margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:5px;">
+                    <strong>${items[id].t}</strong><br>${items[id].c}
+                    <i class="fas fa-trash" style="float:right; cursor:pointer; color:#ef4444" onclick="remove(ref(db, 'v13_${type}/${id}'))"></i>
+                </div>`;
+            });
+        });
+    });
+
+    window.verResposta = (id) => {
+        onValue(ref(db, 'producao_v13/' + id), (snap) => {
+            const d = snap.val();
+            const win = window.open('', '_blank');
+            win.document.write(`<html><body style="font-family:monospace; padding:40px;"><h2>${d.peca}</h2><hr>`);
+            d.conteudo.forEach((l, i) => { if(l) win.document.write(`<p><b>${i+1}</b> ${l}</p>`); });
+            win.document.write(`</body></html>`);
+        }, { onlyOnce: true });
     };
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>FOLHA ELITE | ENGINE A4</title>
+    <title>JOAQUIM ELITE 2026 | ENGINE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -12,35 +12,49 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); }
         main { display: flex; flex: 1; overflow: hidden; }
+
         .sidebar { width: 80px; background: #1e293b; display: flex; flex-direction: column; gap: 10px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); }
-        .btn-side { width: 100%; height: 50px; border-radius: 8px; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; color: white; font-size: 0.6rem; font-weight: 900; }
+        .btn-side { width: 100%; height: 50px; border-radius: 8px; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.3s; }
+        
+        #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; color: white; font-size: 0.6rem; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+
         .editor-container { flex: 1; overflow-y: auto; padding: 20px; background: var(--bg-paper); display: flex; justify-content: center; }
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #identificador-peca { padding: 20px; text-align: center; font-weight: 900; font-size: 1.3rem; text-transform: uppercase; border-bottom: 2px solid var(--line-color); color: var(--gold); }
+        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        
+        #identificador-peca { padding: 20px; text-align: center; font-weight: 900; font-size: 1.4rem; text-transform: uppercase; border-bottom: 2px solid var(--line-color); color: var(--gold); }
+        
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
         .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.2); }
         .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
-        @media print { header, .sidebar { display: none !important; } .paper { width: 100% !important; background: white !important; } .linha-folha { color: black !important; border-bottom: 1px solid #ccc !important; } }
+
+        @media print {
+            header, .sidebar { display: none !important; }
+            .paper { width: 100% !important; background: white !important; }
+            .linha-folha { color: black !important; border-bottom: 1px solid #000 !important; }
+            #identificador-peca { color: black !important; }
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div>
-    <div id="status-producao" style="font-size: 0.7rem; color: var(--gold); font-weight: 800;">AGUARDANDO ESCRITA...</div>
+    <div id="status-producao" style="color: var(--gold); font-size: 0.7rem; font-weight: 800; border: 1px solid var(--gold); padding: 4px 10px; border-radius: 4px;">LINHAS: 0</div>
 </header>
 
 <main>
     <aside class="sidebar">
         <div id="radar-container"><div id="radar-status">SCANNER</div></div>
-        <button class="btn-side" style="background:var(--gold); color: black;" onclick="salvarProducao()" title="Salvar Minha Peça">
+        
+        <button class="btn-side" style="background:var(--gold); color: #000;" onclick="salvarProducao()" title="Salvar no Histórico">
             <i class="fas fa-save"></i>
         </button>
+        
         <button class="btn-side" style="background:#a855f7;" onclick="window.location.href='mentoria.html'"><i class="fas fa-robot"></i></button>
-        <button class="btn-side" style="background:#64748b;" onclick="window.print()"><i class="fas fa-print"></i></button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="window.print()"><i class="fas fa-print"></i></button>
     </aside>
 
     <section class="editor-container">
@@ -55,14 +69,14 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // ENGINE INTERNA PARA EVITAR ERROS DE CARREGAMENTO
+    // RADAR INTEGRADO PARA EVITAR ERROS [cite: 2026-01-30]
     const RadarElite = {
         analisar: (texto) => {
             const t = texto.toUpperCase();
-            if (t.includes("RECURSO ORDINÁRIO")) return "RECURSO ORDINÁRIO";
-            if (t.includes("CONTESTAÇÃO")) return "CONTESTAÇÃO";
-            if (t.includes("RECLAMAÇÃO")) return "RECLAMATÓRIA TRABALHISTA";
-            if (t.includes("AGRAVO DE PETIÇÃO")) return "AGRAVO DE PETIÇÃO";
+            if(t.includes("AGRAVO DE PETIÇÃO")) return "AGRAVO DE PETIÇÃO";
+            if(t.includes("RECURSO ORDINÁRIO")) return "RECURSO ORDINÁRIO";
+            if(t.includes("CONTESTAÇÃO")) return "CONTESTAÇÃO";
+            if(t.includes("RECLAMAÇÃO")) return "RECLAMATÓRIA TRABALHISTA";
             return null;
         }
     };
@@ -81,20 +95,20 @@
         for(let i=1; i<=150; i++) {
             const row = document.createElement('div');
             row.className = 'linha-wrapper';
-            row.innerHTML = `<div class="linha-num">${i}</div><input class="linha-folha" id="L${i}" maxlength="85" autocomplete="off" spellcheck="false">`;
+            row.innerHTML = `<div class="linha-num">${i}</div><input class="linha-folha" id="L${i}" maxlength="85" spellcheck="false" autocomplete="off">`;
             container.appendChild(row);
             
-            row.querySelector('input').oninput = (e) => {
+            row.querySelector('input').oninput = () => {
                 const linhas = Array.from(document.querySelectorAll('.linha-folha'));
                 const textoTopo = linhas.slice(0, 10).map(l => l.value).join(" ");
-                const pecaIdentificada = RadarElite.analisar(textoTopo);
+                const peca = RadarElite.analisar(textoTopo);
                 
-                if(pecaIdentificada) {
-                    document.getElementById('identificador-peca').innerText = pecaIdentificada;
-                    document.getElementById('radar-status').innerHTML = `<span style="color:var(--gold)">DETECTADO</span><br>${pecaIdentificada}`;
+                if(peca) {
+                    document.getElementById('identificador-peca').innerText = peca;
+                    document.getElementById('radar-status').innerHTML = `<span style="color:var(--gold)">RADAR</span><br>${peca}`;
                 }
-                const preenchidas = linhas.filter(l => l.value.length > 2).length;
-                document.getElementById('status-producao').innerText = `PRODUÇÃO: ${preenchidas} LINHAS`;
+                const preenchidas = linhas.filter(l => l.value.trim().length > 0).length;
+                document.getElementById('status-producao').innerText = `LINHAS: ${preenchidas}`;
             };
         }
     };
@@ -103,31 +117,27 @@
         const identificador = document.getElementById('identificador-peca').innerText;
         const linhas = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
         const textoTotal = linhas.join("").trim();
-        const exameAtivo = localStorage.getItem('activeEx') || "44";
-        
-        // Link de teste da prova (exemplo para teste conforme solicitado)
-        const pdfProva = `https://oab.fgv.br/provas/exame${exameAtivo}/caderno_prova.pdf`;
+        const exame = localStorage.getItem('activeEx') || "44";
 
-        if (textoTotal.length < 10) {
-            alert("⚠️ ESCREVA ALGO NA FOLHA ANTES DE SALVAR!");
+        if (textoTotal.length < 20) {
+            alert("⚠️ ESCREVA SUA PEÇA ANTES DE SALVAR!");
             return;
         }
 
         const idSessao = Date.now();
-        
-        // SALVAMENTO COMPLETO: PRODUÇÃO + REFERÊNCIA DA PROVA
+        // PDF da prova simulado para teste
+        const pdfProva = `https://oab.fgv.br/provas/exame${exame}/peca_pratica.pdf`;
+
         set(ref(db, 'estudos/' + idSessao), {
-            exame: exameAtivo,
+            exame: exame,
             pecaNome: identificador,
-            producao: linhas,
-            provaReferencia: pdfProva, // SALVANDO O PDF JUNTO PARA TESTE
+            linhas: linhas, // SALVA O TEXTO PRODUZIDO
+            arquivo: pdfProva, // SALVA O PDF DA PROVA PARA REFERÊNCIA
             ts: serverTimestamp()
         }).then(() => {
-            alert(`☁️ REGISTRADO NO HISTÓRICO ELITE! EXAME ${exameAtivo} - ${identificador}`);
-        }).catch(err => {
-            console.error(err);
-            alert("ERRO NA GRAVAÇÃO: Verifique sua conexão ou Firebase.");
-        });
+            // AVISO EXATO SOLICITADO [cite: 2026-02-01]
+            alert(`☁️ REGISTRADO NO HISTÓRICO ELITE! EXAME ${exame} - ${identificador}`);
+        }).catch(err => alert("Erro ao salvar: " + err));
     };
 
     window.onload = montarFolha;

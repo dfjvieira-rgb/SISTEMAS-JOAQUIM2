@@ -12,9 +12,7 @@
             --mentoria: #a855f7; --sidebar-w: 240px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
@@ -31,31 +29,37 @@
 
         /* EDITOR */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 100px; }
+        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 80px; }
         
         #identificador-peca { 
             width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); 
             text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer;
         }
 
-        /* HUB MOBILE (FOGUETE) - Z-INDEX MAXIMO */
+        /* HUB MOBILE (FOGUETE) - PARTIDA GARANTIDA */
         #mobile-hub { 
-            display: none; position: fixed; bottom: 40px; right: 25px; z-index: 9999; 
+            display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; 
             flex-direction: column-reverse; gap: 12px; align-items: center;
+            pointer-events: none; /* Não bloqueia a folha quando fechado */
         }
+        .fab-main, .fab-sub { pointer-events: auto; } /* Ativa clique apenas nos botões */
+
         .fab-main { 
-            width: 70px; height: 70px; border-radius: 50%; background: var(--gold); border: none; 
-            box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 2rem; display: flex; 
-            align-items: center; justify-content: center; color: #000; cursor: pointer; transition: 0.3s;
+            width: 70px; height: 70px; border-radius: 50%; background: var(--gold); border: 4px solid var(--primary); 
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); font-size: 2rem; display: flex; 
+            align-items: center; justify-content: center; color: #000; cursor: pointer; 
         }
         .fab-sub { 
             width: 55px; height: 55px; border-radius: 50%; border: 2px solid #fff; color: white; 
             display: none; align-items: center; justify-content: center; font-size: 1.3rem; 
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: 0.2s;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
         }
-        #mobile-hub.active .fab-sub { display: flex; animation: flyUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
+        #mobile-hub.active .fab-sub { display: flex; animation: rocketLaunch 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards; }
 
-        @keyframes flyUp { from { opacity: 0; transform: translateY(60px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes rocketLaunch { 
+            from { opacity: 0; transform: translateY(100px) scale(0.5); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
 
         @media (max-width: 768px) {
             .sidebar { display: none !important; }
@@ -69,15 +73,15 @@
         #pdf-split-view.active { display: block; }
 
         /* MODAIS */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; max-height: 85vh; padding: 25px; border-radius: 20px; display: flex; flex-direction: column; }
         #modal-content { overflow-y: auto; flex: 1; margin: 15px 0; }
         
-        .opt-btn { width: 100%; padding: 22px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 900; font-size: 1.2rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #1e293b; }
+        .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; font-size: 1.1rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #1e293b; }
 
         /* LINHA FGV */
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
-        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.03); }
+        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); }
         .linha-folha { flex: 1; border: none; outline: none; background: transparent !important; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
     </style>
 </head>
@@ -87,7 +91,7 @@
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
     <div style="display:flex; gap:10px;">
         <button class="btn-side" style="width:40px; background:#475569;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-adjust"></i></button>
-        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Zerar Sistema?') && location.reload()"><i class="fas fa-trash"></i></button>
+        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Zerar?') && location.reload()"><i class="fas fa-trash"></i></button>
     </div>
 </header>
 
@@ -149,13 +153,11 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
-    // --- PDF ENGINE (CORRIGIDO PARA roXX-gabarito.pdf) ---
+    // --- PDF ---
     window.verPDF = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
-        let arquivo = (tipo === 'P') ? `ro${window.activeEx}.pdf` : 
-                      (tipo === 'G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
-        
+        let arquivo = (tipo === 'P') ? `ro${window.activeEx}.pdf` : (tipo === 'G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
         frame.src = arquivo;
         view.classList.add('active');
         document.getElementById('mobile-hub').classList.remove('active');
@@ -177,11 +179,12 @@
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>OAB Exame ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.innerHTML = `<span>OAB ${i}</span> <i class="fas fa-chevron-right"></i>`;
             b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
             content.appendChild(b);
         }
         modal.style.display='flex';
+        document.getElementById('mobile-hub').classList.remove('active');
     };
 
     window.injetarTeses = () => {
@@ -196,7 +199,7 @@
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS FGV";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
@@ -212,38 +215,37 @@
             content.appendChild(b);
         });
         modal.style.display='flex';
+        document.getElementById('mobile-hub').classList.remove('active');
     };
 
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
 
-    // --- INICIALIZAÇÃO ---
+    // --- START ---
     window.onload = () => {
         FolhaEngine.montar('folha-total', 85);
         window.forcarRadar();
 
-        // Salvar Unificado
-        const saveElite = () => {
-            engineSaveElite(db, window.activeEx);
-            document.getElementById('mobile-hub').classList.remove('active');
-        };
+        // Salvar
+        const saveElite = () => engineSaveElite(db, window.activeEx);
         document.getElementById('btn-save-pc').onclick = saveElite;
         document.getElementById('btn-save-mob').onclick = saveElite;
 
-        // Controle do Foguete (Click + Touch)
+        // PARTIDA DO FOGUETE (CLICK + TOUCH)
         const fab = document.getElementById('main-fab');
         const hub = document.getElementById('mobile-hub');
         
-        const toggleHub = (e) => {
+        const launch = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             hub.classList.toggle('active');
             fab.innerHTML = hub.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-rocket"></i>';
             fab.style.background = hub.classList.contains('active') ? '#ef4444' : 'var(--gold)';
         };
 
-        fab.addEventListener('click', toggleHub);
-        fab.addEventListener('touchstart', toggleHub, {passive: false});
+        fab.addEventListener('click', launch);
+        fab.addEventListener('touchstart', launch, {passive: false});
 
-        // Focus Listener
+        // Focus em linhas
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
                 input.addEventListener('focus', () => { window.ultimaLinha = parseInt(input.getAttribute('data-index')); });

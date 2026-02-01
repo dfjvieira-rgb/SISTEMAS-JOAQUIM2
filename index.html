@@ -9,7 +9,7 @@
         :root {
             --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
             --paper-color: #ffffff; --text-color: #1e293b; --line-color: #d1d5db;
-            --mentoria: #a855f7; --sidebar-w: 240px;
+            --mentoria: #a855f7; --sidebar-pc: 240px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,11 +19,11 @@
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* SIDEBAR PC (Oculta no Mobile) */
+        /* SIDEBAR PC: Visível apenas em telas grandes */
         .sidebar { 
-            width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; 
+            width: var(--sidebar-pc); background: #1e293b; display: flex; flex-direction: column; 
             gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); 
-            overflow-y: auto; z-index: 1001;
+            overflow-y: auto; z-index: 1001; transition: 0.3s;
         }
         .btn-side { 
             width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; 
@@ -31,40 +31,38 @@
             cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase;
         }
 
-        /* EDITOR E PAPEL (Ocupa tudo no Mobile) */
-        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); transition: 0.3s; }
+        /* EDITOR E FOLHA */
+        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #334155; }
 
-        /* PDF SPLIT VIEW */
-        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
-        #pdf-split-view.active { display: block; }
+        /* HUB MOBILE (ZONA DO POLEGAR) */
+        #mobile-hub { display: none; position: fixed; bottom: 25px; right: 25px; z-index: 5000; flex-direction: column-reverse; gap: 10px; }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #mobile-hub.active .fab-sub { display: flex; animation: popUp 0.2s ease-out forwards; }
 
-        /* HUB FLUTUANTE (Melhor Prática Mobile) */
-        #mobile-hub { display: none; position: fixed; bottom: 25px; right: 25px; z-index: 5000; flex-direction: column-reverse; gap: 10px; align-items: center; }
-        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.4); font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 5001; }
-        .fab-sub { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #mobile-hub.active .fab-sub { display: flex; animation: popUp 0.3s ease-out; }
+        @keyframes popUp { from { opacity: 0; transform: translateY(15px) scale(0.8); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        @keyframes popUp { from { opacity: 0; transform: translateY(20px) scale(0.5); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
-        /* LINHA FGV */
-        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
-        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); }
-        .linha-folha { flex: 1; border: none; outline: none; background: transparent !important; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
-
+        /* RESPONSIVIDADE BLINDADA */
         @media (max-width: 768px) {
-            .sidebar { display: none; }
-            #mobile-hub { display: flex; }
+            .sidebar { display: none !important; } /* Esconde sidebar lateral */
+            #mobile-hub { display: flex; } /* Mostra o Hub de Foguete */
             .editor-container { padding: 5px; width: 100vw; }
             #pdf-split-view.active { position: fixed; inset: 0; width: 100%; z-index: 4000; }
         }
 
-        /* MODAIS */
+        /* PDF VIEW */
+        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
+        #pdf-split-view.active { display: block; }
+
+        /* LINHA ESTILO FGV */
+        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
+        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); }
+        .linha-folha { flex: 1; border: none; outline: none; background: transparent !important; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
+
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 6000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 90%; max-width: 500px; max-height: 80vh; padding: 20px; border-radius: 12px; display: flex; flex-direction: column; color: #333; }
-        #modal-content { overflow-y: auto; flex: 1; margin-top: 15px; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; text-align: left; cursor: pointer; }
     </style>
 </head>
 <body class="dark-mode">
@@ -78,38 +76,39 @@
 </header>
 
 <main>
-    <aside class="sidebar" id="sidebar-pc">
+    <aside class="sidebar">
         <div style="background:#000; padding:10px; border-radius:8px; border:2px solid var(--gold); text-align:center; margin-bottom:10px;">
             <div id="radar-pc" style="color:white; font-size:0.7rem; font-weight:bold;">SCANNER ATIVO</div>
         </div>
-        <button class="btn-side" style="background:var(--gold); color:#000;" onclick="abrirExames()"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
-        <button class="btn-side" style="background:#10b981;" onclick="executarSalvar()"><i class="fas fa-save"></i> <span>Salvar</span></button>
-        <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
-        <button class="btn-side" style="background:#3b82f6;" onclick="injetarTeses()"><i class="fas fa-gavel"></i> <span>Teses</span></button>
-        <button class="btn-side" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria</span></button>
-        <hr style="opacity:0.1; margin:5px 0;">
-        <button class="btn-side" style="background:#f97316;" onclick="verPDF('P')"><b>P</b> <span>Enunciado</span></button>
-        <button class="btn-side" style="background:#eab308;" onclick="verPDF('G')"><b>G</b> <span>Gabarito</span></button>
-        <button class="btn-side" style="background:#10b981;" onclick="verPDF('V')"><b>V</b> <span>Vade Mecum</span></button>
-        <button class="btn-side" style="background:#475569;" onclick="rolar('topo')"><i class="fas fa-arrow-up"></i> <span>Topo</span></button>
+        <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Trocar Exame</span></button>
+        <button class="btn-side" style="background:#10b981;" onclick="window.executarSalvar()"><i class="fas fa-save"></i> <span>Salvar Treino</span></button>
+        <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Injetar Teses</span></button>
+        <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
+        <hr style="opacity:0.2;">
+        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b> <span>Peça</span></button>
+        <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b> <span>Gabarito</span></button>
+        <button class="btn-side" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b> <span>Vade Mecum</span></button>
+        <button class="btn-side" style="background:#475569;" onclick="window.rolar('topo')"><i class="fas fa-arrow-up"></i> <span>Ir ao Topo</span></button>
+        <button class="btn-side" style="background:#475569;" onclick="window.rolar('fim')"><i class="fas fa-arrow-down"></i> <span>Ir ao Fim</span></button>
     </aside>
 
     <section class="editor-container">
         <div class="paper">
-            <div id="identificador-peca">RADAR EM ESPERA...</div>
+            <div id="identificador-peca">ESCANEANDO DNA...</div>
             <div id="folha-total"></div>
         </div>
     </section>
 
     <div id="mobile-hub">
-        <button class="fab-main" id="btn-hub-main"><i class="fas fa-rocket"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="executarSalvar()"><i class="fas fa-save"></i></button>
-        <button class="fab-sub" style="background:#fbbf24; color:#000" onclick="abrirPergaminho()"><i class="fas fa-scroll"></i></button>
-        <button class="fab-sub" style="background:#3b82f6;" onclick="injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:#f97316;" onclick="verPDF('P')"><b>P</b></button>
-        <button class="fab-sub" style="background:#eab308;" onclick="verPDF('G')"><b>G</b></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="verPDF('V')"><b>V</b></button>
+        <button class="fab-main" id="btn-fab-main"><i class="fas fa-rocket"></i></button>
+        <button class="fab-sub" style="background:#10b981;" onclick="window.executarSalvar()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" style="background:#fbbf24; color:#000" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
+        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b></button>
+        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b></button>
+        <button class="fab-sub" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b></button>
     </div>
 
     <div id="pdf-split-view">
@@ -120,9 +119,9 @@
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h3 id="modal-title"></h3>
+        <h3 id="modal-title" style="color:#000"></h3>
         <div id="modal-content"></div>
-        <button onclick="fecharModal()" style="width:100%; margin-top:15px; padding:12px; background:#000; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer;">FECHAR</button>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:12px; background:#000; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer;">VOLTAR</button>
     </div>
 </div>
 
@@ -134,42 +133,41 @@
     import { RadarEngine } from './radar-engine.js';
     import { engineSaveElite } from './salvar.js';
 
-    let activeEx = localStorage.getItem('activeEx') || "44";
-    let ultimaLinha = 1;
+    window.activeEx = localStorage.getItem('activeEx') || "44";
+    window.ultimaLinha = 1;
 
-    // --- FUNÇÕES GLOBAIS (MAPEO DE 12 BOTÕES) ---
+    // --- MOTORES GLOBAIS ---
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "BANCO DE EXAMES";
+        document.getElementById('modal-title').innerText = "EXAMES OAB";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame OAB ${i}`;
-            b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); location.reload(); };
+            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame ${i}`;
+            b.onclick = () => { localStorage.setItem('activeEx', i); location.reload(); };
             content.appendChild(b);
         }
         modal.style.display='flex';
     };
 
     window.executarSalvar = () => {
-        engineSaveElite(db, activeEx);
+        engineSaveElite(db, window.activeEx);
         document.getElementById('mobile-hub').classList.remove('active');
     };
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PERGAMINHO DE ESTRUTURAS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS FGV";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className='opt-btn'; b.innerText=k;
             b.onclick = () => {
                 pecas[k].split('\n').forEach((t, i) => {
-                    const el = document.getElementById(`L${ultimaLinha + i}`);
+                    const el = document.getElementById(`L${window.ultimaLinha + i}`);
                     if(el) el.value = t;
                 });
                 modal.style.display='none';
-                document.getElementById('mobile-hub').classList.remove('active');
             };
             content.appendChild(b);
         });
@@ -177,51 +175,57 @@
     };
 
     window.injetarTeses = () => {
-        const dna = BANCO_ESPELHOS[activeEx] || "";
+        const dna = BANCO_ESPELHOS[window.activeEx] || "";
         const teses = dna.replace(/<[^>]*>?/gm, '').split('\n').filter(t => t.trim().length > 10);
         teses.forEach((t, i) => {
-            const linha = document.getElementById(`L${ultimaLinha + i}`);
+            const linha = document.getElementById(`L${window.ultimaLinha + i}`);
             if(linha) linha.value = "➤ " + t.trim().substring(0, 80);
         });
-        document.getElementById('mobile-hub').classList.remove('active');
     };
-
-    window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
 
     window.verPDF = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
-        frame.src = tipo === 'P' ? `ro${activeEx}.pdf` : tipo === 'G' ? `ga${activeEx}.pdf` : `vade.pdf`;
+        let arq = tipo === 'P' ? `ro${window.activeEx}.pdf` : tipo === 'G' ? `ga${window.activeEx}.pdf` : `vade.pdf`;
+        frame.src = arq;
         view.classList.add('active');
-        document.getElementById('mobile-hub').classList.remove('active');
     };
 
+    window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
     window.rolar = (onde) => {
-        const target = onde === 'topo' ? document.querySelector('.editor-container') : document.getElementById('L180');
-        if(onde === 'topo') target.scrollTo({top:0, behavior:'smooth'});
-        else target.scrollIntoView({behavior:'smooth'});
+        const container = document.querySelector('.editor-container');
+        if(onde === 'topo') container.scrollTo({top:0, behavior:'smooth'});
+        else document.getElementById('L180').scrollIntoView({behavior:'smooth'});
     };
 
-    window.fecharModal = () => document.getElementById('universal-modal').style.display='none';
-
-    // --- INICIALIZAÇÃO ---
+    // --- INICIALIZAÇÃO BLINDADA ---
     const start = () => {
         FolhaEngine.montar('folha-total', 85);
         
+        // Ativa o Radar imediatamente
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        if (dna) {
+            const analise = RadarEngine.analisar(dna);
+            RadarEngine.renderizar(analise);
+            document.getElementById('identificador-peca').innerText = analise.peca.toUpperCase();
+        } else {
+            document.getElementById('identificador-peca').innerText = "PEÇA LIVRE / TREINO";
+        }
+
+        // Mapeia linhas para o Pergaminho
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
-                input.addEventListener('focus', () => ultimaLinha = parseInt(input.getAttribute('data-index')));
+                input.addEventListener('focus', () => {
+                    window.ultimaLinha = parseInt(input.getAttribute('data-index'));
+                });
             });
         }, 500);
 
-        const dna = BANCO_ESPELHOS[activeEx] || "";
-        RadarEngine.renderizar(RadarEngine.analisar(dna));
-
-        // Hub Mobile Toggle
-        document.getElementById('btn-hub-main').onclick = () => document.getElementById('mobile-hub').classList.toggle('active');
+        // Eventos de Sistema
+        document.getElementById('btn-fab-main').onclick = () => document.getElementById('mobile-hub').classList.toggle('active');
         document.getElementById('btn-pdf-close').onclick = () => document.getElementById('pdf-split-view').classList.remove('active');
         document.getElementById('btn-theme').onclick = () => document.body.classList.toggle('dark-mode');
-        document.getElementById('btn-trash').onclick = () => confirm("Limpar?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
+        document.getElementById('btn-trash').onclick = () => confirm("Limpar Folha?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
     };
 
     window.onload = start;

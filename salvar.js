@@ -1,7 +1,12 @@
-// salvar.js - VERSÃO ELITE HISTÓRICO COMPLETA [cite: 2026-02-01]
+// salvar.js - VERSÃO ELITE HISTÓRICO COMPLETA [2026-02-01] - SEM ALERTS
 import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 export const engineSaveElite = async (db, exame) => {
+    // Busca os elementos de feedback no cabeçalho
+    const syncText = document.getElementById('sync-text');
+    const syncIcon = document.getElementById('sync-icon');
+    const syncIndicator = document.getElementById('sync-indicator');
+
     // Busca o botão pelo ID (PC) ou pela classe do Foguete (Mobile)
     const btnSave = document.getElementById('btn-salvar-elite') || 
                     document.querySelector('.fab-sub[onclick*="dispararSalvar"]');
@@ -42,15 +47,21 @@ export const engineSaveElite = async (db, exame) => {
         };
 
         // 5. Gravação no Firebase: HISTÓRICO DA MENTORIA (producao_v13)
-        // Criamos uma chave única com Timestamp para não sobrescrever treinos antigos
         const safePecaName = tituloPeca.replace(/\s+/g, '_'); 
         const savePath = `producao_v13/${exameOficial}_${safePecaName}_${Date.now()}`;
         
         await set(ref(db, savePath), payload);
 
-        // 6. Feedback de Sucesso no Botão
+        // 6. Feedback de Sucesso Silencioso e Visual
         if (hasBtn) {
             btnSave.innerHTML = '<i class="fas fa-check" style="color:#fbbf24"></i>';
+        }
+
+        // Atualiza o indicador do topo para o modo "Pulsante Verde"
+        if (syncText && syncIcon) {
+            syncText.innerText = "HISTÓRICO SALVO ✅";
+            if (syncIndicator) syncIndicator.classList.add('sync-success');
+            syncIcon.className = "fas fa-check-circle sync-success";
         }
         
         console.log(`✔ Peça Enviada ao Histórico: ${tituloPeca}`);
@@ -60,12 +71,22 @@ export const engineSaveElite = async (db, exame) => {
                 btnSave.innerHTML = originalIcon;
                 btnSave.style.pointerEvents = 'auto';
             }
-            // AVISO DE SUCESSO AO USUÁRIO
-            alert("✅ Sincronizado! Sua peça foi enviada para o histórico da mentoria.");
+            
+            // Retorna o status original do cabeçalho após 4 segundos
+            setTimeout(() => {
+                if (syncText && !window.isFinalizing) {
+                    syncText.innerText = "SYNC ON";
+                    if (syncIndicator) syncIndicator.classList.remove('sync-success');
+                    syncIcon.className = "fas fa-cloud";
+                }
+            }, 4000);
+
         }, 1000);
 
     } catch (error) {
         console.error("Erro na Engine de Salvamento:", error);
+        if (syncText) syncText.innerText = "ERRO NA CONEXÃO";
+        
         if (hasBtn) {
             btnSave.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
             setTimeout(() => {

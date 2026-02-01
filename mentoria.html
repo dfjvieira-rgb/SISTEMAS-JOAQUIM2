@@ -67,7 +67,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -112,6 +112,7 @@
                 <div class="card-h" style="border-left-color: ${cor}">
                     <span><strong>${t.nome_peca || "Sem Nome"}</strong><br><small>${t.data_envio || ""}</small></span>
                     <div style="display:flex; gap:5px;">
+                        <button class="btn" style="width:auto; margin:0; background:#3b82f6; color:white; padding: 8px;" onclick="compartilharTreino('${id}')"><i class="fas fa-share-alt"></i></button>
                         <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 8px;" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
                         <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 8px;" onclick="deletarItem('producao_v13/${id}')"><i class="fas fa-trash"></i></button>
                     </div>
@@ -128,7 +129,34 @@
         });
     });
 
-    // FUNÇÃO VER TREINO COM AJUSTE DE ESCALA MOBILE (FULL SCREEN)
+    // NOVA FUNÇÃO: COMPARTILHAR TREINO
+    window.compartilharTreino = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        const p = s.val();
+        if(!p || !p.linhas) return;
+
+        // Limpa linhas vazias e formata o texto
+        const textoPeca = p.linhas
+            .map((l, i) => `${i + 1}. ${l || ""}`)
+            .filter(linha => linha.split(". ")[1].length > 0)
+            .join('\n');
+
+        const mensagem = `📝 *PEÇA OAB FINALIZADA*\n\n*Peça:* ${p.nome_peca}\n*Exame:* ${p.exame}\n*Data:* ${p.data_envio}\n\n--- CONTEÚDO ---\n${textoPeca}`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: `Peça: ${p.nome_peca}`,
+                    text: mensagem
+                });
+            } catch (err) { console.log("Erro ao compartilhar", err); }
+        } else {
+            // Fallback para cópia se o navegador não suportar share (ex: PC antigo)
+            await navigator.clipboard.writeText(mensagem);
+            alert("Conteúdo copiado para a área de transferência!");
+        }
+    };
+
     window.verTreino = (id) => {
         onValue(ref(db, 'producao_v13/' + id), (s) => {
             const p = s.val();

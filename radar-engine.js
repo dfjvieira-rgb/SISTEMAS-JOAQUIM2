@@ -1,26 +1,30 @@
-// radar-engine.js - Inteligência de Detecção [cite: 2026-01-30]
+// radar-engine.js - Inteligência de Detecção Elite [cite: 2026-01-30]
 export const RadarEngine = {
-    analisar: (linhas) => {
-        const textoCompleto = linhas.join(" ").toUpperCase();
-        
-        // Regras de Identificação (Extraídas das Peças Oficiais) [cite: 2026-01-26]
-        if (textoCompleto.includes("RECURSO ORDINÁRIO")) return "RECURSO ORDINÁRIO";
-        if (textoCompleto.includes("CONTESTAÇÃO")) return "CONTESTAÇÃO";
-        if (textoCompleto.includes("RECLAMAÇÃO TRABALHISTA")) return "RECLAMAÇÃO TRABALHISTA";
-        if (textoCompleto.includes("AGRAVO DE PETIÇÃO")) return "AGRAVO DE PETIÇÃO";
-        if (textoCompleto.includes("AÇÃO DE CONSIGNAÇÃO")) return "AÇÃO DE CONSIGNAÇÃO EM PAGAMENTO";
-        if (textoCompleto.includes("MANDADO DE SEGURANÇA")) return "MANDADO DE SEGURANÇA";
-        if (textoCompleto.includes("RECURSO DE REVISTA")) return "RECURSO DE REVISTA";
-        
-        return "IDENTIFICANDO PEÇA...";
+    DICIONARIO: [
+        { id: "AGRAVO DE PETIÇÃO", display: "AGRAVO DE PETIÇÃO", cor: "#f87171" },
+        { id: "RECURSO ORDINÁRIO", display: "RECURSO ORDINÁRIO", cor: "#3b82f6" },
+        { id: "CONTESTAÇÃO", display: "CONTESTAÇÃO TRABALHISTA", cor: "#22c55e" },
+        { id: "RECLAMAÇÃO", display: "RECLAMATÓRIA TRABALHISTA", cor: "#a855f7" },
+        { id: "MANDADO DE SEGURANÇA", display: "MANDADO DE SEGURANÇA", cor: "#0ea5e9" }
+    ],
+
+    analisar: (textoParaAnalise) => {
+        const txt = textoParaAnalise.toUpperCase();
+        return RadarEngine.DICIONARIO.find(p => txt.includes(p.id)) || null;
     },
 
-    atualizarStatus: (ativo) => {
-        const radar = document.getElementById('radar-status');
-        if (radar) {
-            radar.innerText = ativo ? "RADAR ATIVO" : "RADAR OFF";
-            radar.style.borderColor = ativo ? "#fbbf24" : "#ef4444";
-            radar.style.color = ativo ? "#fbbf24" : "#ef4444";
+    renderizar: (encontrado) => {
+        const sidebarStatus = document.getElementById('radar-status');
+        const topoFolha = document.getElementById('identificador-peca');
+        
+        if (encontrado) {
+            sidebarStatus.innerHTML = `<span style="color:${encontrado.cor}">RADAR</span><br>${encontrado.id}`;
+            topoFolha.innerText = encontrado.display;
+            topoFolha.style.color = encontrado.cor;
+        } else {
+            sidebarStatus.innerHTML = `<span>RADAR</span><br><span class="radar-blink">BUSCANDO...</span>`;
+            topoFolha.innerText = "CADERNO DE RESPOSTAS";
+            topoFolha.style.color = "#64748b";
         }
     }
 };

@@ -89,6 +89,9 @@
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b></button>
+        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b></button>
+        <button class="fab-sub" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b></button>
     </div>
 
     <div id="pdf-split-view">
@@ -115,44 +118,45 @@
 
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
+    let isFinalizing = false;
 
-    // --- SALVAMENTO DE RASCUNHO (SOBRESCREVE SEMPRE O MESMO) ---
+    // --- SALVAMENTO DE RASCUNHO ---
     window.dispararSalvar = async () => {
+        if (isFinalizing) return;
         const syncText = document.getElementById('sync-text');
+        
+        const lines = document.querySelectorAll('.linha-folha');
+        let temConteudo = false;
+        lines.forEach(l => { if(l.value.trim().length > 0) temConteudo = true; });
+        if (!temConteudo) return;
+
         syncText.innerText = "SYNCING...";
         try {
-            // Passamos um parâmetro extra 'isDraft' se sua engine suportar, 
-            // ou apenas garantimos que salve no rascunho.
             await engineSaveElite(db, window.activeEx, { tipo: 'rascunho' });
             syncText.innerText = "SAVED";
-            setTimeout(() => syncText.innerText = "SYNC ON", 2000);
-        } catch(e) { 
-            syncText.innerText = "OFFLINE"; 
-        }
+            setTimeout(() => { if(!isFinalizing) syncText.innerText = "SYNC ON"; }, 2000);
+        } catch(e) { syncText.innerText = "OFFLINE"; }
     };
 
-    // --- FINALIZAR PEÇA (ENVIA PARA O HISTÓRICO DEFINITIVO) ---
+    // --- FINALIZAR PEÇA ---
     window.finalizarPeca = async () => {
         if(!confirm("Deseja finalizar a peça e salvar no histórico?")) return;
-        
+        isFinalizing = true;
         const syncText = document.getElementById('sync-text');
         syncText.innerText = "FINALIZANDO...";
-        
         try {
-            // Aqui a engine deve salvar com um timestamp único para o histórico
             await engineSaveElite(db, window.activeEx, { tipo: 'historico' });
-            alert("Peça enviada para o Histórico com sucesso!");
-            syncText.innerText = "SYNC ON";
+            syncText.innerText = "CONCLUÍDO ✅";
+            alert("✅ Sincronizado! Sua peça foi enviada para o histórico da mentoria.");
+            setTimeout(() => { isFinalizing = false; syncText.innerText = "SYNC ON"; }, 5000);
         } catch(e) {
-            alert("Erro ao finalizar. Verifique a conexão.");
+            isFinalizing = false;
+            alert("Erro ao finalizar.");
+            syncText.innerText = "SYNC ON";
         }
     };
 
-    window.limparFolha = () => {
-        if(confirm("Apagar tudo?")) {
-            document.querySelectorAll('.linha-folha').forEach(i => i.value = "");
-        }
-    };
+    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };
 
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
@@ -196,7 +200,7 @@
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
@@ -214,14 +218,13 @@
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(!dna) return;
-        const textoLimpio = dna.replace(/<[^>]*>?/gm, '').trim();
-        FolhaEngine.injetarTextoMultilinhas(textoLimpio, window.ultimaLinha);
+        FolhaEngine.injetarTextoMultilinhas(dna, window.ultimaLinha);
     };
 
     window.onload = () => {
         FolhaEngine.montar('folha-total', 75);
         setTimeout(window.forcarRadar, 1500); 
-        setInterval(window.dispararSalvar, 30000); // Rascunho automático
+        setInterval(window.dispararSalvar, 30000); 
 
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {

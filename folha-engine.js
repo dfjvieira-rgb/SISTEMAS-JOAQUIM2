@@ -34,7 +34,7 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
-            // --- QUEBRA AUTOMÁTICA NA MARGEM (MANTIDA) ---
+            // --- QUEBRA AUTOMÁTICA NA MARGEM ---
             input.addEventListener('input', (e) => {
                 if (e.inputType === 'deleteContentBackward') return;
                 if (input.value.length >= FolhaEngine.LIMITE_OAB) {
@@ -53,19 +53,36 @@ export const FolhaEngine = {
                 }
             });
 
-            // --- INTELIGÊNCIA DE NAVEGAÇÃO SUPERIOR ---
+            // --- INTELIGÊNCIA DE NAVEGAÇÃO E EDIÇÃO (ENTER, DELETE, BACKSPACE) ---
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: Próxima linha
+                // ENTER: EMPURRA O TEXTO PARA BAIXO (ABRE ESPAÇO)
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (proximo) proximo.focus();
+                    const pos = input.selectionStart;
+                    const textoAtual = input.value;
+                    const fica = textoAtual.substring(0, pos);
+                    const desce = textoAtual.substring(pos);
+
+                    // Desloca todas as linhas de baixo para abrir o buraco
+                    for (let j = 150; j > idx + 1; j--) {
+                        const linhaAlvo = document.getElementById(`L${j}`);
+                        const linhaAcima = document.getElementById(`L${j - 1}`);
+                        if (linhaAlvo && linhaAcima) linhaAlvo.value = linhaAcima.value;
+                    }
+
+                    if (proximo) {
+                        input.value = fica.trim();
+                        proximo.value = desce.trim();
+                        proximo.focus();
+                        proximo.setSelectionRange(0, 0);
+                    }
                 }
 
-                // BACKSPACE: Se vazio, volta para anterior e foca no fim do texto
+                // BACKSPACE: Se vazio, volta para anterior
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -75,21 +92,24 @@ export const FolhaEngine = {
                     }
                 }
 
-                // DELETE: "EXCLUIR LINHA" (Puxa tudo de baixo para cima)
-                if (e.key === 'Delete' && input.value === '') {
-                    e.preventDefault();
-                    // Loop para deslocar conteúdo de baixo para cima
-                    for (let j = idx; j < 150; j++) {
-                        const atual = document.getElementById(`L${j}`);
-                        const proximaLinha = document.getElementById(`L${j + 1}`);
-                        if (atual && proximaLinha) {
-                            atual.value = proximaLinha.value;
+                // DELETE E CTRL+DELETE
+                if (e.key === 'Delete') {
+                    // CTRL+DELETE: Limpa a linha atual instantaneamente
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                        input.value = "";
+                    } 
+                    // DELETE SIMPLES EM LINHA VAZIA: PUXA O TEXTO DE BAIXO (FECHA ESPAÇO)
+                    else if (input.value === '') {
+                        e.preventDefault();
+                        for (let j = idx; j < 150; j++) {
+                            const atual = document.getElementById(`L${j}`);
+                            const proximaLinha = document.getElementById(`L${j + 1}`);
+                            if (atual && proximaLinha) atual.value = proximaLinha.value;
                         }
+                        const ultima = document.getElementById('L150');
+                        if (ultima) ultima.value = "";
                     }
-                    // Limpa a última linha absoluta
-                    const ultima = document.getElementById('L150');
-                    if (ultima) ultima.value = "";
-                    // Mantém o foco na linha atual, agora com o novo texto
                 }
 
                 // SETAS

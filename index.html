@@ -2,293 +2,186 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MENTORIA ELITE | REVISÃO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
-            --paper-color: #ffffff; --text-color: #000000; --line-color: #d1d5db;
-            --mentoria: #a855f7; --sidebar-w: 240px;
-        }
-        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #ffffff; --text-color: #000000; --line-color: #334155; }
+        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
         
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-
-        header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
-        main { display: flex; flex: 1; overflow: hidden; position: relative; }
-
-        @keyframes pulse-discreto {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .sync-success { color: #10b981 !important; animation: pulse-discreto 1.2s infinite; font-weight: 900; }
-
-        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
-        .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
-
-        /* EDITOR CONTAINER - GARANTE CENTRALIZAÇÃO NO PC */
-        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
+        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
+        .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; transition: 0.3s; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         
-        /* PAPER - RESPEITA O MOBILE SEM QUEBRAR O PC */
-        .paper { 
-            background: var(--paper-color); 
-            width: 100%; 
-            max-width: 850px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-            margin-bottom: 50px; 
-            position: relative;
-            z-index: 15;
-            transition: width 0.3s ease;
-        }
+        .feed { max-height: 450px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
+        .feed::-webkit-scrollbar { width: 5px; }
+        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
         
-        #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
-
-        .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
-        .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
-
-        /* LINHAS E DIGITAÇÃO (OTIMIZADO) */
-        .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; background: white; border-bottom: 1px solid var(--line-color); }
-        .linha-folha { 
-            flex: 1 !important; 
-            font-size: 16px !important; 
-            padding: 10px 8px !important;
-            border: none !important;
-            outline: none !important;
-            background: transparent !important;
-            color: var(--text-color) !important;
-            font-family: 'Courier New', monospace !important;
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--success); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .card-h span { font-size: 13px; line-height: 1.4; flex: 1; }
+        
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
+        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; position: relative; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        @media (max-width: 768px) { 
+            .dashboard { grid-template-columns: 1fr; } 
+            header h2 { font-size: 1.2rem; }
         }
-
-        /* HUB MOBILE - SEMPRE NO TOPO DE TUDO */
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
-        .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-        #mobile-hub.active .fab-sub { display: flex; }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none !important; }
-            #mobile-hub { display: flex; }
-            .editor-container { padding: 5px; padding-top: 10px; } 
-            .paper { margin-bottom: 120px; width: 98% !important; } /* Margem extra para o teclado/foguete */
-        }
-
-        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; z-index: 3000; }
-        #pdf-split-view.active { display: block; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
-        .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     </style>
 </head>
-<body class="dark-mode">
+<body>
 
-<header>
-    <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
-    <div id="sync-indicator" style="color:var(--gold); font-size:12px; display:flex; align-items:center; gap:8px;">
-        <i id="sync-icon" class="fas fa-cloud"></i> <span id="sync-text">SYNC ON</span>
-    </div>
+<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
+    <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
+    <button class="btn" style="width:auto; margin:0" onclick="window.close()">SAIR</button>
 </header>
 
-<main>
-    <aside class="sidebar">
-        <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
-        <button id="btn-finalizar" class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> <span>Finalizar Peça</span></button>
-        <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
-        <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
-        <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
-        <hr style="opacity:0.2; margin:10px 0;">
-        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b> <span>Peça</span></button>
-        <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b> <span>Gabarito</span></button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b> <span>Vade Mecum</span></button>
-    </aside>
-
-    <section class="editor-container">
-        <div class="paper">
-            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO - TOQUE AQUI</div>
-            <div class="toolbar-liberdade">
-                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
-                <button class="btn-lib" style="color:var(--mentoria)" onclick="window.abrirMentoria()"><i class="fas fa-history"></i> Histórico</button>
-            </div>
-            <div id="folha-total"></div>
+<main class="dashboard">
+    <section class="panel" style="grid-column: span 2;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="color:var(--success); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
+            <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; font-size: 10px; padding: 5px 10px;" onclick="window.limparHistoricoCompleto()">
+                <i class="fas fa-trash-sweep"></i> LIMPAR TUDO
+            </button>
         </div>
+        <div id="feed-producao" class="feed">Buscando registros...</div>
     </section>
 
-    <div id="mobile-hub">
-        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
-        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b></button>
-        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b></button>
-    </div>
+    <section class="panel" style="border-top-color: #f472b6;">
+        <h3 style="color:#f472b6; font-size: 1rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Título">
+        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">GRAVAR DICA</button>
+        <div id="feed-nc" class="feed"></div>
+    </section>
 
-    <div id="pdf-split-view">
-        <button style="position:absolute; top:10px; right:10px; background:var(--gold); border:none; width:45px; height:45px; border-radius:8px; z-index:5001;" onclick="window.fecharPDF()"><i class="fas fa-times"></i></button>
-        <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
-    </div>
+    <section class="panel" style="border-top-color: #3b82f6;">
+        <h3 style="color:#3b82f6; font-size: 1rem;"><i class="fas fa-gavel"></i> TESES</h3>
+        <input id="tese-t" placeholder="Título da Tese">
+        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">GRAVAR TESE</button>
+        <div id="feed-tese" class="feed"></div>
+    </section>
 </main>
 
-<div class="modal" id="universal-modal">
-    <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:3px solid var(--gold)"></h2>
-        <div id="modal-content" style="max-height: 60vh; overflow-y: auto;"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:10px; font-weight:900; margin-top:15px;">VOLTAR</button>
-    </div>
-</div>
-
 <script type="module">
-    import { db } from './firebase-config.js';
-    import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { BANCO_ESPELHOS } from './banco-espelhos.js';
-    import { pecas } from './estruturas.js';
-    import { FolhaEngine } from './folha-engine.js';
-    import { RadarEngine } from './radar-engine.js';
-    import { engineSaveElite } from './salvar.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    window.db = db;
-    window.activeEx = localStorage.getItem('activeEx') || "44";
-    window.ultimaLinha = 1;
-    let isFinalizing = false;
-
-    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR (ATIVA CORRETOR)
-    const originalMontar = FolhaEngine.montar;
-    FolhaEngine.montar = function(id) {
-        originalMontar.apply(this, arguments);
-        document.querySelectorAll('.linha-folha').forEach(input => {
-            input.setAttribute('spellcheck', 'true');
-            input.setAttribute('autocorrect', 'on');
-            input.setAttribute('autocapitalize', 'sentences');
-            input.setAttribute('autocomplete', 'on');
-        });
-    };
-
-    window.alert = (msg) => {
-        const st = document.getElementById('sync-text');
-        if (st && (msg.includes("Sincronizado") || msg.includes("sucesso"))) {
-            st.innerText = "PEÇA SALVA ✅";
-            document.getElementById('sync-indicator').classList.add('sync-success');
-            setTimeout(() => {
-                st.innerText = "SYNC ON";
-                document.getElementById('sync-indicator').classList.remove('sync-success');
-            }, 3000);
-        }
-    };
-
-    window.carregarRascunho = async () => {
-        const syncText = document.getElementById('sync-text');
-        try {
-            const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-            if (snapshot.exists()) {
-                const dados = snapshot.val();
-                if (dados && dados.linhas) {
-                    dados.linhas.forEach((texto, i) => {
-                        const input = document.getElementById(`L${i + 1}`);
-                        if (input) input.value = texto;
-                    });
-                }
-            }
-        } catch (e) { console.error("Erro no load:", e); }
-    };
-
-    window.dispararSalvar = async () => {
-        if (isFinalizing) return;
-        try { await engineSaveElite(db, window.activeEx, false); } catch(e) {}
-    };
-
-    window.finalizarPeca = async () => {
-        if(!confirm("Deseja finalizar e enviar ao histórico oficial?")) return;
-        isFinalizing = true;
-        try {
-            const ok = await engineSaveElite(db, window.activeEx, true);
-            if(ok) window.alert("Sincronizado!"); 
-        } catch(e) { console.error(e); }
-        isFinalizing = false;
-    };
-
-    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };
-
-    window.forcarRadar = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        if (dna) {
-            const analise = RadarEngine.analisar(dna);
-            RadarEngine.renderizar(analise);
-            document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
-        }
-    };
-
-    window.toggleFoguete = () => {
-        const hub = document.getElementById('mobile-hub');
-        hub.classList.toggle('active');
-        document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
-    };
-
-    window.verPDF = (tipo) => {
-        const frame = document.getElementById('pdf-frame');
-        const view = document.getElementById('pdf-split-view');
-        frame.src = (tipo === 'P') ? `ro${window.activeEx}.pdf` : (tipo === 'G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
-        view.classList.add('active');
-    };
-
-    window.fecharPDF = () => document.getElementById('pdf-split-view').classList.remove('active');
-
-    window.abrirExames = () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "TROCAR EXAME";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>OAB Exame ${i}</span> <i class="fas fa-chevron-right"></i>`;
-            b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
-            content.appendChild(b);
-        }
-        modal.style.display='flex';
-    };
-
-    window.abrirPergaminho = () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>${k}</span> <i class="fas fa-file-alt"></i>`;
-            b.onclick = () => {
-                FolhaEngine.injetarTextoMultilinhas(pecas[k], window.ultimaLinha);
-                modal.style.display='none';
-            };
-            content.appendChild(b);
-        });
-        modal.style.display='flex';
-    };
-
-    window.injetarTeses = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) FolhaEngine.injetarTextoMultilinhas(dna, window.ultimaLinha);
-    };
-
-    window.onload = async () => {
-        FolhaEngine.montar('folha-total');
-        await window.carregarRascunho();
-        setTimeout(window.forcarRadar, 1500); 
-        setInterval(window.dispararSalvar, 30000); 
-
-        document.getElementById('folha-total').addEventListener('focusin', (e) => {
-            if (e.target.classList.contains('linha-folha')) {
-                window.ultimaLinha = parseInt(e.target.getAttribute('data-index')) || 1;
-            }
-        });
+    const config = { 
+        apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
+        authDomain: "masteroab-db5e1.firebaseapp.com", 
+        projectId: "masteroab-db5e1", 
+        databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" 
     };
     
-    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-</script>
+    const app = initializeApp(config);
+    const db = getDatabase(app);
 
+    window.salvarRapido = (type) => {
+        const t = document.getElementById(type+'-t');
+        const c = document.getElementById(type+'-c');
+        if(t.value && c.value) {
+            push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
+            t.value = ""; c.value = "";
+        }
+    };
+
+    window.deletarItem = (caminho) => {
+        if(confirm("Excluir permanentemente?")) remove(ref(db, caminho));
+    };
+
+    window.limparHistoricoCompleto = () => {
+        if(confirm("Apagar TODOS os treinos? Dicas e Teses serão mantidas.")) {
+            remove(ref(db, 'producao_v13')).then(() => alert("Limpo!"));
+        }
+    };
+
+    onValue(ref(db), (snap) => {
+        const d = snap.val() || {};
+        const fP = document.getElementById('feed-producao'); 
+        fP.innerHTML = "";
+        const treinos = d.producao_v13 || {};
+        
+        Object.keys(treinos).reverse().forEach(id => {
+            const t = treinos[id];
+            const isRascunho = id.includes("RASCUNHO_ATUAL");
+            const cor = isRascunho ? "#fbbf24" : "#22c55e";
+            fP.innerHTML += `
+                <div class="card-h" style="border-left-color: ${cor}">
+                    <span><strong>${t.nome_peca || "Sem Nome"}</strong><br><small>${t.data_envio || ""}</small></span>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn" style="width:auto; margin:0; background:#3b82f6; color:white; padding: 8px;" onclick="compartilharTreino('${id}')" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 8px;" onclick="verTreino('${id}')" title="Ver Peça"><i class="fas fa-eye"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 8px;" onclick="deletarItem('producao_v13/${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+        });
+
+        ['nc', 'tese'].forEach(type => {
+            const f = document.getElementById('feed-'+type); f.innerHTML = "";
+            const items = d['v13_'+type] || {};
+            const color = type === 'nc' ? '#f472b6' : '#3b82f6';
+            Object.keys(items).reverse().forEach(id => {
+                f.innerHTML += `<div class="post-it" style="background:${color}"><i class="fas fa-times" style="float:right;" onclick="deletarItem('v13_${type}/${id}')"></i><strong>${items[id].t}</strong><p style="font-size:0.85rem; margin:5px 0; white-space: pre-wrap;">${items[id].c}</p></div>`;
+            });
+        });
+    });
+
+    window.compartilharTreino = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        const p = s.val();
+        if(!p || !p.linhas) return;
+        const textoPeca = p.linhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(linha => linha.split(". ")[1].trim().length > 0).join('\n');
+        const mensagem = `📝 *TREINO ELITE OAB*\n\n*Peça:* ${p.nome_peca}\n*Data:* ${p.data_envio}\n\n--- CONTEÚDO ---\n${textoPeca}`;
+        if (navigator.share) {
+            try { await navigator.share({ title: p.nome_peca, text: mensagem }); } catch (err) {}
+        } else {
+            await navigator.clipboard.writeText(mensagem);
+            alert("Texto copiado para o WhatsApp!");
+        }
+    };
+
+    window.verTreino = (id) => {
+        onValue(ref(db, 'producao_v13/' + id), (s) => {
+            const p = s.val();
+            if(!p || !p.linhas) return;
+            const w = window.open('', '_blank');
+            const linhasHtml = p.linhas.map((l, i) => `
+                <div style="display:flex; border-bottom:1px solid #f1f5f9; min-height:24px; align-items:flex-start;">
+                    <div style="width:30px; min-width:30px; color:#cbd5e1; font-size:10px; text-align:right; padding-right:8px; padding-top:4px; border-right:1px solid #f1f5f9; margin-right:10px; font-family:sans-serif;">${i+1}</div>
+                    <div style="flex:1; padding:2px 0; font-family:'Courier New', monospace; font-size:16px; line-height:1.5; color:#334155; word-break:break-word;">${l || ""}</div>
+                </div>
+            `).join('');
+            
+            w.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { margin:0; padding:10px; background:#f8fafc; font-family:sans-serif; }
+                        .paper { background:#fff; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; max-width:800px; margin:0 auto; }
+                        .header { text-align:center; border-bottom:2px solid #fbbf24; padding-bottom:10px; margin-bottom:20px; }
+                        .btn-voltar { display:block; width:100%; padding:15px; background:#020617; color:#fff; text-align:center; text-decoration:none; border-radius:8px; font-weight:bold; margin-top:20px; cursor:pointer; border:none; }
+                    </style>
+                </head>
+                <body>
+                    <div class="paper">
+                        <div class="header">
+                            <h3 style="margin:0; color:#020617;">${p.nome_peca}</h3>
+                            <small style="color:#64748b;">Enviado em: ${p.data_envio}</small>
+                        </div>
+                        ${linhasHtml}
+                        <button class="btn-voltar" onclick="window.close()">FECHAR VISUALIZAÇÃO</button>
+                    </div>
+                </body>
+                </html>
+            `);
+            w.document.close();
+        }, {onlyOnce: true});
+    };
+</script>
 </body>
 </html>

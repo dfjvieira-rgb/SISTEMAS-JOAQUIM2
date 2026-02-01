@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA ELITE 2026 | SEUS TREINOS</title>
+    <title>MENTORIA ELITE 2026 | BASE BLINDADA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #020617; --gold: #fbbf24; --accent: #a855f7;
-            --card-bg: #1e293b; --text: #f8fafc; --success: #16a34a; --danger: #dc2626;
+            --card-bg: #1e293b; --text: #f8fafc; --border: #94a3b8;
+            --success: #16a34a; --purple: #5b21b6; --danger: #dc2626; --slate: #475569;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: var(--text); padding: 20px; }
@@ -23,88 +24,95 @@
         .panel-header { padding: 12px; background: rgba(255,255,255,0.05); border-bottom: 1px solid #334155; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; text-align: center; color: var(--gold); }
         .panel-body { padding: 15px; }
 
-        /* CARDS DE TREINOS SALVOS */
+        /* CARDS DO HISTÓRICO DE PRODUÇÃO */
         .card-treino { border-left: 5px solid var(--gold); background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .treino-info strong { display: block; color: var(--gold); font-size: 0.9rem; }
         .treino-info small { color: #94a3b8; font-size: 0.75rem; }
         .treino-actions { display: flex; gap: 15px; }
-        .treino-actions i { cursor: pointer; font-size: 1.1rem; transition: 0.2s; }
+        .treino-actions i { cursor: pointer; font-size: 1.1rem; transition: 0.2s; color: white; }
+        .treino-actions i:hover { color: var(--gold); }
 
-        /* ESTILO DOS OUTROS PAINÉIS */
+        /* FORMULÁRIOS */
         label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px; color: #94a3b8; }
-        input, textarea { width: 100%; border: 1px solid #334155; background: rgba(0,0,0,0.2); color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-family: inherit; }
+        input, textarea { width: 100%; border: 1px solid #334155; background: rgba(0,0,0,0.2); color: white; border-radius: 8px; padding: 12px; margin-bottom: 10px; font-family: inherit; outline: none; }
+        input:focus, textarea:focus { border-color: var(--gold); }
         .btn-save { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; color: #fff; text-transform: uppercase; }
-        .feed { margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        
+        .feed { margin-top: 15px; max-height: 350px; overflow-y: auto; }
         .card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; position: relative; }
         .btn-reveal { background: var(--gold); color: #000; border: none; padding: 10px; border-radius: 6px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 5px; }
-        .hidden-content { display: none; margin-top: 10px; padding: 12px; background: rgba(22, 163, 74, 0.2); border: 1px solid #4ade80; border-radius: 6px; }
+        .hidden-content { display: none; margin-top: 10px; padding: 12px; background: rgba(22, 163, 74, 0.2); border: 1px solid #4ade80; border-radius: 6px; color: #4ade80; font-weight: bold; }
 
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
 
-        /* ÁREA OCULTA PARA IMPRESSÃO A4 */
+        /* ENGINE DE IMPRESSÃO A4 (Oculto na tela, visível no papel) */
         #print-area { display: none; }
         @media print {
             body * { display: none !important; }
-            #print-area { display: block !important; background: white; color: black; padding: 0; }
-            .print-row { display: flex; border-bottom: 1px solid #ccc; font-family: 'Courier New', monospace; font-size: 14pt; line-height: 1.5; }
-            .print-num { width: 40px; border-right: 1px solid #ccc; text-align: center; font-size: 10pt; color: #666; padding-right: 5px; }
-            .print-text { padding-left: 10px; flex: 1; }
+            #print-area { display: block !important; background: white; color: black; padding: 20px; }
+            .print-header { text-align: center; border-bottom: 2px solid black; margin-bottom: 20px; padding-bottom: 10px; }
+            .print-row { display: flex; border-bottom: 1px solid #eee; font-family: 'Courier New', monospace; font-size: 12pt; min-height: 25px; align-items: center; }
+            .print-num { width: 40px; border-right: 1px solid #ddd; text-align: center; font-size: 9pt; color: #666; margin-right: 10px; }
+            .print-text { flex: 1; white-space: pre-wrap; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo"><i class="fas fa-robot"></i> MENTORIA ELITE</div>
-    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR À FOLHA</a>
+    <div class="logo"><i class="fas fa-brain"></i> MENTORIA ELITE</div>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="window.location.reload()" class="btn-voltar" style="background: var(--slate); border-color: var(--slate); color: white;"><i class="fas fa-sync"></i> ATUALIZAR</button>
+        <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR À FOLHA</a>
+    </div>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="border-top: 4px solid var(--gold); grid-column: span 2;">
-        <div class="panel-header"><i class="fas fa-pen-nib"></i> Minhas Petições Salvas (Sua Produção)</div>
+        <div class="panel-header"><i class="fas fa-history"></i> Minhas Petições Salvas (Para Correção)</div>
         <div class="panel-body">
-            <div id="feed-treinos">
-                <p style="text-align:center; color:gray;">Carregando sua produção...</p>
+            <div id="feed-estudos" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
+                <p style="text-align:center; color:gray; grid-column: 1/-1;">Carregando sua produção...</p>
             </div>
         </div>
     </section>
 
     <section class="panel" style="border-top: 4px solid var(--danger);">
-        <div class="panel-header">Não Confunda</div>
+        <div class="panel-header">Inteligência: Não Confunda</div>
         <div class="panel-body">
-            <label>Conceito A vs B</label><input type="text" id="nc-t">
-            <label>O Pulo do Gato</label><textarea id="nc-c" rows="2"></textarea>
+            <label>Conceito A vs B</label><input type="text" id="nc-t" placeholder="Ex: Rito Ordinário vs Sumaríssimo">
+            <label>O Pulo do Gato</label><textarea id="nc-c" rows="2" placeholder="Diferença técnica crucial..."></textarea>
             <button class="btn-save" style="background: var(--danger);" onclick="salvar('nc')">Gravar Alerta</button>
             <div class="feed" id="feed-nc"></div>
         </div>
     </section>
 
     <section class="panel" style="border-top: 4px solid var(--purple);">
-        <div class="panel-header">Qual a Peça?</div>
+        <div class="panel-header">Qual a Peça? (Flashcards)</div>
         <div class="panel-body">
-            <label>Dica/Fatos</label><textarea id="peca-t" rows="2"></textarea>
-            <label>Gabarito</label><input type="text" id="peca-c">
+            <label>Cenário / Enunciado</label><textarea id="peca-t" rows="2" placeholder="Fatos identificadores..."></textarea>
+            <label>Gabarito</label><input type="text" id="peca-c" placeholder="Nome Completo da Peça">
             <button class="btn-save" style="background: var(--purple);" onclick="salvar('peca')">Salvar Flashcard</button>
             <div class="feed" id="feed-peca"></div>
         </div>
     </section>
 
     <section class="panel" style="border-top: 4px solid var(--success);">
-        <div class="panel-header">Preliminares</div>
+        <div class="panel-header">Preliminares Processuais</div>
         <div class="panel-body">
-            <label>Título</label><input type="text" id="pre-t">
-            <label>Texto Técnico</label><textarea id="pre-c" rows="2"></textarea>
-            <button class="btn-save" style="background: var(--success);" onclick="salvar('pre')">Arquivar</button>
+            <label>Título</label><input type="text" id="pre-t" placeholder="Ex: Litispendência">
+            <label>Fundamentação</label><textarea id="pre-c" rows="2" placeholder="Texto técnico da preliminar..."></textarea>
+            <button class="btn-save" style="background: var(--success);" onclick="salvar('pre')">Arquivar Preliminar</button>
             <div class="feed" id="feed-pre"></div>
         </div>
     </section>
 
     <section class="panel" style="border-top: 4px solid #3b82f6;">
-        <div class="panel-header">Tesário</div>
+        <div class="panel-header">Tesário de Mérito</div>
         <div class="panel-body">
-            <label>Tema</label><input type="text" id="tese-t">
-            <label>Estrutura</label><textarea id="tese-c" rows="2"></textarea>
-            <button class="btn-save" style="background: #3b82f6;" onclick="salvar('tese')">Arquivar</button>
+            <label>Tema</label><input type="text" id="tese-t" placeholder="Ex: Horas In Itinere">
+            <label>Estrutura (Fato/Fund/Ped)</label><textarea id="tese-c" rows="2"></textarea>
+            <button class="btn-save" style="background: #3b82f6;" onclick="salvar('tese')">Arquivar Tese</button>
             <div class="feed" id="feed-tese"></div>
         </div>
     </section>
@@ -127,17 +135,23 @@
 
     const paths = { pre: 'v13_pre', peca: 'v13_peca', nc: 'v13_nc', tese: 'v13_tese', hist: 'estudos' };
 
-    // FUNÇÃO PARA GERAR A FOLHA A4 DA SUA PRODUÇÃO PARA A PROFESSORA
-    window.imprimirSuaPeca = (data) => {
-        const printArea = document.getElementById('print-area');
-        printArea.innerHTML = `<h2 style="text-align:center; margin-bottom:20px;">TREINO ELITE - EXAME ${data.exame || ''}</h2>`;
+    // ENGINE DE RECONSTRUÇÃO DA SUA FOLHA [cite: 2026-02-01]
+    window.imprimirMinhaProducao = (exameId, linhas) => {
+        const area = document.getElementById('print-area');
+        area.innerHTML = `
+            <div class="print-header">
+                <h2>CADERNO DE RESPOSTAS - EXAME ${exameId}</h2>
+                <p>Treino realizado em: ${new Date().toLocaleDateString()}</p>
+            </div>
+        `;
         
-        data.linhas.forEach((txt, i) => {
-            printArea.innerHTML += `
+        linhas.forEach((texto, index) => {
+            area.innerHTML += `
                 <div class="print-row">
-                    <div class="print-num">${i + 1}</div>
-                    <div class="print-text">${txt || ''}</div>
-                </div>`;
+                    <div class="print-num">${index + 1}</div>
+                    <div class="print-text">${texto || ''}</div>
+                </div>
+            `;
         });
         window.print();
     };
@@ -145,14 +159,18 @@
     window.salvar = (type) => {
         const t = document.getElementById(`${type}-t`).value;
         const c = document.getElementById(`${type}-c`).value;
-        if(!t || !c) return;
+        if(!t || !c) return alert("Preencha todos os campos!");
         push(ref(db, paths[type]), { t, c, ts: serverTimestamp() }).then(() => {
             document.getElementById(`${type}-t`).value = '';
             document.getElementById(`${type}-c`).value = '';
         });
     };
 
-    window.excluir = (path, id) => { if(confirm("Remover permanentemente?")) remove(ref(db, `${path}/${id}`)); };
+    window.excluir = (path, id) => { 
+        if(confirm("Deseja apagar este registro do seu histórico?")) {
+            remove(ref(db, `${path}/${id}`)); 
+        }
+    };
 
     window.toggleR = (btn) => {
         const div = btn.nextElementSibling;
@@ -163,42 +181,46 @@
 
     // ESCUTA EM TEMPO REAL
     onValue(ref(db), (snap) => {
-        const v = snap.val() || {};
+        const data = snap.val() || {};
         
-        // Renderizar Produção (O que o Disquete enviou)
-        const feedTreinos = document.getElementById('feed-treinos');
-        feedTreinos.innerHTML = "";
-        const treinos = v['estudos'] || {};
-        
-        Object.keys(treinos).reverse().forEach(id => {
-            const t = treinos[id];
-            const div = document.createElement('div');
-            div.className = 'card-treino';
-            div.innerHTML = `
-                <div class="treino-info">
-                    <strong>PEÇA DO EXAME ${id}</strong>
-                    <small>Salvo em: ${new Date(t.ts).toLocaleString()}</small>
-                </div>
-                <div class="treino-actions">
-                    <i class="fas fa-print" style="color:white" title="Imprimir para Professora" id="btn-p-${id}"></i>
-                    <i class="fas fa-trash-alt" style="color:var(--danger)" onclick="excluir('estudos','${id}')"></i>
-                </div>
-            `;
-            feedTreinos.appendChild(div);
-            // Pendura o evento de impressão enviando os dados da folha
-            document.getElementById(`btn-p-${id}`).onclick = () => imprimirSuaPeca({exame: id, linhas: t.linhas});
-        });
+        // 1. Renderizar Suas Petições (O que veio do Disquete)
+        const feedEstudos = document.getElementById('feed-estudos');
+        feedEstudos.innerHTML = "";
+        const estudos = data['estudos'] || {};
+        const chavesEstudos = Object.keys(estudos);
 
-        // Renderizar outros painéis (nc, peca, pre, tese)
+        if(chavesEstudos.length === 0) {
+            feedEstudos.innerHTML = '<p style="text-align:center; color:gray; grid-column:1/-1;">Nenhuma petição salva ainda.</p>';
+        } else {
+            chavesEstudos.reverse().forEach(id => {
+                const treino = estudos[id];
+                const card = document.createElement('div');
+                card.className = 'card-treino';
+                card.innerHTML = `
+                    <div class="treino-info">
+                        <strong>TREINO EXAME ${id}</strong>
+                        <small>Data: ${new Date(treino.ts).toLocaleString()}</small>
+                    </div>
+                    <div class="treino-actions">
+                        <i class="fas fa-print" title="Imprimir para Professora" id="print-btn-${id}"></i>
+                        <i class="fas fa-trash-alt" style="color:var(--danger)" onclick="excluir('estudos','${id}')"></i>
+                    </div>
+                `;
+                feedEstudos.appendChild(card);
+                document.getElementById(`print-btn-${id}`).onclick = () => imprimirMinhaProducao(id, treino.linhas);
+            });
+        }
+
+        // 2. Renderizar Painéis de Inteligência
         ['nc', 'peca', 'pre', 'tese'].forEach(type => {
             const feed = document.getElementById(`feed-${type}`);
             feed.innerHTML = "";
-            const items = v[paths[type]] || {};
+            const items = data[paths[type]] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
                 feed.innerHTML += `
                     <div class="card">
-                        <i class="fas fa-trash" style="position:absolute; right:10px; top:10px; font-size:0.7rem; color:gray; cursor:pointer" onclick="excluir('${paths[type]}','${id}')"></i>
+                        <i class="fas fa-times" style="position:absolute; right:10px; top:10px; font-size:0.7rem; color:gray; cursor:pointer" onclick="excluir('${paths[type]}','${id}')"></i>
                         ${type === 'peca' ? 
                             `<strong>Cenário:</strong> ${item.t}<button class="btn-reveal" onclick="toggleR(this)">VER GABARITO</button><div class="hidden-content">${item.c}</div>` : 
                             `<strong>${item.t}</strong><p style="font-size:0.85rem; opacity:0.8; margin-top:5px; white-space:pre-wrap;">${item.c}</p>`}

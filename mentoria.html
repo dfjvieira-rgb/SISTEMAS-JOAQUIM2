@@ -26,7 +26,7 @@
         @media (max-width: 768px) { 
             .dashboard { grid-template-columns: 1fr; } 
             header h2 { font-size: 1.2rem; }
-            .btn { padding: 15px; } /* Botões maiores para o dedo no mobile */
+            .btn { padding: 15px; }
         }
     </style>
 </head>
@@ -128,29 +128,45 @@
         });
     });
 
+    // FUNÇÃO VER TREINO COM AJUSTE DE ESCALA MOBILE (FULL SCREEN)
     window.verTreino = (id) => {
         onValue(ref(db, 'producao_v13/' + id), (s) => {
             const p = s.val();
             if(!p || !p.linhas) return;
             const w = window.open('', '_blank');
             const linhasHtml = p.linhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #eee; padding:5px 0; font-family: monospace; font-size:13px;">
-                    <span style="width:25px; color:#999; border-right:1px solid #ddd; margin-right:8px; text-align:right; padding-right:4px;">${i+1}</span>
-                    <span style="flex:1; color:#000; word-break: break-word;">${l || ""}</span>
+                <div style="display:flex; border-bottom:1px solid #eee; padding:10px 0; font-family: 'Courier New', monospace; font-size:16px; align-items: flex-start;">
+                    <span style="width:35px; min-width:35px; color:#94a3b8; border-right:1px solid #e2e8f0; margin-right:10px; text-align:right; padding-right:8px; font-size:12px; margin-top:3px;">${i+1}</span>
+                    <span style="flex:1; color:#1e293b; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${l || ""}</span>
                 </div>
             `).join('');
+            
             w.document.write(`
                 <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>REVISÃO MOBILE</title>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+                    <title>REVISÃO: ${p.nome_peca}</title>
+                    <style>
+                        body { background:#f8fafc; margin:0; padding:0; font-family: sans-serif; -webkit-text-size-adjust: 100%; }
+                        .paper { background:#fff; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+                        .header { text-align:center; border:2px solid #020617; padding:15px; margin-bottom:20px; background: #fff; }
+                        .btn-back { width:100%; padding:18px; background:#020617; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:16px; margin-top:25px; cursor:pointer; }
+                        @media (min-width: 768px) {
+                            body { padding: 40px; }
+                            .paper { max-width: 850px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; padding: 40px; min-height: auto; }
+                        }
+                    </style>
                 </head>
-                <body style="background:#fff; margin:0; padding:10px; font-family: sans-serif;">
-                    <div style="text-align:center; border:1px solid #000; padding:5px; margin-bottom:15px;">
-                        <b style="font-size:14px;">${p.nome_peca}</b><br><small>Exame ${p.exame}</small>
+                <body>
+                    <div class="paper">
+                        <div class="header">
+                            <b style="font-size:16px; display:block; margin-bottom:5px;">${p.nome_peca}</b>
+                            <span style="font-size:12px; color:#64748b;">EXAME OAB ${p.exame} | DATA: ${p.data_envio}</span>
+                        </div>
+                        <div class="content">${linhasHtml}</div>
+                        <button class="btn-back" onclick="window.close()">VOLTAR À REVISÃO</button>
                     </div>
-                    <div>${linhasHtml}</div>
-                    <button onclick="window.close()" style="width:100%; margin-top:20px; padding:15px; background:#000; color:#fff; border:none; border-radius:8px; font-weight:bold;">VOLTAR</button>
                 </body>
                 </html>
             `);

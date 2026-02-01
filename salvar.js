@@ -1,49 +1,50 @@
 // salvar.js
 import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-/**
- * Engine de Salvamento Isolada
- * @param {Object} db - Instância do banco de dados Firebase
- * @param {String} exame - Número do exame atual
- */
 export const engineSaveElite = async (db, exame) => {
-    const btn = document.getElementById('btn-save-elite');
-    const icon = btn.querySelector('i');
+    const btnSave = document.getElementById('btn-salvar-elite');
+    if (!btnSave) return;
+
+    const originalIcon = '<i class="fas fa-save"></i>';
     
-    // Bloqueio de segurança para evitar cliques duplos
-    btn.style.pointerEvents = 'none';
-    icon.className = 'fas fa-spinner fa-spin';
+    // Feedback de carregamento
+    btnSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btnSave.style.pointerEvents = 'none';
 
     try {
-        const titulo = document.getElementById('identificador-peca').innerText;
-        // Captura todas as linhas da folha
-        const conteudo = Array.from(document.querySelectorAll('.linha-input')).map(input => input.value);
+        const tituloPeca = document.getElementById('identificador-peca').innerText;
+        // Captura todas as linhas da folha usando a classe correta
+        const linhasConteudo = Array.from(document.querySelectorAll('.linha-folha'))
+                                    .map(input => input.value || "");
 
-        // Envio para a coleção blindada producao_v13
-        await set(ref(db, 'producao_v13/' + Date.now()), {
+        // Payload blindado para producao_v13
+        const payload = {
             exame: exame,
-            nome_peca: titulo,
-            linhas: conteudo,
-            timestamp: serverTimestamp()
-        });
+            nome_peca: tituloPeca,
+            linhas: linhasConteudo,
+            timestamp: serverTimestamp(),
+            versao: "ELITE-2026-V13"
+        };
 
-        // Feedback de sucesso
-        icon.className = 'fas fa-check';
-        console.log("✔ Backup Elite Concluído com sucesso.");
+        // Salva com ID único baseado no tempo
+        await set(ref(db, `producao_v13/${exame}_${Date.now()}`), payload);
+
+        // Sucesso
+        btnSave.innerHTML = '<i class="fas fa-check" style="color:#fff"></i>';
+        console.log("✔ Sincronização Elite concluída.");
 
         setTimeout(() => {
-            window.print(); // Dispara o PDF oficial
-            icon.className = 'fas fa-save';
-            btn.style.pointerEvents = 'auto';
+            window.print(); // Dispara o PDF após salvar
+            btnSave.innerHTML = originalIcon;
+            btnSave.style.pointerEvents = 'auto';
         }, 1000);
 
     } catch (error) {
-        console.error("❌ Falha na Engine de Salvamento:", error);
-        icon.className = 'fas fa-exclamation-triangle';
-        alert("Erro ao sincronizar. Dados mantidos localmente.");
+        console.error("Erro na Engine de Salvamento:", error);
+        btnSave.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
         setTimeout(() => {
-            icon.className = 'fas fa-save';
-            btn.style.pointerEvents = 'auto';
+            btnSave.innerHTML = originalIcon;
+            btnSave.style.pointerEvents = 'auto';
         }, 3000);
     }
 };

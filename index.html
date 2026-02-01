@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - MODULAR RADAR FIX</title>
+    <title>JOAQUIM ELITE 2026 - DISQUETE BLINDADO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -21,11 +21,10 @@
         main { flex: 1; overflow-y: auto; background: var(--bg-paper); display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
         .paper { background: white; width: 100%; max-width: 850px; min-height: 100%; box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; }
         
-        /* Identificador em Vermelho conforme a imagem original [cite: 2026-01-30] */
         #identificador-peca { padding: 25px 15px; text-align: center; color: #ef4444; font-weight: 900; font-size: 1.4rem; text-transform: uppercase; border-bottom: 3px double #f1f5f9; min-height: 80px; }
 
         .toolbar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; display: grid; grid-template-columns: repeat(6, 1fr); border-top: 3px solid var(--gold); z-index: 2000; }
-        .btn-tool { background: transparent; border: none; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        .btn-tool { background: transparent; border: none; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; }
         .btn-tool span { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; }
 
         @media (max-width: 600px) {
@@ -69,9 +68,9 @@
 
 <nav class="toolbar">
     <button class="btn-tool" onclick="abrirModalExames()" style="color:var(--gold);"><i class="fas fa-bullseye"></i><span>Exames</span></button>
-    <button class="btn-tool" onclick="salvarManual()" style="color:#0ea5e9;"><i class="fas fa-save"></i><span>Salvar</span></button>
+    <button class="btn-tool" onclick="salvarEstrategico()" style="color:#0ea5e9;"><i class="fas fa-save"></i><span>Salvar</span></button>
     <button class="btn-tool" onclick="abrirModalPecas()" style="color:#f59e0b;"><i class="fas fa-scroll"></i><span>Peças</span></button>
-    <button class="btn-tool" onclick="alert('Injetando Conteúdo...')" style="color:#3b82f6;"><i class="fas fa-gavel"></i><span>Justiça</span></button>
+    <button class="btn-tool" onclick="alert('Injetando Content...')" style="color:#3b82f6;"><i class="fas fa-gavel"></i><span>Justiça</span></button>
     <button class="btn-tool" onclick="abrirMentoria()" style="color:#a855f7;"><i class="fas fa-robot"></i><span>Mentoria</span></button>
     <button class="btn-tool" onclick="window.print()" style="color:#10b981;"><i class="fas fa-print"></i><span>Imprimir</span></button>
     <button class="btn-tool" onclick="pdf('p')" style="color:#f97316;"><i class="fas fa-file-pdf"></i><span>Peça PDF</span></button>
@@ -92,7 +91,7 @@
 
 <script type="module">
     import { db } from './firebase-config.js';
-    import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
     import { RadarEngine } from './radar-engine.js';
     import { pecas } from './estruturas.js';
@@ -113,7 +112,6 @@
             };
         });
         carregarDados();
-        RadarEngine.atualizarStatus(true);
     };
 
     window.carregarDados = () => {
@@ -128,12 +126,32 @@
         }, { onlyOnce: true });
     };
 
-    window.salvarManual = () => {
+    // FUNÇÃO DO DISQUETE BLINDADO [cite: 2026-01-30]
+    window.salvarEstrategico = () => {
         const dados = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
-        set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() }).then(() => alert("☁️ Sincronizado!"));
+        const nomePeca = document.getElementById('identificador-peca').innerText;
+        
+        // 1. Salva o rascunho atual
+        set(ref(db, 'estudos/' + activeEx), { 
+            linhas: dados, 
+            peca: nomePeca,
+            ts: Date.now() 
+        });
+
+        // 2. Registra no Histórico da Mentoria (Organizando PDFs) [cite: 2026-01-30]
+        const historicoRef = ref(db, 'mentoria/historico');
+        push(historicoRef, {
+            exame: activeEx,
+            peca: nomePeca,
+            data: new Date().toLocaleString(),
+            pdf_enunciado: `ro${activeEx}.pdf`,
+            pdf_gabarito: `ro${activeEx}-gabarito.pdf`,
+            status: "Concluído"
+        }).then(() => {
+            alert(`💾 SALVO!\nPeça: ${nomePeca}\nHistórico atualizado na Mentoria.`);
+        });
     };
 
-    // CORREÇÃO: Função que injeta a peça agora atualiza o nome no topo [cite: 2026-01-30]
     window.abrirModalPecas = () => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-title').innerText = "ESTRUTURAS ANALISADAS";
@@ -141,17 +159,11 @@
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = k;
             b.onclick = () => {
-                // Limpa o identificador antes de injetar
-                const idTopo = document.getElementById('identificador-peca');
-                
                 pecas[k].split('\n').forEach((t, i) => {
                     const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
                     if(el) el.value = t.substring(0, 85);
                 });
-                
-                // Força a atualização do texto vermelho [cite: 2026-01-30]
-                if(idTopo) idTopo.innerText = k;
-                
+                document.getElementById('identificador-peca').innerText = k;
                 fecharModal();
             };
             content.appendChild(b);

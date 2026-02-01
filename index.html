@@ -33,19 +33,19 @@
         
         #identificador-peca { 
             width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); 
-            text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem;
+            text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer;
         }
 
-        /* HUB MOBILE (FOGUETE) - Ajustado para subir os botões */
+        /* HUB MOBILE (FOGUETE) - RE-ALINHADO */
         #mobile-hub { 
-            display: none; position: fixed; bottom: 30px; right: 25px; z-index: 5000; 
+            display: none; position: fixed; bottom: 40px; right: 25px; z-index: 5000; 
             flex-direction: column-reverse; gap: 12px; align-items: center;
         }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; z-index: 5001; }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #mobile-hub.active .fab-sub { display: flex; animation: slideUp 0.3s ease-out forwards; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; z-index: 5001; color: #000; cursor: pointer; }
+        .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        #mobile-hub.active .fab-sub { display: flex; animation: flyUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes flyUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 768px) {
             .sidebar { display: none !important; }
@@ -59,16 +59,16 @@
         #pdf-split-view.active { display: block; }
 
         /* MODAIS */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 6000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 95%; max-width: 500px; max-height: 80vh; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; align-items: center; justify-content: center; }
+        .modal-body { background: white; width: 95%; max-width: 500px; max-height: 85vh; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; }
         #modal-content { overflow-y: auto; flex: 1; margin: 15px 0; }
         
-        .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 10px; border: 2px solid #ddd; background: #f8fafc; font-weight: 900; font-size: 1.1rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #1e293b; }
+        .opt-btn { width: 100%; padding: 22px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 900; font-size: 1.2rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #1e293b; }
 
         /* LINHA FGV */
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
-        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); }
-        .linha-folha { flex: 1; border: none; outline: none; background: transparent; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
+        .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); }
+        .linha-folha { flex: 1; border: none; outline: none; background: transparent !important; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
     </style>
 </head>
 <body class="dark-mode">
@@ -77,7 +77,7 @@
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
     <div style="display:flex; gap:10px;">
         <button class="btn-side" style="width:40px; background:#475569;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-adjust"></i></button>
-        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Reiniciar Sistema?') && location.reload()"><i class="fas fa-trash"></i></button>
+        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Limpar e Reiniciar?') && location.reload()"><i class="fas fa-trash"></i></button>
     </div>
 </header>
 
@@ -87,7 +87,7 @@
             <div id="radar-status" style="color:white; font-size:0.7rem; font-weight:bold;">SCANNER ATIVO</div>
         </div>
         <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Trocar Exame</span></button>
-        <button class="btn-side" style="background:#10b981;" id="btn-save-pc"><i class="fas fa-save"></i> <span>Salvar Treino</span></button>
+        <button class="btn-side" style="background:#10b981;" id="btn-save-pc"><i class="fas fa-save"></i> <span>Salvar Elite</span></button>
         <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
@@ -99,7 +99,7 @@
 
     <section class="editor-container">
         <div class="paper">
-            <div id="identificador-peca" onclick="window.forcarRadar()">ESCANEANDO DNA...</div>
+            <div id="identificador-peca" onclick="window.forcarRadar()">CARREGANDO DNA...</div>
             <div id="folha-total"></div>
         </div>
     </section>
@@ -123,9 +123,9 @@
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h3 id="modal-title" style="color:#1e293b; border-bottom:2px solid var(--gold); padding-bottom:10px;"></h3>
+        <h2 id="modal-title" style="margin-bottom:10px; border-bottom:3px solid var(--gold)"></h2>
         <div id="modal-content"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; font-weight:bold; margin-top:10px;">VOLTAR</button>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:10px; font-weight:900; margin-top:10px;">VOLTAR</button>
     </div>
 </div>
 
@@ -140,27 +140,21 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
-    // --- CORREÇÃO DE ROTAS (Nomes de arquivos 2026) ---
+    // --- CORREÇÃO DE ROTAS (Bate com a lista de arquivos real) ---
     window.verPDF = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
         
         let arquivo = "";
-        if(tipo === 'P') {
-            arquivo = `ro${window.activeEx}.pdf`; 
-        } else if(tipo === 'G') {
-            // DEPARA PARA GABARITO: r0XX-gabarito.pdf conforme seu erro 404
-            arquivo = `r0${window.activeEx}-gabarito.pdf`;
-        } else {
-            arquivo = `vade.pdf`;
-        }
+        if(tipo === 'P') arquivo = `ro${window.activeEx}.pdf`;
+        else if(tipo === 'G') arquivo = `ro${window.activeEx}-gabarito.pdf`; // PADRÃO CORRIGIDO
+        else arquivo = `vade.pdf`;
         
         frame.src = arquivo;
         view.classList.add('active');
         document.getElementById('mobile-hub').classList.remove('active');
     };
 
-    // --- RADAR E MOTORES ---
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna) {
@@ -172,12 +166,12 @@
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "TROCAR EXAME";
+        document.getElementById('modal-title').innerText = "SELECIONAR OAB";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>Exame OAB ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.innerHTML = `<span>Exame ${i}</span> <i class="fas fa-chevron-right"></i>`;
             b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
             content.appendChild(b);
         }
@@ -186,6 +180,7 @@
 
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
+        if(!dna) return alert("DNA não localizado.");
         const teses = dna.replace(/<[^>]*>?/gm, '').split('\n').filter(t => t.trim().length > 15);
         teses.forEach((t, i) => {
             const linha = document.getElementById(`L${window.ultimaLinha + i}`);
@@ -196,12 +191,12 @@
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PEÇAS FGV";
+        document.getElementById('modal-title').innerText = "PEÇAS";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>${k}</span> <i class="fas fa-file-import"></i>`;
+            b.innerHTML = `<span>${k}</span> <i class="fas fa-file-export"></i>`;
             b.onclick = () => {
                 pecas[k].split('\n').forEach((t, i) => {
                     const el = document.getElementById(`L${window.ultimaLinha + i}`);
@@ -216,31 +211,30 @@
 
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
 
-    // --- START E EVENTOS ---
+    // --- INICIALIZAÇÃO BLINDADA ---
     window.onload = () => {
         FolhaEngine.montar('folha-total', 85);
         window.forcarRadar();
 
-        // Salvar blindado para PC e Mobile
-        const btnSavePc = document.getElementById('btn-save-pc');
-        const btnSaveMob = document.getElementById('btn-save-mob');
-        const saveAction = () => {
+        // Fix Salvar PC & Mobile
+        const saveElite = () => {
             engineSaveElite(db, window.activeEx);
             document.getElementById('mobile-hub').classList.remove('active');
         };
-        if(btnSavePc) btnSavePc.onclick = saveAction;
-        if(btnSaveMob) btnSaveMob.onclick = saveAction;
+        document.getElementById('btn-save-pc').onclick = saveElite;
+        document.getElementById('btn-save-mob').onclick = saveElite;
 
+        // Listener de Linhas
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
                 input.addEventListener('focus', () => { window.ultimaLinha = parseInt(input.getAttribute('data-index')); });
             });
-        }, 600);
+        }, 800);
 
+        // Mobile Hub Toggle
         document.getElementById('main-fab').onclick = () => {
             const hub = document.getElementById('mobile-hub');
             hub.classList.toggle('active');
-            // Muda ícone do foguete para fechar quando ativo
             document.getElementById('main-fab').innerHTML = hub.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-rocket"></i>';
         };
     };

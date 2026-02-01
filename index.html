@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - MODULAR RADAR</title>
+    <title>JOAQUIM ELITE 2026 - MODULAR RADAR FIX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -16,11 +16,12 @@
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
         header { background: var(--primary); height: var(--header-h); padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 1000; }
-        .radar-box { border: 1px solid var(--gold); color: var(--gold); padding: 3px 8px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; text-transform: uppercase; transition: 0.3s; }
+        .radar-box { border: 1px solid var(--gold); color: var(--gold); padding: 3px 8px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; text-transform: uppercase; }
 
         main { flex: 1; overflow-y: auto; background: var(--bg-paper); display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
         .paper { background: white; width: 100%; max-width: 850px; min-height: 100%; box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; }
         
+        /* Identificador em Vermelho conforme a imagem original [cite: 2026-01-30] */
         #identificador-peca { padding: 25px 15px; text-align: center; color: #ef4444; font-weight: 900; font-size: 1.4rem; text-transform: uppercase; border-bottom: 3px double #f1f5f9; min-height: 80px; }
 
         .toolbar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; display: grid; grid-template-columns: repeat(6, 1fr); border-top: 3px solid var(--gold); z-index: 2000; }
@@ -103,7 +104,6 @@
         FolhaEngine.montar('folha-total', 85);
         document.querySelectorAll('.linha-folha').forEach((input, index) => {
             input.onfocus = () => { ultimaLinhaFocada = index + 1; };
-            // Aciona o Radar a cada mudança de texto [cite: 2026-01-30]
             input.oninput = () => {
                 const linhas = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
                 const detectado = RadarEngine.analisar(linhas);
@@ -133,6 +133,7 @@
         set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() }).then(() => alert("☁️ Sincronizado!"));
     };
 
+    // CORREÇÃO: Função que injeta a peça agora atualiza o nome no topo [cite: 2026-01-30]
     window.abrirModalPecas = () => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-title').innerText = "ESTRUTURAS ANALISADAS";
@@ -140,11 +141,17 @@
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = k;
             b.onclick = () => {
+                // Limpa o identificador antes de injetar
+                const idTopo = document.getElementById('identificador-peca');
+                
                 pecas[k].split('\n').forEach((t, i) => {
                     const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
                     if(el) el.value = t.substring(0, 85);
                 });
-                document.getElementById('identificador-peca').innerText = k;
+                
+                // Força a atualização do texto vermelho [cite: 2026-01-30]
+                if(idTopo) idTopo.innerText = k;
+                
                 fecharModal();
             };
             content.appendChild(b);

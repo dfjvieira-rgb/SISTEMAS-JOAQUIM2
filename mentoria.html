@@ -3,21 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA ELITE | CENTRAL DE INTELIGÊNCIA</title>
+    <title>MENTORIA ELITE | CENTRAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --text: #f8fafc; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: var(--text); padding: 20px; }
-        header { border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 25px; }
         
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-        .panel { background: var(--card); border-radius: 12px; border: 1px solid #334155; border-top: 4px solid var(--gold); }
+        .panel { background: var(--card); border-radius: 12px; border: 1px solid #334155; border-top: 4px solid var(--gold); display: flex; flex-direction: column; }
         .panel-header { padding: 12px; background: rgba(255,255,255,0.05); font-weight: 800; font-size: 0.8rem; text-transform: uppercase; color: var(--gold); text-align: center; }
-        .panel-body { padding: 15px; }
+        .panel-body { padding: 15px; flex: 1; }
 
-        .card-estudo { background: rgba(0,0,0,0.2); border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; }
-        .btn-save { width: 100%; padding: 10px; border: none; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; color: white; }
+        .card-producao { background: rgba(0,0,0,0.3); border: 1px solid #475569; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-elite { background: var(--gold); color: black; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 800; cursor: pointer; font-size: 0.7rem; }
+        
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+        .btn-save-intel { width: 100%; padding: 12px; border: none; background: #22c55e; color: white; font-weight: 900; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
+
+        .feed { max-height: 300px; overflow-y: auto; margin-top: 15px; }
+        .intel-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid var(--gold); position: relative; }
         
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
@@ -25,45 +30,45 @@
 <body>
 
 <header>
-    <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <a href="index.html" style="color:var(--gold); text-decoration:none; font-weight:bold;">← VOLTAR À FOLHA</a>
+    <div style="font-size: 1.5rem; font-weight: 900; color: var(--gold);"><i class="fas fa-brain"></i> MENTORIA ELITE</div>
+    <a href="index.html" style="background: var(--card); color: var(--gold); padding: 10px 20px; border-radius: 8px; text-decoration: none; border: 1px solid var(--gold); font-weight: bold;">VOLTAR À FOLHA</a>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <div class="panel-header">HISTÓRICO DE PEÇAS PRODUZIDAS</div>
-        <div class="panel-body" id="feed-estudos">
-            <p style="text-align:center; color:gray;">Carregando sua produção...</p>
+        <div class="panel-header">Histórico de Peças Escritas (Produção Real)</div>
+        <div class="panel-body" id="feed-producao">
+            <p style="text-align:center; color:gray;">Buscando registros na nuvem...</p>
         </div>
     </section>
 
     <section class="panel" style="border-top-color: #ef4444;">
-        <div class="panel-header">INTELIGÊNCIA: NÃO CONFUNDA</div>
+        <div class="panel-header">Inteligência: Não Confunda</div>
         <div class="panel-body">
             <input id="nc-t" placeholder="Conceito A vs B">
-            <textarea id="nc-c" placeholder="O pulo do gato..."></textarea>
-            <button class="btn-save" style="background:#ef4444" onclick="salvar('nc')">GRAVAR</button>
-            <div id="feed-nc" style="margin-top:10px;"></div>
+            <textarea id="nc-c" rows="2" placeholder="Diferença crucial..."></textarea>
+            <button class="btn-save-intel" style="background: #ef4444;" onclick="salvarIntel('nc')">Gravar Alerta</button>
+            <div class="feed" id="feed-nc"></div>
         </div>
     </section>
 
     <section class="panel" style="border-top-color: #a855f7;">
-        <div class="panel-header">QUAL A PEÇA? (FLASHCARDS)</div>
+        <div class="panel-header">Qual a Peça? (Flashcards)</div>
         <div class="panel-body">
-            <textarea id="peca-t" placeholder="Cenário do problema..."></textarea>
-            <input id="peca-c" placeholder="Nome da Peça">
-            <button class="btn-save" style="background:#a855f7" onclick="salvar('peca')">GERAR</button>
-            <div id="feed-peca" style="margin-top:10px;"></div>
+            <textarea id="peca-t" rows="2" placeholder="Cenário do problema..."></textarea>
+            <input id="peca-c" placeholder="Resposta / Artigo">
+            <button class="btn-save-intel" style="background: #a855f7;" onclick="salvarIntel('peca')">Gerar Flashcard</button>
+            <div class="feed" id="feed-peca"></div>
         </div>
     </section>
 
-    <section class="panel" style="border-top-color: #22c55e;">
-        <div class="panel-header">PRELIMINARES E TESES</div>
+    <section class="panel" style="border-top-color: #3b82f6;">
+        <div class="panel-header">Preliminares e Tesário</div>
         <div class="panel-body">
-            <input id="tese-t" placeholder="Título da Tese/Preliminar">
-            <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido..."></textarea>
-            <button class="btn-save" style="background:#22c55e" onclick="salvar('tese')">ARQUIVAR</button>
-            <div id="feed-tese" style="margin-top:10px;"></div>
+            <input id="tese-t" placeholder="Título da Tese">
+            <textarea id="tese-c" rows="2" placeholder="Fato, Fundamento e Pedido..."></textarea>
+            <button class="btn-save-intel" style="background: #3b82f6;" onclick="salvarIntel('tese')">Arquivar Tese</button>
+            <div class="feed" id="feed-tese"></div>
         </div>
     </section>
 </main>
@@ -81,52 +86,77 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    const paths = { nc: 'v13_nc', peca: 'v13_peca', tese: 'v13_tese', estudos: 'estudos_v2' };
+    const paths = { nc: 'v13_nc', peca: 'v13_peca', tese: 'v13_tese', producao: 'v13_producao' };
 
-    window.salvar = (type) => {
+    // SALVAR INTELIGÊNCIA
+    window.salvarIntel = (type) => {
         const t = document.getElementById(type+'-t').value;
         const c = document.getElementById(type+'-c').value;
-        if(t && c) push(ref(db, paths[type]), { t, c, ts: serverTimestamp() }).then(() => location.reload());
+        if(t && c) {
+            push(ref(db, paths[type]), { t, c, ts: serverTimestamp() }).then(() => {
+                document.getElementById(type+'-t').value = '';
+                document.getElementById(type+'-c').value = '';
+            });
+        }
     };
 
-    window.verProducao = (id) => {
-        onValue(ref(db, 'estudos_v2/' + id), (snap) => {
+    // VISUALIZAR PRODUÇÃO ESCRITA
+    window.visualizarTexto = (id) => {
+        onValue(ref(db, 'v13_producao/' + id), (snap) => {
             const data = snap.val();
             const win = window.open('', '_blank');
-            win.document.write(`<html><body style="font-family:monospace; padding:30px;"><h2>${data.nome}</h2><hr>`);
-            data.conteudo.forEach((l, i) => { if(l) win.document.write(`<p><b>${i+1}</b> ${l}</p>`); });
-            win.document.write('</body></html>');
+            win.document.write(`
+                <html><head><title>REVISÃO ELITE</title></head>
+                <body style="font-family:monospace; padding:40px; background:#f4f4f4;">
+                    <h2 style="text-align:center">${data.pecaNome} - EXAME ${data.exame}</h2>
+                    <p style="text-align:center; color:gray">${data.data}</p><hr>
+                    <div style="background:white; padding:20px; border:1px solid #ccc; max-width:800px; margin:auto;">
+                        ${data.texto.map((l, i) => `<div style="border-bottom:1px solid #eee; display:flex;">
+                            <span style="width:30px; color:gray; font-size:10px;">${i+1}</span>
+                            <span>${l || ''}</span>
+                        </div>`).join('')}
+                    </div>
+                </body></html>
+            `);
         }, { onlyOnce: true });
     };
 
+    // ESCUTA EM TEMPO REAL
     onValue(ref(db), (snap) => {
         const data = snap.val() || {};
         
-        // Feed de Estudos (Produção Real)
-        const fEstudos = document.getElementById('feed-estudos');
-        fEstudos.innerHTML = "";
-        const estudos = data.estudos_v2 || {};
-        Object.keys(estudos).reverse().forEach(id => {
-            const item = estudos[id];
-            fEstudos.innerHTML += `<div class="card-estudo">
-                <div><strong>${item.nome}</strong><br><small>Exame ${item.exame} | ${item.data}</small></div>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn-save" style="background:var(--gold); color:black; width:auto; padding:5px 10px;" onclick="verProducao('${id}')">VER FOLHA</button>
-                    <button class="btn-save" style="background:#ef4444; width:auto; padding:5px 10px;" onclick="remove(ref(db, 'estudos_v2/${id}'))">X</button>
-                </div>
-            </div>`;
+        // Renderizar Produção
+        const fProd = document.getElementById('feed-producao');
+        fProd.innerHTML = "";
+        const producoes = data.v13_producao || {};
+        Object.keys(producoes).reverse().forEach(id => {
+            const it = producoes[id];
+            fProd.innerHTML += `
+                <div class="card-producao">
+                    <div>
+                        <strong style="color:var(--gold)">${it.pecaNome}</strong><br>
+                        <small style="opacity:0.7">Escrito em: ${it.data}</small>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-elite" onclick="visualizarTexto('${id}')">VER RESPOSTA</button>
+                        <button class="btn-elite" style="background:white" onclick="window.open('${it.pdfReferencia}','_blank')">PROVA PDF</button>
+                        <button class="btn-elite" style="background:#ef4444; color:white" onclick="remove(ref(db, 'v13_producao/${id}'))">X</button>
+                    </div>
+                </div>`;
         });
 
-        // Outros painéis (NC, Peca, Tese)
+        // Renderizar Paineis de Inteligência
         ['nc', 'peca', 'tese'].forEach(type => {
             const feed = document.getElementById('feed-'+type);
             feed.innerHTML = "";
             const items = data[paths[type]] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
-                feed.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:5px; border-radius:5px; font-size:0.85rem;">
-                    <strong style="color:var(--gold)">${item.t}</strong><p>${item.c}</p>
-                </div>`;
+                feed.innerHTML += `
+                    <div class="intel-item">
+                        <i class="fas fa-trash" style="position:absolute; right:8px; top:8px; font-size:0.6rem; cursor:pointer; color:#ef4444;" onclick="remove(ref(db, '${paths[type]}/${id}'))"></i>
+                        <strong>${item.t}</strong><br><small style="opacity:0.8">${item.c}</small>
+                    </div>`;
             });
         });
     });

@@ -2,11 +2,10 @@
 import { ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 export const engineSaveElite = async (db, exame) => {
-    // AJUSTE MOBILE: Busca o botão pelo ID (PC) ou pela classe do Foguete (Mobile)
+    // Busca o botão pelo ID (PC) ou pela classe do Foguete (Mobile)
     const btnSave = document.getElementById('btn-salvar-elite') || 
                     document.querySelector('.fab-sub[onclick*="dispararSalvar"]');
     
-    // Se não achar nenhum dos dois, a função não quebra, apenas executa o save silencioso
     const hasBtn = !!btnSave;
 
     // 1. Recupera o nome da peça identificado pelo RADAR no topo da folha
@@ -14,8 +13,8 @@ export const engineSaveElite = async (db, exame) => {
     let tituloPeca = elementoIdentificador ? elementoIdentificador.innerText : "PEÇA NÃO IDENTIFICADA";
 
     // 2. Limpa textos de sistema se o radar ainda estiver "escaneando"
-    if (tituloPeca.includes("IDENTIFICANDO") || tituloPeca.includes("ESPERA") || tituloPeca.includes("ESCANEANDO")) {
-        tituloPeca = "TREINO AVULSO";
+    if (tituloPeca.includes("IDENTIFICANDO") || tituloPeca.includes("ESPERA") || tituloPeca.includes("SCANNER INATIVO")) {
+        tituloPeca = "TREINO_AVULSO";
     }
 
     // 3. Garante que o número do exame venha do localStorage caso o parâmetro falhe
@@ -32,7 +31,7 @@ export const engineSaveElite = async (db, exame) => {
         const linhasConteudo = Array.from(document.querySelectorAll('.linha-folha'))
                                     .map(input => input.value || "");
 
-        // 4. Payload com inteligência de identificação e versão ELITE
+        // 4. Payload formatado para o Histórico da Mentoria
         const payload = {
             exame: exameOficial,
             nome_peca: tituloPeca, 
@@ -43,24 +42,26 @@ export const engineSaveElite = async (db, exame) => {
         };
 
         // 5. Gravação no Firebase: HISTÓRICO DA MENTORIA (producao_v13)
+        // Criamos uma chave única com Timestamp para não sobrescrever treinos antigos
         const safePecaName = tituloPeca.replace(/\s+/g, '_'); 
         const savePath = `producao_v13/${exameOficial}_${safePecaName}_${Date.now()}`;
         
         await set(ref(db, savePath), payload);
 
-        // 6. Feedback de Sucesso
-        if (hasBtn) btnSave.innerHTML = '<i class="fas fa-check" style="color:#fbbf24"></i>';
-        console.log(`✔ Sincronização Elite: Exame ${exameOficial} - ${tituloPeca}`);
+        // 6. Feedback de Sucesso no Botão
+        if (hasBtn) {
+            btnSave.innerHTML = '<i class="fas fa-check" style="color:#fbbf24"></i>';
+        }
+        
+        console.log(`✔ Peça Enviada ao Histórico: ${tituloPeca}`);
 
         setTimeout(() => {
-            // 7. LIBERDADE: Mantém o salvamento no histórico e abre a visualização
-            // O usuário agora tem a liberdade de imprimir ou apenas fechar a janela
-            window.print(); 
-            
             if (hasBtn) {
                 btnSave.innerHTML = originalIcon;
                 btnSave.style.pointerEvents = 'auto';
             }
+            // AVISO DE SUCESSO AO USUÁRIO
+            alert("✅ Sincronizado! Sua peça foi enviada para o histórico da mentoria.");
         }, 1000);
 
     } catch (error) {

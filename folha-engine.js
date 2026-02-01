@@ -1,3 +1,4 @@
+// FolhaEngine.js - VERSÃO ELITE [2026-02-01]
 export const FolhaEngine = {
     LIMITE_OAB: 60, 
 
@@ -34,6 +35,7 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
+            // QUEBRA AUTOMÁTICA (Melhoria mantida)
             input.addEventListener('input', (e) => {
                 if (e.inputType === 'deleteContentBackward') return;
                 if (input.value.length >= FolhaEngine.LIMITE_OAB) {
@@ -52,12 +54,13 @@ export const FolhaEngine = {
                 }
             });
 
+            // NAVEGAÇÃO E EDIÇÃO (Shift Vertical)
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: CORRIGIDO PARA NÃO DUPLICAR
+                // ENTER: Empurra para baixo sem duplicar
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const pos = input.selectionStart;
@@ -65,7 +68,7 @@ export const FolhaEngine = {
                     const fica = textoAtual.substring(0, pos).trim();
                     const desce = textoAtual.substring(pos).trim();
 
-                    // 1. Primeiro "empurramos" as linhas para abrir espaço
+                    // Abre o espaço primeiro (Shift Vertical)
                     for (let j = 150; j > idx + 1; j--) {
                         const linhaAlvo = document.getElementById(`L${j}`);
                         const linhaAcima = document.getElementById(`L${j - 1}`);
@@ -74,15 +77,15 @@ export const FolhaEngine = {
                         }
                     }
 
-                    // 2. Agora distribuímos o conteúdo da quebra
                     if (proximo) {
                         input.value = fica; 
-                        proximo.value = desce; // Atribui apenas o que desceu, sem somar
+                        proximo.value = desce; 
                         proximo.focus();
                         proximo.setSelectionRange(0, 0);
                     }
                 }
 
+                // BACKSPACE: Volta para linha anterior se vazio
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -92,6 +95,7 @@ export const FolhaEngine = {
                     }
                 }
 
+                // DELETE: Puxa o texto de baixo para cima
                 if (e.key === 'Delete') {
                     if (e.ctrlKey) { 
                         e.preventDefault();
@@ -101,8 +105,8 @@ export const FolhaEngine = {
                         e.preventDefault();
                         for (let j = idx; j < 150; j++) {
                             const atual = document.getElementById(`L${j}`);
-                            const proximaLinha = document.getElementById(`L${j + 1}`);
-                            if (atual && proximaLinha) atual.value = proximaLinha.value;
+                            const prox = document.getElementById(`L${j + 1}`);
+                            if (atual && prox) atual.value = prox.value;
                         }
                         const ultima = document.getElementById('L150');
                         if (ultima) ultima.value = "";

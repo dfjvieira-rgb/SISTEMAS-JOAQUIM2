@@ -1,11 +1,36 @@
-// folha-engine.js - VERSÃO TURBO BLINDADA COM QUEBRA AUTOMÁTICA
+// folha-engine.js - VERSÃO TURBO BLINDADA COM NITIDEZ ABNT [2026-02-01]
 export const FolhaEngine = {
     montar: (containerId, limite) => {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = "";
         
-        // Mantemos os 150 a 180 conforme padrão FGV
+        // --- INJEÇÃO DE ESTILO ABNT E NITIDEZ ---
+        if (!document.getElementById('style-folha-elite')) {
+            const style = document.createElement('style');
+            style.id = 'style-folha-elite';
+            style.innerHTML = `
+                .linha-folha {
+                    font-weight: 700 !important; /* Letra Negritada */
+                    color: #000000 !important;   /* Preto Puro (ABNT) */
+                    font-family: 'Courier New', Courier, monospace !important; 
+                    font-size: 19px !important;  /* Tamanho ideal para leitura */
+                    letter-spacing: 0.5px;
+                    text-transform: uppercase;   /* Estilo padrão de prova */
+                    opacity: 1 !important;       /* Garante que não fique apagado */
+                }
+                .linha-wrapper {
+                    background: var(--paper-color);
+                    transition: background 0.3s;
+                }
+                /* Estilo para a margem direita visual */
+                .linha-folha:focus {
+                    background: rgba(251, 191, 36, 0.05);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         for(let i=1; i<=150; i++) {
             const row = document.createElement('div');
             row.className = 'linha-wrapper';
@@ -24,48 +49,42 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
             
-            // --- LÓGICA DE QUEBRA E SALTO DE MARGEM ---
             input.addEventListener('input', (e) => {
                 const value = input.value;
                 const count = value.length;
                 
-                // 1. Alerta visual de proximidade da margem (Amarelo 70, Vermelho 80)
-                if (count >= 80) input.style.color = "#f87171";
-                else if (count >= 70) input.style.color = "#fbbf24";
-                else input.style.color = "inherit";
+                // 1. Alerta visual de margem (Feedback de Elite)
+                if (count >= 80) input.style.color = "#ef4444"; // Vermelho forte
+                else if (count >= 70) input.style.color = "#d97706"; // Laranja escuro
+                else input.style.color = "#000000";
 
-                // 2. Lógica de Quebra Automática (O pulo do gato)
+                // 2. Lógica de Quebra Automática
                 if (count >= limite) {
                     const palavras = value.split(" ");
-                    const ultimaPalavra = palavras.pop(); // Pega o que está sendo digitado
-                    const textoFica = palavras.join(" "); // O que fica na linha atual
+                    const ultimaPalavra = palavras.pop(); 
+                    const textoFica = palavras.join(" "); 
                     
                     const next = document.getElementById(`L${i + 1}`);
                     if (next) {
-                        // Corta a palavra incompleta da linha atual
                         input.value = textoFica;
-                        // Joga a palavra para a linha seguinte e foca
                         next.focus();
                         next.value = ultimaPalavra + (e.data || ""); 
                     }
                 }
             });
 
-            // --- ATALHOS DE TECLADO (BACKSPACE E PARÁGRAFO) ---
             input.addEventListener('keydown', (e) => {
-                // Atalho de Parágrafo (Se digitar 2 espaços no início, ele vira um tab de 10)
+                // Atalho de Parágrafo (2 espaços = Tab OAB)
                 if (e.code === 'Space' && input.value === "  ") {
                     e.preventDefault();
                     input.value = "          "; 
                 }
 
-                // Backspace Inteligente: Se apagar tudo no início da linha, volta para a anterior
                 if (e.key === 'Backspace' && input.value === "" && i > 1) {
                     const prev = document.getElementById(`L${i - 1}`);
                     if (prev) {
                         e.preventDefault();
                         prev.focus();
-                        // Coloca o cursor no final do texto da linha anterior
                         const val = prev.value;
                         prev.value = "";
                         prev.value = val;

@@ -1,15 +1,17 @@
 // folha-engine.js - VERSÃO ESTÉTICA OAB FINAL [2026-02-01]
+// AJUSTES: Recuo de segurança (68 chars) e Formatação de Sentença (Sentence Case)
 export const FolhaEngine = {
-    LIMITE_OAB: 75, // Definido como constante global do objeto para ser usado na injeção
+    // Reduzido para 68 para garantir que nunca encoste na linha vermelha
+    LIMITE_OAB: 68, 
 
     montar: (containerId, limite) => {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = "";
         
-        FolhaEngine.LIMITE_OAB = limite || 75;
+        // Calibragem de segurança
+        FolhaEngine.LIMITE_OAB = (limite || 75) - 7;
 
-        // --- INJEÇÃO DE ESTILO COM MARGEM VERTICAL ---
         if (!document.getElementById('style-folha-elite')) {
             const style = document.createElement('style');
             style.id = 'style-folha-elite';
@@ -21,15 +23,14 @@ export const FolhaEngine = {
                     display: flex;
                     height: 35px;
                 }
-                /* A LINHA DA MARGEM DIREITA */
                 .linha-wrapper::after {
                     content: "";
                     position: absolute;
                     right: 60px;
                     top: 0;
                     bottom: 0;
-                    width: 1px;
-                    background: rgba(239, 68, 68, 0.3);
+                    width: 2px;
+                    background: rgba(239, 68, 68, 0.4);
                     pointer-events: none;
                 }
                 .linha-num {
@@ -48,15 +49,17 @@ export const FolhaEngine = {
                     border: none;
                     outline: none;
                     background: transparent !important;
-                    padding: 0 10px;
-                    padding-right: 65px !important;
+                    padding: 0 15px;
+                    /* Padding largo para criar barreira física na margem */
+                    padding-right: 80px !important; 
                     font-size: 19px !important;
                     font-family: 'Courier New', Courier, monospace !important;
                     font-weight: 700 !important;
                     color: #000000 !important;
-                    text-transform: uppercase;
+                    /* Removido o Uppercase forçado */
                     height: 100%;
                     box-sizing: border-box;
+                    letter-spacing: 0.5px;
                 }
             `;
             document.head.appendChild(style);
@@ -67,19 +70,18 @@ export const FolhaEngine = {
             row.className = 'linha-wrapper';
             row.innerHTML = `
                 <div class="linha-num">${i}</div>
-                <input class="linha-folha" id="L${i}" maxlength="100" 
+                <input class="linha-folha" id="L${i}" maxlength="90" 
                        spellcheck="false" autocomplete="off" data-index="${i}"> 
             `;
             container.appendChild(row);
 
             const input = row.querySelector('input');
             
-            // Lógica para digitação manual
             input.addEventListener('input', (e) => {
                 const value = input.value;
                 if (value.length >= FolhaEngine.LIMITE_OAB && e.inputType !== 'deleteContentBackward') {
                     const ultimoEspaco = value.lastIndexOf(" ");
-                    if (ultimoEspaco > (FolhaEngine.LIMITE_OAB * 0.6)) {
+                    if (ultimoEspaco > (FolhaEngine.LIMITE_OAB * 0.5)) {
                         const textoFica = value.substring(0, ultimoEspaco);
                         const textoPula = value.substring(ultimoEspaco).trim();
                         const next = document.getElementById(`L${i + 1}`);
@@ -110,17 +112,27 @@ export const FolhaEngine = {
         }
     },
 
-    // --- FUNÇÃO PARA INJETAR TEXTO EXTERNO (PERGAMINHO/MARTELO) ---
+    // Formata o texto para "Padrão de petição" (Primeira maiúscula, resto minúscula)
+    formatarParaOAB: (texto) => {
+        if (!texto) return "";
+        // Remove tags HTML se houver
+        const limpo = texto.replace(/<[^>]*>?/gm, '').trim();
+        const minusculo = limpo.toLowerCase();
+        return minusculo.charAt(0).toUpperCase() + minusculo.slice(1);
+    },
+
     injetarTextoMultilinhas: (textoBruto, linhaInicial) => {
         let currentLinha = linhaInicial;
-        const paragrafos = textoBruto.split('\n');
+        
+        // Aplica a formatação estética
+        const textoProcessado = FolhaEngine.formatarParaOAB(textoBruto);
+        const paragrafos = textoProcessado.split('\n');
 
         paragrafos.forEach(paragrafo => {
             let palavras = paragrafo.split(' ');
             let linhaTexto = "";
 
             palavras.forEach(palavra => {
-                // Se a palavra + o que já tem na linha passar do limite OAB
                 if ((linhaTexto + palavra).length > FolhaEngine.LIMITE_OAB) {
                     const el = document.getElementById(`L${currentLinha}`);
                     if (el) el.value = linhaTexto.trim();
@@ -131,10 +143,9 @@ export const FolhaEngine = {
                 }
             });
 
-            // Salva o resto do parágrafo
             const elFinal = document.getElementById(`L${currentLinha}`);
             if (elFinal) elFinal.value = linhaTexto.trim();
-            currentLinha++; // Pula linha após o parágrafo
+            currentLinha++; 
         });
     }
 };

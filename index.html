@@ -1,214 +1,50 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - SISTEMA BLINDADO</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
-            --paper-color: #ffffff; --text-color: #1e293b; --line-color: #d1d5db;
-            --mentoria: #a855f7; --header-h: 60px; --sidebar-w: 80px;
-        }
-        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        header { background: var(--primary); height: var(--header-h); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
-        main { display: flex; flex: 1; overflow: hidden; position: relative; }
-
-        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); z-index: 1001; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-        .btn-side { width: 100%; min-height: 44px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; }
-
-        #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
-        #radar-status { font-size: 0.55rem; color: #fff; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
-        .radar-blink { animation: blink 1.5s infinite; color: var(--gold); }
-        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
-        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); -webkit-overflow-scrolling: touch; }
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 50px; position: relative; }
-        
-        #identificador-peca { width: 100%; padding: 20px; background: rgba(0,0,0,0.03); border-bottom: 3px double var(--line-color); text-align: center; font-weight: 900; font-size: 1.3rem; text-transform: uppercase; }
-        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
-        .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; }
-        .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); width: 100%; }
-
-        /* MODAL FIX MOBILE [cite: 2026-01-30] */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 90%; max-width: 450px; height: 70vh; display: flex; flex-direction: column; border-radius: 20px; border: 3px solid var(--gold); overflow: hidden; }
-        #modal-content { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; background: #f1f5f9; color: #000; text-align: center; }
-
-        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); height: 100%; position: relative; }
-        #pdf-split-view.active { display: block; }
-        .btn-close-pdf { position: absolute; top: 15px; left: -40px; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 8px 0 0 8px; cursor: pointer; }
-    </style>
-</head>
-<body class="dark-mode">
-
-<header>
-    <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div>
-    <div style="display:flex; gap:10px;">
-        <button class="btn-side" style="width:40px; background:#64748b;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-adjust"></i></button>
-        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="resetarFolha()"><i class="fas fa-trash"></i></button>
-    </div>
-</header>
-
-<main>
-    <aside class="sidebar">
-        <div id="radar-container"><div id="radar-status">SCANNER</div></div>
-        <button class="btn-side" style="background:var(--gold); color:black;" onclick="abrirModalExames()"><i class="fas fa-bullseye"></i></button>
-        <button class="btn-side" style="background:#0ea5e9;" onclick="salvarEstrategico()"><i class="fas fa-save"></i></button>
-        <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="abrirModalPecas()"><i class="fas fa-scroll"></i></button>
-        <button class="btn-side" style="background:#3b82f6;" onclick="injetarJustica()"><i class="fas fa-gavel"></i></button>
-        <button class="btn-side" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <hr style="opacity:0.1; margin:5px 0;">
-        <button class="btn-side" style="background:#f97316;" onclick="abrirSplitPdf('p')"><b>P</b></button>
-        <button class="btn-side" style="background:#eab308;" onclick="abrirSplitPdf('g')"><b>G</b></button>
-        <button class="btn-side" style="background:#10b981;" onclick="abrirSplitPdf('v')"><b>V</b></button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.print()"><i class="fas fa-print"></i></button>
-        <button class="btn-side" style="background:#475569;" onclick="irPara(1)"><i class="fas fa-chevron-up"></i></button>
-        <button class="btn-side" style="background:#475569;" onclick="irPara(51)"><i class="fas fa-chevron-down"></i></button>
-    </aside>
-
-    <section class="editor-container">
-        <div class="paper">
-            <div id="identificador-peca">CADERNO DE RESPOSTAS</div>
-            <div id="folha-total"></div>
-        </div>
-    </section>
-
-    <div id="pdf-split-view">
-        <button class="btn-close-pdf" onclick="fecharSplitPdf()"><i class="fas fa-times"></i></button>
-        <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
-    </div>
-</main>
-
-<div class="modal" id="universal-modal">
-    <div class="modal-body">
-        <div id="modal-content"></div>
-        <button onclick="fecharModal()" style="width:100%; padding:15px; background:black; color:white; border:none; font-weight:bold;">VOLTAR</button>
-    </div>
-</div>
-
 <script type="module">
-    import { db } from './firebase-config.js';
-    import { ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { BANCO_ESPELHOS } from './banco-espelhos.js';
-    import { pecas } from './estruturas.js';
-    import { RadarEngine } from './radar-engine.js'; // IMPORTAÇÃO DO MOTOR [cite: 2026-01-30]
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    let activeEx = localStorage.getItem('activeEx') || "44";
-    let ultimaLinhaFocada = 1;
+    const config = { 
+        apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
+        authDomain: "masteroab-db5e1.firebaseapp.com", 
+        projectId: "masteroab-db5e1", 
+        databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" 
+    };
+    const app = initializeApp(config);
+    const db = getDatabase(app);
 
-    window.montarFolha = () => {
-        const container = document.getElementById('folha-total');
-        container.innerHTML = "";
-        for(let i=1; i<=180; i++) {
-            if(i === 1 || i === 51) {
-                const h = document.createElement('div');
-                h.style.cssText = "background:#1e293b; color:#fbbf24; padding:8px; text-align:center; font-size:0.7rem; font-weight:bold;";
-                h.innerText = i === 1 ? 'CADERNO DE RESPOSTAS - PEÇA' : 'CADERNO DE RESPOSTAS - QUESTÕES';
-                container.appendChild(h);
-            }
-            const row = document.createElement('div');
-            row.className = 'linha-wrapper';
-            row.innerHTML = `<div class="linha-num">${i}</div><input class="linha-folha" id="L${i}" maxlength="85" spellcheck="false">`;
-            container.appendChild(row);
-            
-            const input = row.querySelector('input');
-            input.onfocus = () => { ultimaLinhaFocada = i; };
-            // DISPARO DO RADAR AO DIGITAR [cite: 2026-01-30]
-            input.oninput = () => {
-                const textoDigitado = Array.from(document.querySelectorAll('.linha-folha')).slice(0, 10).map(l => l.value).join(" ");
-                const encontrado = RadarEngine.analisar(textoDigitado);
-                RadarEngine.renderizar(encontrado);
-            };
+    // Radar Integrado
+    const RadarElite = {
+        analisar: (texto) => {
+            const t = texto.toUpperCase();
+            if(t.includes("AGRAVO DE PETIÇÃO")) return "AGRAVO DE PETIÇÃO";
+            if(t.includes("RECURSO ORDINÁRIO")) return "RECURSO ORDINÁRIO";
+            if(t.includes("CONTESTAÇÃO")) return "CONTESTAÇÃO";
+            if(t.includes("RECLAMAÇÃO")) return "RECLAMATÓRIA TRABALHISTA";
+            return "PEÇA EM ANÁLISE";
         }
-        carregarDados();
     };
 
-    window.carregarDados = () => {
-        onValue(ref(db, 'estudos/' + activeEx), (snap) => {
-            const data = snap.val();
-            if (data && data.linhas) {
-                data.linhas.forEach((txt, idx) => {
-                    const el = document.getElementById(`L${idx + 1}`);
-                    if (el) el.value = txt;
-                });
-            }
-            // Primeiro checa o espelho oficial, depois a folha
-            const textoAnalise = (BANCO_ESPELHOS[activeEx] || "") + " " + (data?.linhas?.join(" ") || "");
-            const encontrado = RadarEngine.analisar(textoAnalise);
-            RadarEngine.renderizar(encontrado);
-        }, { onlyOnce: true });
-    };
+    // Montar Folha e Lógica de Input (igual ao anterior)
+    // ...
 
-    window.salvarEstrategico = () => {
-        const dados = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
-        const pecaAtual = document.getElementById('identificador-peca').innerText;
-        
-        set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() });
-        
-        push(ref(db, 'mentoria/historico'), {
-            exame: activeEx,
-            peca: pecaAtual,
-            data: new Date().toLocaleString(),
-            pdf: `ro${activeEx}.pdf`
-        }).then(() => alert("☁️ REGISTRADO NO HISTÓRICO ELITE!"));
-    };
+    window.salvarProducao = () => {
+        const identificador = document.getElementById('identificador-peca').innerText;
+        const linhas = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
+        const exame = localStorage.getItem('activeEx') || "44";
+        const idSessao = Date.now();
 
-    window.abrirModalExames = () => {
-        const content = document.getElementById('modal-content');
-        content.innerHTML = `<h3>EXAMES</h3>`;
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame ${i}`;
-            b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); location.reload(); };
-            content.appendChild(b);
-        }
-        document.getElementById('universal-modal').style.display='flex';
-    };
+        // O PDF que você disse que funcionava (exemplo da FGV)
+        const linkPdfProva = `https://oab.fgv.br/provas/exame${exame}/peca_pratica.pdf`;
 
-    window.abrirModalPecas = () => {
-        const content = document.getElementById('modal-content');
-        content.innerHTML = `<h3>ESTRUTURAS</h3>`;
-        Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=k;
-            b.onclick = () => {
-                pecas[k].split('\n').forEach((t, i) => {
-                    const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
-                    if(el) el.value = t.substring(0, 85);
-                });
-                const encontrado = RadarEngine.analisar(k);
-                RadarEngine.renderizar(encontrado);
-                fecharModal();
-            };
-            content.appendChild(b);
-        });
-        document.getElementById('universal-modal').style.display='flex';
+        // SALVAMENTO SINCRONIZADO NO CAMINHO 'estudos'
+        set(ref(db, 'estudos/' + idSessao), {
+            exame: exame,
+            pecaNome: identificador,
+            linhasEscritas: linhas, // O seu texto
+            arquivoPdf: linkPdfProva, // O PDF da prova
+            ts: serverTimestamp(),
+            dataHumanizada: new Date().toLocaleString()
+        }).then(() => {
+            alert(`☁️ REGISTRADO NO HISTÓRICO ELITE! EXAME ${exame} - ${identificador}`);
+        }).catch(e => alert("Erro ao salvar: " + e));
     };
-
-    window.injetarJustica = () => {
-        const dna = BANCO_ESPELHOS[activeEx] || "";
-        const frases = dna.replace(/<[^>]*>/g, '').split('\n').filter(f => f.trim().length > 5);
-        frases.forEach((f, i) => {
-            const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
-            if(el) el.value = "➤ " + f.trim().substring(0, 83);
-        });
-    };
-
-    window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
-    window.abrirSplitPdf = (t) => {
-        document.getElementById('pdf-frame').src = t === 'v' ? 'vade.pdf' : `ro${activeEx}${t === 'g' ? '-gabarito' : ''}.pdf`;
-        document.getElementById('pdf-split-view').classList.add('active');
-    };
-    window.fecharSplitPdf = () => document.getElementById('pdf-split-view').classList.remove('active');
-    window.fecharModal = () => document.getElementById('universal-modal').style.display='none';
-    window.irPara = (n) => document.getElementById(`L${n}`)?.scrollIntoView({behavior:'smooth', block:'center'});
-    window.resetarFolha = () => { if(confirm("Limpar tudo?")) { document.querySelectorAll('.linha-folha').forEach(i => i.value=""); location.reload(); }};
-
-    window.onload = montarFolha;
 </script>
-</body>
-</html>

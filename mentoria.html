@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA ELITE | CENTRAL</title>
+    <title>MENTORIA ELITE | REVISÃO</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 20px; }
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
-        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; }
         .feed { max-height: 300px; overflow-y: auto; margin-top: 10px; }
         .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #22c55e; display: flex; justify-content: space-between; align-items: center; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; }
@@ -18,7 +19,6 @@
     </style>
 </head>
 <body>
-
 <header style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
     <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
     <button class="btn" style="width:auto" onclick="location.href='index.html'">VOLTAR À FOLHA</button>
@@ -26,23 +26,23 @@
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:#22c55e"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS (EVOLUÇÃO)</h3>
+        <h3 style="color:#22c55e"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
         <div id="feed-producao" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #f472b6;">
         <h3 style="color:#f472b6">NÃO CONFUNDA</h3>
         <input id="nc-t" placeholder="Título">
-        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarIntel('nc')">GRAVAR</button>
+        <textarea id="nc-c" placeholder="Diferença..."></textarea>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvar('nc')">GRAVAR</button>
         <div id="feed-nc" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6">TESES E PRELIMINARES</h3>
-        <input id="tese-t" placeholder="Nome da Tese">
-        <textarea id="tese-c" placeholder="Fundamento..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarIntel('tese')">GRAVAR</button>
+        <h3 style="color:#3b82f6">TESES</h3>
+        <input id="tese-t" placeholder="Título">
+        <textarea id="tese-c" placeholder="Tese..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvar('tese')">GRAVAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 </main>
@@ -50,65 +50,40 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    const config = { 
-        apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
-        authDomain: "masteroab-db5e1.firebaseapp.com", 
-        projectId: "masteroab-db5e1", 
-        databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" 
-    };
+    const config = { apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", authDomain: "masteroab-db5e1.firebaseapp.com", projectId: "masteroab-db5e1", databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" };
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Salvar Inteligências em nós fixos v13
-    window.salvarIntel = (type) => {
+    window.salvar = (type) => {
         const t = document.getElementById(type+'-t').value;
         const c = document.getElementById(type+'-c').value;
-        if(t && c) push(ref(db, 'v13_'+type), {t, c, ts: serverTimestamp()}).then(() => {
-            document.getElementById(type+'-t').value = "";
-            document.getElementById(type+'-c').value = "";
-        });
+        if(t && c) push(ref(db, 'v13_'+type), {t, c, ts: serverTimestamp()});
     };
 
-    // Sincronização em tempo real
     onValue(ref(db), (snap) => {
-        const data = snap.val() || {};
-        
-        // Histórico de Treinos (Vindo da index.html)
-        const fP = document.getElementById('feed-producao');
-        fP.innerHTML = "";
-        const treinos = data.producao_v13 || {};
+        const d = snap.val() || {};
+        const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
+        const treinos = d.producao_v13 || {};
         Object.keys(treinos).reverse().forEach(id => {
-            fP.innerHTML += `<div class="card-h">
-                <span><strong>${treinos[id].nome}</strong> - ${treinos[id].data}</span>
-                <div style="display:flex; gap:10px;">
-                    <button class="btn" style="width:auto; margin:0; background:#3b82f6; color:white" onclick="abrirTreino('${id}')">VER EVOLUÇÃO</button>
-                    <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white" onclick="remove(ref(db, 'producao_v13/${id}'))">X</button>
-                </div>
-            </div>`;
+            fP.innerHTML += `<div class="card-h"><span><strong>${treinos[id].nome}</strong> - ${treinos[id].data}</span>
+                <button class="btn" style="width:auto; margin:0" onclick="ver('${id}')">VER TREINO</button></div>`;
         });
-
-        // Inteligências Independentes
         const colors = { nc: '#f472b6', tese: '#3b82f6' };
         ['nc', 'tese'].forEach(type => {
-            const f = document.getElementById('feed-'+type);
-            f.innerHTML = "";
-            const items = data['v13_'+type] || {};
+            const f = document.getElementById('feed-'+type); f.innerHTML = "";
+            const items = d['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
                 f.innerHTML += `<div class="post-it" style="background:${colors[type]}">
                     <strong>${items[id].t}</strong><br>${items[id].c}
-                    <i class="fas fa-trash" style="position:absolute; right:5px; top:5px; cursor:pointer" onclick="remove(ref(db, 'v13_${type}/${id}'))"></i>
-                </div>`;
+                    <i class="fas fa-trash" style="float:right; cursor:pointer" onclick="remove(ref(db, 'v13_${type}/${id}'))"></i></div>`;
             });
         });
     });
 
-    window.abrirTreino = (id) => {
+    window.ver = (id) => {
         onValue(ref(db, 'producao_v13/' + id), (s) => {
-            const p = s.val();
-            const w = window.open('', '_blank');
-            w.document.write(`<html><head><title>REVISÃO</title><style>body{font-family:monospace; padding:40px;} div{border-bottom:1px solid #eee;}</style></head>
-                <body><h2>${p.nome}</h2><p>${p.data}</p><hr>${p.texto.map((l,i)=>`<div><b>${i+1}</b> ${l}</div>`).join('')}</body></html>`);
+            const p = s.val(); const w = window.open('', '_blank');
+            w.document.write(`<html><body style="font-family:monospace; padding:20px;"><h2>${p.nome}</h2><hr>${p.texto.map((l,i)=>`<div><b>${i+1}</b> ${l}</div>`).join('')}</body></html>`);
         }, {onlyOnce: true});
     };
 </script>

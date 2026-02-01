@@ -118,71 +118,78 @@
 
 <script type="module">
     import { db } from './firebase-config.js';
-    import { ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
     import { FolhaEngine } from './folha-engine.js';
     import { RadarEngine } from './radar-engine.js';
     import { engineSaveElite } from './salvar.js';
 
-    // --- VACINA ANTI-ALERT (Feedback Visual no Sync) ---
-    window.alert = (msg) => {
-        console.log("🛡️ Bloqueado:", msg);
-        const st = document.getElementById('sync-text');
-        if (st && msg.includes("Sincronizado")) {
-            st.innerText = "HISTÓRICO SALVO ✅";
-            document.getElementById('sync-indicator').classList.add('sync-success');
-            setTimeout(() => {
-                st.innerText = "SYNC ON";
-                document.getElementById('sync-indicator').classList.remove('sync-success');
-            }, 4000);
-        }
-    };
-
+    // --- VARIÁVEIS GLOBAIS ---
+    window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
     let isFinalizing = false;
 
-    // --- SISTEMA DE REIDRATAÇÃO ---
+    // --- VACINA ANTI-ALERT (Feedback Visual) ---
+    window.alert = (msg) => {
+        console.log("🛡️ Bloqueado:", msg);
+        const st = document.getElementById('sync-text');
+        if (st && (msg.includes("Sincronizado") || msg.includes("sucesso"))) {
+            st.innerText = "PEÇA SALVA ✅";
+            document.getElementById('sync-indicator').classList.add('sync-success');
+            setTimeout(() => {
+                st.innerText = "SYNC ON";
+                document.getElementById('sync-indicator').classList.remove('sync-success');
+            }, 3000);
+        }
+    };
+
+    // --- CARREGAMENTO AUTOMÁTICO (RECUPERAÇÃO) ---
     window.carregarRascunho = async () => {
         const syncText = document.getElementById('sync-text');
-        if(syncText) syncText.innerText = "RECUPERANDO...";
+        if(syncText) syncText.innerText = "BUSCANDO...";
         
         try {
-            const snapshot = await get(child(ref(db), `producao_v13`));
+            const loadPath = `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`;
+            const snapshot = await get(ref(db, loadPath));
+
             if (snapshot.exists()) {
                 const dados = snapshot.val();
-                const chaves = Object.keys(dados).filter(k => k.startsWith(window.activeEx));
-                const ultimaChave = chaves.sort().reverse()[0];
-                
-                if (ultimaChave) {
-                    const linhas = dados[ultimaChave].linhas;
-                    const inputs = document.querySelectorAll('.linha-folha');
-                    linhas.forEach((texto, i) => { if(inputs[i]) inputs[i].value = texto; });
-                    if(syncText) syncText.innerText = "DADOS CARREGADOS ✅";
+                if (dados && dados.linhas) {
+                    dados.linhas.forEach((texto, i) => {
+                        const input = document.getElementById(`L${i + 1}`);
+                        if (input) input.value = texto;
+                    });
+                    if(syncText) syncText.innerText = "RECUPERADO ✅";
                 }
+            } else {
+                if(syncText) syncText.innerText = "NENHUM SALVO";
             }
-        } catch (e) { console.error("Erro no load:", e); }
+        } catch (e) { 
+            console.error("Erro no load:", e);
+        }
         setTimeout(() => { if(syncText) syncText.innerText = "SYNC ON"; }, 2000);
     };
 
+    // --- LOOP DE AUTO-SAVE (30 SEGUNDOS) ---
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
-        const syncText = document.getElementById('sync-text');
         try {
-            await engineSaveElite(db, window.activeEx);
-            if(syncText) syncText.innerText = "AUTO-SAVED";
-            setTimeout(() => { if(!isFinalizing && syncText) syncText.innerText = "SYNC ON"; }, 2000);
-        } catch(e) { if(syncText) syncText.innerText = "OFFLINE"; }
+            await engineSaveElite(db, window.activeEx, false);
+        } catch(e) { console.error("Erro Auto-save:", e); }
     };
 
+    // --- FINALIZAR E SALVAR NO HISTÓRICO ---
     window.finalizarPeca = async () => {
-        if(!confirm("Deseja finalizar e enviar ao histórico?")) return;
+        if(!confirm("Deseja finalizar e enviar ao histórico oficial?")) return;
         isFinalizing = true;
-        document.getElementById('sync-text').innerText = "ENVIANDO...";
+        const st = document.getElementById('sync-text');
+        if(st) st.innerText = "ENVIANDO...";
+        
         try {
-            await engineSaveElite(db, window.activeEx);
-            window.alert("Sincronizado!"); // Dispara a vacina visual
+            const ok = await engineSaveElite(db, window.activeEx, true);
+            if(ok) window.alert("Sincronizado!"); 
         } catch(e) { console.error(e); }
         isFinalizing = false;
     };
@@ -249,20 +256,13 @@
         if(dna) FolhaEngine.injetarTextoMultilinhas(dna, window.ultimaLinha);
     };
 
+    // --- INICIALIZAÇÃO ---
     window.onload = async () => {
-        // 1. Montagem da Folha
         FolhaEngine.montar('folha-total');
-        
-        // 2. Recuperação de Dados
         await window.carregarRascunho();
-
-        // 3. Scanner de Radar
         setTimeout(window.forcarRadar, 1500); 
-
-        // 4. Ciclo de Auto-Save
         setInterval(window.dispararSalvar, 30000); 
 
-        // 5. Delegação de Evento para últimaLinha (Otimizado)
         document.getElementById('folha-total').addEventListener('focusin', (e) => {
             if (e.target.classList.contains('linha-folha')) {
                 window.ultimaLinha = parseInt(e.target.getAttribute('data-index')) || 1;
@@ -272,5 +272,6 @@
     
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
+
 </body>
 </html>

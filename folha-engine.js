@@ -1,16 +1,15 @@
-// folha-engine.js - VERSÃO ESTÉTICA OAB FINAL [2026-02-01]
-// AJUSTES: Recuo de segurança (68 chars) e Formatação de Sentença (Sentence Case)
+// folha-engine.js - VERSÃO QUEBRA ANTECIPADA [2026-02-01]
 export const FolhaEngine = {
-    // Reduzido para 68 para garantir que nunca encoste na linha vermelha
-    LIMITE_OAB: 68, 
+    // Reduzi drasticamente para 62 para garantir recuo visual seguro
+    LIMITE_OAB: 62, 
 
     montar: (containerId, limite) => {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = "";
         
-        // Calibragem de segurança
-        FolhaEngine.LIMITE_OAB = (limite || 75) - 7;
+        // Força o limite em 62 independente do que venha no parâmetro
+        FolhaEngine.LIMITE_OAB = 62; 
 
         if (!document.getElementById('style-folha-elite')) {
             const style = document.createElement('style');
@@ -42,7 +41,6 @@ export const FolhaEngine = {
                     color: #94a3b8;
                     border-right: 1px solid #d1d5db;
                     background: #f8fafc;
-                    user-select: none;
                 }
                 .linha-folha {
                     flex: 1;
@@ -50,13 +48,12 @@ export const FolhaEngine = {
                     outline: none;
                     background: transparent !important;
                     padding: 0 15px;
-                    /* Padding largo para criar barreira física na margem */
-                    padding-right: 80px !important; 
+                    /* BLOQUEIO FÍSICO: Aumentado para 90px para empurrar o texto */
+                    padding-right: 90px !important; 
                     font-size: 19px !important;
                     font-family: 'Courier New', Courier, monospace !important;
                     font-weight: 700 !important;
                     color: #000000 !important;
-                    /* Removido o Uppercase forçado */
                     height: 100%;
                     box-sizing: border-box;
                     letter-spacing: 0.5px;
@@ -70,7 +67,7 @@ export const FolhaEngine = {
             row.className = 'linha-wrapper';
             row.innerHTML = `
                 <div class="linha-num">${i}</div>
-                <input class="linha-folha" id="L${i}" maxlength="90" 
+                <input class="linha-folha" id="L${i}" maxlength="95" 
                        spellcheck="false" autocomplete="off" data-index="${i}"> 
             `;
             container.appendChild(row);
@@ -79,9 +76,10 @@ export const FolhaEngine = {
             
             input.addEventListener('input', (e) => {
                 const value = input.value;
+                // Quebra manual na digitação
                 if (value.length >= FolhaEngine.LIMITE_OAB && e.inputType !== 'deleteContentBackward') {
                     const ultimoEspaco = value.lastIndexOf(" ");
-                    if (ultimoEspaco > (FolhaEngine.LIMITE_OAB * 0.5)) {
+                    if (ultimoEspaco > 0) {
                         const textoFica = value.substring(0, ultimoEspaco);
                         const textoPula = value.substring(ultimoEspaco).trim();
                         const next = document.getElementById(`L${i + 1}`);
@@ -99,10 +97,6 @@ export const FolhaEngine = {
                     e.preventDefault();
                     input.value = "          ";
                 }
-                if (e.key === 'Backspace' && input.value === "" && i > 1) {
-                    const prev = document.getElementById(`L${i - 1}`);
-                    if (prev) { e.preventDefault(); prev.focus(); }
-                }
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const next = document.getElementById(`L${i + 1}`);
@@ -112,10 +106,8 @@ export const FolhaEngine = {
         }
     },
 
-    // Formata o texto para "Padrão de petição" (Primeira maiúscula, resto minúscula)
     formatarParaOAB: (texto) => {
         if (!texto) return "";
-        // Remove tags HTML se houver
         const limpo = texto.replace(/<[^>]*>?/gm, '').trim();
         const minusculo = limpo.toLowerCase();
         return minusculo.charAt(0).toUpperCase() + minusculo.slice(1);
@@ -123,8 +115,6 @@ export const FolhaEngine = {
 
     injetarTextoMultilinhas: (textoBruto, linhaInicial) => {
         let currentLinha = linhaInicial;
-        
-        // Aplica a formatação estética
         const textoProcessado = FolhaEngine.formatarParaOAB(textoBruto);
         const paragrafos = textoProcessado.split('\n');
 
@@ -133,6 +123,7 @@ export const FolhaEngine = {
             let linhaTexto = "";
 
             palavras.forEach(palavra => {
+                // Se a palavra atual + o que já tem ultrapassar 62, pula AGORA.
                 if ((linhaTexto + palavra).length > FolhaEngine.LIMITE_OAB) {
                     const el = document.getElementById(`L${currentLinha}`);
                     if (el) el.value = linhaTexto.trim();

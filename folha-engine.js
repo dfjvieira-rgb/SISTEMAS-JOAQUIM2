@@ -1,4 +1,4 @@
-// folha-engine.js - Motor de Renderização Elite
+// folha-engine.js - Motor de Renderização Blindado
 export const FolhaEngine = {
     montar: (containerId, limite) => {
         const container = document.getElementById(containerId);
@@ -15,7 +15,7 @@ export const FolhaEngine = {
             const row = document.createElement('div');
             row.className = 'linha-wrapper';
             row.innerHTML = `
-                <div class="linha-num" title="Duplo clique para revisão" 
+                <div class="linha-num" title="Duplo clique para marcar" 
                      ondblclick="this.parentElement.style.background = this.parentElement.style.background === 'rgba(251, 191, 36, 0.2)' ? 'transparent' : 'rgba(251, 191, 36, 0.2)'">
                     ${i}
                 </div>
@@ -23,7 +23,7 @@ export const FolhaEngine = {
             `;
             container.appendChild(row);
 
-            // Adiciona evento de validação de cor dinamicamente
+            // Validação visual de caracteres
             const input = row.querySelector('input');
             input.addEventListener('input', () => {
                 const count = input.value.length;

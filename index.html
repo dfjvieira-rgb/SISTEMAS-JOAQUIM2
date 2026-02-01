@@ -1,172 +1,227 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA JOAQUIM - 18 PEÇAS COMPLETAS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>JOAQUIM ELITE 2026 - HOME</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; --sidebar-bg: #1e293b; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); color: #334155; }
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); display: flex; align-items: center; justify-content: center; z-index: 9999; }
-        #main-app { display: none; }
-        header { background: var(--primary); color: white; padding: 18px; text-align: center; font-weight: 800; border-bottom: 4px solid var(--accent); position: sticky; top: 0; z-index: 100; }
-        .main-layout { display: flex; flex-direction: column; min-height: 100vh; }
-        @media (min-width: 768px) { .main-layout { flex-direction: row; } .sidebar { width: 320px; height: 100vh; position: sticky; top: 0; } }
-        .sidebar { background: var(--sidebar-bg); color: white; padding: 15px; overflow-y: auto; }
-        .nav-btn { width: 100%; text-align: left; padding: 12px; margin-bottom: 5px; border: none; background: rgba(255,255,255,0.08); color: #f8fafc; cursor: pointer; border-radius: 6px; font-size: 0.8rem; }
-        .nav-btn.active { background: var(--accent); font-weight: bold; border-left: 4px solid #fff; }
-        .content-area { padding: 15px; flex-grow: 1; max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box; }
-        #joaquim { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); min-height: 70vh; border: 1px solid #e2e8f0; font-family: 'Times New Roman', serif; line-height: 1.6; }
-        .gabarito-panel { background: #f1f5f9; border: 2px solid var(--accent); padding: 12px; border-radius: 10px; margin-bottom: 20px; font-family: 'Segoe UI', sans-serif; }
-        .gab-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
-        .gab-btn { background: var(--accent); color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.7rem; cursor: pointer; }
-        .gab-content { display: none; margin-top: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #ddd; font-size: 1.05rem; white-space: pre-wrap; color: #1e293b; }
-        .copy-btn { width: 100%; margin-bottom: 20px; background: #10b981; color: white; border: none; padding: 18px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        .peca-header { text-align: center; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px solid #eee; padding-bottom: 15px; font-family: 'Segoe UI', sans-serif; }
-        .area-detecao { background: #f0f9ff; border: 2px solid #3b82f6; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
-        .card-fundamento { background: white; border: 1px solid #3b82f6; border-radius: 6px; padding: 8px; margin-bottom: 8px; box-shadow: 2px 2px 0px #bfdbfe; display: flex; align-items: center; }
-        .tag-numero { background: #1e40af; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; margin-right: 10px; white-space: nowrap; }
-        .texto-conceito { font-size: 0.8rem; color: #1e3a8a; font-family: 'Segoe UI', sans-serif; font-weight: 600; }
-        .painel-estudo { background: #fffbeb; border: 2px solid #f59e0b; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-family: 'Segoe UI', sans-serif; }
+        :root {
+            --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
+            --paper-color: #ffffff; --text-color: #1e293b; --line-color: #d1d5db;
+            --mentoria: #a855f7; --header-h: 60px; --sidebar-w: 80px;
+        }
+        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        header { background: var(--primary); height: var(--header-h); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
+        main { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        /* SIDEBAR */
+        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); z-index: 1001; overflow-y: auto; scrollbar-width: none; }
+        .btn-side { width: 100%; min-height: 44px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+        .btn-side:active { transform: scale(0.9); }
+
+        #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
+        #radar-status { font-size: 0.55rem; color: #fff; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
+        .radar-blink { animation: blink 1.5s infinite; color: var(--gold); }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* EDITOR */
+        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
+        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 50px; }
+        #identificador-peca { width: 100%; padding: 15px; background: #f8fafc; border-bottom: 3px double var(--line-color); text-align: center; font-weight: 900; font-size: 1.1rem; color: #64748b; text-transform: uppercase; }
+        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
+        .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; }
+        .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', Courier, monospace; color: var(--text-color); width: 100%; }
+
+        /* MODAIS E PDF */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
+        .modal-body { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 3px solid var(--gold); }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; cursor: pointer; background: #f1f5f9; text-align: center; color: #000; }
+        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); height: 100%; position: relative; }
+        #pdf-split-view.active { display: block; }
+        .btn-close-pdf { position: absolute; top: 15px; left: -40px; background: var(--gold); border: none; width: 40px; height: 40px; border-radius: 8px 0 0 8px; cursor: pointer; }
     </style>
 </head>
-<body>
+<body class="dark-mode">
 
-<div id="login-screen">
-    <button onclick="liberar()" style="padding:20px; cursor:pointer; font-weight:bold; border-radius:8px; border:none; background:var(--accent); color:white;">ACESSAR SISTEMA (JOAQUIM)</button>
-</div>
+<header>
+    <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div>
+    <div style="display:flex; gap:10px;">
+        <button class="btn-side" style="width:40px; background:#64748b;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-moon"></i></button>
+        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="resetarFolha()"><i class="fas fa-trash"></i></button>
+    </div>
+</header>
 
-<div id="main-app">
-    <header>PRÁTICA 2ª FASE DIREITO DO TRABALHO</header>
-    <div class="main-layout">
-        <nav class="sidebar" id="menuLateral"></nav>
-        <main class="content-area">
-            <div id="joaquim"></div>
-        </main>
+<main>
+    <aside class="sidebar">
+        <div id="radar-container"><div id="radar-status">SCANNER</div></div>
+        
+        <button class="btn-side" style="background:var(--gold); color:black;" onclick="abrirModalExames()"><i class="fas fa-bullseye"></i></button>
+        <button class="btn-side" style="background:#0ea5e9;" onclick="salvarManual()"><i class="fas fa-save"></i></button>
+        <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="abrirModalPecas()"><i class="fas fa-scroll"></i></button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="injetarJustica()"><i class="fas fa-gavel"></i></button>
+        
+        <button class="btn-side" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <hr style="opacity:0.1; margin:5px 0;">
+        <button class="btn-side" style="background:#f97316;" onclick="abrirSplitPdf('p')"><b>P</b></button>
+        <button class="btn-side" style="background:#eab308;" onclick="abrirSplitPdf('g')"><b>G</b></button>
+        <button class="btn-side" style="background:#10b981;" onclick="abrirSplitPdf('v')"><b>V</b></button>
+        <button class="btn-side" style="background:#10b981;" onclick="window.print()"><i class="fas fa-print"></i></button>
+        <button class="btn-side" style="background:#475569;" onclick="irPara(1)"><i class="fas fa-chevron-up"></i></button>
+        <button class="btn-side" style="background:#475569;" onclick="irPara(51)"><i class="fas fa-chevron-down"></i></button>
+    </aside>
+
+    <section class="editor-container">
+        <div class="paper">
+            <div id="identificador-peca">CARREGANDO...</div>
+            <div id="folha-total"></div>
+        </div>
+    </section>
+
+    <div id="pdf-split-view">
+        <button class="btn-close-pdf" onclick="fecharSplitPdf()"><i class="fas fa-times"></i></button>
+        <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+</main>
+
+<div class="modal" id="universal-modal">
+    <div class="modal-body">
+        <div id="modal-content"></div>
+        <button onclick="fecharModal()" style="width:100%; margin-top:15px; padding:12px; background:black; color:white; border-radius:10px; cursor:pointer;">VOLTAR</button>
     </div>
 </div>
 
-<script>
-    const conceitosJuridicos = {
-        "840": "Petição Inicial: Requisitos essenciais da RT escrita no rito ordinário.",
-        "461": "Equiparação Salarial: Trabalho de igual valor, mesma produtividade e perfeição técnica.",
-        "473": "Faltas Justificadas: Ausências que não geram prejuízo ao salário (interrupção).",
-        "71": "Intervalo Intrajornada: O § 4º prevê indenização de 50% sobre o período suprimido.",
-        "611-B": "Objeto Ilícito: Direitos indisponíveis que não podem ser objeto de negociação coletiva.",
-        "790": "Justiça Gratuita: Benefício concedido mediante comprovação de insuficiência de recursos.",
-        "539": "Consignação (CPC): Depósito judicial para extinguir a obrigação do devedor.",
-        "477": "Rescisão: Prazo de 10 dias para pagamento e multa do § 8º pelo atraso.",
-        "542": "Procedimento da Consignação: Depósito do valor em juízo no prazo de 5 dias.",
-        "546": "Sentença de Consignação: Declara quitada a dívida e extinta a obrigação.",
-        "769": "Aplicação Subsidiária: Permite o uso do CPC quando a CLT for omissa e compatível.",
-        "853": "Inquérito Falta Grave: Prazo decadencial de 30 dias após a suspensão do estável.",
-        "847": "Contestação: Defesa do reclamado que deve ser apresentada até a audiência.",
-        "337": "Preliminares: Defesas processuais (inépcia, litispendência, etc.) arguidas antes do mérito.",
-        "895": "Recurso Ordinário: Recurso para o TRT contra sentenças das Varas (8 dias).",
-        "818": "Ônus da Prova: Regras de distribuição da prova entre as partes no processo.",
-        "897-A": "Embargos de Declaração (CLT): Sanar omissão, contradição, obscuridade ou erro material.",
-        "1022": "Embargos de Declaração (CPC): Fundamento subsidiário para omissões na sentença.",
-        "900": "Contrarrazões: Prazo de 8 dias para a parte recorrida responder ao recurso."
-    };
+<script type="module">
+    import { db } from './firebase-config.js';
+    import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { BANCO_ESPELHOS } from './banco-espelhos.js';
+    import { pecas } from './estruturas.js';
 
-    const dbGabaritos = {
-        'rt': { 1: `1.2. EXERCÍCIO I DE RECLAMAÇÃO TRABALHISTA (Enunciado - pág. 8)\nJosé Fininho foi contratado pela empresa Heart Attack Grill Ltda., para trabalhar na cidade de Florianópolis/SC, como garçom, mediante salário de R$ 1.500,00. Relata que foi contratado no mesmo dia em que Juan para exercer a mesma função, na mesma filial. O trabalho se dava com a mesma perfeição técnica e produtividade, porém Juan recebia salário fixo de R$ 2.500,00 por mês. O senhor Fininho conta que, em janeiro do ano da extinção do contrato, faltou ao trabalho por um dia para comparecer em juízo como parte no processo em que litigava contra seu ex-empregador. Embora tenha apresentado a certidão da Justiça do Trabalho confirmando suas alegações, o dia foi descontado do seu salário. O empregado comenta também que trabalhava 8 horas diárias de segunda a sexta-feira e usufruía de apenas 30 minutos de intervalo intrajornada. No curso do contrato, o empregador depositava apenas 4% do valor da remuneração a título de FGTS, pois havia acordo coletivo de trabalho autorizando o recolhimento de apenas metade do valor.\n\nRESOLUÇÃO (pág. 9 a 11)\nAO DOUTO JUÍZO DA ... VARA DO TRABALHO DE FLORIANÓPOLIS/SC\nJOSÉ FININHO, garçom, qualificação e endereço completos, vem, respeitosamente, perante Vossa Excelência, por intermédio de seu advogado adiante assinado (procuração anexa), com escritório profissional no endereço completo, onde recebe intimações ou notificações, com fulcro no art. 840, caput e § 1º, da CLT, PROPOR:\nRECLAMAÇÃO TRABALHISTA, pelo rito ordinário, em face de HEART ATTACK GRILL LTDA., qualificação e endereço completos.\n\n1 - MÉRITO\n1.1. Equiparação salarial\nO Reclamante e o paradigma Juan exerciam a mesma função, para o mesmo empregador, na mesma localidade, com a mesma produtividade e perfeição técnica. No entanto, o paradigma recebia R$ 2.500,00 e o Reclamante R$ 1.500,00. Assim, requer a condenação ao pagamento das diferenças salariais e reflexos, nos termos do art. 461 da CLT.\n1.2. Devolução do desconto\nO Reclamante faltou um dia para comparecer em juízo. Nos termos do art. 473, VIII, da CLT, tal ausência é considerada interrupção contratual. Requer a devolução do desconto.\n1.3. Intervalo intrajornada\nO Reclamante usufruía de apenas 30 minutos de intervalo. Nos termos do art. 71, caput e § 4º da CLT, requer o pagamento do período suprimido com adicional de 50%.\n1.4. Diferenças de FGTS\nO empregador depositava apenas 4% de FGTS com base em acordo coletivo. Tal cláusula é nula, conforme art. 611-B, III, da CLT. Requer o pagamento das diferenças.\n\n2 - PEDIDOS\na) Diferenças salariais por equiparação e reflexos; b) Devolução do desconto indevido; c) Pagamento do intervalo intrajornada suprimido; d) Diferenças de FGTS; e) Honorários de sucumbência.\n\n3 - REQUERIMENTOS FINAIS\na) Notificação da reclamada; b) Justiça gratuita nos termos do art. 790, § 3º, da CLT; c) Procedência total.\nDá-se à causa o valor de R$ .......\nNestes Termos, Pede Deferimento. Local e Data. Advogado... OAB...` },
-        'consigna': { 1: `EXERCÍCIO DE AÇÃO DE CONSIGNAÇÃO EM PAGAMENTO (Gabarito 1)\nAO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...\nTRANSPORTES RÁPIDOS LTDA, qualificação e endereço completos, vem, por seu advogado, com fulcro no art. 539 do CPC e art. 769 da CLT, propor:\nAÇÃO DE CONSIGNAÇÃO EM PAGAMENTO\nem face de MARCOS VINICIUS, qualificação e endereço completos.\n\n1 - MÉRITO\nO consignado foi dispensado por justa causa. Ocorre que o mesmo não compareceu para receber suas verbas rescisórias. Visando evitar a mora e a incidência da multa do art. 477, § 8º da CLT, a consignante busca o depósito judicial do valor de R$ .......\n\n2 - PEDIDOS\na) O deferimento do depósito da quantia devida no prazo de 5 dias, conforme art. 542, I, do CPC;\nb) A notificação do consignado;\nc) A total procedência para declarar extinta a obrigação e dar quitação aos valores, nos termos do art. 546 do CPC;\nd) A condenação em custas e honorários.\n\nDá-se à causa o valor de R$ .......\nNestes Termos, Pede Deferimento. Local e Data. Advogado... OAB...` },
-        'inquerito': { 1: `EXERCÍCIO DE INQUÉRITO PARA APURAÇÃO DE FALTA GRAVE (Gabarito 1)\nAO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...\nRECLAMADA (EMPRESA), qualificação completa, com fulcro no art. 853 da CLT, propor:\nINQUÉRITO PARA APURAÇÃO DE FALTA GRAVE em face de RECLAMADO (EMPREGADO).\n\n1 - MÉRITO\n1.1. Do Prazo Decadencial: O Reclamado foi suspenso em (data). O presente inquérito está sendo ajuizado dentro do prazo de 30 dias, conforme determina o art. 853 da CLT.\n1.2. Da Justa Causa: O Reclamado praticou falta grave nos termos do art. 482 da CLT. Tratando-se de empregado estável, a rescisão exige a procedência deste inquérito conforme art. 494 da CLT.\n\n2 - PEDIDOS E REQUERIMENTOS\na) Notificação; b) Procedência total para autorizar a dispensa; c) Provas (art. 821 da CLT).\nDá-se à causa o valor de R$... Pede Deferimento. Advogado... OAB...` },
-        'cont': { 1: `EXERCÍCIO DE CONTESTAÇÃO (Gabarito 1)\nAO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...\nProcesso nº: ...\nRECLAMADA, já qualificada, por seu advogado, vem, com fulcro no art. 847 da CLT, apresentar:\nCONTESTAÇÃO\nem face de RECLAMANTE, já qualificado.\n\n1 - PRELIMINARES\nInépcia da inicial: O pedido de horas extras não apresenta causa de pedir, devendo ser extinto sem mérito conforme art. 337, IV, do CPC.\n\n2 - MÉRITO\n2.1. Das Horas Extras: A reclamada contesta o pedido, pois o reclamante exercia cargo de confiança, sem controle de jornada.\n2.2. Do Adicional de Periculosidade: O reclamante jamais manteve contato com agentes inflamáveis. Requer a improcedência.\n\n3 - PEDIDOS\nDiante do exposto, requer o acolhimento da preliminar e, no mérito, a improcedência total dos pedidos.\nNestes Termos, Pede Deferimento. Advogado... OAB...` },
-        'ed': { 1: `EXERCÍCIO DE EMBARGOS DE DECLARAÇÃO (Gabarito 1)\nAO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...\nProcesso nº: ...\nRECLAMANTE (ou RECLAMADA), já devidamente qualificado nos autos em epígrafe, vem, respeitosamente, perante Vossa Excelência, por intermédio de seu advogado, com fulcro no art. 897-A da CLT e art. 1.022 do CPC, opor:\nEMBARGOS DE DECLARAÇÃO\nem face da r. decisão de fls., pelas razões de fato e de direito a seguir expostas:\n1 - CABIMENTO E TEMPESTIVIDADE\nOs presentes embargos são cabíveis, visto que a r. decisão padece de omissão. Outrossim, o recurso é tempestivo, pois interposto dentro do prazo de 5 dias úteis.\n2 - RAZÕES DOS EMBARGOS\n2.1. Da Omissão\nVossa Excelência, ao proferir a sentença, condenou a Reclamada ao pagamento de horas extras, todavia, quedou-se omisso em relação ao pedido de reflexos em Descanso Semanal Remunerado (DSR), conforme pleiteado na inicial.\nDessa forma, faz-se necessário o acolhimento dos presentes embargos para que seja sanada a omissão apontada.\n3 - PEDIDOS\nDiante do exposto, requer o conhecimento e o acolhimento dos presentes Embargos de Declaração, para que seja sanada a omissão apontada, conferindo, se necessário, efeito modificativo ao julgado.\nNestes Termos, Pede Deferimento. Local e Data. Advogado... OAB...` },
-        'ro': { 1: `EXERCÍCIO DE RECURSO ORDINÁRIO (Gabarito 1)\n1ª PEÇA: INTERPOSIÇÃO\nAO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...\nProcesso nº: ...\nRECORRENTE, qualificação, vem interpor RECURSO ORDINÁRIO com fulcro no art. 895, I, da CLT. Requer notificação para contrarrazões (art. 900 da CLT) e prova do preparo (arts. 789 e 899 CLT).\n\n2ª PEÇA: RAZÕES\nEGRÉGIO TRIBUNAL REGIONAL DO TRABALHO DA ... REGIÃO\nI - MÉRITO: Reforma da sentença quanto ao ônus da prova (art. 818 CLT). O juízo a quo decidiu em desacordo com as provas dos autos.\nII - CONCLUSÃO: Requer o conhecimento e provimento do recurso.\nLocal e Data. Advogado... OAB...` }
-    };
+    let activeEx = localStorage.getItem('activeEx') || "44";
+    let ultimaLinhaFocada = 1;
+    const LIMITE_LINHA = 85;
 
-    const nomesPecas = {
-        rt: "01. Reclamação Trabalhista", consigna: "02. Consignação em Pagamento", inquerito: "03. Inquérito Falta Grave",
-        cont: "04. Contestação", ed: "05. Embargos de Declaração", replica: "06. Réplica",
-        ro: "07. Recurso Ordinário", rade: "08. Recurso Adesivo", ai: "09. Agravo de Instrumento",
-        rr: "10. Recurso de Revista", emb_tst: "11. Embargos ao TST", re_stf: "12. Recurso Extraordinário",
-        emb_exec: "13. Embargos à Execução", epe: "14. Exceção de Pré-Executividade", ap: "15. Agravo de Petição",
-        emb_terc: "16. Embargos de Terceiro", ms: "17. Mandado de Segurança", ar: "18. Ação Rescisória"
-    };
-
-    function extrairConceitos(texto) {
-        const regex = /(art\.?|artigo|súmula|oj|lei)\s?(\d+)[^\n,.;]*/gi;
-        let html = "";
-        let matches;
-        let encontrados = new Set();
-        while ((matches = regex.exec(texto)) !== null) {
-            let numero = matches[2];
-            let itemCompleto = matches[0].toUpperCase();
-            if (!encontrados.has(numero)) {
-                let conceito = conceitosJuridicos[numero] || "Fundamento identificado no gabarito oficial.";
-                html += `<div class="card-fundamento"><span class="tag-numero">${itemCompleto}</span><span class="texto-conceito">${conceito}</span></div>`;
-                encontrados.add(numero);
+    // 1. MONTAR FOLHA
+    window.montarFolha = () => {
+        const container = document.getElementById('folha-total');
+        container.innerHTML = "";
+        for(let i=1; i<=180; i++) {
+            if(i === 1 || i === 51) {
+                const h = document.createElement('div');
+                h.style.cssText = "background:#1e293b; color:#fbbf24; padding:8px; text-align:center; font-size:0.7rem; font-weight:bold;";
+                h.innerText = i === 1 ? 'CADERNO DE RESPOSTAS - PEÇA' : 'CADERNO DE RESPOSTAS - QUESTÕES';
+                container.appendChild(h);
             }
+            const row = document.createElement('div');
+            row.className = 'linha-wrapper';
+            row.innerHTML = `<div class="linha-num">${i}</div><input class="linha-folha" id="L${i}" maxlength="${LIMITE_LINHA}" spellcheck="false">`;
+            container.appendChild(row);
+            
+            const input = row.querySelector('input');
+            input.onfocus = () => { ultimaLinhaFocada = i; };
+            input.onkeydown = (e) => {
+                if(e.key === "Enter") { e.preventDefault(); document.getElementById(`L${i+1}`)?.focus(); }
+            };
         }
-        return html || "Aguardando extração de fundamentos...";
-    }
+        carregarDados();
+    };
 
-    function liberar() {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        montarMenu();
-        loadPeca('rt');
-    }
+    // 2. LOGICA DE RADAR
+    window.escaneamentoElite = () => {
+        const sidebarStatus = document.getElementById('radar-status');
+        const topoFolha = document.getElementById('identificador-peca');
+        const textoBanco = (BANCO_ESPELHOS[activeEx] || "").toUpperCase();
 
-    function montarMenu() {
-        document.getElementById('menuLateral').innerHTML = Object.keys(nomesPecas).map(k =>
-            `<button class="nav-btn" id="btn_${k}" onclick="loadPeca('${k}')">${nomesPecas[k]}</button>`
-        ).join('');
-    }
+        const DICIONARIO = [
+            { id: "AGRAVO DE PETIÇÃO", display: "AGRAVO DE PETIÇÃO", cor: "#f87171" },
+            { id: "RECURSO ORDINÁRIO", display: "RECURSO ORDINÁRIO", cor: "#3b82f6" },
+            { id: "CONTESTAÇÃO", display: "CONTESTAÇÃO TRABALHISTA", cor: "#22c55e" },
+            { id: "RECLAMAÇÃO", display: "RECLAMATÓRIA TRABALHISTA", cor: "#a855f7" }
+        ];
 
-    // AJUSTE: Função loadPeca agora recupera o que foi salvo no localStorage
-    function loadPeca(key) {
-        let botoes = '', blocos = '';
-        const lista = dbGabaritos[key] || {};
-        for(let i=1; i<=10; i++){
-            let id = `${key}_${i}`;
-            let textoGabarito = lista[i] || `Gabarito ${i} aguardando inserção palavra por palavra.`;
-            let areaConceitos = extrairConceitos(textoGabarito);
-            botoes += `<button class="gab-btn" onclick="toggleG('${id}')">📖 Gabarito ${i}</button>`;
-            blocos += `<div id="${id}" class="gab-content"><div class="area-detecao"><strong style="color:#1e3a8a; display:block; margin-bottom:10px;">⚖️ FUNDAMENTAÇÃO (SEM DUPLICATAS):</strong>${areaConceitos}</div>${textoGabarito}</div>`;
+        let encontrado = DICIONARIO.find(p => textoBanco.includes(p.id));
+        if (encontrado) {
+            sidebarStatus.innerHTML = `<span style="color:${encontrado.cor}">RADAR</span><br>${encontrado.id}`;
+            topoFolha.innerText = encontrado.display;
+            topoFolha.style.color = encontrado.cor;
+        } else {
+            sidebarStatus.innerHTML = `<span>RADAR</span><br><span class="radar-blink">BUSCANDO...</span>`;
+            topoFolha.innerText = "CADERNO DE RESPOSTAS";
         }
+    };
 
-        // Tenta buscar o texto salvo anteriormente para esta peça específica
-        const textoSalvo = localStorage.getItem('rascunho_' + key) || "ID: 936045\n\n(Digite aqui sua peça...)";
+    // 3. FIREBASE E DADOS
+    window.carregarDados = () => {
+        onValue(ref(db, 'estudos/' + activeEx), (snap) => {
+            const data = snap.val();
+            if (data && data.linhas) {
+                data.linhas.forEach((txt, idx) => {
+                    const el = document.getElementById(`L${idx + 1}`);
+                    if (el) el.value = txt;
+                });
+            }
+            escaneamentoElite();
+        }, { onlyOnce: true });
+    };
 
-        document.getElementById('joaquim').innerHTML = `
-            <div class="painel-estudo"><strong>🧠 TREINO DE MEMÓRIA</strong><br><small>Escreva os fundamentos abaixo antes de conferir:</small><textarea style="width:100%; margin-top:10px; border:1px solid #f59e0b; padding:10px; border-radius:6px; height:60px; font-family:sans-serif;"></textarea></div>
-            <button class="copy-btn" onclick="copyContent()">COPIAR TEXTO DO EDITOR</button>
-            <div class="gabarito-panel"><div class="gab-grid">${botoes}</div>${blocos}</div>
-            <div class="peca-header">${nomesPecas[key].split('. ')[1]}</div>
-            <div id="texto-final" contenteditable="true" oninput="salvarAuto('${key}')">${textoSalvo}</div>
-        `;
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn_'+key).classList.add('active');
-        window.scrollTo(0,0);
-    }
+    window.salvarManual = () => {
+        const dados = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
+        set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() }).then(() => alert("☁️ SINCRONIZADO!"));
+    };
 
-    // AJUSTE: Função que salva o texto automaticamente a cada letra digitada
-    function salvarAuto(key) {
-        const conteudo = document.getElementById('texto-final').innerText;
-        localStorage.setItem('rascunho_' + key, conteudo);
-    }
+    // 4. NAVEGAÇÃO E MODAIS
+    window.abrirModalExames = () => {
+        const content = document.getElementById('modal-content');
+        content.innerHTML = `<h3 style="color:#000; margin-bottom:10px;">EXAMES</h3>`;
+        for(let i=44; i>=35; i--) {
+            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame ${i}`;
+            b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); montarFolha(); fecharModal(); };
+            content.appendChild(b);
+        }
+        document.getElementById('universal-modal').style.display='flex';
+    };
 
-    function toggleG(id) {
-        const el = document.getElementById(id);
-        const visible = el.style.display === 'block';
-        document.querySelectorAll('.gab-content').forEach(d => d.style.display = 'none');
-        el.style.display = visible ? 'none' : 'block';
-    }
+    window.abrirModalPecas = () => {
+        const content = document.getElementById('modal-content');
+        content.innerHTML = `<h3 style="color:#000; margin-bottom:10px;">ESTRUTURAS</h3>`;
+        Object.keys(pecas).forEach(k => {
+            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=k;
+            b.onclick = () => {
+                pecas[k].split('\n').forEach((t, i) => {
+                    const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
+                    if(el) el.value = t.substring(0, LIMITE_LINHA);
+                });
+                fecharModal();
+            };
+            content.appendChild(b);
+        });
+        document.getElementById('universal-modal').style.display='flex';
+    };
 
-    function copyContent() {
-        const texto = document.getElementById('texto-final').innerText;
-        const areaCopia = document.createElement('textarea');
-        areaCopia.value = texto;
-        document.body.appendChild(areaCopia);
-        areaCopia.select();
-        document.execCommand('copy');
-        document.body.removeChild(areaCopia);
-        alert("Copiado!");
-    }
+    window.injetarJustica = () => {
+        const dna = BANCO_ESPELHOS[activeEx] || "";
+        const frases = dna.replace(/<[^>]*>/g, '').split('\n').filter(f => f.trim().length > 5);
+        frases.forEach((f, i) => {
+            const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
+            if(el) el.value = "➤ " + f.trim().substring(0, LIMITE_LINHA - 2);
+        });
+    };
+
+    window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
+    window.abrirSplitPdf = (t) => {
+        document.getElementById('pdf-frame').src = t === 'v' ? 'vade.pdf' : `ro${activeEx}${t === 'g' ? '-gabarito' : ''}.pdf`;
+        document.getElementById('pdf-split-view').classList.add('active');
+    };
+    window.fecharSplitPdf = () => document.getElementById('pdf-split-view').classList.remove('active');
+    window.fecharModal = () => document.getElementById('universal-modal').style.display='none';
+    window.irPara = (n) => document.getElementById(`L${n}`)?.scrollIntoView({behavior:'smooth', block:'center'});
+    window.resetarFolha = () => { if(confirm("Limpar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value=""); };
+
+    window.onload = montarFolha;
 </script>
 </body>
 </html>
+

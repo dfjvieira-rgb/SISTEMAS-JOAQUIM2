@@ -29,7 +29,6 @@
 
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
-        .btn-lib:hover { background: #f8fafc; color: var(--primary); }
 
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
@@ -44,12 +43,6 @@
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
         #pdf-split-view.active { display: block; }
-
-        @media print {
-            header, .sidebar, #mobile-hub, .toolbar-liberdade, .modal, #pdf-split-view { display: none !important; }
-            .editor-container { padding: 0 !important; background: white !important; overflow: visible !important; }
-            .paper { box-shadow: none !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
-        }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
@@ -68,7 +61,7 @@
 <main>
     <aside class="sidebar">
         <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
-        <button id="btn-salvar-elite" class="btn-side" style="background:#10b981;" onclick="window.dispararSalvar()"><i class="fas fa-save"></i> <span>Salvar Elite</span></button>
+        <button id="btn-finalizar" class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> <span>Finalizar Peça</span></button>
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
         <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
@@ -81,27 +74,21 @@
     <section class="editor-container">
         <div class="paper">
             <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO - TOQUE AQUI</div>
-            
             <div class="toolbar-liberdade">
-                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Apagar</button>
-                <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
+                <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
                 <button class="btn-lib" style="color:var(--mentoria)" onclick="window.abrirMentoria()"><i class="fas fa-history"></i> Histórico</button>
             </div>
-
             <div id="folha-total"></div>
         </div>
     </section>
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.dispararSalvar()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b></button>
-        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b></button>
     </div>
 
     <div id="pdf-split-view">
@@ -129,10 +116,41 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
+    // --- SALVAMENTO DE RASCUNHO (SOBRESCREVE SEMPRE O MESMO) ---
+    window.dispararSalvar = async () => {
+        const syncText = document.getElementById('sync-text');
+        syncText.innerText = "SYNCING...";
+        try {
+            // Passamos um parâmetro extra 'isDraft' se sua engine suportar, 
+            // ou apenas garantimos que salve no rascunho.
+            await engineSaveElite(db, window.activeEx, { tipo: 'rascunho' });
+            syncText.innerText = "SAVED";
+            setTimeout(() => syncText.innerText = "SYNC ON", 2000);
+        } catch(e) { 
+            syncText.innerText = "OFFLINE"; 
+        }
+    };
+
+    // --- FINALIZAR PEÇA (ENVIA PARA O HISTÓRICO DEFINITIVO) ---
+    window.finalizarPeca = async () => {
+        if(!confirm("Deseja finalizar a peça e salvar no histórico?")) return;
+        
+        const syncText = document.getElementById('sync-text');
+        syncText.innerText = "FINALIZANDO...";
+        
+        try {
+            // Aqui a engine deve salvar com um timestamp único para o histórico
+            await engineSaveElite(db, window.activeEx, { tipo: 'historico' });
+            alert("Peça enviada para o Histórico com sucesso!");
+            syncText.innerText = "SYNC ON";
+        } catch(e) {
+            alert("Erro ao finalizar. Verifique a conexão.");
+        }
+    };
+
     window.limparFolha = () => {
-        if(confirm("Deseja apagar sua resposta localmente?")) {
+        if(confirm("Apagar tudo?")) {
             document.querySelectorAll('.linha-folha').forEach(i => i.value = "");
-            localStorage.removeItem(`rascunho_${window.activeEx}`);
         }
     };
 
@@ -145,50 +163,22 @@
         }
     };
 
-    window.dispararSalvar = async () => {
-        const syncText = document.getElementById('sync-text');
-        syncText.innerText = "SYNCING...";
-        try {
-            await engineSaveElite(db, window.activeEx);
-            syncText.innerText = "SAVED";
-            setTimeout(() => syncText.innerText = "SYNC ON", 2000);
-        } catch(e) { 
-            syncText.innerText = "OFFLINE"; 
-            console.error(e);
-        }
-    };
-
-    window.abrirMentoria = () => {
-        if (window.innerWidth < 768) {
-            window.open('mentoria.html', '_blank');
-        } else {
-            const largura = 500;
-            const esquerda = window.screen.width - largura;
-            window.open('mentoria.html', 'MentoriaElite', `width=${largura},height=${window.screen.height},left=${esquerda},top=0`);
-        }
-    };
+    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 
     window.toggleFoguete = () => {
         const hub = document.getElementById('mobile-hub');
-        const icon = document.getElementById('rocket-icon');
         hub.classList.toggle('active');
-        icon.className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
+        document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
 
     window.verPDF = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
-        let arquivo = (tipo === 'P') ? `ro${window.activeEx}.pdf` : (tipo === 'G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
-        frame.src = arquivo;
+        frame.src = (tipo === 'P') ? `ro${window.activeEx}.pdf` : (tipo === 'G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
         view.classList.add('active');
-        document.body.classList.add('pdf-aberto');
-        document.getElementById('mobile-hub').classList.remove('active');
     };
 
-    window.fecharPDF = () => {
-        document.getElementById('pdf-split-view').classList.remove('active');
-        document.body.classList.remove('pdf-aberto');
-    };
+    window.fecharPDF = () => document.getElementById('pdf-split-view').classList.remove('active');
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
@@ -197,24 +187,22 @@
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>OAB Exame ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.innerHTML = `<span>OAB Exame ${i}</span>`;
             b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
             content.appendChild(b);
         }
         modal.style.display='flex';
     };
 
-    // --- PERGAMINHO ATUALIZADO (CHAMA A FUNÇÃO MULTILINHAS DO ENGINE) ---
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className='opt-btn';
             b.innerHTML = `<span>${k}</span>`;
             b.onclick = () => {
-                // USA A LÓGICA DE DISTRIBUIÇÃO AUTOMÁTICA
                 FolhaEngine.injetarTextoMultilinhas(pecas[k], window.ultimaLinha);
                 modal.style.display='none';
             };
@@ -223,31 +211,24 @@
         modal.style.display='flex';
     };
 
-    // --- MARTELO ATUALIZADO (CHAMA A FUNÇÃO MULTILINHAS DO ENGINE) ---
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(!dna) return;
-        // Limpa tags HTML e quebra em parágrafos limpos
         const textoLimpio = dna.replace(/<[^>]*>?/gm, '').trim();
         FolhaEngine.injetarTextoMultilinhas(textoLimpio, window.ultimaLinha);
     };
 
     window.onload = () => {
-        // Inicializa a folha com limite de 75 (OAB Padrão)
         FolhaEngine.montar('folha-total', 75);
-        
         setTimeout(window.forcarRadar, 1500); 
-        setInterval(window.dispararSalvar, 60000);
+        setInterval(window.dispararSalvar, 30000); // Rascunho automático
 
-        // Listener para capturar em qual linha o usuário clicou pela última vez
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
                 input.addEventListener('focus', () => { 
-                    document.body.classList.add('digitando');
                     const idx = input.getAttribute('data-index');
                     if(idx) window.ultimaLinha = parseInt(idx); 
                 });
-                input.addEventListener('blur', () => { document.body.classList.remove('digitando'); });
             });
         }, 1000);
     };

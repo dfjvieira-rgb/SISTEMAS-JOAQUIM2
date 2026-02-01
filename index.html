@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JOAQUIM ELITE 2026 | FULL ENGINE</title>
+    <title>JOAQUIM ELITE 2026 | FIX ENGINE</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,36 +11,31 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); display: flex; height: 100vh; overflow: hidden; color: white; }
         
-        /* SIDEBAR IDENTIDADE ELITE - 12 BOTÕES */
-        .sidebar { width: 75px; background: var(--sidebar); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 10px; z-index: 100; overflow-y: auto; }
+        /* CORREÇÃO DE CLIQUE: Z-INDEX 999 E CURSOR POINTER */
+        .sidebar { width: 75px; background: var(--sidebar); border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; padding: 15px 0; gap: 10px; z-index: 999; overflow-y: auto; position: relative; }
         
-        .radar-box { width: 60px; height: 60px; background: black; border: 2px solid var(--gold); border-radius: 8px; color: #22c55e; font-size: 8px; font-weight: 900; text-align: center; display: flex; flex-direction: column; justify-content: center; line-height: 1.2; margin-bottom: 5px; text-transform: uppercase; flex-shrink: 0; }
+        .radar-box { width: 60px; height: 60px; background: black; border: 2px solid var(--gold); border-radius: 8px; color: #22c55e; font-size: 8px; font-weight: 900; text-align: center; display: flex; flex-direction: column; justify-content: center; line-height: 1.2; margin-bottom: 5px; text-transform: uppercase; flex-shrink: 0; pointer-events: none; }
         
-        .btn-side { width: 55px; height: 55px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; transition: 0.2s; flex-shrink: 0; }
-        
-        /* CORES ORIGINAIS RESTAURADAS */
-        .btn-target { background: #f59e0b; } /* 2. Alvo */
-        .btn-disk { background: #0ea5e9; }   /* 3. Disquete */
-        .btn-scroll { background: #334155; color: #f59e0b; } /* 4. Pergaminho */
-        .btn-gavel { background: #3b82f6; }   /* 5. Martelo */
-        .btn-robot { background: #a855f7; }   /* 6. Robô */
-        .btn-p { background: #f97316; }       /* 7. P */
-        .btn-g { background: #eab308; color: black; } /* 8. G */
-        .btn-v { background: #10b981; }       /* 9. V */
-        .btn-print { background: #10b981; }    /* 10. Print */
-        .btn-nav { background: #334155; }      /* 11 e 12. Setas */
+        .btn-side { width: 55px; height: 55px; border-radius: 12px; border: none; cursor: pointer !important; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; transition: 0.2s; flex-shrink: 0; position: relative; z-index: 1000; }
+        .btn-side:active { transform: scale(0.9); }
 
-        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        /* CORES ELITE */
+        .btn-target { background: #f59e0b; } 
+        .btn-disk { background: #0ea5e9; }   
+        .btn-scroll { background: #334155; color: #f59e0b; } 
+        .btn-gavel { background: #3b82f6; }   
+        .btn-robot { background: #a855f7; }   
+        .btn-status { font-weight: 900; }
+        .btn-nav { background: #334155; }
+
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; z-index: 1; }
         header { height: 60px; padding: 0 25px; display: flex; align-items: center; border-bottom: 2px solid var(--gold); background: #020617; }
         
         .editor-scroll { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         
-        /* PERGAMINHO DE ESTRUTURAS */
         .pergaminho-container { width: 100%; max-width: 900px; background: #0f172a; border: 1px solid var(--line); border-radius: 10px; padding: 20px; }
-        .exame-header { color: var(--gold); font-weight: 900; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .exame-card { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.05); padding: 15px; margin-bottom: 12px; }
 
-        /* FOLHA DE RESPOSTAS */
         .paper { background: #1e293b; width: 100%; max-width: 900px; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         .peca-header { background: white; color: #16a34a; text-align: center; padding: 20px; font-weight: 900; font-size: 1.8rem; text-transform: uppercase; border-bottom: 3px solid var(--gold); }
         
@@ -48,7 +43,7 @@
         .linha-num { width: 45px; color: #64748b; font-size: 11px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--line); background: rgba(0,0,0,0.3); }
         .linha-input { flex: 1; background: transparent; border: none; color: white; padding: 0 15px; font-family: 'Courier New', monospace; font-size: 18px; outline: none; width: 100%; }
 
-        @media print { .sidebar, header, .pergaminho-container { display: none !important; } .paper { width: 100%; background: white; box-shadow: none; } .linha-input { color: black !important; border-bottom: 1px solid #ccc; } .peca-header { border-bottom: 2px solid black !important; } }
+        @media print { .sidebar, header, .pergaminho-container { display: none !important; } .paper { width: 100%; background: white; } .linha-input { color: black !important; } }
     </style>
 </head>
 <body>
@@ -56,26 +51,24 @@
     <aside class="sidebar">
         <div class="radar-box">RADAR<br><span id="radar-label">AUTO</span></div>
         
-        <button class="btn-side btn-target" title="Escaner Ativo"><i class="fas fa-bullseye"></i></button>
+        <button class="btn-side btn-target" onclick="console.log('Alvo clicado')"><i class="fas fa-bullseye"></i></button>
         
-        <button id="btn-save" class="btn-side btn-disk" onclick="salvarGeral()" title="Salvar Treino"><i class="fas fa-save"></i></button>
+        <button id="btn-save" class="btn-side btn-disk" onclick="salvarGeral()"><i class="fas fa-save"></i></button>
         
-        <button class="btn-side btn-scroll" title="Ver Estruturas"><i class="fas fa-scroll"></i></button>
+        <button class="btn-side btn-scroll" onclick="alert('Estruturas Ativas')"><i class="fas fa-scroll"></i></button>
         
-        <button class="btn-side btn-gavel" title="Teses Jurídicas"><i class="fas fa-gavel"></i></button>
+        <button class="btn-side btn-gavel" onclick="alert('Teses Jurídicas')"><i class="fas fa-gavel"></i></button>
         
-        <button class="btn-side btn-robot" onclick="location.href='mentoria.html'" title="Ir para Mentoria"><i class="fas fa-robot"></i></button>
+        <button class="btn-side btn-robot" onclick="window.location.href='mentoria.html'"><i class="fas fa-robot"></i></button>
         
         <div style="flex: 1;"></div>
 
-        <button class="btn-side btn-p" style="font-weight:900">P</button>
-        <button class="btn-side btn-g" style="font-weight:900">G</button>
-        <button class="btn-side btn-v" style="font-weight:900">V</button>
-        
-        <button class="btn-side btn-print" onclick="window.print()" title="Imprimir PDF"><i class="fas fa-print"></i></button>
-        
-        <button class="btn-side btn-nav"><i class="fas fa-chevron-up"></i></button>
-        <button class="btn-side btn-nav"><i class="fas fa-chevron-down"></i></button>
+        <button class="btn-side btn-status" style="background: #f97316;">P</button>
+        <button class="btn-side btn-status" style="background: #eab308; color: black;">G</button>
+        <button class="btn-side btn-status" style="background: #10b981;">V</button>
+        <button class="btn-side" style="background: #475569;" onclick="window.print()"><i class="fas fa-print"></i></button>
+        <button class="btn-side btn-nav" onclick="document.querySelector('.editor-scroll').scrollBy(0,-100)"><i class="fas fa-chevron-up"></i></button>
+        <button class="btn-side btn-nav" onclick="document.querySelector('.editor-scroll').scrollBy(0,100)"><i class="fas fa-chevron-down"></i></button>
     </aside>
 
     <div class="main">
@@ -83,15 +76,9 @@
 
         <section class="editor-scroll">
             <div class="pergaminho-container">
-                <div class="exame-header"><i class="fas fa-scroll"></i> ESTRUTURAS TÉCNICAS DOS EXAMES</div>
-                <div class="exame-card">
-                    <strong>EXAME XXXV: RECLAMATÓRIA TRABALHISTA</strong>
-                    <p style="font-size: 13px; color: #94a3b8; margin-top: 5px;">MÉRITO: Adicional de Periculosidade (Art. 193 CLT), Horas In Itinere e Danos Morais (Art. 223-G CLT).</p>
-                </div>
-                <div class="exame-card">
-                    <strong>EXAME XXXVI: CONTESTAÇÃO</strong>
-                    <p style="font-size: 13px; color: #94a3b8; margin-top: 5px;">PRELIMINARES: Inépcia da Inicial (Art. 330, CPC). MÉRITO: Justa Causa e Prescrição Bienal (Art. 7º, XXIX, CF).</p>
-                </div>
+                <div style="color:var(--gold); font-weight:900; margin-bottom:10px;"><i class="fas fa-scroll"></i> ESTRUTURAS TÉCNICAS</div>
+                <div class="exame-card"><strong>EXAME XXXV: RT</strong> - Periculosidade, In Itinere, Danos Morais.</div>
+                <div class="exame-card"><strong>EXAME XXXVI: CONTESTAÇÃO</strong> - Inépcia, Prescrição, Justa Causa.</div>
             </div>
 
             <div class="paper">
@@ -114,26 +101,27 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Gerar 150 linhas
+    // Gerar linhas
     const grid = document.getElementById('grid-linhas');
     for(let i=1; i<=150; i++) {
         grid.innerHTML += `<div class="linha-wrapper"><div class="linha-num">${i}</div><input class="linha-input" id="L${i}" autocomplete="off" spellcheck="false"></div>`;
     }
 
-    // RADAR / ESCANER - IDENTIFICAÇÃO NA LINHA 1
+    // CORREÇÃO DO RADAR: ESCUTA DIRETA NO INPUT
     document.addEventListener('input', (e) => {
-        if(e.target.id === 'L1') {
-            const val = e.target.value.toUpperCase();
+        if(e.target.classList.contains('linha-input')) {
+            const val = document.getElementById('L1').value.toUpperCase();
             const tit = document.getElementById('peca-titulo');
             const rad = document.getElementById('radar-label');
-            if(val.includes("RECLAMA")) { tit.innerText = "RECLAMATÓRIA TRABALHISTA"; rad.innerText = "RT DETECT"; }
-            else if(val.includes("CONTESTA")) { tit.innerText = "CONTESTAÇÃO"; rad.innerText = "CONT DETECT"; }
-            else if(val.includes("ORDINARIO")) { tit.innerText = "RECURSO ORDINÁRIO"; rad.innerText = "RO DETECT"; }
-            else if(val.includes("AGRAVO")) { tit.innerText = "AGRAVO DE PETIÇÃO"; rad.innerText = "AP DETECT"; }
+            
+            if(val.includes("RECLAMA")) { tit.innerText = "RECLAMATÓRIA TRABALHISTA"; rad.innerText = "RT DETECT"; rad.parentElement.style.color = "#22c55e"; }
+            else if(val.includes("CONTESTA")) { tit.innerText = "CONTESTAÇÃO"; rad.innerText = "CONT DETECT"; rad.parentElement.style.color = "#fbbf24"; }
+            else if(val.includes("ORDINARIO")) { tit.innerText = "RECURSO ORDINÁRIO"; rad.innerText = "RO DETECT"; rad.parentElement.style.color = "#3b82f6"; }
+            else { rad.innerText = "AUTO"; rad.parentElement.style.color = "#22c55e"; }
         }
     });
 
-    // INTELIGÊNCIA DE SALVAMENTO BLINDADA
+    // SALVAMENTO BLINDADO
     window.salvarGeral = () => {
         const btn = document.getElementById('btn-save');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -147,6 +135,9 @@
         }).then(() => {
             btn.innerHTML = '<i class="fas fa-save"></i>';
             window.print();
+        }).catch(err => {
+            console.error(err);
+            btn.innerHTML = '<i class="fas fa-times"></i>';
         });
     };
 </script>

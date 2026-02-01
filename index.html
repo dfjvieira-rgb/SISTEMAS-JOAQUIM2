@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - FULL CONNECT</title>
+    <title>JOAQUIM ELITE 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -16,21 +16,31 @@
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         header { background: var(--primary); height: var(--header-h); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
+
+        /* SIDEBAR */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); z-index: 1001; overflow-y: auto; scrollbar-width: none; }
         .btn-side { width: 100%; min-height: 44px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+        
         #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         #radar-status { font-size: 0.55rem; color: #fff; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
         .radar-blink { animation: blink 1.5s infinite; } @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+        /* EDITOR E PAPEL */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 50px; position: relative; }
         #identificador-peca { width: 100%; padding: 15px; background: #f8fafc; border-bottom: 3px double var(--line-color); text-align: center; font-weight: 900; font-size: 1.1rem; color: #64748b; text-transform: uppercase; }
+        
+        /* LINHAS (ESTILOS COMPATÍVEIS COM ENGINE) */
+        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
+        .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; }
         .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', Courier, monospace; color: var(--text-color); width: 100%; }
+
+        /* PDF E MODAIS */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 3px solid var(--gold); }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; cursor: pointer; background: #f1f5f9; text-align: center; color: #000; }
+        .modal-body { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 3px solid var(--gold); color: #000; }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; cursor: pointer; background: #f1f5f9; text-align: center; }
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); height: 100%; position: relative; }
         #pdf-split-view.active { display: block; }
-        @media print { .sidebar, header, .modal, #pdf-split-view { display: none !important; } .paper { width: 100%; box-shadow: none; } .linha-folha { color: black !important; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -46,32 +56,23 @@
 <main>
     <aside class="sidebar">
         <div id="radar-container"><div id="radar-status">SCANNER</div></div>
-        
         <button class="btn-side" style="background:var(--gold); color:black;" id="btn-trigger-exames"><i class="fas fa-bullseye"></i></button>
-        
         <button class="btn-side" style="background:#10b981;" id="btn-salvar-elite"><i class="fas fa-save"></i></button>
-        
         <button class="btn-side" style="background:#334155; color:var(--gold);" id="btn-trigger-pecas"><i class="fas fa-scroll"></i></button>
-        
         <button class="btn-side" style="background:#3b82f6;" id="btn-trigger-teses"><i class="fas fa-gavel"></i></button>
-        
         <button class="btn-side" style="background:var(--mentoria);" id="btn-trigger-robot"><i class="fas fa-robot"></i></button>
-        
         <hr style="opacity:0.1; margin:5px 0;">
-        
         <button class="btn-side" style="background:#f97316;" id="btn-pdf-enunciado"><b>P</b></button>
         <button class="btn-side" style="background:#eab308;" id="btn-pdf-gabarito"><b>G</b></button>
         <button class="btn-side" style="background:#10b981;" id="btn-pdf-vade"><b>V</b></button>
-        
         <button class="btn-side" style="background:#10b981;" onclick="window.print()"><i class="fas fa-print"></i></button>
-        
         <button class="btn-side" style="background:#475569;" id="btn-nav-up"><i class="fas fa-chevron-up"></i></button>
         <button class="btn-side" style="background:#475569;" id="btn-nav-down"><i class="fas fa-chevron-down"></i></button>
     </aside>
 
     <section class="editor-container">
         <div class="paper">
-            <div id="identificador-peca">CARREGANDO ENGINE...</div>
+            <div id="identificador-peca">IDENTIFICANDO DNA...</div>
             <div id="folha-total"></div>
         </div>
     </section>
@@ -90,108 +91,103 @@
 </div>
 
 <script type="module">
-    // IMPORTAÇÕES EXTERNAS
     import { db } from './firebase-config.js';
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
     import { FolhaEngine } from './folha-engine.js';
-    import { engineSaveElite } from './salvar.js';
     import { RadarEngine } from './radar-engine.js';
+    import { engineSaveElite } from './salvar.js';
 
     let activeEx = localStorage.getItem('activeEx') || "44";
     let ultimaLinhaFocada = 1;
-    const LIMITE_LINHA = 85;
 
-    // A - INICIALIZAÇÃO DA FOLHA
-    const startElite = () => {
-        FolhaEngine.montar('folha-total', 180); 
-        document.querySelectorAll('.linha-folha').forEach((input, index) => {
-            const i = index + 1;
-            input.onfocus = () => { ultimaLinhaFocada = i; };
-            input.oninput = () => { 
-                if(i === 1) RadarEngine.renderizar(RadarEngine.analisar(input.value)); 
-            };
-        });
-        // Roda Radar inicial
-        const L1 = document.getElementById('L1')?.value || "";
-        RadarEngine.renderizar(RadarEngine.analisar(L1));
-    };
-
-    // B - LIGAÇÃO DOS 12 BOTÕES (EVENT LISTENERS)
-
-    // 2. BULLSEYE (EXAMES)
-    document.getElementById('btn-trigger-exames').onclick = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "<h3>SELECIONAR EXAME</h3>";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame ${i}`;
-            b.onclick = () => { 
-                activeEx = i.toString(); 
-                localStorage.setItem('activeEx', activeEx); 
-                startElite();
-                modal.style.display='none'; 
-            };
-            content.appendChild(b);
-        }
-        modal.style.display='flex';
-    };
-
-    // 3. DISQUETE (SALVAR)
-    document.getElementById('btn-salvar-elite').onclick = () => engineSaveElite(db, activeEx);
-
-    // 4. PERGAMINHO (PEÇAS)
-    document.getElementById('btn-trigger-pecas').onclick = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "<h3>ESTRUTURAS</h3>";
-        Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div'); b.className='opt-btn'; b.innerText=k;
-            b.onclick = () => {
-                pecas[k].split('\n').forEach((t, i) => {
-                    const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
-                    if(el) el.value = t.substring(0, LIMITE_LINHA);
-                });
-                modal.style.display='none';
-                RadarEngine.renderizar(RadarEngine.analisar(document.getElementById('L1').value));
-            };
-            content.appendChild(b);
-        });
-        modal.style.display='flex';
-    };
-
-    // 5. MARTELO (TESES)
-    document.getElementById('btn-trigger-teses').onclick = () => {
+    // --- REESTABELECIMENTO DA LÓGICA DE-PARA (RADAR) ---
+    const executarRadar = () => {
         const dna = BANCO_ESPELHOS[activeEx] || "";
-        const frases = dna.replace(/<[^>]*>/g, '').split('\n').filter(f => f.trim().length > 5);
-        frases.forEach((f, i) => {
-            const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
-            if(el) el.value = "➤ " + f.trim().substring(0, LIMITE_LINHA - 2);
+        const identificacao = RadarEngine.analisar(dna);
+        RadarEngine.renderizar(identificacao);
+    };
+
+    // --- INICIALIZAÇÃO COMPLETA ---
+    const startElite = () => {
+        // 1. Chama a FolhaEngine Turbo que você enviou
+        FolhaEngine.montar('folha-total', 85);
+
+        // 2. Mapeia o foco para injeção de textos
+        document.querySelectorAll('.linha-folha').forEach(input => {
+            input.addEventListener('focus', () => {
+                ultimaLinhaFocada = parseInt(input.getAttribute('data-index'));
+            });
         });
+
+        // 3. Roda o Radar
+        executarRadar();
+
+        // 4. Ativa os Botões
+        vincularBotoes();
     };
 
-    // 6. ROBÔ (MENTORIA)
-    document.getElementById('btn-trigger-robot').onclick = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
+    const vincularBotoes = () => {
+        // BULLSEYE (Troca Exame)
+        document.getElementById('btn-trigger-exames').onclick = () => {
+            const modal = document.getElementById('universal-modal');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = "<h3>BANCO DE EXAMES</h3>";
+            for(let i=44; i>=35; i--) {
+                const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame ${i}`;
+                b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); startElite(); modal.style.display='none'; };
+                content.appendChild(b);
+            }
+            modal.style.display='flex';
+        };
 
-    // 7, 8, 9. PDFS (P, G, V)
-    const openPdf = (tipo) => {
-        const frame = document.getElementById('pdf-frame');
-        const view = document.getElementById('pdf-split-view');
-        frame.src = tipo === 'v' ? 'vade.pdf' : `ro${activeEx}${tipo === 'g' ? '-gabarito' : ''}.pdf`;
-        view.classList.add('active');
+        // DISQUETE (Salvar)
+        document.getElementById('btn-salvar-elite').onclick = () => engineSaveElite(db, activeEx);
+
+        // PERGAMINHO (Peças)
+        document.getElementById('btn-trigger-pecas').onclick = () => {
+            const modal = document.getElementById('universal-modal');
+            const content = document.getElementById('modal-content');
+            content.innerHTML = "<h3>ESTRUTURAS FGV</h3>";
+            Object.keys(pecas).forEach(k => {
+                const b = document.createElement('div'); b.className='opt-btn'; b.innerText=k;
+                b.onclick = () => {
+                    pecas[k].split('\n').forEach((t, idx) => {
+                        const el = document.getElementById(`L${ultimaLinhaFocada + idx}`);
+                        if(el) el.value = t;
+                    });
+                    modal.style.display='none';
+                };
+                content.appendChild(b);
+            });
+            modal.style.display='flex';
+        };
+
+        // MARTELO (Teses)
+        document.getElementById('btn-trigger-teses').onclick = () => {
+            const dna = BANCO_ESPELHOS[activeEx] || "";
+            const frases = dna.split('\n').filter(f => f.trim().length > 10);
+            frases.forEach((f, idx) => {
+                const el = document.getElementById(`L${ultimaLinhaFocada + idx}`);
+                if(el) el.value = "➤ " + f.trim().substring(0, 80);
+            });
+        };
+
+        // PDFS
+        const pView = document.getElementById('pdf-split-view');
+        const pFrame = document.getElementById('pdf-frame');
+        document.getElementById('btn-pdf-enunciado').onclick = () => { pFrame.src = `ro${activeEx}.pdf`; pView.classList.add('active'); };
+        document.getElementById('btn-pdf-gabarito').onclick = () => { pFrame.src = `ro${activeEx}-gabarito.pdf`; pView.classList.add('active'); };
+        document.getElementById('btn-pdf-vade').onclick = () => { pFrame.src = `vade.pdf`; pView.classList.add('active'); };
+        document.getElementById('btn-pdf-close').onclick = () => pView.classList.remove('active');
+
+        // NAV E AUX
+        document.getElementById('btn-nav-up').onclick = () => document.getElementById('L1').scrollIntoView({behavior:'smooth'});
+        document.getElementById('btn-nav-down').onclick = () => document.getElementById('L51').scrollIntoView({behavior:'smooth'});
+        document.getElementById('btn-trash-reset').onclick = () => confirm("Limpar?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
+        document.getElementById('btn-modal-close').onclick = () => document.getElementById('universal-modal').style.display='none';
+        document.getElementById('btn-trigger-robot').onclick = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
     };
-    document.getElementById('btn-pdf-enunciado').onclick = () => openPdf('p');
-    document.getElementById('btn-pdf-gabarito').onclick = () => openPdf('g');
-    document.getElementById('btn-pdf-vade').onclick = () => openPdf('v');
-    document.getElementById('btn-pdf-close').onclick = () => document.getElementById('pdf-split-view').classList.remove('active');
-
-    // 11, 12. NAVEGAÇÃO
-    document.getElementById('btn-nav-up').onclick = () => document.getElementById('L1').scrollIntoView({behavior:'smooth'});
-    document.getElementById('btn-nav-down').onclick = () => document.getElementById('L51').scrollIntoView({behavior:'smooth'});
-
-    // EXTRAS
-    document.getElementById('btn-trash-reset').onclick = () => confirm("Limpar tudo?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
-    document.getElementById('btn-modal-close').onclick = () => document.getElementById('universal-modal').style.display='none';
 
     window.onload = startElite;
 </script>

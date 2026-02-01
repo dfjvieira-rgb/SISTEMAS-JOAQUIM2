@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ARYANNA MASTER | TREINO & SIMULADO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Courier+Prime&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb; --success: #059669; --warning: #f59e0b; --danger: #dc2626;
+            --bg-site: #0f172a; --gold: #d4af37; --pen-blue: #1e3a8a; --rascunho-bg: #fefce8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-site); color: #fff; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        header { background: #1e293b; padding: 5px 15px; border-bottom: 2px solid var(--gold); display: flex; justify-content: space-between; align-items: center; height: 45px; z-index: 1000; }
+        .logo { font-weight: 800; color: var(--gold); font-size: 0.8rem; }
+        .timer-group { display: flex; align-items: center; gap: 8px; }
+        #timer-display { font-family: 'Courier Prime', monospace; font-size: 1.1rem; color: var(--warning); background: #000; padding: 2px 8px; border-radius: 4px; border: 1px solid #333; }
+        .main-container { flex: 1; display: flex; overflow: hidden; }
+        .editor-section { flex: 1; display: flex; flex-direction: column; background: #f1f5f9; border-right: 2px solid #334155; }
+        .toolbar { background: #fff; padding: 8px 10px; display: flex; gap: 6px; border-bottom: 1px solid #cbd5e1; align-items: center; }
+        .btn-symbol { height: 38px; min-width: 42px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .paper-wrapper { flex: 1; overflow-y: auto; padding: 15px; background: #64748b; }
+        .paper-sheet { width: 100%; max-width: 800px; background: white; min-height: 3000px; display: flex; margin: 0 auto; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
+        .line-nums { width: 45px; background: #f8fafc; border-right: 1px solid #ddd; text-align: center; color: #94a3b8; font-size: 12px; padding-top: 15px; line-height: 28px; font-weight: bold; }
+        .text-area { flex: 1; border: none; outline: none; padding: 15px 25px; font-size: 16px; line-height: 28px; color: var(--pen-blue); background-image: linear-gradient(transparent, transparent 27px, #e2e8f0 28px); background-size: 100% 28px; resize: none; overflow: hidden; }
+        .viewer-section { flex: 1.2; display: flex; flex-direction: column; background: #334155; overflow: hidden; }
+        .tabs { display: flex; background: #1e293b; padding: 5px 10px 0; gap: 4px; }
+        .tab { padding: 8px 15px; border: none; border-radius: 8px 8px 0 0; background: #0f172a; color: #94a3b8; font-size: 0.7rem; cursor: pointer; }
+        .tab.active { background: #fff; color: var(--primary); }
+        #pdf-viewport { flex: 1; overflow: auto; background: #525659; display: flex; flex-direction: column; align-items: center; padding: 10px 0; }
+        canvas { box-shadow: 0 0 15px rgba(0,0,0,0.5); margin-bottom: 20px; max-width: 98%; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; align-items: center; justify-content: center; }
+        .modal-content { background: white; width: 95%; max-width: 500px; border-radius: 12px; padding: 20px; color: #1e293b; }
+        #mobile-btn { display: none; position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: white; border: 2px solid var(--gold); z-index: 1000; align-items: center; justify-content: center; font-size: 1.5rem; }
+        @media (max-width: 1024px) { .viewer-section { position: fixed; inset: 0; z-index: 500; display: none; } .viewer-section.active { display: flex; } #mobile-btn { display: flex; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">ARYANNA MASTER 2026</div>
+    <div class="timer-group">
+        <div id="timer-display">05:00:00</div>
+        <button id="btn-simulado" class="btn-header" style="background:var(--danger); border:none; color:white; padding:5px 10px; border-radius:4px;" onclick="window.toggleSimulado()">🏁</button>
+    </div>
+</header>
+
+<div class="main-container">
+    <section class="editor-section">
+        <div class="toolbar">
+            <select id="exam-select" onchange="window.mudarExame(this.value)" class="btn-symbol" style="width:auto; font-size:0.75rem; border:1px solid #ddd;"></select>
+            <button class="btn-symbol" title="Abrir Mentoria" style="background:var(--gold); color:#000" onclick="window.open('mentoria.html', '_blank')">🏆</button>
+            <button class="btn-symbol" title="Estruturas" style="background:#fef9c3; color:#854d0e" onclick="window.abrirPecas()">⚖️</button>
+            <button class="btn-symbol" title="Post-it" style="background:#fff7ed; color:#c2410c" onclick="window.abrirPostIt()">📌</button>
+            <button class="btn-symbol" title="Limpar" style="background:#fee2e2; color:var(--danger)" onclick="window.limparFolha()">🗑️</button>
+            <button class="btn-symbol" title="Salvar" style="background:var(--success); color:white; margin-left:auto;" onclick="window.finalizarEArquivar()">💾</button>
+        </div>
+        <div class="paper-wrapper">
+            <div class="paper-sheet">
+                <div class="line-nums" id="line-nums-main"></div>
+                <textarea id="texto-final" class="text-area" spellcheck="false" oninput="window.autoSave()"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <section class="viewer-section" id="viewer">
+        <div class="tabs">
+            <button class="tab active" onclick="window.carregarPDF('prova')">PROVA</button>
+            <button class="tab" onclick="window.carregarPDF('gabarito')">GABARITO</button>
+            <button class="tab" style="color:var(--gold)" onclick="window.carregarPDF('vade')">VADE</button>
+        </div>
+        <div id="pdf-viewport"></div>
+    </section>
+</div>
+
+<div id="modal-pecas" class="modal" onclick="if(event.target==this) this.style.display='none'"><div class="modal-content"><h3 id="titulo-modal">⚖️ ESTRUTURAS</h3><br><div id="lista-pecas"></div></div></div>
+<div id="modal-rascunho" class="modal" onclick="if(event.target==this) this.style.display='none'"><div class="modal-content" style="background:var(--rascunho-bg)"><h3>📌 POST-IT RÁPIDO</h3><br><textarea id="rascunho-editor" class="text-area" style="background:var(--rascunho-bg); height:300px; border:1px solid #ddd;" oninput="window.saveRascunho()"></textarea></div></div>
+
+<button id="mobile-btn" onclick="window.toggleMobile()">📑</button>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    
+    const config = { apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", authDomain: "masteroab-db5e1.firebaseapp.com", projectId: "masteroab-db5e1", databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" };
+    const app = initializeApp(config); const db = getDatabase(app);
+
+    let pdfDoc = null; let tempoSegundos = 18000; let timerInterval = null;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    window.mudarExame = () => window.carregarPDF('prova');
+    window.carregarPDF = async (tipo) => {
+        const ex = document.getElementById('exam-select').value;
+        const arq = tipo === 'prova' ? `ro${ex}.pdf` : tipo === 'gabarito' ? `ro${ex}-gabarito.pdf` : `Aryanna Linhares.pdf`;
+        try { pdfDoc = await pdfjsLib.getDocument(arq).promise; window.renderAll(); } catch(e) {}
+    };
+    window.renderAll = async () => {
+        const container = document.getElementById('pdf-viewport'); container.innerHTML = "";
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            const page = await pdfDoc.getPage(i);
+            const viewport = page.getViewport({ scale: 1.3 });
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            canvas.height = viewport.height; canvas.width = viewport.width;
+            await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+        }
+    };
+
+    window.autoSave = () => { window.isEdit = true; clearTimeout(window.sv); window.sv = setTimeout(() => { set(ref(db, 'v4_treino/caderno_unico'), document.getElementById('texto-final').value); window.isEdit = false; }, 1000); };
+    window.saveRascunho = () => set(ref(db, 'v4_rascunho/global'), document.getElementById('rascunho-editor').value);
+    onValue(ref(db, 'v4_treino/caderno_unico'), (s) => { if(!window.isEdit) document.getElementById('texto-final').value = s.val() || ""; });
+    onValue(ref(db, 'v4_rascunho/global'), (s) => { document.getElementById('rascunho-editor').value = s.val() || ""; });
+
+    window.abrirPostIt = () => document.getElementById('modal-rascunho').style.display = 'flex';
+    window.limparFolha = () => { if(confirm("Limpar?")) { document.getElementById('texto-final').value = ""; window.autoSave(); }};
+    window.toggleMobile = () => document.getElementById('viewer').classList.toggle('active');
+    window.toggleSimulado = () => { if(!timerInterval) { timerInterval = setInterval(() => { tempoSegundos--; document.getElementById('timer-display').innerText = new Date(tempoSegundos * 1000).toISOString().substr(11, 8); }, 1000); } else { clearInterval(timerInterval); timerInterval = null; } };
+
+    let h = ""; for(let i=1; i<=300; i++) h += i + "<br>";
+    document.getElementById('line-nums-main').innerHTML = h;
+    const sel = document.getElementById('exam-select');
+    for(let i=45; i>=1; i--) {
+        let opt = document.createElement('option');
+        let num = i < 10 ? "0" + i : i;
+        opt.value = num; opt.innerText = `EXAME ${num}`;
+        if(i==40) opt.selected = true;
+        sel.appendChild(opt);
+    }
+    window.carregarPDF('prova');
+</script>
+</body>
+</html>

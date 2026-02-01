@@ -1,0 +1,50 @@
+<script type="module">
+    import { BANCO_ESPELHOS } from './banco-espelhos.js';
+
+    const radarScanner = () => {
+        // 1. Ele descobre qual exame você selecionou na Home
+        const activeEx = localStorage.getItem('activeEx') || "44";
+        
+        // 2. Ele "bebe" a resposta oficial do Banco
+        const dnaOficial = (BANCO_ESPELHOS[activeEx] || "").toUpperCase();
+        
+        // 3. Ele pega o que você está escrevendo agora
+        const seuTexto = (localStorage.getItem('radar_input') || "").toUpperCase();
+
+        const label = document.getElementById('peca-nome');
+        const info = document.getElementById('detalhes');
+        const box = document.getElementById('visual-scanner');
+
+        // DICIONÁRIO DE IDENTIFICAÇÃO
+        const PECAS = [
+            { id: "CONTESTAÇÃO", nome: "Contestação", cor: "#22c55e" },
+            { id: "RECURSO ORDINÁRIO", nome: "Recurso Ordinário", cor: "#3b82f6" },
+            { id: "RECLAMAÇÃO", nome: "Reclamatória", cor: "#a855f7" },
+            { id: "AGRAVO DE PETIÇÃO", nome: "Agravo de Petição", cor: "#ef4444" }
+        ];
+
+        // LOGICA DE CRUZAMENTO:
+        // Ele prioriza o que está no Banco (Gabarito), mas confirma com o seu texto
+        let pecaGabarito = PECAS.find(p => dnaOficial.includes(p.id));
+        let pecaEscrita = PECAS.find(p => seuTexto.includes(p.id));
+
+        if (pecaGabarito) {
+            box.style.borderColor = pecaGabarito.cor;
+            label.innerText = pecaGabarito.nome;
+            label.style.color = pecaGabarito.cor;
+            
+            // Validação em tempo real
+            if (pecaEscrita && pecaEscrita.id === pecaGabarito.id) {
+                info.innerText = "SINCRO-ELITE: PEÇA CORRETA IDENTIFICADA!";
+                box.style.boxShadow = `0 0 30px ${pecaGabarito.cor}`;
+            } else {
+                info.innerText = `EXAME ${activeEx}: AGUARDANDO NOME DA PEÇA...`;
+                box.style.boxShadow = "none";
+            }
+        }
+    };
+
+    // Fica vigiando tanto a troca de exame quanto a digitação
+    window.addEventListener('storage', radarScanner);
+    window.onload = radarScanner;
+</script>

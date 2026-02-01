@@ -40,7 +40,6 @@
         .btn-reveal { background: var(--gold); color: #000; border: none; padding: 10px; border-radius: 6px; font-weight: 800; width: 100%; cursor: pointer; margin-top: 5px; }
         .hidden-content { display: none; margin-top: 10px; padding: 12px; background: rgba(22, 163, 74, 0.2); border: 1px solid var(--success); border-radius: 6px; font-weight: 700; color: #4ade80; }
 
-        /* Botão Flutuante Disquete (Apenas PDF) */
         .btn-disquete { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--gold); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer; border: 4px solid var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 999; }
 
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
@@ -126,38 +125,33 @@
 
     const paths = { pre: 'v13_pre', peca: 'v13_peca', nc: 'v13_nc', tese: 'v13_tese', hist: 'mentoria_pdfs' };
 
-    // FUNÇÃO DO DISQUETE: SALVA APENAS A REFERÊNCIA DO PDF
     window.salvarApenasPDF = () => {
         const exame = localStorage.getItem('activeEx') || "44";
         const pdfNome = `ro${exame}.pdf`;
-        
         push(ref(db, paths.hist), {
             exame: exame,
             arquivo: pdfNome,
             data: new Date().toLocaleString('pt-BR'),
             ts: serverTimestamp()
-        }).then(() => alert("💾 PDF registrado no seu histórico de mentoria!"));
+        }).then(() => alert("💾 PDF registrado no histórico!"));
     };
 
-    // BACKUP DE SEGURANÇA (DOWNLOAD JSON)
     window.fazerBackup = async () => {
-        if(!confirm("Deseja descarregar o backup completo da sua base de dados?")) return;
+        if(!confirm("Deseja descarregar o backup completo?")) return;
         const snap = await get(ref(db, "/"));
         const data = snap.val();
         const blob = new Blob([JSON.stringify(data, null, 2)], {type : 'application/json'});
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `BACKUP_ELITE_2026_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = `BACKUP_ELITE_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
     };
 
-    // SALVAMENTO DE TESES
     window.salvar = (type) => {
         const t = document.getElementById(`${type}-t`).value;
         const c = document.getElementById(`${type}-c`).value;
         if(!t || !c) return alert("Preencha todos os campos!");
-        
         push(ref(db, paths[type]), { t, c, ts: serverTimestamp() }).then(() => {
             document.getElementById(`${type}-t`).value = '';
             document.getElementById(`${type}-c`).value = '';
@@ -166,60 +160,4 @@
 
     window.excluir = (type, id) => { 
         if(confirm("Excluir permanentemente?")) {
-            remove(ref(db, `${paths[type]}/${id}`)); 
-        }
-    };
-
-    window.toggleR = (btn) => {
-        const div = btn.nextElementSibling;
-        const isVis = div.style.display === "block";
-        div.style.display = isVis ? "none" : "block";
-        btn.innerText = isVis ? "VER GABARITO" : "OCULTAR";
-    };
-
-    // ESCUTA EM TEMPO REAL
-    onValue(ref(db), (snap) => {
-        const v = snap.val() || {};
-        
-        // Renderizar Painéis
-        ['pre', 'peca', 'nc', 'tese'].forEach(type => {
-            const feed = document.getElementById(`feed-${type}`);
-            if(!feed) return;
-            feed.innerHTML = "";
-            const items = v[paths[type]] || {};
-            Object.keys(items).reverse().forEach(id => {
-                const item = items[id];
-                feed.innerHTML += `
-                    <div class="card">
-                        <i class="fas fa-trash" style="position:absolute; right:10px; top:10px; font-size:0.7rem; color:gray; cursor:pointer" onclick="excluir('${type}','${id}')"></i>
-                        ${type === 'peca' ? 
-                            `<strong>Cenário:</strong> ${item.t}<button class="btn-reveal" onclick="toggleR(this)">VER GABARITO</button><div class="hidden-content">${item.c}</div>` : 
-                            `<strong>${item.t}</strong><p style="font-size:0.85rem; opacity:0.8; margin-top:5px; white-space:pre-wrap;">${item.c}</p>`}
-                    </div>`;
-            });
-        });
-
-        // Renderizar Histórico de PDFs
-        const feedPdf = document.getElementById('feed-pdf');
-        feedPdf.innerHTML = "";
-        const hist = v[paths.hist] || {};
-        const keys = Object.keys(hist);
-        
-        if (keys.length === 0) {
-            feedPdf.innerHTML = '<p style="text-align:center; color:gray; grid-column: 1/-1;">Sem PDFs salvos.</p>';
-        } else {
-            keys.reverse().forEach(id => {
-                const item = hist[id];
-                feedPdf.innerHTML += `
-                    <div class="card card-pdf">
-                        <div><strong><i class="fas fa-file-pdf"></i> ${item.arquivo}</strong><br><small style="opacity:0.6">Visto em: ${item.data}</small></div>
-                        <div class="pdf-actions">
-                            <i class="fas fa-trash-alt" style="color:var(--danger)" onclick="excluir('hist','${id}')"></i>
-                        </div>
-                    </div>`;
-            });
-        }
-    });
-</script>
-</body>
-</html>
+            const path = type === 'hist' ? paths.hist :

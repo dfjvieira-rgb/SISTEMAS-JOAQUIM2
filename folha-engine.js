@@ -34,7 +34,6 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
-            // --- QUEBRA AUTOMÁTICA NA MARGEM ---
             input.addEventListener('input', (e) => {
                 if (e.inputType === 'deleteContentBackward') return;
                 if (input.value.length >= FolhaEngine.LIMITE_OAB) {
@@ -53,35 +52,37 @@ export const FolhaEngine = {
                 }
             });
 
-            // --- NAVEGAÇÃO E EDIÇÃO AVANÇADA ---
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: EMPURRA O TEXTO PARA BAIXO (SHIFT VERTICAL)
+                // ENTER: CORRIGIDO PARA NÃO DUPLICAR
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const pos = input.selectionStart;
                     const textoAtual = input.value;
-                    const fica = textoAtual.substring(0, pos);
-                    const desce = textoAtual.substring(pos);
+                    const fica = textoAtual.substring(0, pos).trim();
+                    const desce = textoAtual.substring(pos).trim();
 
+                    // 1. Primeiro "empurramos" as linhas para abrir espaço
                     for (let j = 150; j > idx + 1; j--) {
                         const linhaAlvo = document.getElementById(`L${j}`);
                         const linhaAcima = document.getElementById(`L${j - 1}`);
-                        if (linhaAlvo && linhaAcima) linhaAlvo.value = linhaAcima.value;
+                        if (linhaAlvo && linhaAcima) {
+                            linhaAlvo.value = linhaAcima.value;
+                        }
                     }
 
+                    // 2. Agora distribuímos o conteúdo da quebra
                     if (proximo) {
-                        input.value = fica.trim();
-                        proximo.value = (desce.trim() + " " + proximo.value).trim();
+                        input.value = fica; 
+                        proximo.value = desce; // Atribui apenas o que desceu, sem somar
                         proximo.focus();
                         proximo.setSelectionRange(0, 0);
                     }
                 }
 
-                // BACKSPACE: VOLTA PARA ANTERIOR SE VAZIO
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -91,13 +92,12 @@ export const FolhaEngine = {
                     }
                 }
 
-                // DELETE E CTRL+DELETE
                 if (e.key === 'Delete') {
-                    if (e.ctrlKey) { // CTRL+DEL: LIMPA LINHA
+                    if (e.ctrlKey) { 
                         e.preventDefault();
                         input.value = "";
                     } 
-                    else if (input.value === '') { // DEL EM LINHA VAZIA: PUXA TEXTO DE BAIXO
+                    else if (input.value === '') { 
                         e.preventDefault();
                         for (let j = idx; j < 150; j++) {
                             const atual = document.getElementById(`L${j}`);

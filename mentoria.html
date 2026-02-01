@@ -12,7 +12,7 @@
         .panel { background: var(--card); border-radius: 12px; border-top: 4px solid var(--gold); padding: 15px; }
         .btn { background: var(--gold); border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; color: black; margin-top: 10px; width: 100%; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; }
-        .feed { max-height: 200px; overflow-y: auto; margin-top: 10px; font-size: 0.8rem; border-top: 1px solid #334155; padding-top: 10px; }
+        .feed { max-height: 250px; overflow-y: auto; margin-top: 10px; border-top: 1px solid #334155; padding-top: 10px; }
         .card-p { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border-left: 3px solid var(--gold); }
     </style>
 </head>
@@ -25,31 +25,31 @@
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:var(--gold)">HISTÓRICO DE PRODUÇÃO (FOLHA REAL)</h3>
+        <h3 style="color:var(--gold)">HISTÓRICO DE PRODUÇÃO REAL</h3>
         <div id="feed-producao"></div>
     </section>
 
     <section class="panel" style="border-top-color: #ef4444;">
-        <h3 style="color:#ef4444">INTELIGÊNCIA NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Conceito">
-        <textarea id="nc-c" placeholder="Diferença crucial"></textarea>
-        <button class="btn" style="background:#ef4444; color:white" onclick="salvar('nc')">SALVAR</button>
+        <h3 style="color:#ef4444">INTELIGÊNCIA: NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Conceito A vs B">
+        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
+        <button class="btn" style="background:#ef4444; color:white" onclick="salvar('nc')">GRAVAR</button>
         <div id="feed-nc" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #a855f7;">
-        <h3 style="color:#a855f7">QUAL A PEÇA?</h3>
-        <textarea id="peca-t" placeholder="Fatos"></textarea>
-        <input id="peca-c" placeholder="Gabarito">
-        <button class="btn" style="background:#a855f7; color:white" onclick="salvar('peca')">SALVAR</button>
+        <h3 style="color:#a855f7">QUAL A PEÇA? (FLASHCARDS)</h3>
+        <textarea id="peca-t" placeholder="Fatos do problema..."></textarea>
+        <input id="peca-c" placeholder="Resposta / Gabarito">
+        <button class="btn" style="background:#a855f7; color:white" onclick="salvar('peca')">GRAVAR</button>
         <div id="feed-peca" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6">PRELIMINARES E TESES</h3>
-        <input id="tese-t" placeholder="Título">
-        <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido"></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvar('tese')">SALVAR</button>
+        <h3 style="color:#3b82f6">TESES E PRELIMINARES</h3>
+        <input id="tese-t" placeholder="Nome da Tese">
+        <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvar('tese')">GRAVAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 </main>
@@ -67,7 +67,7 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // FUNÇÃO SALVAR INTELIGÊNCIA
+    // Salvar Inteligências mantendo os nós originais
     window.salvar = (type) => {
         const t = document.getElementById(type+'-t').value;
         const c = document.getElementById(type+'-c').value;
@@ -79,22 +79,21 @@
         }
     };
 
-    // ESCUTA EM TEMPO REAL
+    // Escuta em Tempo Real (Não apaga o que já existe)
     onValue(ref(db), (snap) => {
         const data = snap.val() || {};
         
-        // Renderizar Produção Real
+        // Renderizar Peças
         const fProd = document.getElementById('feed-producao');
         fProd.innerHTML = "";
-        const producoes = data.producao_v13 || {};
-        Object.keys(producoes).reverse().forEach(id => {
-            const it = producoes[id];
+        const pecas = data.producao_v13 || {};
+        Object.keys(pecas).reverse().forEach(id => {
+            const it = pecas[id];
             fProd.innerHTML += `
                 <div class="card-p">
                     <div><strong>${it.peca}</strong> - <small>${it.data}</small></div>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn" style="width:auto; margin:0" onclick="verResposta('${id}')">VER FOLHA</button>
-                        <button class="btn" style="width:auto; margin:0; background:white" onclick="window.open('${it.pdf}')">PDF</button>
+                        <button class="btn" style="width:auto; margin:0" onclick="gerarPDF('${id}')">PDF CORREÇÃO</button>
                         <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white" onclick="remove(ref(db, 'producao_v13/${id}'))">X</button>
                     </div>
                 </div>`;
@@ -106,21 +105,26 @@
             feed.innerHTML = "";
             const items = data['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
-                feed.innerHTML += `<div style="margin-bottom:8px; border-bottom:1px solid #334155; padding-bottom:5px;">
-                    <strong>${items[id].t}</strong><br>${items[id].c}
-                    <i class="fas fa-trash" style="float:right; cursor:pointer; color:#ef4444" onclick="remove(ref(db, 'v13_${type}/${id}'))"></i>
+                feed.innerHTML += `<div style="margin-bottom:10px; border-bottom:1px solid #334155; padding-bottom:5px; position:relative;">
+                    <strong style="color:var(--gold)">${items[id].t}</strong><br>${items[id].c}
+                    <i class="fas fa-trash" style="position:absolute; right:0; top:0; color:#ef4444; cursor:pointer;" onclick="remove(ref(db, 'v13_${type}/${id}'))"></i>
                 </div>`;
             });
         });
     });
 
-    window.verResposta = (id) => {
+    window.gerarPDF = (id) => {
         onValue(ref(db, 'producao_v13/' + id), (snap) => {
             const d = snap.val();
             const win = window.open('', '_blank');
-            win.document.write(`<html><body style="font-family:monospace; padding:40px;"><h2>${d.peca}</h2><hr>`);
-            d.conteudo.forEach((l, i) => { if(l) win.document.write(`<p><b>${i+1}</b> ${l}</p>`); });
-            win.document.write(`</body></html>`);
+            win.document.write(`
+                <html><head><title>ENVIO PROFESSORA - ${d.peca}</title>
+                <style>body{font-family:'Courier New', monospace; padding:40px;} .ln{display:flex; border-bottom:1px solid #eee;} .n{width:40px; border-right:1px solid #000; color:#999; font-size:12px;}</style></head>
+                <body>
+                    <button onclick="window.print()">SALVAR PDF PARA PROFESSORA</button>
+                    <h3>${d.peca} | Data: ${d.data}</h3><hr>
+                    ${d.conteudo.map((l, i) => `<div class="ln"><div class="n">${i+1}</div><div style="padding-left:10px;">${l}</div></div>`).join('')}
+                </body></html>`);
         }, { onlyOnce: true });
     };
 </script>

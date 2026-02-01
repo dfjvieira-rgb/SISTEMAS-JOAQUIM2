@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - FULL ENGINE</title>
-    <link rel="icon" href="data:,">
+    <title>JOAQUIM ELITE 2026 - FULL CONNECT</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -15,28 +14,21 @@
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-        
         header { background: var(--primary); height: var(--header-h); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
-
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); z-index: 1001; overflow-y: auto; scrollbar-width: none; }
         .btn-side { width: 100%; min-height: 44px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
-        
         #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         #radar-status { font-size: 0.55rem; color: #fff; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
-
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 50px; position: relative; }
-        
         #identificador-peca { width: 100%; padding: 15px; background: #f8fafc; border-bottom: 3px double var(--line-color); text-align: center; font-weight: 900; font-size: 1.1rem; color: #64748b; text-transform: uppercase; }
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
         .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; }
         .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', Courier, monospace; color: var(--text-color); width: 100%; }
-
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 3px solid var(--gold); }
         .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; cursor: pointer; background: #f1f5f9; text-align: center; color: #000; }
-        
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); height: 100%; position: relative; }
         #pdf-split-view.active { display: block; }
         @media print { .sidebar, header, .modal, #pdf-split-view { display: none !important; } .paper { width: 100%; box-shadow: none; } .linha-folha { color: black !important; } }
@@ -48,40 +40,41 @@
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div>
     <div style="display:flex; gap:10px;">
         <button class="btn-side" style="width:40px; background:#64748b;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-moon"></i></button>
-        <button class="btn-side" style="width:40px; background:#ef4444;" id="btn-reset"><i class="fas fa-trash"></i></button>
+        <button class="btn-side" style="width:40px; background:#ef4444;" id="btn-reset-folha"><i class="fas fa-trash"></i></button>
     </div>
 </header>
 
 <main>
     <aside class="sidebar">
         <div id="radar-container"><div id="radar-status">SCANNER</div></div>
-        <button class="btn-side" style="background:var(--gold); color:black;" id="btn-exames"><i class="fas fa-bullseye"></i></button>
         
-        <button class="btn-side btn-disk-save" style="background:#0ea5e9;" id="btn-salvar-elite"><i class="fas fa-save"></i></button>
+        <button class="btn-side" style="background:var(--gold); color:black;" id="btn-modal-exames"><i class="fas fa-bullseye"></i></button>
         
-        <button class="btn-side" style="background:#334155; color:var(--gold);" id="btn-pergaminho"><i class="fas fa-scroll"></i></button>
+        <button class="btn-side" style="background:#10b981;" id="btn-salvar-elite"><i class="fas fa-save"></i></button>
         
-        <button class="btn-side" style="background:#3b82f6;" id="btn-gavel"><i class="fas fa-gavel"></i></button>
-        <button class="btn-side" style="background:var(--mentoria);" id="btn-mentoria"><i class="fas fa-robot"></i></button>
+        <button class="btn-side" style="background:#334155; color:var(--gold);" id="btn-scroll-pecas"><i class="fas fa-scroll"></i></button>
+        
+        <button class="btn-side" style="background:#3b82f6;" id="btn-martelo-teses"><i class="fas fa-gavel"></i></button>
+        <button class="btn-side" style="background:var(--mentoria);" id="btn-open-robot"><i class="fas fa-robot"></i></button>
         
         <hr style="opacity:0.1; margin:5px 0;">
-        <button class="btn-side" style="background:#f97316;" id="btn-p"><b>P</b></button>
-        <button class="btn-side" style="background:#eab308;" id="btn-g"><b>G</b></button>
-        <button class="btn-side" style="background:#10b981;" id="btn-v"><b>V</b></button>
+        <button class="btn-side" style="background:#f97316;" id="btn-pdf-p"><b>P</b></button>
+        <button class="btn-side" style="background:#eab308;" id="btn-pdf-g"><b>G</b></button>
+        <button class="btn-side" style="background:#10b981;" id="btn-pdf-v"><b>V</b></button>
         <button class="btn-side" style="background:#10b981;" onclick="window.print()"><i class="fas fa-print"></i></button>
-        <button class="btn-side" style="background:#475569;" id="btn-up"><i class="fas fa-chevron-up"></i></button>
-        <button class="btn-side" style="background:#475569;" id="btn-down"><i class="fas fa-chevron-down"></i></button>
+        <button class="btn-side" style="background:#475569;" id="btn-scroll-up"><i class="fas fa-chevron-up"></i></button>
+        <button class="btn-side" style="background:#475569;" id="btn-scroll-down"><i class="fas fa-chevron-down"></i></button>
     </aside>
 
     <section class="editor-container">
         <div class="paper">
-            <div id="identificador-peca">INICIANDO ENGINE...</div>
+            <div id="identificador-peca">CARREGANDO...</div>
             <div id="folha-total"></div>
         </div>
     </section>
 
     <div id="pdf-split-view">
-        <button style="position:absolute; top:15px; left:-40px; background:var(--gold); border:none; width:40px; height:40px; border-radius:8px 0 0 8px; cursor:pointer;" id="btn-close-pdf"><i class="fas fa-times"></i></button>
+        <button style="position:absolute; top:15px; left:-40px; background:var(--gold); border:none; width:40px; height:40px; border-radius:8px 0 0 8px; cursor:pointer;" id="btn-pdf-close"><i class="fas fa-times"></i></button>
         <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
     </div>
 </main>
@@ -89,7 +82,7 @@
 <div class="modal" id="universal-modal">
     <div class="modal-body">
         <div id="modal-content"></div>
-        <button id="btn-close-modal" style="width:100%; margin-top:15px; padding:12px; background:black; color:white; border-radius:10px; cursor:pointer;">VOLTAR</button>
+        <button id="btn-modal-back" style="width:100%; margin-top:15px; padding:12px; background:black; color:white; border-radius:10px; cursor:pointer;">VOLTAR</button>
     </div>
 </div>
 
@@ -99,15 +92,15 @@
     import { pecas } from './estruturas.js';
     import { FolhaEngine } from './folha-engine.js';
     
-    // IMPORT DA SUA ENGINE DE SALVAMENTO ISOLADA
+    // IMPORT DA ENGINE ISOLADA
     import { engineSaveElite } from './salvar.js';
 
     let activeEx = localStorage.getItem('activeEx') || "44";
     let ultimaLinhaFocada = 1;
     const LIMITE_LINHA = 85;
 
-    // 1. INICIALIZAÇÃO DA FOLHA
-    const carregarInterface = () => {
+    // 1. MONTAGEM INICIAL
+    const init = () => {
         FolhaEngine.montar('folha-total', LIMITE_LINHA);
         document.querySelectorAll('.linha-folha').forEach((input, index) => {
             const i = index + 1;
@@ -118,25 +111,27 @@
         radarDetect();
     };
 
-    // 2. RADAR DE PEÇA
+    // 2. RADAR (SCANNER)
     const radarDetect = () => {
         const val = document.getElementById('L1')?.value.toUpperCase() || "";
         const topo = document.getElementById('identificador-peca');
         const status = document.getElementById('radar-status');
-        
         if(val.includes("RECLAMA")) { topo.innerText = "RECLAMATÓRIA TRABALHISTA"; status.innerHTML = "RADAR<br><span style='color:#a855f7'>RT DETECT</span>"; }
         else if(val.includes("CONTESTA")) { topo.innerText = "CONTESTAÇÃO"; status.innerHTML = "RADAR<br><span style='color:#22c55e'>CONT DETECT</span>"; }
         else if(val.includes("ORDINARIO")) { topo.innerText = "RECURSO ORDINÁRIO"; status.innerHTML = "RADAR<br><span style='color:#3b82f6'>RO DETECT</span>"; }
-        else { status.innerHTML = "RADAR<br><span class='radar-blink'>BUSCANDO...</span>"; }
+        else { status.innerHTML = "RADAR<br>SCANNING..."; }
     };
 
-    // 3. AÇÕES DOS BOTÕES
+    // 3. LIGAÇÕES DOS 12 BOTÕES
+    
+    // DISQUETE (BOTÃO 3) - O coração do salvamento
     document.getElementById('btn-salvar-elite').onclick = () => engineSaveElite(db, activeEx);
 
-    document.getElementById('btn-pergaminho').onclick = () => {
+    // PERGAMINHO (BOTÃO 4) - Estruturas
+    document.getElementById('btn-scroll-pecas').onclick = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
-        content.innerHTML = "<h3>ESTRUTURAS</h3>";
+        content.innerHTML = "<h3>ESTRUTURAS PEÇAS</h3>";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = k;
             b.onclick = () => {
@@ -152,7 +147,8 @@
         modal.style.display = 'flex';
     };
 
-    document.getElementById('btn-gavel').onclick = () => {
+    // MARTELO (BOTÃO 5) - Teses
+    document.getElementById('btn-martelo-teses').onclick = () => {
         const dna = BANCO_ESPELHOS[activeEx] || "";
         const frases = dna.replace(/<[^>]*>/g, '').split('\n').filter(f => f.trim().length > 5);
         frases.forEach((f, i) => {
@@ -161,24 +157,26 @@
         });
     };
 
-    // 4. PDF E UTILITÁRIOS
-    const abrirPDF = (tipo) => {
+    // PDFs (BOTÕES 7, 8, 9)
+    const viewPdf = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         frame.src = tipo === 'v' ? 'vade.pdf' : `ro${activeEx}${tipo === 'g' ? '-gabarito' : ''}.pdf`;
         document.getElementById('pdf-split-view').classList.add('active');
     };
+    document.getElementById('btn-pdf-p').onclick = () => viewPdf('p');
+    document.getElementById('btn-pdf-g').onclick = () => viewPdf('g');
+    document.getElementById('btn-pdf-v').onclick = () => viewPdf('v');
+    document.getElementById('btn-pdf-close').onclick = () => document.getElementById('pdf-split-view').classList.remove('active');
 
-    document.getElementById('btn-p').onclick = () => abrirPDF('p');
-    document.getElementById('btn-g').onclick = () => abrirPDF('g');
-    document.getElementById('btn-v').onclick = () => abrirPDF('v');
-    document.getElementById('btn-close-pdf').onclick = () => document.getElementById('pdf-split-view').classList.remove('active');
-    document.getElementById('btn-close-modal').onclick = () => document.getElementById('universal-modal').style.display = 'none';
-    document.getElementById('btn-up').onclick = () => document.getElementById('L1').scrollIntoView({behavior:'smooth'});
-    document.getElementById('btn-down').onclick = () => document.getElementById('L51').scrollIntoView({behavior:'smooth'});
-    document.getElementById('btn-reset').onclick = () => confirm("Limpar tudo?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
-    document.getElementById('btn-mentoria').onclick = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
+    // NAVEGAÇÃO E OUTROS
+    document.getElementById('btn-modal-exames').onclick = () => { /* Sua lógica de abrir exames */ };
+    document.getElementById('btn-open-robot').onclick = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
+    document.getElementById('btn-scroll-up').onclick = () => document.getElementById('L1').scrollIntoView({behavior:'smooth'});
+    document.getElementById('btn-scroll-down').onclick = () => document.getElementById('L51').scrollIntoView({behavior:'smooth'});
+    document.getElementById('btn-reset-folha').onclick = () => confirm("Limpar tudo?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
+    document.getElementById('btn-modal-back').onclick = () => document.getElementById('universal-modal').style.display = 'none';
 
-    window.onload = carregarInterface;
+    window.onload = init;
 </script>
 </body>
 </html>

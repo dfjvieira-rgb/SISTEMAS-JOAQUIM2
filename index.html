@@ -19,7 +19,7 @@
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* SIDEBAR PC (Oculta no Mobile para liberar espaço) */
+        /* SIDEBAR PC */
         .sidebar { 
             width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; 
             gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); 
@@ -31,22 +31,21 @@
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         
-        /* BANNER RADAR (CLICÁVEL) */
         #identificador-peca { 
             width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); 
-            text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer;
+            text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem;
         }
 
-        /* HUB MOBILE (ZONA DO POLEGAR - MELHOR PRÁTICA) */
+        /* HUB MOBILE (FOGUETE) - Ajustado para subir os botões */
         #mobile-hub { 
-            display: none; position: fixed; bottom: 25px; right: 25px; z-index: 5000; 
-            flex-direction: column-reverse; gap: 10px; align-items: center;
+            display: none; position: fixed; bottom: 30px; right: 25px; z-index: 5000; 
+            flex-direction: column-reverse; gap: 12px; align-items: center;
         }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; z-index: 5001; }
         .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        #mobile-hub.active .fab-sub { display: flex; animation: slideIn 0.2s ease-out forwards; }
+        #mobile-hub.active .fab-sub { display: flex; animation: slideUp 0.3s ease-out forwards; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 768px) {
             .sidebar { display: none !important; }
@@ -78,7 +77,7 @@
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
     <div style="display:flex; gap:10px;">
         <button class="btn-side" style="width:40px; background:#475569;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-adjust"></i></button>
-        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Limpar Tudo?') && location.reload()"><i class="fas fa-trash"></i></button>
+        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Reiniciar Sistema?') && location.reload()"><i class="fas fa-trash"></i></button>
     </div>
 </header>
 
@@ -87,8 +86,8 @@
         <div style="background:#000; padding:10px; border-radius:8px; border:2px solid var(--gold); text-align:center; margin-bottom:10px; cursor:pointer;" onclick="window.forcarRadar()">
             <div id="radar-status" style="color:white; font-size:0.7rem; font-weight:bold;">SCANNER ATIVO</div>
         </div>
-        <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.executarSalvar()"><i class="fas fa-save"></i> <span>Salvar</span></button>
+        <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Trocar Exame</span></button>
+        <button class="btn-side" style="background:#10b981;" id="btn-save-pc"><i class="fas fa-save"></i> <span>Salvar Treino</span></button>
         <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
@@ -107,7 +106,7 @@
 
     <div id="mobile-hub">
         <button class="fab-main" id="main-fab"><i class="fas fa-rocket"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.executarSalvar()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" style="background:#10b981;" id="btn-save-mob"><i class="fas fa-save"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:#000" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
@@ -141,7 +140,27 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
-    // --- LOGICA DE INTELIGÊNCIA ---
+    // --- CORREÇÃO DE ROTAS (Nomes de arquivos 2026) ---
+    window.verPDF = (tipo) => {
+        const frame = document.getElementById('pdf-frame');
+        const view = document.getElementById('pdf-split-view');
+        
+        let arquivo = "";
+        if(tipo === 'P') {
+            arquivo = `ro${window.activeEx}.pdf`; 
+        } else if(tipo === 'G') {
+            // DEPARA PARA GABARITO: r0XX-gabarito.pdf conforme seu erro 404
+            arquivo = `r0${window.activeEx}-gabarito.pdf`;
+        } else {
+            arquivo = `vade.pdf`;
+        }
+        
+        frame.src = arquivo;
+        view.classList.add('active');
+        document.getElementById('mobile-hub').classList.remove('active');
+    };
+
+    // --- RADAR E MOTORES ---
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna) {
@@ -195,31 +214,35 @@
         modal.style.display='flex';
     };
 
-    window.verPDF = (tipo) => {
-        const frame = document.getElementById('pdf-frame');
-        const view = document.getElementById('pdf-split-view');
-        frame.src = tipo === 'P' ? `ro${window.activeEx}.pdf` : tipo === 'G' ? `ga${window.activeEx}.pdf` : `vade.pdf`;
-        view.classList.add('active');
-        document.getElementById('mobile-hub').classList.remove('active');
-    };
-
-    window.executarSalvar = () => engineSaveElite(db, window.activeEx);
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
 
-    // --- START ---
+    // --- START E EVENTOS ---
     window.onload = () => {
         FolhaEngine.montar('folha-total', 85);
         window.forcarRadar();
 
-        // Mapeia foco para mobile e PC
+        // Salvar blindado para PC e Mobile
+        const btnSavePc = document.getElementById('btn-save-pc');
+        const btnSaveMob = document.getElementById('btn-save-mob');
+        const saveAction = () => {
+            engineSaveElite(db, window.activeEx);
+            document.getElementById('mobile-hub').classList.remove('active');
+        };
+        if(btnSavePc) btnSavePc.onclick = saveAction;
+        if(btnSaveMob) btnSaveMob.onclick = saveAction;
+
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
                 input.addEventListener('focus', () => { window.ultimaLinha = parseInt(input.getAttribute('data-index')); });
             });
         }, 600);
 
-        // Toggle do Hub Mobile
-        document.getElementById('main-fab').onclick = () => document.getElementById('mobile-hub').classList.toggle('active');
+        document.getElementById('main-fab').onclick = () => {
+            const hub = document.getElementById('mobile-hub');
+            hub.classList.toggle('active');
+            // Muda ícone do foguete para fechar quando ativo
+            document.getElementById('main-fab').innerHTML = hub.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-rocket"></i>';
+        };
     };
 </script>
 </body>

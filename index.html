@@ -29,10 +29,8 @@
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 1001; }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
-        /* AJUSTE CIRÚRGICO: EDITOR CONTAINER */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; }
         
-        /* AJUSTE CIRÚRGICO: PAPER RESPONSIVO */
         .paper { 
             background: var(--paper-color); 
             width: 100%; 
@@ -40,7 +38,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
             margin-bottom: 100px; 
             position: relative;
-            overflow: hidden; /* Evita que o conteúdo interno force a largura */
+            overflow: hidden;
         }
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
@@ -48,21 +46,38 @@
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
-        /* AJUSTE NAS LINHAS (Injetado via CSS global para o FolhaEngine) */
-        .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; }
-        .linha-folha { flex: 1 !important; width: 100% !important; min-width: 0 !important; font-size: 16px !important; }
+        /* --- BLOCO DE CORREÇÃO MOBILE (TECLADO E DIGITAÇÃO) --- */
+        .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; background: white; border-bottom: 1px solid var(--line-color); }
+        
+        /* Força os atributos de sistema no input gerado pelo FolhaEngine */
+        .linha-folha { 
+            flex: 1 !important; 
+            width: 100% !important; 
+            min-width: 0 !important; 
+            font-size: 16px !important; /* Tamanho crítico para evitar zoom no iOS/Android */
+            padding: 12px 8px !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            color: var(--text-color) !important;
+            font-family: 'Courier New', monospace !important;
+            /* Ativa recursos do teclado via CSS onde possível */
+            text-rendering: optimizeLegibility;
+        }
+        
+        /* Ajuste de toque no mobile */
+        @media (max-width: 768px) {
+            .sidebar { display: none !important; }
+            #mobile-hub { display: flex; }
+            .editor-container { padding: 5px; } 
+            .paper { margin-bottom: 80px; width: 100% !important; border-radius: 0; }
+            .linha-folha { padding: 15px 10px !important; } /* Área de toque maior */
+        }
 
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #mobile-hub.active .fab-sub { display: flex; }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none !important; }
-            #mobile-hub { display: flex; }
-            .editor-container { padding: 5px; } /* Menos padding lateral no mobile */
-            .paper { margin-bottom: 50px; }
-        }
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
         #pdf-split-view.active { display: block; }
@@ -145,6 +160,19 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
     let isFinalizing = false;
+
+    // MELHORIA NO ENGINE: Habilita recursos de teclado ao montar a folha
+    const originalMontar = FolhaEngine.montar;
+    FolhaEngine.montar = function(id) {
+        originalMontar.apply(this, arguments);
+        // Após montar, injetamos as propriedades de teclado em cada input
+        document.querySelectorAll('.linha-folha').forEach(input => {
+            input.setAttribute('spellcheck', 'true');
+            input.setAttribute('autocorrect', 'on');
+            input.setAttribute('autocapitalize', 'sentences');
+            input.setAttribute('autocomplete', 'on');
+        });
+    };
 
     window.alert = (msg) => {
         console.log("🛡️ Bloqueado:", msg);

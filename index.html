@@ -9,7 +9,7 @@
         :root {
             --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
             --paper-color: #ffffff; --text-color: #1e293b; --line-color: #d1d5db;
-            --mentoria: #a855f7; --sidebar-pc: 200px; --sidebar-mobile: 70px;
+            --mentoria: #a855f7; --sidebar-pc: 220px; --sidebar-mobile: 70px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
         
@@ -20,39 +20,37 @@
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* SIDEBAR RESPONSIVA COM NOMES COMPLETOS NO PC */
-        .sidebar { width: var(--sidebar-pc); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; transition: 0.3s; }
-        .btn-side { width: 100%; min-height: 48px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.85rem; text-transform: uppercase; }
+        /* SIDEBAR ESTRUTURADA */
+        .sidebar { width: var(--sidebar-pc); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; transition: 0.3s; z-index: 1001; }
+        .btn-side { width: 100%; min-height: 48px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.85rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-side:hover { filter: brightness(1.2); }
         .btn-side span { display: inline; }
 
-        /* RADAR COMPACTO */
         #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 8px; text-align: center; margin-bottom: 10px; }
         #radar-status { font-size: 0.7rem; color: #fff; font-weight: 900; }
 
-        /* AJUSTE MOBILE */
         @media (max-width: 768px) {
             .sidebar { width: var(--sidebar-mobile); padding: 8px; }
             .btn-side { justify-content: center; padding: 0; }
             .btn-side span { display: none; }
-            .btn-side i { font-size: 1.3rem; }
         }
 
-        /* ÁREA DA FOLHA (Onde estava o erro) */
+        /* EDITOR */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; min-height: fit-content; }
+        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); position: relative; }
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #334155; }
 
-        /* CSS DA LINHA CORRIGIDO */
-        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); background: transparent; height: 35px; align-items: stretch; }
-        .linha-num { width: 45px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.03); user-select: none; }
-        .linha-folha { flex: 1; border: none !important; outline: none !important; background: transparent !important; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); width: 100%; }
+        /* LINHA FGV ESTILO */
+        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
+        .linha-num { width: 45px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.03); }
+        .linha-folha { flex: 1; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
 
-        /* MODAL DE PEÇAS ROLÁVEL */
+        /* MODAIS */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 90%; max-width: 500px; max-height: 80vh; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; }
-        #modal-content { overflow-y: auto; flex: 1; margin: 15px 0; padding-right: 10px; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; font-weight: 800; color: #1e293b; text-align: left; }
+        .modal-body { background: white; width: 90%; max-width: 500px; max-height: 80vh; padding: 25px; border-radius: 15px; display: flex; flex-direction: column; color: #333; }
+        #modal-content { overflow-y: auto; flex: 1; margin: 15px 0; }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; cursor: pointer; font-weight: 800; text-align: left; }
     </style>
 </head>
 <body class="dark-mode">
@@ -71,9 +69,10 @@
         
         <button class="btn-side" style="background:var(--gold); color:#000;" id="btn-trigger-exames"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
         <button class="btn-side" style="background:#10b981;" id="btn-salvar-elite"><i class="fas fa-save"></i> <span>Salvar</span></button>
-        <button class="btn-side" style="background:#334155; color:var(--gold);" id="btn-trigger-pecas"><i class="fas fa-scroll"></i> <span>Estruturas</span></button>
+        <button class="btn-side" style="background:#334155; color:var(--gold);" id="btn-trigger-pecas"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" id="btn-trigger-teses"><i class="fas fa-gavel"></i> <span>Teses</span></button>
-        <button class="btn-side" style="background:var(--mentoria);" id="btn-trigger-robot"><i class="fas fa-robot"></i> <span>Mentoria</span></button>
+        
+        <button class="btn-side" style="background:var(--mentoria);" id="btn-trigger-robot"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
         
         <hr style="opacity:0.1; margin:10px 0;">
         
@@ -93,7 +92,7 @@
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h3 id="modal-title" style="color:#1e293b"></h3>
+        <h3 id="modal-title"></h3>
         <div id="modal-content"></div>
         <button id="btn-modal-close" style="width:100%; padding:12px; background:#000; color:#fff; border-radius:8px; font-weight:bold; cursor:pointer;">VOLTAR</button>
     </div>
@@ -110,49 +109,69 @@
     let activeEx = localStorage.getItem('activeEx') || "44";
     let ultimaLinhaFocada = 1;
 
-    const init = () => {
-        // Monta a folha usando sua FolhaEngine Turbo [cite: 2026-01-30]
+    const startElite = () => {
         FolhaEngine.montar('folha-total', 85);
         
-        // Listener de Foco para Injeção do Pergaminho [cite: 2026-02-01]
-        document.querySelectorAll('.linha-folha').forEach(input => {
-            input.addEventListener('focus', () => {
-                ultimaLinhaFocada = parseInt(input.getAttribute('data-index'));
+        // Re-mapeamento de foco para injeção
+        setTimeout(() => {
+            document.querySelectorAll('.linha-folha').forEach(input => {
+                input.addEventListener('focus', () => {
+                    ultimaLinhaFocada = parseInt(input.getAttribute('data-index'));
+                });
             });
-        });
+        }, 500);
 
-        // Executa Radar e mapeia Identificador [cite: 2026-01-30]
+        // Radar de Identificação
         const dna = BANCO_ESPELHOS[activeEx] || "";
         RadarEngine.renderizar(RadarEngine.analisar(dna));
 
-        ligarAcoes();
+        vincularTudo();
     };
 
-    const ligarAcoes = () => {
-        // PERGAMINHO (ESTRUTURAS) - Integrado e Rolável
+    const vincularTudo = () => {
+        // PERGAMINHO
         document.getElementById('btn-trigger-pecas').onclick = () => {
             const modal = document.getElementById('universal-modal');
             document.getElementById('modal-title').innerText = "ESTRUTURAS FGV";
             const content = document.getElementById('modal-content');
             content.innerHTML = "";
-            Object.keys(pecas).forEach(key => {
-                const btn = document.createElement('div');
-                btn.className = 'opt-btn';
-                btn.innerText = key;
-                btn.onclick = () => {
-                    const linhas = pecas[key].split('\n');
-                    linhas.forEach((texto, i) => {
-                        const campo = document.getElementById(`L${ultimaLinhaFocada + i}`);
-                        if(campo) campo.value = texto;
+            Object.keys(pecas).forEach(k => {
+                const b = document.createElement('div'); b.className='opt-btn'; b.innerText=k;
+                b.onclick = () => {
+                    pecas[k].split('\n').forEach((t, i) => {
+                        const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
+                        if(el) el.value = t;
                     });
-                    modal.style.display = 'none';
+                    modal.style.display='none';
                 };
-                content.appendChild(btn);
+                content.appendChild(b);
             });
-            modal.style.display = 'flex';
+            modal.style.display='flex';
         };
 
-        // EXAMES
+        // BANCO DE TESES (CORRIGIDO)
+        document.getElementById('btn-trigger-teses').onclick = () => {
+            const dna = BANCO_ESPELHOS[activeEx] || "";
+            // Limpa o HTML e quebra em linhas para injetar como teses
+            const teses = dna.replace(/<[^>]*>?/gm, '').split('\n').filter(t => t.trim().length > 10);
+            
+            if(teses.length === 0) {
+                alert("Nenhuma tese encontrada para este exame no banco.");
+                return;
+            }
+
+            teses.forEach((texto, i) => {
+                const linha = document.getElementById(`L${ultimaLinhaFocada + i}`);
+                if(linha) linha.value = "➤ " + texto.trim().substring(0, 80);
+            });
+        };
+
+        // ROBÔ DA MENTORIA (RESTAURADO)
+        document.getElementById('btn-trigger-robot').onclick = () => {
+            window.open('mentoria.html', 'MentoriaIA', 'width=450,height=700,left=100,top=100');
+        };
+
+        // DEMAIS AÇÕES
         document.getElementById('btn-trigger-exames').onclick = () => {
             const modal = document.getElementById('universal-modal');
             document.getElementById('modal-title').innerText = "BANCO DE EXAMES";
@@ -160,20 +179,20 @@
             content.innerHTML = "";
             for(let i=44; i>=35; i--) {
                 const b = document.createElement('div'); b.className='opt-btn'; b.innerText=`Exame ${i}`;
-                b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); init(); modal.style.display='none'; };
+                b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); startElite(); modal.style.display='none'; };
                 content.appendChild(b);
             }
             modal.style.display='flex';
         };
 
-        // Outros botões
         document.getElementById('btn-salvar-elite').onclick = () => engineSaveElite(db, activeEx);
-        document.getElementById('btn-modal-close').onclick = () => document.getElementById('universal-modal').style.display='none';
+        document.getElementById('btn-pdf-enunciado').onclick = () => window.open(`ro${activeEx}.pdf`);
         document.getElementById('btn-nav-up').onclick = () => document.querySelector('.editor-container').scrollTo({top:0, behavior:'smooth'});
+        document.getElementById('btn-modal-close').onclick = () => document.getElementById('universal-modal').style.display='none';
         document.getElementById('btn-trash-reset').onclick = () => confirm("Limpar?") && document.querySelectorAll('.linha-folha').forEach(i => i.value="");
     };
 
-    window.onload = init;
+    window.onload = startElite;
 </script>
 </body>
 </html>

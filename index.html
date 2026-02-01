@@ -19,7 +19,6 @@
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* Animação do Indicador Verde */
         @keyframes pulse-discreto {
             0% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.5; transform: scale(1.1); }
@@ -119,57 +118,73 @@
 
 <script type="module">
     import { db } from './firebase-config.js';
+    import { ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
     import { FolhaEngine } from './folha-engine.js';
     import { RadarEngine } from './radar-engine.js';
     import { engineSaveElite } from './salvar.js';
 
+    // --- VACINA ANTI-ALERT (PASSO 2) ---
+    window.alert = (msg) => {
+        console.log("🛡️ Bloqueado:", msg);
+        const st = document.getElementById('sync-text');
+        if (st && msg.includes("Sincronizado")) {
+            st.innerText = "HISTÓRICO SALVO ✅";
+            document.getElementById('sync-indicator').classList.add('sync-success');
+            setTimeout(() => {
+                st.innerText = "SYNC ON";
+                document.getElementById('sync-indicator').classList.remove('sync-success');
+            }, 4000);
+        }
+    };
+
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
     let isFinalizing = false;
 
+    // --- SISTEMA DE REIDRATAÇÃO (RECUPERAR DADOS AO F5) ---
+    window.carregarRascunho = async () => {
+        const syncText = document.getElementById('sync-text');
+        if(syncText) syncText.innerText = "RECUPERANDO...";
+        
+        try {
+            const snapshot = await get(child(ref(db), `producao_v13`));
+            if (snapshot.exists()) {
+                const dados = snapshot.val();
+                // Filtra as peças do exame atual e pega a mais recente (pelo timestamp no nome da chave)
+                const chaves = Object.keys(dados).filter(k => k.startsWith(window.activeEx));
+                const ultimaChave = chaves.sort().reverse()[0];
+                
+                if (ultimaChave) {
+                    const linhas = dados[ultimaChave].linhas;
+                    const inputs = document.querySelectorAll('.linha-folha');
+                    linhas.forEach((texto, i) => { if(inputs[i]) inputs[i].value = texto; });
+                    if(syncText) syncText.innerText = "DADOS CARREGADOS ✅";
+                }
+            }
+        } catch (e) { console.error("Erro no load:", e); }
+        setTimeout(() => { if(syncText) syncText.innerText = "SYNC ON"; }, 2000);
+    };
+
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
         const syncText = document.getElementById('sync-text');
-        const syncIcon = document.getElementById('sync-icon');
-        
-        syncText.innerText = "SYNCING...";
         try {
-            await engineSaveElite(db, window.activeEx, { tipo: 'rascunho' });
-            syncText.innerText = "SAVED";
-            setTimeout(() => { if(!isFinalizing) syncText.innerText = "SYNC ON"; }, 2000);
-        } catch(e) { syncText.innerText = "OFFLINE"; }
+            await engineSaveElite(db, window.activeEx);
+            if(syncText) syncText.innerText = "AUTO-SAVED";
+            setTimeout(() => { if(!isFinalizing && syncText) syncText.innerText = "SYNC ON"; }, 2000);
+        } catch(e) { if(syncText) syncText.innerText = "OFFLINE"; }
     };
 
     window.finalizarPeca = async () => {
-        if(!confirm("Deseja finalizar a peça e salvar no histórico?")) return;
+        if(!confirm("Deseja finalizar e enviar ao histórico?")) return;
         isFinalizing = true;
-        
-        const syncText = document.getElementById('sync-text');
-        const syncIndicator = document.getElementById('sync-indicator');
-        const syncIcon = document.getElementById('sync-icon');
-
-        syncText.innerText = "ENVIANDO...";
-        
+        document.getElementById('sync-text').innerText = "ENVIANDO...";
         try {
-            await engineSaveElite(db, window.activeEx, { tipo: 'historico' });
-            
-            // FEEDBACK VISUAL DISCRETO E VERDE
-            syncText.innerText = "HISTÓRICO SALVO";
-            syncIndicator.classList.add('sync-success');
-            syncIcon.className = "fas fa-check-circle";
-
-            setTimeout(() => { 
-                isFinalizing = false; 
-                syncText.innerText = "SYNC ON"; 
-                syncIndicator.classList.remove('sync-success');
-                syncIcon.className = "fas fa-cloud";
-            }, 6000);
-        } catch(e) {
-            isFinalizing = false;
-            syncText.innerText = "SYNC ON";
-        }
+            await engineSaveElite(db, window.activeEx);
+        } catch(e) { console.error(e); }
+        isFinalizing = false;
     };
 
     window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };
@@ -182,8 +197,6 @@
             document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
         }
     };
-
-    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 
     window.toggleFoguete = () => {
         const hub = document.getElementById('mobile-hub');
@@ -233,13 +246,16 @@
 
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if(!dna) return;
-        FolhaEngine.injetarTextoMultilinhas(dna, window.ultimaLinha);
+        if(dna) FolhaEngine.injetarTextoMultilinhas(dna, window.ultimaLinha);
     };
 
-    window.onload = () => {
+    window.onload = async () => {
         FolhaEngine.montar('folha-total');
         setTimeout(window.forcarRadar, 1500); 
+        
+        // RECUPERAÇÃO AUTOMÁTICA
+        await window.carregarRascunho();
+
         setInterval(window.dispararSalvar, 30000); 
 
         setTimeout(() => {
@@ -251,6 +267,8 @@
             });
         }, 1000);
     };
+    
+    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>
 </html>

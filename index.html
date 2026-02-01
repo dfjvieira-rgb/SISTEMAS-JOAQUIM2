@@ -3,92 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - MOBILE OPTIMIZED</title>
+    <title>JOAQUIM ELITE 2026 - SISTEMA HÍBRIDO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
-            --paper-color: #ffffff; --text-color: #1e293b; --line-color: #d1d5db;
-            --mentoria: #a855f7; --header-h: 55px; --footer-h: 115px;
+            --primary: #020617; --gold: #fbbf24; --bg-paper: #0f172a;
+            --paper-color: #ffffff; --text-color: #1e293b; --line-color: #cbd5e1;
+            --header-h: 55px; --footer-h-pc: 90px; --footer-h-mob: 65px;
         }
-        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #ffffff; --text-color: #1e293b; --line-color: #334155; }
+        body.light-mode { --primary: #f8fafc; --bg-paper: #cbd5e1; --gold: #f59e0b; }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
         
-        header { background: var(--primary); height: var(--header-h); padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
-        main { flex: 1; overflow-y: auto; background: var(--bg-paper); -webkit-overflow-scrolling: touch; display: flex; justify-content: center; }
+        /* HEADER [cite: 2026-01-30] */
+        header { background: var(--primary); height: var(--header-h); padding: 0 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 1000; }
+        .radar-box { border: 1px solid var(--gold); color: var(--gold); padding: 3px 8px; font-size: 0.6rem; font-weight: 900; border-radius: 4px; text-transform: uppercase; }
 
-        /* Folha ocupando espaço total sem sidebar lateral */
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; min-height: 100%; box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin-bottom: var(--footer-h); position: relative; }
+        /* EDITOR E FOLHA [cite: 2026-01-30] */
+        main { flex: 1; overflow-y: auto; background: var(--bg-paper); display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
+        .paper { background: white; width: 100%; max-width: 850px; min-height: 100%; box-shadow: 0 0 30px rgba(0,0,0,0.5); position: relative; }
         
-        #identificador-peca { width: 100%; padding: 12px; background: #f8fafc; border-bottom: 2px solid var(--line-color); text-align: center; font-weight: 900; font-size: 0.85rem; color: #64748b; text-transform: uppercase; }
-        
-        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
-        .linha-num { width: 35px; font-size: 0.65rem; color: #94a3b8; text-align: center; padding-top: 12px; border-right: 1px solid var(--line-color); flex-shrink: 0; background: rgba(0,0,0,0.02); }
-        
-        /* FIX: Letras engolidas resolvido com padding-right maior */
-        .linha-folha { flex: 1; height: 40px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); width: 100%; }
+        /* IDENTIFICADOR EM VERMELHO (ESTILO DA FOTO) [cite: 2026-01-30] */
+        #identificador-peca { 
+            padding: 25px 15px; text-align: center; color: #ef4444; 
+            font-weight: 900; font-size: 1.4rem; text-transform: uppercase; 
+            border-bottom: 3px double #f1f5f9; 
+        }
 
-        /* TOOLBAR INFERIOR (12 BOTÕES EM 2 LINHAS) [cite: 2026-01-30] */
+        /* TOOLBAR HÍBRIDA (PC vs MOBILE) [cite: 2021-01-20, 2026-01-30] */
         .toolbar { 
-            position: fixed; bottom: 0; left: 0; right: 0; height: var(--footer-h); 
+            position: fixed; bottom: 0; left: 0; right: 0; 
             background: #1e293b; display: grid; grid-template-columns: repeat(6, 1fr); 
-            gap: 4px; border-top: 3px solid var(--gold); padding: 6px; z-index: 3000;
+            border-top: 3px solid var(--gold); z-index: 2000;
         }
         .btn-tool { 
-            background: rgba(255,255,255,0.05); border: none; color: white; border-radius: 8px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer;
+            background: transparent; border: none; color: white;
+            display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; cursor: pointer; transition: 0.2s;
         }
-        .btn-tool i { font-size: 1.1rem; }
-        .btn-tool span { font-size: 0.45rem; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
+        .btn-tool span { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; }
         .btn-tool:active { background: var(--gold); color: black; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; align-items: center; justify-content: center; padding: 15px; }
-        .modal-body { background: #fff; width: 100%; max-width: 450px; max-height: 80vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; border: 3px solid var(--gold); }
-        .modal-scroll { flex: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .opt-btn { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #1e293b; }
+        /* ADAPTAÇÃO DE TELAS [cite: 2026-01-30] */
+        @media (max-width: 600px) {
+            .toolbar { height: var(--footer-h-mob); }
+            .btn-tool span { display: none; } /* Mobile: Só ícones */
+            .btn-tool i { font-size: 1.3rem; }
+            .paper { margin-bottom: var(--footer-h-mob); }
+        }
+        @media (min-width: 601px) {
+            .toolbar { height: var(--footer-h-pc); }
+            .btn-tool i { font-size: 1.1rem; }
+            .paper { margin-bottom: var(--footer-h-pc); }
+        }
 
-        @media print { .toolbar, header, .modal { display: none !important; } main { padding: 0; } }
+        /* ESTILO DA FOLHA (ENGINE) [cite: 2026-01-30] */
+        .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
+        .linha-num { width: 40px; font-size: 0.65rem; color: #94a3b8; text-align: center; padding-top: 12px; border-right: 1px solid var(--line-color); background: #f8fafc; flex-shrink: 0; }
+        .linha-folha { flex: 1; height: 38px; border: none; outline: none; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; width: 100%; color: var(--text-color); }
+
+        /* MODAL [cite: 2026-01-30] */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; align-items: center; justify-content: center; padding: 15px; }
+        .modal-body { background: white; width: 100%; max-width: 450px; max-height: 80vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-scroll { flex: 1; overflow-y: auto; padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .opt-btn { background: #f1f5f9; padding: 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-align: center; color: #1e293b; border: 1px solid #cbd5e1; }
+
+        @media print { .toolbar, header, .modal { display: none !important; } .paper { margin: 0; box-shadow: none; } }
     </style>
 </head>
 <body class="dark-mode">
 
 <header>
-    <div style="color:white; font-weight:900; font-size:0.8rem;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
-    <div style="display:flex; gap:10px;">
-        <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:none; color:white;"><i class="fas fa-moon"></i></button>
-        <div id="radar-status" style="font-size:0.55rem; color:var(--gold); font-weight:900;">SCANNER</div>
+    <div id="radar-status" class="radar-box">RADAR ATIVO</div>
+    <div style="color:white; font-weight:900; font-size:0.8rem; letter-spacing: 1px;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div>
+    <div style="display:flex; gap:12px;">
+        <button onclick="document.body.classList.toggle('light-mode')" style="background:none; border:none; color:white; font-size:1.1rem;"><i class="fas fa-adjust"></i></button>
+        <button onclick="resetarFolha()" style="background:none; border:none; color:#ef4444; font-size:1.1rem;"><i class="fas fa-eraser"></i></button>
     </div>
 </header>
 
 <main>
     <div class="paper">
-        <div id="identificador-peca">CARREGANDO...</div>
+        <div id="identificador-peca">AGRAVO DE PETIÇÃO</div>
         <div id="folha-total"></div>
     </div>
 </main>
 
 <nav class="toolbar">
-    <button class="btn-tool" style="color:#0ea5e9;" onclick="salvarManual()"><i class="fas fa-save"></i><span>Salvar</span></button>
-    <button class="btn-tool" style="color:var(--gold);" onclick="abrirModalExames()"><i class="fas fa-bullseye"></i><span>Exame</span></button>
-    <button class="btn-tool" style="color:#f59e0b;" onclick="abrirModalPecas()"><i class="fas fa-scroll"></i><span>Peças</span></button>
-    <button class="btn-tool" style="color:#3b82f6;" onclick="irPara(1)"><i class="fas fa-arrow-up"></i><span>Topo</span></button>
-    <button class="btn-tool" style="color:#8b5cf6;" onclick="irPara(51)"><i class="fas fa-arrow-down"></i><span>Quest.</span></button>
-    <button class="btn-tool" style="color:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i><span>IA</span></button>
+    <button class="btn-tool" onclick="abrirModalExames()" style="color:var(--gold);"><i class="fas fa-bullseye"></i><span>Exames</span></button>
+    <button class="btn-tool" onclick="salvarManual()" style="color:#0ea5e9;"><i class="fas fa-save"></i><span>Salvar</span></button>
+    <button class="btn-tool" onclick="abrirModalPecas()" style="color:#f59e0b;"><i class="fas fa-scroll"></i><span>Peças</span></button>
+    <button class="btn-tool" onclick="alert('Justiça Injetada')" style="color:#3b82f6;"><i class="fas fa-gavel"></i><span>Justiça</span></button>
+    <button class="btn-tool" onclick="abrirMentoria()" style="color:#a855f7;"><i class="fas fa-robot"></i><span>Mentoria</span></button>
+    <button class="btn-tool" onclick="window.print()" style="color:#10b981;"><i class="fas fa-print"></i><span>Imprimir</span></button>
     
-    <button class="btn-tool" style="color:#10b981;" onclick="window.print()"><i class="fas fa-print"></i><span>PDF</span></button>
-    <button class="btn-tool" style="color:#f97316;" onclick="window.open('ro'+activeEx+'.pdf')"><i class="fas fa-file-alt"></i><span>Peça</span></button>
-    <button class="btn-tool" style="color:#eab308;" onclick="window.open('ro'+activeEx+'-gabarito.pdf')"><i class="fas fa-check-circle"></i><span>Gab.</span></button>
-    <button class="btn-tool" style="color:#22c55e;" onclick="window.open('vade.pdf')"><i class="fas fa-book"></i><span>Vade</span></button>
-    <button class="btn-tool" style="color:#94a3b8;" onclick="location.reload()"><i class="fas fa-sync"></i><span>Reload</span></button>
-    <button class="btn-tool" style="color:#ef4444;" onclick="resetarFolha()"><i class="fas fa-eraser"></i><span>Limpar</span></button>
+    <button class="btn-tool" onclick="pdf('p')" style="color:#f97316;"><i class="fas fa-file-pdf"></i><span>Peça PDF</span></button>
+    <button class="btn-tool" onclick="pdf('g')" style="color:#eab308;"><i class="fas fa-check-circle"></i><span>Gabarito</span></button>
+    <button class="btn-tool" onclick="pdf('v')" style="color:#22c55e;"><i class="fas fa-book"></i><span>Vade</span></button>
+    <button class="btn-tool" onclick="irPara(1)" style="color:#94a3b8;"><i class="fas fa-arrow-up"></i><span>Topo</span></button>
+    <button class="btn-tool" onclick="irPara(51)" style="color:#94a3b8;"><i class="fas fa-question"></i><span>Questões</span></button>
+    <button class="btn-tool" onclick="location.reload()" style="color:#64748b;"><i class="fas fa-sync"></i><span>Sync</span></button>
 </nav>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <div style="padding:15px; background:#f8fafc; font-weight:900; text-align:center;" id="modal-title">MENU</div>
+        <div id="modal-title" style="padding:15px; font-weight:900; text-align:center; background:#f8fafc; border-bottom:1px solid #eee;">MENU</div>
         <div class="modal-scroll" id="modal-content"></div>
-        <button onclick="fecharModal()" style="padding:15px; background:black; color:white; border:none; font-weight:900;">VOLTAR</button>
+        <button onclick="fecharModal()" style="padding:15px; background:black; color:white; border:none; font-weight:900;">FECHAR</button>
     </div>
 </div>
 
@@ -118,7 +140,6 @@
                     if (el) el.value = txt;
                 });
             }
-            document.getElementById('identificador-peca').innerText = `EXAME ${activeEx} - TREINO`;
         }, { onlyOnce: true });
     };
 
@@ -129,7 +150,7 @@
 
     window.abrirModalPecas = () => {
         const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS ANALISADAS";
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = k;
@@ -139,6 +160,7 @@
                     if(el) el.value = t.substring(0, 85);
                 });
                 fecharModal();
+                document.getElementById('identificador-peca').innerText = k;
             };
             content.appendChild(b);
         });
@@ -151,7 +173,7 @@
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = `OAB ${i}`;
-            b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); montarFolha(); fecharModal(); };
+            b.onclick = () => { activeEx = i.toString(); localStorage.setItem('activeEx', activeEx); location.reload(); };
             content.appendChild(b);
         }
         document.getElementById('universal-modal').style.display = 'flex';
@@ -160,6 +182,7 @@
     window.irPara = (n) => document.getElementById(`L${n}`)?.scrollIntoView({behavior:'smooth', block:'center'});
     window.fecharModal = () => document.getElementById('universal-modal').style.display = 'none';
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
+    window.pdf = (t) => window.open(t === 'v' ? 'vade.pdf' : `ro${activeEx}${t === 'g' ? '-gabarito' : ''}.pdf`);
     window.resetarFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value=""); };
 
     window.onload = montarFolha;

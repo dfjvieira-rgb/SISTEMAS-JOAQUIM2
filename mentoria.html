@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA ELITE | INTELIGÊNCIA NÃO CONFUNDA</title>
+    <title>MENTORIA ELITE 2026 | BASE BLINDADA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #020617; --gold: #fbbf24; --accent: #a855f7;
             --card-bg: #1e293b; --text: #f8fafc; --border: #94a3b8;
-            --success: #16a34a; --purple: #5b21b6; --danger: #dc2626;
+            --success: #16a34a; --purple: #5b21b6; --danger: #dc2626; --slate: #475569;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: var(--text); padding: 20px; }
@@ -20,16 +20,18 @@
 
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 
-        .panel { background: var(--card-bg); border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; overflow: hidden; }
+        .panel { background: var(--card-bg); border-radius: 12px; border: 1px solid #334155; display: flex; flex-direction: column; overflow: hidden; margin-bottom: 10px; }
         .panel-header { padding: 12px; background: rgba(255,255,255,0.05); border-bottom: 1px solid #334155; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; text-align: center; color: var(--gold); }
         .panel-body { padding: 15px; }
 
         label { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 4px; color: #94a3b8; }
-        input, textarea { width: 100%; border: 1px solid #334155; background: rgba(0,0,0,0.2); color: white; border-radius: 8px; padding: 12px; font-size: 1rem; margin-bottom: 10px; font-family: inherit; outline: none; }
+        input, textarea { width: 100%; border: 1px solid #334155; background: rgba(0,0,0,0.2); color: white; border-radius: 8px; padding: 12px; font-size: 1rem; margin-bottom: 10px; font-family: inherit; outline: none; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: var(--gold); }
         
         .btn-save { width: 100%; padding: 15px; border-radius: 8px; border: none; font-weight: 800; font-size: 0.9rem; cursor: pointer; color: #fff; text-transform: uppercase; transition: 0.3s; }
+        .btn-save:active { transform: scale(0.98); }
         
-        .feed { margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .feed { margin-top: 15px; max-height: 300px; overflow-y: auto; padding-right: 5px; scrollbar-width: thin; }
         .card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-bottom: 10px; position: relative; }
         
         .card-pdf { border-left: 5px solid var(--gold); background: rgba(251, 191, 36, 0.05); display: flex; justify-content: space-between; align-items: center; }
@@ -48,10 +50,13 @@
 
 <header>
     <div class="logo"><i class="fas fa-brain"></i> MENTORIA ELITE</div>
-    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR AOS TREINOS</a>
+    <div style="display: flex; gap: 10px;">
+        <button onclick="fazerBackup()" class="btn-voltar" style="background: var(--slate); border-color: var(--slate); color: white;"><i class="fas fa-download"></i> BACKUP</button>
+        <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR</a>
+    </div>
 </header>
 
-<div class="btn-disquete" onclick="salvarApenasPDF()" title="Salvar PDF no Histórico">
+<div class="btn-disquete" onclick="salvarApenasPDF()" title="Salvar Estudo de PDF no Histórico">
     <i class="fas fa-save"></i>
 </div>
 
@@ -60,46 +65,46 @@
         <div class="panel-header"><i class="fas fa-file-pdf"></i> Histórico de PDFs Analisados</div>
         <div class="panel-body">
             <div id="feed-pdf" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;">
-                <p style="text-align:center; color:gray;">Buscando PDFs salvos...</p>
+                <p style="text-align:center; color:gray;">Buscando histórico...</p>
             </div>
-        </div>
-    </section>
-
-    <section class="panel" style="border-top: 4px solid var(--success);">
-        <div class="panel-header">Preliminares Processuais</div>
-        <div class="panel-body">
-            <label>Título da Preliminar</label><input type="text" id="pre-t" placeholder="Ex: Inépcia da Inicial">
-            <label>Tese/Artigo</label><textarea id="pre-c" rows="2" placeholder="Descreva a fundamentação técnica..."></textarea>
-            <button class="btn-save" style="background: var(--success);" onclick="salvar('pre')">Salvar Preliminar</button>
-            <div class="feed" id="feed-pre"></div>
-        </div>
-    </section>
-
-    <section class="panel" style="border-top: 4px solid var(--purple);">
-        <div class="panel-header">Qual é a Peça?</div>
-        <div class="panel-body">
-            <label>Dica/Enunciado</label><textarea id="peca-t" rows="2" placeholder="Fatos que identificam a peça..."></textarea>
-            <label>Nome da Peça (Gabarito)</label><input type="text" id="peca-c" placeholder="Ex: Recurso Ordinário">
-            <button class="btn-save" style="background: var(--purple);" onclick="salvar('peca')">Salvar Peça</button>
-            <div class="feed" id="feed-peca"></div>
         </div>
     </section>
 
     <section class="panel" style="border-top: 4px solid var(--danger);">
         <div class="panel-header">Inteligência: Não Confunda</div>
         <div class="panel-body">
-            <label>Conceito A vs B</label><input type="text" id="nc-t" placeholder="Ex: Diferença de Multa 467 vs 477">
-            <label>Atenção / Pulo do Gato</label><textarea id="nc-c" rows="2" placeholder="Explique o detalhe que confunde..."></textarea>
-            <button class="btn-save" style="background: var(--danger);" onclick="salvar('nc')">Salvar no Radar</button>
+            <label>Conceito A vs B</label><input type="text" id="nc-t" placeholder="Ex: Multa 467 vs 477">
+            <label>O Pulo do Gato</label><textarea id="nc-c" rows="2" placeholder="Explique a diferença crucial..."></textarea>
+            <button class="btn-save" style="background: var(--danger);" onclick="salvar('nc')">Salvar Alerta</button>
             <div class="feed" id="feed-nc"></div>
         </div>
     </section>
 
-    <section class="panel" style="border-top: 4px solid #3b82f6;">
-        <div class="panel-header">Tesários de Mérito</div>
+    <section class="panel" style="border-top: 4px solid var(--purple);">
+        <div class="panel-header">Qual é a Peça? (Flashcard)</div>
         <div class="panel-body">
-            <label>Tema de Direito Material</label><input type="text" id="tese-t" placeholder="Ex: Horas Extras Art. 58">
-            <label>Estrutura da Tese</label><textarea id="tese-c" rows="2" placeholder="Fato, Fundamento e Pedido..."></textarea>
+            <label>Enunciado / Dica</label><textarea id="peca-t" rows="2" placeholder="Fatos identificadores..."></textarea>
+            <label>Gabarito</label><input type="text" id="peca-c" placeholder="Nome completo da Peça">
+            <button class="btn-save" style="background: var(--purple);" onclick="salvar('peca')">Salvar Flashcard</button>
+            <div class="feed" id="feed-peca"></div>
+        </div>
+    </section>
+
+    <section class="panel" style="border-top: 4px solid var(--success);">
+        <div class="panel-header">Preliminares Processuais</div>
+        <div class="panel-body">
+            <label>Título</label><input type="text" id="pre-t" placeholder="Ex: Inépcia">
+            <label>Fundamentação Técnica</label><textarea id="pre-c" rows="2"></textarea>
+            <button class="btn-save" style="background: var(--success);" onclick="salvar('pre')">Arquivar Preliminar</button>
+            <div class="feed" id="feed-pre"></div>
+        </div>
+    </section>
+
+    <section class="panel" style="border-top: 4px solid #3b82f6;">
+        <div class="panel-header">Tesário de Mérito</div>
+        <div class="panel-body">
+            <label>Tema</label><input type="text" id="tese-t" placeholder="Ex: Adicional de Periculosidade">
+            <label>Estrutura (Fato/Fund/Ped)</label><textarea id="tese-c" rows="2"></textarea>
             <button class="btn-save" style="background: #3b82f6;" onclick="salvar('tese')">Arquivar Tese</button>
             <div class="feed" id="feed-tese"></div>
         </div>
@@ -108,7 +113,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -119,25 +124,39 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    const paths = { pre: 'v13_pre', peca: 'v13_peca', nc: 'v13_nc', tese: 'v13_tese', historico: 'mentoria_pdfs' };
+    const paths = { pre: 'v13_pre', peca: 'v13_peca', nc: 'v13_nc', tese: 'v13_tese', hist: 'mentoria_pdfs' };
 
-    // SALVAR APENAS PDF (O DISQUETE)
+    // FUNÇÃO DO DISQUETE: SALVA APENAS A REFERÊNCIA DO PDF
     window.salvarApenasPDF = () => {
         const exame = localStorage.getItem('activeEx') || "44";
         const pdfNome = `ro${exame}.pdf`;
         
-        push(ref(db, paths.historico), {
+        push(ref(db, paths.hist), {
             exame: exame,
             arquivo: pdfNome,
             data: new Date().toLocaleString('pt-BR'),
             ts: serverTimestamp()
-        }).then(() => alert(`💾 PDF ${pdfNome} salvo no histórico!`));
+        }).then(() => alert("💾 PDF registrado no seu histórico de mentoria!"));
     };
 
+    // BACKUP DE SEGURANÇA (DOWNLOAD JSON)
+    window.fazerBackup = async () => {
+        if(!confirm("Deseja descarregar o backup completo da sua base de dados?")) return;
+        const snap = await get(ref(db, "/"));
+        const data = snap.val();
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type : 'application/json'});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BACKUP_ELITE_2026_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    };
+
+    // SALVAMENTO DE TESES
     window.salvar = (type) => {
         const t = document.getElementById(`${type}-t`).value;
         const c = document.getElementById(`${type}-c`).value;
-        if(!t || !c) return alert("Preencha os campos!");
+        if(!t || !c) return alert("Preencha todos os campos!");
         
         push(ref(db, paths[type]), { t, c, ts: serverTimestamp() }).then(() => {
             document.getElementById(`${type}-t`).value = '';
@@ -145,34 +164,36 @@
         });
     };
 
-    window.excluir = (pathType, id) => { 
-        if(confirm("Apagar permanentemente?")) {
-            remove(ref(db, `${paths[pathType]}/${id}`)); 
+    window.excluir = (type, id) => { 
+        if(confirm("Excluir permanentemente?")) {
+            remove(ref(db, `${paths[type]}/${id}`)); 
         }
     };
 
     window.toggleR = (btn) => {
         const div = btn.nextElementSibling;
-        div.style.display = div.style.display === "block" ? "none" : "block";
-        btn.innerText = div.style.display === "block" ? "OCULTAR GABARITO" : "VER GABARITO";
+        const isVis = div.style.display === "block";
+        div.style.display = isVis ? "none" : "block";
+        btn.innerText = isVis ? "VER GABARITO" : "OCULTAR";
     };
 
     // ESCUTA EM TEMPO REAL
     onValue(ref(db), (snap) => {
         const v = snap.val() || {};
         
-        // Renderizar Cards de Estudo
+        // Renderizar Painéis
         ['pre', 'peca', 'nc', 'tese'].forEach(type => {
             const feed = document.getElementById(`feed-${type}`);
+            if(!feed) return;
             feed.innerHTML = "";
             const items = v[paths[type]] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
                 feed.innerHTML += `
                     <div class="card">
-                        <i class="fas fa-times" style="position:absolute; right:10px; top:10px; color:gray; cursor:pointer" onclick="excluir('${type}','${id}')"></i>
+                        <i class="fas fa-trash" style="position:absolute; right:10px; top:10px; font-size:0.7rem; color:gray; cursor:pointer" onclick="excluir('${type}','${id}')"></i>
                         ${type === 'peca' ? 
-                            `<strong>DICA:</strong> ${item.t}<button class="btn-reveal" onclick="toggleR(this)">VER GABARITO</button><div class="hidden-content">${item.c}</div>` : 
+                            `<strong>Cenário:</strong> ${item.t}<button class="btn-reveal" onclick="toggleR(this)">VER GABARITO</button><div class="hidden-content">${item.c}</div>` : 
                             `<strong>${item.t}</strong><p style="font-size:0.85rem; opacity:0.8; margin-top:5px; white-space:pre-wrap;">${item.c}</p>`}
                     </div>`;
             });
@@ -181,19 +202,19 @@
         // Renderizar Histórico de PDFs
         const feedPdf = document.getElementById('feed-pdf');
         feedPdf.innerHTML = "";
-        const hist = v[paths.historico] || {};
-        const chaves = Object.keys(hist);
+        const hist = v[paths.hist] || {};
+        const keys = Object.keys(hist);
         
-        if (chaves.length === 0) {
-            feedPdf.innerHTML = '<p style="text-align:center; color:gray; grid-column: 1/-1;">Nenhum PDF no histórico.</p>';
+        if (keys.length === 0) {
+            feedPdf.innerHTML = '<p style="text-align:center; color:gray; grid-column: 1/-1;">Sem PDFs salvos.</p>';
         } else {
-            chaves.reverse().forEach(id => {
+            keys.reverse().forEach(id => {
                 const item = hist[id];
                 feedPdf.innerHTML += `
                     <div class="card card-pdf">
-                        <div><strong><i class="fas fa-file-pdf"></i> ${item.arquivo}</strong><br><small>${item.data}</small></div>
+                        <div><strong><i class="fas fa-file-pdf"></i> ${item.arquivo}</strong><br><small style="opacity:0.6">Visto em: ${item.data}</small></div>
                         <div class="pdf-actions">
-                            <i class="fas fa-trash-alt" style="color:var(--danger)" onclick="excluir('historico','${id}')"></i>
+                            <i class="fas fa-trash-alt" style="color:var(--danger)" onclick="excluir('hist','${id}')"></i>
                         </div>
                     </div>`;
             });

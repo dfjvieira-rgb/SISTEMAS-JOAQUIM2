@@ -27,7 +27,7 @@
         }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
-        /* EDITOR */
+        /* EDITOR E FOLHA */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         
@@ -36,9 +36,9 @@
             text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer;
         }
 
-        /* HUB MOBILE (FOGUETE) - RE-ALINHADO */
+        /* HUB MOBILE (FOGUETE) */
         #mobile-hub { 
-            display: none; position: fixed; bottom: 40px; right: 25px; z-index: 5000; 
+            display: none; position: fixed; bottom: 35px; right: 25px; z-index: 5000; 
             flex-direction: column-reverse; gap: 12px; align-items: center;
         }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; z-index: 5001; color: #000; cursor: pointer; }
@@ -54,7 +54,7 @@
             #pdf-split-view.active { position: fixed; inset: 0; width: 100%; z-index: 4000; }
         }
 
-        /* PDF VIEW */
+        /* PDF SPLIT */
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
         #pdf-split-view.active { display: block; }
 
@@ -65,7 +65,7 @@
         
         .opt-btn { width: 100%; padding: 22px; margin-bottom: 12px; border-radius: 12px; border: 2px solid #e2e8f0; background: #f8fafc; font-weight: 900; font-size: 1.2rem; text-align: left; display: flex; justify-content: space-between; align-items: center; cursor: pointer; color: #1e293b; }
 
-        /* LINHA FGV */
+        /* LINHA ESTILO FGV */
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
         .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); }
         .linha-folha { flex: 1; border: none; outline: none; background: transparent !important; padding: 0 10px; font-size: 18px; font-family: 'Courier New', monospace; color: var(--text-color); }
@@ -77,7 +77,7 @@
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
     <div style="display:flex; gap:10px;">
         <button class="btn-side" style="width:40px; background:#475569;" onclick="document.body.classList.toggle('dark-mode')"><i class="fas fa-adjust"></i></button>
-        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Limpar e Reiniciar?') && location.reload()"><i class="fas fa-trash"></i></button>
+        <button class="btn-side" style="width:40px; background:#ef4444;" onclick="confirm('Reiniciar tudo?') && location.reload()"><i class="fas fa-trash"></i></button>
     </div>
 </header>
 
@@ -87,32 +87,32 @@
             <div id="radar-status" style="color:white; font-size:0.7rem; font-weight:bold;">SCANNER ATIVO</div>
         </div>
         <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Trocar Exame</span></button>
-        <button class="btn-side" style="background:#10b981;" id="btn-save-pc"><i class="fas fa-save"></i> <span>Salvar Elite</span></button>
+        <button class="btn-side" style="background:#10b981;" id="btn-save-pc"><i class="fas fa-save"></i> <span>Salvar Treino</span></button>
         <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
-        <hr style="opacity:0.2;">
-        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b> <span>Peça</span></button>
+        <hr style="opacity:0.2; margin:10px 0;">
+        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b> <span>Ver Peça</span></button>
         <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b> <span>Gabarito</span></button>
         <button class="btn-side" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b> <span>Vade Mecum</span></button>
     </aside>
 
     <section class="editor-container">
         <div class="paper">
-            <div id="identificador-peca" onclick="window.forcarRadar()">CARREGANDO DNA...</div>
+            <div id="identificador-peca" onclick="window.forcarRadar()">ESCANEANDO DNA...</div>
             <div id="folha-total"></div>
         </div>
     </section>
 
     <div id="mobile-hub">
         <button class="fab-main" id="main-fab"><i class="fas fa-rocket"></i></button>
-        <button class="fab-sub" style="background:#10b981;" id="btn-save-mob"><i class="fas fa-save"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:#000" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
-        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-sub" style="background:var(--gold); color:#000" onclick="window.abrirExames()" title="Exames"><i class="fas fa-bullseye"></i></button>
+        <button class="fab-sub" style="background:#10b981;" id="btn-save-mob" title="Salvar"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()" title="Peças"><i class="fas fa-scroll"></i></button>
+        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()" title="Martelo"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()" title="IA"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b></button>
         <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b></button>
     </div>
 
     <div id="pdf-split-view">
@@ -123,7 +123,7 @@
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:10px; border-bottom:3px solid var(--gold)"></h2>
+        <h2 id="modal-title" style="margin-bottom:10px; border-bottom:3px solid var(--gold); color:#1e293b;"></h2>
         <div id="modal-content"></div>
         <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:10px; font-weight:900; margin-top:10px;">VOLTAR</button>
     </div>
@@ -140,14 +140,14 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
-    // --- CORREÇÃO DE ROTAS (Bate com a lista de arquivos real) ---
+    // --- LOGICA DE PDF (Baseada na sua lista real) ---
     window.verPDF = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
-        
         let arquivo = "";
+        
         if(tipo === 'P') arquivo = `ro${window.activeEx}.pdf`;
-        else if(tipo === 'G') arquivo = `ro${window.activeEx}-gabarito.pdf`; // PADRÃO CORRIGIDO
+        else if(tipo === 'G') arquivo = `ro${window.activeEx}-gabarito.pdf`;
         else arquivo = `vade.pdf`;
         
         frame.src = arquivo;
@@ -155,6 +155,7 @@
         document.getElementById('mobile-hub').classList.remove('active');
     };
 
+    // --- MOTORES E RADAR ---
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna) {
@@ -166,12 +167,12 @@
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "SELECIONAR OAB";
+        document.getElementById('modal-title').innerText = "TROCAR EXAME";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className='opt-btn';
-            b.innerHTML = `<span>Exame ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.innerHTML = `<span>OAB Exame ${i}</span> <i class="fas fa-chevron-right"></i>`;
             b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
             content.appendChild(b);
         }
@@ -191,7 +192,7 @@
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PEÇAS";
+        document.getElementById('modal-title').innerText = "PEÇAS DISPONÍVEIS";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
@@ -211,27 +212,27 @@
 
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
 
-    // --- INICIALIZAÇÃO BLINDADA ---
+    // --- START ---
     window.onload = () => {
         FolhaEngine.montar('folha-total', 85);
         window.forcarRadar();
 
-        // Fix Salvar PC & Mobile
-        const saveElite = () => {
+        // Bind Salvar (PC e Mobile)
+        const saveFunc = () => {
             engineSaveElite(db, window.activeEx);
             document.getElementById('mobile-hub').classList.remove('active');
         };
-        document.getElementById('btn-save-pc').onclick = saveElite;
-        document.getElementById('btn-save-mob').onclick = saveElite;
+        document.getElementById('btn-save-pc').onclick = saveFunc;
+        document.getElementById('btn-save-mob').onclick = saveFunc;
 
-        // Listener de Linhas
+        // Foco nas linhas
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
                 input.addEventListener('focus', () => { window.ultimaLinha = parseInt(input.getAttribute('data-index')); });
             });
         }, 800);
 
-        // Mobile Hub Toggle
+        // FAB Mobile Toggle
         document.getElementById('main-fab').onclick = () => {
             const hub = document.getElementById('mobile-hub');
             hub.classList.toggle('active');

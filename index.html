@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - HOME</title>
+    <title>JOAQUIM ELITE 2026 - MODULAR</title>
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,27 +15,20 @@
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; --paper-color: #1e293b; --text-color: #f8fafc; --line-color: #334155; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
-        
         header { background: var(--primary); height: var(--header-h); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
-
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); z-index: 1001; overflow-y: auto; scrollbar-width: none; }
         .btn-side { width: 100%; min-height: 44px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
-        .btn-side:active { transform: scale(0.9); }
-
         #radar-container { background: #000; border: 2px solid var(--gold); border-radius: 6px; padding: 5px; text-align: center; min-height: 65px; display: flex; flex-direction: column; justify-content: center; }
         #radar-status { font-size: 0.55rem; color: #fff; font-weight: 900; line-height: 1.2; text-transform: uppercase; }
         .radar-blink { animation: blink 1.5s infinite; color: var(--gold); }
         @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 50px; position: relative; }
-        
         #identificador-peca { width: 100%; padding: 15px; background: #f8fafc; border-bottom: 3px double var(--line-color); text-align: center; font-weight: 900; font-size: 1.1rem; color: #64748b; text-transform: uppercase; }
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
-        .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; }
+        .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; cursor: pointer; }
         .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', Courier, monospace; color: var(--text-color); width: 100%; }
-
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 3px solid var(--gold); }
         .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; cursor: pointer; background: #f1f5f9; text-align: center; color: #000; }
@@ -97,18 +90,17 @@
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
     
-    // IMPORT DO MOTOR DA FOLHA
+    // IMPORTAÇÃO EXTERNA DA FOLHA [cite: 2026-01-26, 2026-01-30]
     import { FolhaEngine } from './folha-engine.js';
 
     let activeEx = localStorage.getItem('activeEx') || "44";
     let ultimaLinhaFocada = 1;
     const LIMITE_LINHA = 85;
 
-    // MOTOR ATIVADO
     window.montarFolha = () => {
+        // CHAMA O MOTOR EXTERNO [cite: 2026-01-30]
         FolhaEngine.montar('folha-total', LIMITE_LINHA);
         
-        // Atribui focos dinamicamente
         document.querySelectorAll('.linha-folha').forEach((input, index) => {
             const i = index + 1;
             input.onfocus = () => { ultimaLinhaFocada = i; };
@@ -123,14 +115,12 @@
         const sidebarStatus = document.getElementById('radar-status');
         const topoFolha = document.getElementById('identificador-peca');
         const textoBanco = (BANCO_ESPELHOS[activeEx] || "").toUpperCase();
-
         const DICIONARIO = [
             { id: "AGRAVO DE PETIÇÃO", display: "AGRAVO DE PETIÇÃO", cor: "#f87171" },
             { id: "RECURSO ORDINÁRIO", display: "RECURSO ORDINÁRIO", cor: "#3b82f6" },
             { id: "CONTESTAÇÃO", display: "CONTESTAÇÃO TRABALHISTA", cor: "#22c55e" },
             { id: "RECLAMAÇÃO", display: "RECLAMATÓRIA TRABALHISTA", cor: "#a855f7" }
         ];
-
         let encontrado = DICIONARIO.find(p => textoBanco.includes(p.id));
         if (encontrado) {
             sidebarStatus.innerHTML = `<span style="color:${encontrado.cor}">RADAR</span><br>${encontrado.id}`;

@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>JOAQUIM ELITE 2026 - HOME</title>
+    
+    <link rel="icon" href="data:,">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -18,7 +21,7 @@
         header { background: var(--primary); height: var(--header-h); padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* SIDEBAR ESTILO FGV */
+        /* SIDEBAR */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); z-index: 1001; overflow-y: auto; scrollbar-width: none; }
         .btn-side { width: 100%; min-height: 44px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
         .btn-side:active { transform: scale(0.9); }
@@ -28,20 +31,16 @@
         .radar-blink { animation: blink 1.5s infinite; color: var(--gold); }
         @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-        /* EDITOR E FOLHA DE RESPOSTAS */
+        /* EDITOR FGV STYLE */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); }
         .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); margin-bottom: 50px; position: relative; }
         
-        /* POST-ITS INTEGRADOS */
-        .post-it-area { position: absolute; right: -120px; top: 20px; width: 100px; display: flex; flex-direction: column; gap: 10px; }
-        .post-it { background: #fef08a; padding: 10px; font-size: 0.7rem; border-radius: 4px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); color: #854d0e; font-weight: bold; }
-
         #identificador-peca { width: 100%; padding: 15px; background: #f8fafc; border-bottom: 3px double var(--line-color); text-align: center; font-weight: 900; font-size: 1.1rem; color: #64748b; text-transform: uppercase; }
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); }
         .linha-num { width: 45px; font-size: 0.7rem; color: #64748b; text-align: center; padding-top: 10px; border-right: 1px solid var(--line-color); background: rgba(0,0,0,0.02); flex-shrink: 0; }
         .linha-folha { flex: 1; height: 35px; border: none; outline: none; background: transparent; padding: 0 15px; font-size: 18px; font-family: 'Courier New', Courier, monospace; color: var(--text-color); width: 100%; }
 
-        /* MODAL E PDF SPLIT */
+        /* MODAIS E PDF SPLIT */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 90%; max-width: 450px; padding: 25px; border-radius: 20px; border: 3px solid var(--gold); }
         .opt-btn { width: 100%; padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #ddd; font-weight: 800; cursor: pointer; background: #f1f5f9; text-align: center; color: #000; }
@@ -64,12 +63,12 @@
     <aside class="sidebar">
         <div id="radar-container"><div id="radar-status">SCANNER</div></div>
         
-        <button title="Exames" class="btn-side" style="background:var(--gold); color:black;" onclick="abrirModalExames()"><i class="fas fa-bullseye"></i></button>
-        <button title="Sincronizar" class="btn-side" style="background:#0ea5e9;" onclick="salvarManual()"><i class="fas fa-save"></i></button>
-        <button title="Estruturas" class="btn-side" style="background:#334155; color:var(--gold);" onclick="abrirModalPecas()"><i class="fas fa-scroll"></i></button>
-        <button title="Injetar Espelho" class="btn-side" style="background:#3b82f6;" onclick="injetarJustica()"><i class="fas fa-gavel"></i></button>
+        <button class="btn-side" style="background:var(--gold); color:black;" onclick="abrirModalExames()"><i class="fas fa-bullseye"></i></button>
+        <button class="btn-side" style="background:#0ea5e9;" onclick="salvarManual()"><i class="fas fa-save"></i></button>
+        <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="abrirModalPecas()"><i class="fas fa-scroll"></i></button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="injetarJustica()"><i class="fas fa-gavel"></i></button>
         
-        <button title="Mentoria" class="btn-side" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="btn-side" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i></button>
         <hr style="opacity:0.1; margin:5px 0;">
         <button class="btn-side" style="background:#f97316;" onclick="abrirSplitPdf('p')"><b>P</b></button>
         <button class="btn-side" style="background:#eab308;" onclick="abrirSplitPdf('g')"><b>G</b></button>
@@ -83,7 +82,6 @@
         <div class="paper">
             <div id="identificador-peca">CARREGANDO...</div>
             <div id="folha-total"></div>
-            <div class="post-it-area" id="post-it-container"></div>
         </div>
     </section>
 
@@ -110,15 +108,14 @@
     let ultimaLinhaFocada = 1;
     const LIMITE_LINHA = 85;
 
-    // MONTAR FOLHA PADRÃO FGV
     window.montarFolha = () => {
         const container = document.getElementById('folha-total');
         container.innerHTML = "";
-        for(let i=1; i<=150; i++) {
-            if(i === 1 || i === 91) {
+        for(let i=1; i<=180; i++) {
+            if(i === 1 || i === 51) {
                 const h = document.createElement('div');
                 h.style.cssText = "background:#1e293b; color:#fbbf24; padding:8px; text-align:center; font-size:0.7rem; font-weight:bold;";
-                h.innerText = i === 1 ? 'PEÇA PRÁTICO-PROFISSIONAL' : 'QUESTÕES DISCURSIVAS';
+                h.innerText = i === 1 ? 'CADERNO DE RESPOSTAS - PEÇA' : 'CADERNO DE RESPOSTAS - QUESTÕES';
                 container.appendChild(h);
             }
             const row = document.createElement('div');
@@ -128,11 +125,13 @@
             
             const input = row.querySelector('input');
             input.onfocus = () => { ultimaLinhaFocada = i; };
+            input.onkeydown = (e) => {
+                if(e.key === "Enter") { e.preventDefault(); document.getElementById(`L${i+1}`)?.focus(); }
+            };
         }
         carregarDados();
     };
 
-    // RADAR DE IDENTIFICAÇÃO DE PEÇA
     window.escaneamentoElite = () => {
         const sidebarStatus = document.getElementById('radar-status');
         const topoFolha = document.getElementById('identificador-peca');
@@ -156,7 +155,6 @@
         }
     };
 
-    // SINCRONIZAÇÃO FIREBASE (BLINDADA)
     window.carregarDados = () => {
         onValue(ref(db, 'estudos/' + activeEx), (snap) => {
             const data = snap.val();
@@ -172,14 +170,9 @@
 
     window.salvarManual = () => {
         const dados = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
-        set(ref(db, 'estudos/' + activeEx), { 
-            linhas: dados, 
-            ts: Date.now(),
-            local: window.location.pathname // Salva qual das 3 pastas enviou o dado
-        }).then(() => alert("☁️ SINCRONIZADO NO HISTÓRICO!"));
+        set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() }).then(() => alert("☁️ SINCRONIZADO NO HISTÓRICO!"));
     };
 
-    // FUNÇÕES DE PDF E MODAIS
     window.abrirModalExames = () => {
         const content = document.getElementById('modal-content');
         content.innerHTML = `<h3 style="color:#000; margin-bottom:10px;">EXAMES</h3>`;
@@ -218,14 +211,10 @@
     };
 
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=500,height=800');
-    
     window.abrirSplitPdf = (t) => {
-        // Busca o PDF na mesma pasta do projeto
-        const prefixo = t === 'v' ? 'vade.pdf' : `ro${activeEx}${t === 'g' ? '-gabarito' : ''}.pdf`;
-        document.getElementById('pdf-frame').src = prefixo;
+        document.getElementById('pdf-frame').src = t === 'v' ? 'vade.pdf' : `ro${activeEx}${t === 'g' ? '-gabarito' : ''}.pdf`;
         document.getElementById('pdf-split-view').classList.add('active');
     };
-
     window.fecharSplitPdf = () => document.getElementById('pdf-split-view').classList.remove('active');
     window.fecharModal = () => document.getElementById('universal-modal').style.display='none';
     window.irPara = (n) => document.getElementById(`L${n}`)?.scrollIntoView({behavior:'smooth', block:'center'});

@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - SISTEMA BLINDADO</title>
+    <title>JOAQUIM ELITE 2026 - IDENTIFICADOR FIX</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #020617; --gold: #fbbf24; --bg-paper: #0f172a;
             --paper-color: #ffffff; --text-color: #1e293b; --line-color: #cbd5e1;
-            --header-h: 55px; --footer-h-pc: 90px; --footer-h-mob: 70px;
+            --header-h: 55px; --footer-h-pc: 90px; --footer-h-mob: 75px;
         }
         body.light-mode { --primary: #f8fafc; --bg-paper: #cbd5e1; --gold: #f59e0b; }
         
@@ -28,7 +28,7 @@
         #identificador-peca { 
             padding: 25px 15px; text-align: center; color: #ef4444; 
             font-weight: 900; font-size: 1.4rem; text-transform: uppercase; 
-            border-bottom: 3px double #f1f5f9; 
+            border-bottom: 3px double #f1f5f9; min-height: 80px;
         }
 
         /* TOOLBAR HÍBRIDA [cite: 2021-01-20, 2026-01-30] */
@@ -45,7 +45,6 @@
         .btn-tool span { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; margin-top: 4px; }
         .btn-tool:active { background: var(--gold); color: black; }
 
-        /* ADAPTAÇÃO MOBILE VS PC [cite: 2021-01-20, 2026-01-30] */
         @media (max-width: 600px) {
             .toolbar { height: var(--footer-h-mob); }
             .btn-tool span { display: none; } 
@@ -63,19 +62,18 @@
         .linha-num { width: 40px; font-size: 0.65rem; color: #94a3b8; text-align: center; padding-top: 12px; border-right: 1px solid var(--line-color); background: #f8fafc; flex-shrink: 0; }
         .linha-folha { flex: 1; height: 38px; border: none; outline: none; padding: 0 15px; font-size: 18px; font-family: 'Courier New', monospace; width: 100%; color: var(--text-color); }
 
-        /* MODAL COM SCROLL DESTRAVADO NO MOBILE [cite: 2026-01-20, 2026-01-30] */
+        /* MODAL COM ROLAGEM DESTRAVADA [cite: 2026-01-20, 2026-01-30] */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 4000; align-items: center; justify-content: center; padding: 15px; }
         .modal-body { 
             background: white; width: 100%; max-width: 450px; 
-            height: 80vh; /* Altura fixa necessária para o scroll [cite: 2026-01-30] */
-            border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; 
+            height: 75vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; 
         }
         .modal-scroll { 
             flex: 1; overflow-y: auto; padding: 15px; display: grid; 
-            grid-template-columns: 1fr 1fr; gap: 8px; 
-            -webkit-overflow-scrolling: touch; /* Suaviza scroll no mobile [cite: 2026-01-20] */
+            grid-template-columns: 1fr; gap: 8px; 
+            -webkit-overflow-scrolling: touch; 
         }
-        .opt-btn { background: #f1f5f9; padding: 15px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-align: center; color: #1e293b; border: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: center; }
+        .opt-btn { background: #f1f5f9; padding: 18px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; text-align: center; color: #1e293b; border: 1px solid #cbd5e1; }
 
         @media print { .toolbar, header, .modal { display: none !important; } .paper { margin: 0; box-shadow: none; } }
     </style>
@@ -86,14 +84,14 @@
     <div id="radar-status" class="radar-box">RADAR ATIVO</div>
     <div style="color:white; font-weight:900; font-size:0.8rem;">JOAQUIM <span style="color:var(--gold)">ELITE 2026</span></div>
     <div style="display:flex; gap:12px;">
-        <button onclick="document.body.classList.toggle('light-mode')" style="background:none; border:none; color:white; font-size:1.1rem;"><i class="fas fa-adjust"></i></button>
-        <button onclick="resetarFolha()" style="background:none; border:none; color:#ef4444; font-size:1.1rem;"><i class="fas fa-eraser"></i></button>
+        <button onclick="document.body.classList.toggle('light-mode')" style="background:none; border:none; color:white;"><i class="fas fa-adjust"></i></button>
+        <button onclick="resetarFolha()" style="background:none; border:none; color:#ef4444;"><i class="fas fa-eraser"></i></button>
     </div>
 </header>
 
 <main>
     <div class="paper">
-        <div id="identificador-peca">IDENTIFICANDO...</div>
+        <div id="identificador-peca">SELECIONE A ESTRUTURA</div>
         <div id="folha-total"></div>
     </div>
 </main>
@@ -102,7 +100,7 @@
     <button class="btn-tool" onclick="abrirModalExames()" style="color:var(--gold);"><i class="fas fa-bullseye"></i><span>Exames</span></button>
     <button class="btn-tool" onclick="salvarManual()" style="color:#0ea5e9;"><i class="fas fa-save"></i><span>Salvar</span></button>
     <button class="btn-tool" onclick="abrirModalPecas()" style="color:#f59e0b;"><i class="fas fa-scroll"></i><span>Peças</span></button>
-    <button class="btn-tool" onclick="alert('Justiça Injetada')" style="color:#3b82f6;"><i class="fas fa-gavel"></i><span>Justiça</span></button>
+    <button class="btn-tool" onclick="alert('Injetando Conteúdo...')" style="color:#3b82f6;"><i class="fas fa-gavel"></i><span>Justiça</span></button>
     <button class="btn-tool" onclick="abrirMentoria()" style="color:#a855f7;"><i class="fas fa-robot"></i><span>Mentoria</span></button>
     <button class="btn-tool" onclick="window.print()" style="color:#10b981;"><i class="fas fa-print"></i><span>Imprimir</span></button>
     
@@ -156,19 +154,24 @@
         set(ref(db, 'estudos/' + activeEx), { linhas: dados, ts: Date.now() }).then(() => alert("☁️ Sincronizado!"));
     };
 
+    // FIX IDENTIFICADOR: Agora ele atualiza o texto na folha [cite: 2026-01-30]
     window.abrirModalPecas = () => {
         const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "PEÇAS DISPONÍVEIS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS ANALISADAS";
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerText = k;
+            const b = document.createElement('div');
+            b.className = 'opt-btn';
+            b.innerText = k;
             b.onclick = () => {
+                // Injeta o conteúdo da peça
                 pecas[k].split('\n').forEach((t, i) => {
                     const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
                     if(el) el.value = t.substring(0, 85);
                 });
-                fecharModal();
+                // ATUALIZA O IDENTIFICADOR NA FOLHA [cite: 2026-01-30]
                 document.getElementById('identificador-peca').innerText = k;
+                fecharModal();
             };
             content.appendChild(b);
         });
@@ -191,7 +194,7 @@
     window.fecharModal = () => document.getElementById('universal-modal').style.display = 'none';
     window.abrirMentoria = () => window.open('mentoria.html', 'Mentoria', 'width=450,height=700');
     window.pdf = (t) => window.open(t === 'v' ? 'vade.pdf' : `ro${activeEx}${t === 'g' ? '-gabarito' : ''}.pdf`);
-    window.resetarFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value=""); };
+    window.resetarFolha = () => { if(confirm("Apagar tudo?")) { document.querySelectorAll('.linha-folha').forEach(i => i.value=""); document.getElementById('identificador-peca').innerText = "SELECIONE A ESTRUTURA"; } };
 
     window.onload = montarFolha;
 </script>

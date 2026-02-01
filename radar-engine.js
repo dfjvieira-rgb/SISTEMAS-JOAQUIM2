@@ -1,4 +1,4 @@
-// radar-engine.js - Inteligência de Detecção Elite [cite: 2026-01-30]
+// radar-engine.js - MANTENDO A LÓGICA DE 2026
 export const RadarEngine = {
     DICIONARIO: [
         { id: "AGRAVO DE PETIÇÃO", display: "AGRAVO DE PETIÇÃO", cor: "#f87171" },
@@ -9,7 +9,9 @@ export const RadarEngine = {
     ],
 
     analisar: (textoParaAnalise) => {
+        if (!textoParaAnalise) return null;
         const txt = textoParaAnalise.toUpperCase();
+        // A lógica de busca por ID dentro do texto permanece intacta
         return RadarEngine.DICIONARIO.find(p => txt.includes(p.id)) || null;
     },
 
@@ -18,13 +20,17 @@ export const RadarEngine = {
         const topoFolha = document.getElementById('identificador-peca');
         
         if (encontrado) {
-            sidebarStatus.innerHTML = `<span style="color:${encontrado.cor}">RADAR</span><br>${encontrado.id}`;
-            topoFolha.innerText = encontrado.display;
-            topoFolha.style.color = encontrado.cor;
+            // SÓ ESCREVE SE O ELEMENTO EXISTIR - ISSO É A BLINDAGEM
+            if (sidebarStatus) { 
+                sidebarStatus.innerHTML = `<span style="color:${encontrado.cor}">RADAR:</span> ${encontrado.id}`;
+            }
+            if (topoFolha) {
+                topoFolha.innerText = encontrado.display;
+                topoFolha.style.borderBottom = `3px solid ${encontrado.cor}`;
+            }
         } else {
-            sidebarStatus.innerHTML = `<span>RADAR</span><br><span class="radar-blink">BUSCANDO...</span>`;
-            topoFolha.innerText = "CADERNO DE RESPOSTAS";
-            topoFolha.style.color = "#64748b";
+            if (sidebarStatus) sidebarStatus.innerHTML = `RADAR: <span style="color:#94a3b8">OFF</span>`;
+            if (topoFolha) topoFolha.innerText = "CADERNO DE RESPOSTAS";
         }
     }
 };

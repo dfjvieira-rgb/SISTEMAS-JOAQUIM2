@@ -26,6 +26,11 @@
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
 
+        /* NOVA TOOLBAR DE LIBERDADE */
+        .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
+        .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
+        .btn-lib:hover { background: #f8fafc; color: var(--primary); }
+
         /* HUB FOGUETE */
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
@@ -44,6 +49,15 @@
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
         #pdf-split-view.active { display: block; }
+
+        /* REGRAS DE IMPRESSÃO - LIMPANDO O PDF */
+        @media print {
+            header, .sidebar, #mobile-hub, .toolbar-liberdade, .modal, #pdf-split-view { display: none !important; }
+            body { background: white !important; }
+            .editor-container { padding: 0 !important; background: white !important; overflow: visible !important; }
+            .paper { box-shadow: none !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
+            #identificador-peca { border-bottom: 2px solid #000 !important; }
+        }
 
         .linha-wrapper { display: flex; border-bottom: 1px solid var(--line-color); height: 35px; }
         .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid var(--line-color); }
@@ -68,7 +82,7 @@
 <main>
     <aside class="sidebar">
         <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.dispararSalvar()"><i class="fas fa-save"></i> <span>Salvar Elite</span></button>
+        <button id="btn-salvar-elite" class="btn-side" style="background:#10b981;" onclick="window.dispararSalvar()"><i class="fas fa-save"></i> <span>Salvar Elite</span></button>
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> <span>Mentoria IA</span></button>
         <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
@@ -81,6 +95,13 @@
     <section class="editor-container">
         <div class="paper">
             <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO - TOQUE AQUI</div>
+            
+            <div class="toolbar-liberdade">
+                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Apagar</button>
+                <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+                <button class="btn-lib" style="color:var(--mentoria)" onclick="window.open('historico.html')"><i class="fas fa-history"></i> Histórico</button>
+            </div>
+
             <div id="folha-total"></div>
         </div>
     </section>
@@ -122,26 +143,36 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.ultimaLinha = 1;
 
-    // --- RADAR INTEGRADO ---
+    // --- FUNÇÃO LIMPAR (LIBERDADE) ---
+    window.limparFolha = () => {
+        if(confirm("Deseja apagar sua resposta localmente?")) {
+            document.querySelectorAll('.linha-folha').forEach(i => i.value = "");
+            localStorage.removeItem(`rascunho_${window.activeEx}`);
+        }
+    };
+
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna) {
             const analise = RadarEngine.analisar(dna);
             RadarEngine.renderizar(analise);
-            document.getElementById('identificador-peca').innerText = analise.peca.toUpperCase();
-            document.getElementById('identificador-peca').style.background = "#dcfce7";
+            // Atualiza o texto do identificador com o nome da peça detectada
+            document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
         }
     };
 
-    // --- SINCRONISMO ---
     window.dispararSalvar = async () => {
         const syncText = document.getElementById('sync-text');
         syncText.innerText = "SYNCING...";
         try {
+            // Chama a engine do salvar.js que agora cuida do histórico e do PDF
             await engineSaveElite(db, window.activeEx);
             syncText.innerText = "SAVED";
             setTimeout(() => syncText.innerText = "SYNC ON", 2000);
-        } catch(e) { syncText.innerText = "OFFLINE"; }
+        } catch(e) { 
+            syncText.innerText = "OFFLINE"; 
+            console.error(e);
+        }
     };
 
     window.toggleFoguete = () => {
@@ -182,14 +213,15 @@
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PEÇAS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className='opt-btn';
             b.innerHTML = `<span>${k}</span>`;
             b.onclick = () => {
-                pecas[k].split('\n').forEach((t, i) => {
+                const linhasTexto = pecas[k].split('\n');
+                linhasTexto.forEach((t, i) => {
                     const el = document.getElementById(`L${window.ultimaLinha + i}`);
                     if(el) el.value = t;
                 });
@@ -202,6 +234,7 @@
 
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
+        if(!dna) return;
         const teses = dna.replace(/<[^>]*>?/gm, '').split('\n').filter(t => t.trim().length > 15);
         teses.forEach((t, i) => {
             const linha = document.getElementById(`L${window.ultimaLinha + i}`);
@@ -213,16 +246,16 @@
 
     window.onload = () => {
         FolhaEngine.montar('folha-total', 85);
-        setTimeout(window.forcarRadar, 1500); // Radar liga após carregar a folha
+        setTimeout(window.forcarRadar, 1500); 
         
-        // Auto-Save a cada 60s
         setInterval(window.dispararSalvar, 60000);
 
         setTimeout(() => {
             document.querySelectorAll('.linha-folha').forEach(input => {
                 input.addEventListener('focus', () => { 
                     document.body.classList.add('digitando');
-                    window.ultimaLinha = parseInt(input.getAttribute('data-index')); 
+                    const idx = input.getAttribute('data-index');
+                    if(idx) window.ultimaLinha = parseInt(idx); 
                 });
                 input.addEventListener('blur', () => { document.body.classList.remove('digitando'); });
             });

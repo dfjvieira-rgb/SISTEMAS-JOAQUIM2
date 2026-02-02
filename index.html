@@ -29,40 +29,17 @@
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
-        /* EDITOR CONTAINER - GARANTE CENTRALIZAÇÃO NO PC */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
-        
-        /* PAPER - RESPEITA O MOBILE SEM QUEBRAR O PC */
-        .paper { 
-            background: var(--paper-color); 
-            width: 100%; 
-            max-width: 850px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-            margin-bottom: 50px; 
-            position: relative;
-            z-index: 15;
-            transition: width 0.3s ease;
-        }
+        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 50px; position: relative; z-index: 15; transition: width 0.3s ease; }
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
 
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
-        /* LINHAS E DIGITAÇÃO (OTIMIZADO) */
         .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; background: white; border-bottom: 1px solid var(--line-color); }
-        .linha-folha { 
-            flex: 1 !important; 
-            font-size: 16px !important; 
-            padding: 10px 8px !important;
-            border: none !important;
-            outline: none !important;
-            background: transparent !important;
-            color: var(--text-color) !important;
-            font-family: 'Courier New', monospace !important;
-        }
+        .linha-folha { flex: 1 !important; font-size: 16px !important; padding: 10px 8px !important; border: none !important; outline: none !important; background: transparent !important; color: var(--text-color) !important; font-family: 'Courier New', monospace !important; }
 
-        /* HUB MOBILE - SEMPRE NO TOPO DE TUDO */
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
@@ -72,7 +49,7 @@
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
             .editor-container { padding: 5px; padding-top: 10px; } 
-            .paper { margin-bottom: 120px; width: 98% !important; } /* Margem extra para o teclado/foguete */
+            .paper { margin-bottom: 120px; width: 98% !important; }
         }
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; z-index: 3000; }
@@ -157,32 +134,31 @@
     window.ultimaLinha = 1;
     let isFinalizing = false;
 
-    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR (ATIVA CORRETOR)
-    const originalMontar = FolhaEngine.montar;
-    FolhaEngine.montar = function(id) {
-        originalMontar.apply(this, arguments);
-        document.querySelectorAll('.linha-folha').forEach(input => {
-            input.setAttribute('spellcheck', 'true');
-            input.setAttribute('autocorrect', 'on');
-            input.setAttribute('autocapitalize', 'sentences');
-            input.setAttribute('autocomplete', 'on');
-        });
-    };
-
-    window.alert = (msg) => {
+    // Feedback visual do SYNC
+    window.notificarStatus = (msg, isSucesso = true) => {
         const st = document.getElementById('sync-text');
-        if (st && (msg.includes("Sincronizado") || msg.includes("sucesso"))) {
-            st.innerText = "PEÇA SALVA ✅";
-            document.getElementById('sync-indicator').classList.add('sync-success');
+        const indicator = document.getElementById('sync-indicator');
+        if (st) {
+            st.innerText = msg.toUpperCase();
+            if(isSucesso) indicator.classList.add('sync-success');
             setTimeout(() => {
                 st.innerText = "SYNC ON";
-                document.getElementById('sync-indicator').classList.remove('sync-success');
+                indicator.classList.remove('sync-success');
             }, 3000);
         }
     };
 
+    // Sobrescreve o alert nativo para usar o feedback visual do sistema
+    window.alertOriginal = window.alert;
+    window.alert = (msg) => {
+        if (msg.includes("Sincronizado") || msg.includes("sucesso") || msg.includes("salva")) {
+            window.notificarStatus("PEÇA SALVA ✅");
+        } else {
+            window.alertOriginal(msg);
+        }
+    };
+
     window.carregarRascunho = async () => {
-        const syncText = document.getElementById('sync-text');
         try {
             const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             if (snapshot.exists()) {
@@ -197,19 +173,32 @@
         } catch (e) { console.error("Erro no load:", e); }
     };
 
+    // Dispara salvamento automático de rascunho
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
-        try { await engineSaveElite(db, window.activeEx, false); } catch(e) {}
+        try { 
+            await engineSaveElite(db, window.activeEx, false); 
+        } catch(e) { console.warn("Falha no auto-save rascunho"); }
     };
 
+    // ENVIO OFICIAL PARA O HISTÓRICO DA MENTORIA
     window.finalizarPeca = async () => {
-        if(!confirm("Deseja finalizar e enviar ao histórico oficial?")) return;
+        if(!confirm("Deseja FINALIZAR? Isso salvará a peça permanentemente no seu Histórico da Mentoria.")) return;
+        
         isFinalizing = true;
         try {
+            // O parâmetro 'true' sinaliza para a engine que deve salvar no histórico oficial
             const ok = await engineSaveElite(db, window.activeEx, true);
-            if(ok) window.alert("Sincronizado!"); 
-        } catch(e) { console.error(e); }
-        isFinalizing = false;
+            if(ok) {
+                window.notificarStatus("HISTÓRICO ATUALIZADO ✅");
+                window.alertOriginal("Peça finalizada e enviada ao histórico!");
+            }
+        } catch(e) { 
+            console.error("Erro na finalização:", e);
+            window.alertOriginal("Erro ao salvar no histórico. Tente novamente.");
+        } finally {
+            isFinalizing = false;
+        }
     };
 
     window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };

@@ -29,10 +29,8 @@
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
-        /* EDITOR CONTAINER - GARANTE CENTRALIZAÇÃO NO PC */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
         
-        /* PAPER - RESPEITA O MOBILE SEM QUEBRAR O PC */
         .paper { 
             background: var(--paper-color); 
             width: 100%; 
@@ -49,7 +47,6 @@
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
-        /* LINHAS E DIGITAÇÃO (OTIMIZADO) */
         .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; background: white; border-bottom: 1px solid var(--line-color); }
         .linha-folha { 
             flex: 1 !important; 
@@ -62,7 +59,6 @@
             font-family: 'Courier New', monospace !important;
         }
 
-        /* HUB MOBILE - SEMPRE NO TOPO DE TUDO */
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
@@ -72,7 +68,7 @@
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
             .editor-container { padding: 5px; padding-top: 10px; } 
-            .paper { margin-bottom: 120px; width: 98% !important; } /* Margem extra para o teclado/foguete */
+            .paper { margin-bottom: 120px; width: 98% !important; }
         }
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; z-index: 3000; }
@@ -157,7 +153,7 @@
     window.ultimaLinha = 1;
     let isFinalizing = false;
 
-    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR (ATIVA CORRETOR)
+    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR
     const originalMontar = FolhaEngine.montar;
     FolhaEngine.montar = function(id) {
         originalMontar.apply(this, arguments);
@@ -165,7 +161,6 @@
             input.setAttribute('spellcheck', 'true');
             input.setAttribute('autocorrect', 'on');
             input.setAttribute('autocapitalize', 'sentences');
-            input.setAttribute('autocomplete', 'on');
         });
     };
 
@@ -181,25 +176,30 @@
         }
     };
 
+    // CORREÇÃO: Função de carregar agora aceita 'linhas' ou 'conteudo'
     window.carregarRascunho = async () => {
-        const syncText = document.getElementById('sync-text');
         try {
             const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             if (snapshot.exists()) {
                 const dados = snapshot.val();
-                if (dados && dados.linhas) {
-                    dados.linhas.forEach((texto, i) => {
-                        const input = document.getElementById(`L${i + 1}`);
-                        if (input) input.value = texto;
-                    });
-                }
+                // Tenta carregar do campo novo 'linhas' ou do antigo 'conteudo'
+                const textoParaCarregar = dados.linhas || dados.conteudo || [];
+                
+                textoParaCarregar.forEach((texto, i) => {
+                    const input = document.getElementById(`L${i + 1}`);
+                    if (input) input.value = texto;
+                });
+                console.log("✅ Rascunho restaurado com sucesso!");
             }
         } catch (e) { console.error("Erro no load:", e); }
     };
 
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
-        try { await engineSaveElite(db, window.activeEx, false); } catch(e) {}
+        try { 
+            // Salva o rascunho. O salvar.js agora envia tanto 'linhas' quanto 'conteudo'
+            await engineSaveElite(db, window.activeEx, false); 
+        } catch(e) {}
     };
 
     window.finalizarPeca = async () => {
@@ -276,7 +276,9 @@
 
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
+        // Importante: Espera carregar o rascunho antes de ligar o auto-salvamento
         await window.carregarRascunho();
+        
         setTimeout(window.forcarRadar, 1500); 
         setInterval(window.dispararSalvar, 30000); 
 

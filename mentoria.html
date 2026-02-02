@@ -2,25 +2,21 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MENTORIA ELITE | REVISÃO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
-        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; transition: 0.3s; }
-        .btn:hover { opacity: 0.8; }
+        .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; transition: 0.3s; font-size: 14px; }
         .feed { max-height: 450px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
-        
         .feed::-webkit-scrollbar { width: 5px; }
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-        
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--success); display: flex; justify-content: space-between; align-items: center; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--success); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
         .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; position: relative; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        
         @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -28,32 +24,32 @@
 
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
     <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <button class="btn" style="width:auto" onclick="window.close()">FECHAR PAINEL</button>
+    <button class="btn" style="width:auto; margin:0" onclick="window.close()">SAIR</button>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="color:var(--success); margin:0;"><i class="fas fa-history"></i> HISTÓRICO E RASCUNHOS ATIVOS</h3>
-            <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; font-size: 11px; padding: 5px 15px;" onclick="window.limparHistoricoCompleto()">
+            <h3 style="color:var(--success); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
+            <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; font-size: 10px; padding: 5px 10px;" onclick="window.limparHistoricoCompleto()">
                 <i class="fas fa-trash-sweep"></i> LIMPAR TUDO
             </button>
         </div>
-        <div id="feed-producao" class="feed">Buscando registros no Firebase...</div>
+        <div id="feed-producao" class="feed">Buscando registros...</div>
     </section>
 
     <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6"><i class="fas fa-brain"></i> INTELIGÊNCIA: NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Título (Ex: Reclamação x RT)">
-        <textarea id="nc-c" placeholder="Qual a diferença crucial?"></textarea>
+        <h3 style="color:#f472b6; font-size: 1rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Título">
+        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
         <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">GRAVAR DICA</button>
         <div id="feed-nc" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6"><i class="fas fa-gavel"></i> TESES BLINDADAS</h3>
+        <h3 style="color:#3b82f6; font-size: 1rem;"><i class="fas fa-gavel"></i> TESES BLINDADAS</h3>
         <input id="tese-t" placeholder="Título da Tese">
-        <textarea id="tese-c" placeholder="Fundamentação Legal..."></textarea>
+        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
         <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">GRAVAR TESE</button>
         <div id="feed-tese" class="feed"></div>
     </section>
@@ -73,92 +69,100 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Salvar Dicas e Teses
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
         if(t.value && c.value) {
-            push(ref(db, 'v13_'+type), {
-                t: t.value, 
-                c: c.value, 
-                ts: serverTimestamp()
-            });
+            push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
             t.value = ""; c.value = "";
         }
     };
 
     window.deletarItem = (caminho) => {
-        if(confirm("Deseja excluir permanentemente?")) {
-            remove(ref(db, caminho));
-        }
+        if(confirm("Excluir permanentemente?")) remove(ref(db, caminho));
     };
 
-    // AJUSTE PONTUAL: FUNÇÃO PARA LIMPAR TODO O HISTÓRICO
     window.limparHistoricoCompleto = () => {
-        if(confirm("ATENÇÃO: Isso apagará TODOS os treinos e rascunhos salvos. Suas Dicas e Teses NÃO serão afetadas. Confirmar?")) {
-            remove(ref(db, 'producao_v13'))
-                .then(() => alert("Histórico de treinos limpo com sucesso!"))
-                .catch((e) => console.error("Erro ao limpar:", e));
+        if(confirm("Apagar TODOS os treinos salvos?")) {
+            remove(ref(db, 'producao_v13')).then(() => alert("Limpo!"));
         }
     };
 
-    // LISTENER EM TEMPO REAL
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
         const fP = document.getElementById('feed-producao'); 
         fP.innerHTML = "";
         const treinos = d.producao_v13 || {};
         
-        const chaves = Object.keys(treinos);
-        if(chaves.length === 0) fP.innerHTML = "<p style='opacity:0.5; text-align:center;'>Nenhum registro encontrado.</p>";
-
-        chaves.reverse().forEach(id => {
+        Object.keys(treinos).reverse().forEach(id => {
             const t = treinos[id];
             const isRascunho = id.includes("RASCUNHO_ATUAL");
-            const corBorda = isRascunho ? "#fbbf24" : "#22c55e";
-            const tag = isRascunho ? "[RASCUNHO]" : "[FINALIZADA]";
-
+            const cor = isRascunho ? "#fbbf24" : "#22c55e";
             fP.innerHTML += `
-                <div class="card-h" style="border-left-color: ${corBorda}">
-                    <span>
-                        <small style="color:${corBorda}; font-weight:bold">${tag}</small><br>
-                        <strong>EXAME ${t.exame || '--'}</strong>: ${t.nome_peca || "Sem Nome"} <br> 
-                        <small style="opacity:0.7">${t.data_envio || ""}</small>
-                    </span>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn" style="width:auto; margin:0; background:${corBorda}; color:black" onclick="verTreino('${id}')">ABRIR</button>
-                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white" onclick="deletarItem('producao_v13/${id}')"><i class="fas fa-trash"></i></button>
+                <div class="card-h" style="border-left-color: ${cor}">
+                    <span><strong>${t.nome_peca || "Sem Nome"}</strong><br><small>${t.data_envio || ""}</small></span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 10px;" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 10px;" onclick="deletarItem('producao_v13/${id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
         });
 
-        const colors = { nc: '#f472b6', tese: '#3b82f6' };
         ['nc', 'tese'].forEach(type => {
             const f = document.getElementById('feed-'+type); f.innerHTML = "";
             const items = d['v13_'+type] || {};
+            const color = type === 'nc' ? '#f472b6' : '#3b82f6';
             Object.keys(items).reverse().forEach(id => {
-                f.innerHTML += `
-                    <div class="post-it" style="background:${colors[type]}">
-                        <i class="fas fa-times" style="float:right; cursor:pointer; opacity:0.5" onclick="deletarItem('v13_${type}/${id}')"></i>
-                        <strong>${items[id].t}</strong><br>
-                        <p style="font-size:0.9rem; margin-top:5px; white-space: pre-wrap;">${items[id].c}</p>
-                    </div>`;
+                f.innerHTML += `<div class="post-it" style="background:${color}"><i class="fas fa-times" style="float:right;" onclick="deletarItem('v13_${type}/${id}')"></i><strong>${items[id].t}</strong><p style="font-size:0.85rem; margin:5px 0; white-space: pre-wrap;">${items[id].c}</p></div>`;
             });
         });
     });
 
+    // FUNÇÃO AJUSTADA: FOLHA DE PRODUÇÃO MOBILE RESPONSIVA
     window.verTreino = (id) => {
         onValue(ref(db, 'producao_v13/' + id), (s) => {
             const p = s.val();
             if(!p || !p.linhas) return;
             const w = window.open('', '_blank');
             const linhasHtml = p.linhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #eee; padding:4px 0; font-family: 'Courier New', monospace; font-size:14px;">
-                    <span style="width:35px; color:#999; border-right:1px solid #ddd; margin-right:10px; text-align:right; padding-right:5px;">${i+1}</span>
-                    <span style="flex:1; color:#000;">${l || ""}</span>
+                <div style="display:flex; border-bottom:1px solid #eee; padding:6px 0; font-family: 'Courier New', monospace; font-size:14px; align-items: flex-start;">
+                    <span style="width:30px; min-width:30px; color:#999; border-right:1px solid #ddd; margin-right:8px; text-align:right; padding-right:5px; font-size:11px;">${i+1}</span>
+                    <span style="flex:1; color:#000; word-break: break-word; white-space: pre-wrap;">${l || ""}</span>
                 </div>
             `).join('');
-            w.document.write(`<html><head><title>REVISÃO: ${p.nome_peca}</title></head><body style="background:#f3f4f6; padding:20px;"><div style="max-width:800px; margin:0 auto; background:white; padding:40px; box-shadow:0 4px 15px rgba(0,0,0,0.1); border-radius:5px;"><div style="text-align:center; border:2px solid #000; padding:10px; margin-bottom:20px;"><h2 style="margin:0;">FOLHA DE RESPOSTA - REVISÃO MENTORIA</h2><small>EXAME: ${p.exame} | PEÇA: ${p.nome_peca}</small></div><div style="background:#fff;">${linhasHtml}</div><div style="margin-top:30px; display:flex; gap:10px; justify-content:center;" class="no-print"><button onclick="window.print()" style="padding:12px 25px; background:#22c55e; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">IMPRIMIR PDF</button><button onclick="window.close()" style="padding:12px 25px; background:#64748b; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">FECHAR</button></div><style>@media print{.no-print{display:none;}body{background:white;padding:0;}}</style></div></body></html>`);
+
+            w.document.write(`
+                <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>
+                        body { background:#f0f0f0; margin:0; padding:10px; font-family: sans-serif; }
+                        .folha { 
+                            background:#fff; 
+                            margin: 0 auto; 
+                            padding: 20px; 
+                            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+                            max-width: 800px; /* No PC fica elegante */
+                            width: 95%;      /* No Mobile ocupa tudo */
+                        }
+                        .header-folha { text-align:center; border:2px solid #000; padding:10px; margin-bottom:15px; }
+                        .no-print { width:100%; padding:15px; margin-top:20px; background:#fbbf24; border:none; font-weight:bold; border-radius:8px; }
+                        @media print { .no-print { display:none; } body { padding:0; } .folha { width:100%; box-shadow:none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="folha">
+                        <div class="header-folha">
+                            <b style="font-size:14px; text-transform:uppercase;">Folha de Resposta Oficial</b><br>
+                            <small>${p.nome_peca} | Exame ${p.exame}</small>
+                        </div>
+                        <div style="border:1px solid #eee;">${linhasHtml}</div>
+                        <button class="no-print" onclick="window.print()">GERAR PDF / IMPRIMIR</button>
+                        <button class="no-print" style="background:#64748b; color:white; margin-top:10px;" onclick="window.close()">VOLTAR</button>
+                    </div>
+                </body>
+                </html>
+            `);
         }, {onlyOnce: true});
     };
 </script>

@@ -11,7 +11,7 @@
         
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
-        .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; transition: 0.3s; font-size: 14px; }
+        .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; transition: 0.3s; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 5px; }
         
         .feed { max-height: 450px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
         .feed::-webkit-scrollbar { width: 5px; }
@@ -112,9 +112,9 @@
                 <div class="card-h" style="border-left-color: ${cor}">
                     <span><strong>${t.nome_peca || "Sem Nome"}</strong><br><small>${t.data_envio || ""}</small></span>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn" style="width:auto; margin:0; background:#3b82f6; color:white; padding: 8px;" onclick="compartilharTreino('${id}')"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 8px;" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 8px;" onclick="deletarItem('producao_v13/${id}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:#3b82f6; color:white; padding: 8px;" onclick="compartilharTreino('${id}')" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 8px;" onclick="verTreino('${id}')" title="Ver Peça"><i class="fas fa-eye"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 8px;" onclick="deletarItem('producao_v13/${id}')" title="Excluir"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
         });
@@ -129,31 +129,17 @@
         });
     });
 
-    // NOVA FUNÇÃO: COMPARTILHAR TREINO
     window.compartilharTreino = async (id) => {
         const s = await get(ref(db, 'producao_v13/' + id));
         const p = s.val();
         if(!p || !p.linhas) return;
-
-        // Limpa linhas vazias e formata o texto
-        const textoPeca = p.linhas
-            .map((l, i) => `${i + 1}. ${l || ""}`)
-            .filter(linha => linha.split(". ")[1].length > 0)
-            .join('\n');
-
-        const mensagem = `📝 *PEÇA OAB FINALIZADA*\n\n*Peça:* ${p.nome_peca}\n*Exame:* ${p.exame}\n*Data:* ${p.data_envio}\n\n--- CONTEÚDO ---\n${textoPeca}`;
-
+        const textoPeca = p.linhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(linha => linha.split(". ")[1].length > 0).join('\n');
+        const mensagem = `📝 *TREINO ELITE OAB*\n\n*Peça:* ${p.nome_peca}\n*Exame:* ${p.exame}\n*Data:* ${p.data_envio}\n\n--- CONTEÚDO ---\n${textoPeca}`;
         if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: `Peça: ${p.nome_peca}`,
-                    text: mensagem
-                });
-            } catch (err) { console.log("Erro ao compartilhar", err); }
+            try { await navigator.share({ title: p.nome_peca, text: mensagem }); } catch (err) {}
         } else {
-            // Fallback para cópia se o navegador não suportar share (ex: PC antigo)
             await navigator.clipboard.writeText(mensagem);
-            alert("Conteúdo copiado para a área de transferência!");
+            alert("Texto copiado! Agora é só colar no WhatsApp.");
         }
     };
 
@@ -168,18 +154,16 @@
                     <span style="flex:1; color:#1e293b; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${l || ""}</span>
                 </div>
             `).join('');
-            
             w.document.write(`
                 <html>
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-                    <title>REVISÃO: ${p.nome_peca}</title>
                     <style>
                         body { background:#f8fafc; margin:0; padding:0; font-family: sans-serif; -webkit-text-size-adjust: 100%; }
                         .paper { background:#fff; min-height: 100vh; padding: 15px; box-sizing: border-box; }
-                        .header { text-align:center; border:2px solid #020617; padding:15px; margin-bottom:20px; background: #fff; }
-                        .btn-back { width:100%; padding:18px; background:#020617; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:16px; margin-top:25px; cursor:pointer; }
+                        .header { text-align:center; border:2px solid #020617; padding:15px; margin-bottom:20px; }
+                        .btn-back { width:100%; padding:18px; background:#020617; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:16px; margin-top:25px; }
                         @media (min-width: 768px) {
                             body { padding: 40px; }
                             .paper { max-width: 850px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; padding: 40px; min-height: auto; }
@@ -192,8 +176,8 @@
                             <b style="font-size:16px; display:block; margin-bottom:5px;">${p.nome_peca}</b>
                             <span style="font-size:12px; color:#64748b;">EXAME OAB ${p.exame} | DATA: ${p.data_envio}</span>
                         </div>
-                        <div class="content">${linhasHtml}</div>
-                        <button class="btn-back" onclick="window.close()">VOLTAR À REVISÃO</button>
+                        <div>${linhasHtml}</div>
+                        <button class="btn-back" onclick="window.close()">VOLTAR</button>
                     </div>
                 </body>
                 </html>

@@ -19,10 +19,9 @@
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
         .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .card-h:hover { background: rgba(255,255,255,0.1); }
         .card-h span { font-size: 13px; line-height: 1.4; flex: 1; margin-right: 10px; }
         
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; }
+        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
 
@@ -38,23 +37,23 @@
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:var(--gold); margin:0; font-size: 1.1rem;"><i class="fas fa-history"></i> HISTÓRICO OFICIAL DE PEÇAS</h3>
-        <div id="feed-producao" class="feed">Conectando ao banco de dados...</div>
+        <h3 style="color:var(--gold); margin:0; font-size: 1.1rem;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
+        <div id="feed-producao" class="feed">Sincronizando...</div>
     </section>
 
     <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6;"><i class="fas fa-brain"></i> INTELIGÊNCIA: NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Assunto (Ex: Agravo x REsp)">
-        <textarea id="nc-c" placeholder="Diferença crucial para não errar..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR INSIGHT</button>
+        <h3 style="color:#f472b6;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Título">
+        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">GRAVAR</button>
         <div id="feed-nc" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
-        <input id="tese-t" placeholder="Título da Tese">
-        <textarea id="tese-c" placeholder="Fundamentação legal completa..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR TESE</button>
+        <h3 style="color:#3b82f6;"><i class="fas fa-gavel"></i> TESES</h3>
+        <input id="tese-t" placeholder="Título">
+        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">GRAVAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 </main>
@@ -73,7 +72,6 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Salvar Post-its (Teses e Não Confunda)
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
@@ -83,76 +81,62 @@
         }
     };
 
-    // Escuta em tempo real o Banco de Dados
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
-        
-        // --- PROCESSAR HISTÓRICO DE PEÇAS ---
         const fP = document.getElementById('feed-producao'); 
         fP.innerHTML = "";
         const treinos = d.producao_v13 || {};
         
-        // Pegamos as chaves, revertemos para as mais novas aparecerem primeiro
         Object.keys(treinos).reverse().forEach(id => {
             const t = treinos[id];
-            if(id.includes("RASCUNHO_ATUAL")) return; 
+            if(id.includes("RASCUNHO_ATUAL")) return;
             
-            // Layout do Card com o número do Exame e Nome da Peça
             fP.innerHTML += `
                 <div class="card-h">
                     <span>
-                        <strong style="color:var(--gold)">EXAME ${t.exame || "---"}</strong><br>
-                        <strong style="text-transform:uppercase">${t.nome_peca || t.peca || "PEÇA NÃO IDENTIFICADA"}</strong><br>
+                        <strong style="color:var(--gold)">EXAME ${t.exame || "???"}</strong><br>
+                        <strong style="text-transform:uppercase">${t.nome_peca || t.peca || "SEM TÍTULO"}</strong><br>
                         <small style="opacity:0.7">${t.data_envio || ""}</small>
                     </span>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn" style="width:40px; margin:0; background:#334155; color:var(--gold)" onclick="compartilharTreino('${id}')" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn" style="width:100px; margin:0; background:var(--success); color:white" onclick="verTreino('${id}')"><i class="fas fa-eye"></i> ABRIR</button>
+                        <button class="btn" style="width:40px; margin:0; background:#334155; color:var(--gold)" onclick="compartilharTreino('${id}')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn" style="width:100px; margin:0; background:var(--success); color:white" onclick="verTreino('${id}')">ABRIR</button>
                     </div>
                 </div>`;
         });
 
-        // --- PROCESSAR POST-ITS (NC e TESES) ---
         ['nc', 'tese'].forEach(type => {
             const f = document.getElementById('feed-'+type); f.innerHTML = "";
             const items = d['v13_'+type] || {};
             const color = type === 'nc' ? '#f472b6' : '#3b82f6';
             Object.keys(items).reverse().forEach(id => {
-                f.innerHTML += `
-                    <div class="post-it" style="background:${color}">
-                        <strong>${items[id].t}</strong>
-                        <p style="font-size:0.85rem; margin-top:5px; white-space: pre-wrap;">${items[id].c}</p>
-                    </div>`;
+                f.innerHTML += `<div class="post-it" style="background:${color}"><strong>${items[id].t}</strong><p style="font-size:0.85rem; margin-top:5px; white-space: pre-wrap;">${items[id].c}</p></div>`;
             });
         });
     });
 
-    // VISUALIZADOR DE PEÇA (Sincronizado com o salvar.js)
     window.verTreino = (id) => {
         get(ref(db, 'producao_v13/' + id)).then((s) => {
-            if(!s.exists()) return alert("Peça não encontrada!");
             const p = s.val();
             const win = window.open('', '_blank');
-            
-            // Tenta pegar de 'linhas' ou 'conteudo' para compatibilidade
             const baseLinhas = p.linhas || p.conteudo || [];
             
             const linhasHtml = baseLinhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #eee; padding:6px 0; align-items:center;">
-                    <span style="width:35px; font-size:11px; color:#999; border-right:1px solid #fbbf24; margin-right:10px; font-weight:bold;">${i+1}</span>
-                    <span style="flex:1; font-family:'Courier New', monospace; font-size:16px; color:#1e293b; word-break:break-word;">${l || ""}</span>
+                <div style="display:flex; border-bottom:1px solid #e2e8f0; min-height:28px; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
+                    <span style="width:35px; font-size:10px; color:#94a3b8; border-right:2px solid #fbbf24; margin-right:12px; padding:8px 4px; text-align:right; font-weight:900; background:#f1f5f9;">${i+1}</span>
+                    <span style="flex:1; font-family:'Courier New', monospace; font-size:16px; color:#1e293b; word-break:break-word; padding:6px 4px; line-height:1.5;">${l || ""}</span>
                 </div>`).join('');
 
             win.document.write(`
                 <html>
                 <head>
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Visualizar: ${p.nome_peca}</title>
                     <style>
-                        body { margin:0; padding:15px; background:#0f172a; font-family:sans-serif; }
-                        .paper { background:white; padding:25px; border-radius:12px; max-width:800px; margin:auto; box-shadow:0 10px 25px rgba(0,0,0,0.5); }
-                        .header { border-bottom:4px solid #fbbf24; margin-bottom:20px; padding-bottom:10px; text-align:center; }
-                        h3 { margin:0; color:#020617; text-transform:uppercase; }
+                        body { margin:0; padding:10px; background:#0f172a; font-family:sans-serif; }
+                        .paper { background:white; border-radius:12px; max-width:600px; margin:auto; overflow:hidden; }
+                        .header { background:#1e293b; color:white; padding:20px; text-align:center; border-bottom:4px solid #fbbf24; }
+                        .header h3 { margin:5px 0; color:#fbbf24; text-transform:uppercase; }
+                        .footer { position:sticky; bottom:0; background:white; padding:15px; border-top:1px solid #eee; display:flex; gap:10px; }
                         @media print { .no-print { display:none; } }
                     </style>
                 </head>
@@ -164,37 +148,24 @@
                             <small>${p.data_envio}</small>
                         </div>
                         ${linhasHtml}
-                        <div class="no-print" style="margin-top:25px; display:flex; gap:10px;">
-                            <button onclick="window.print()" style="flex:1; padding:15px; background:#fbbf24; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">IMPRIMIR / PDF</button>
-                            <button onclick="window.close()" style="flex:1; padding:15px; background:black; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">FECHAR</button>
+                        <div class="footer no-print">
+                            <button onclick="window.print()" style="flex:1; padding:15px; background:#fbbf24; border:none; border-radius:8px; font-weight:bold;">GERAR PDF</button>
+                            <button onclick="window.close()" style="flex:1; padding:15px; background:black; color:white; border:none; border-radius:8px; font-weight:bold;">FECHAR</button>
                         </div>
                     </div>
                 </body>
-                </html>
-            `);
+                </html>`);
         });
     };
 
-    // COMPARTILHAR VIA WHATSAPP/SISTEMA
     window.compartilharTreino = async (id) => {
         const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return;
         const p = s.val();
         const baseLinhas = p.linhas || p.conteudo || [];
-        
-        const texto = baseLinhas
-            .map((l, i) => `${String(i + 1).padStart(2, '0')}. ${l || ""}`)
-            .filter(l => l.length > 5)
-            .join('\n');
-
-        const msg = `📝 *TREINO ELITE OAB*\n🏆 *Exame:* ${p.exame || "---"}\n⚖️ *Peça:* ${p.nome_peca || p.peca}\n📅 *Data:* ${p.data_envio}\n\n${texto}`;
-        
-        if (navigator.share) {
-            navigator.share({ title: p.nome_peca, text: msg });
-        } else {
-            navigator.clipboard.writeText(msg);
-            alert("Conteúdo da peça copiado para a área de transferência!");
-        }
+        const texto = baseLinhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(l => l.length > 5).join('\n');
+        const msg = `📝 *TREINO ELITE OAB*\n*Exame:* ${p.exame}\n*Peça:* ${p.nome_peca}\n\n${texto}`;
+        if (navigator.share) navigator.share({ title: p.nome_peca, text: msg });
+        else { navigator.clipboard.writeText(msg); alert("Copiado!"); }
     };
 </script>
 </body>

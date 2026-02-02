@@ -2,20 +2,30 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>HISTÓRICO MENTORIA | ELITE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
+        
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
+        
         .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 13px; text-transform: uppercase; }
-        .feed { max-height: 500px; overflow-y: auto; margin-top: 10px; }
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        .card-h span { font-size: 13px; flex: 1; }
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; }
+        
+        .feed { max-height: 500px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
+        .feed::-webkit-scrollbar { width: 4px; }
+        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .card-h:hover { background: rgba(255,255,255,0.1); }
+        .card-h span { font-size: 13px; line-height: 1.4; flex: 1; margin-right: 10px; }
+        
+        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2); position: relative; }
+        
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+
         @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -28,23 +38,23 @@
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:var(--gold); margin:0;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
-        <div id="feed-producao" class="feed">Aguardando dados...</div>
+        <h3 style="color:var(--gold); margin:0; font-size: 1.1rem;"><i class="fas fa-history"></i> HISTÓRICO OFICIAL DE PEÇAS</h3>
+        <div id="feed-producao" class="feed">Conectando ao banco de dados...</div>
     </section>
 
     <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Título">
-        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">GRAVAR</button>
+        <h3 style="color:#f472b6;"><i class="fas fa-brain"></i> INTELIGÊNCIA: NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Assunto (Ex: Agravo x REsp)">
+        <textarea id="nc-c" placeholder="Diferença crucial para não errar..."></textarea>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR INSIGHT</button>
         <div id="feed-nc" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6;"><i class="fas fa-gavel"></i> TESES</h3>
-        <input id="tese-t" placeholder="Título">
-        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">GRAVAR</button>
+        <h3 style="color:#3b82f6;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
+        <input id="tese-t" placeholder="Título da Tese">
+        <textarea id="tese-c" placeholder="Fundamentação legal completa..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR TESE</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 </main>
@@ -63,6 +73,7 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
+    // Salvar Post-its (Teses e Não Confunda)
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
@@ -72,65 +83,118 @@
         }
     };
 
-    // Monitoramento em Tempo Real
+    // Escuta em tempo real o Banco de Dados
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
         
-        // Renderiza Treinos
-        const fP = document.getElementById('feed-producao');
+        // --- PROCESSAR HISTÓRICO DE PEÇAS ---
+        const fP = document.getElementById('feed-producao'); 
         fP.innerHTML = "";
         const treinos = d.producao_v13 || {};
+        
+        // Pegamos as chaves, revertemos para as mais novas aparecerem primeiro
         Object.keys(treinos).reverse().forEach(id => {
-            if(id.includes("RASCUNHO")) return;
             const t = treinos[id];
+            if(id.includes("RASCUNHO_ATUAL")) return; 
+            
+            // Layout do Card com o número do Exame e Nome da Peça
             fP.innerHTML += `
                 <div class="card-h">
-                    <span><strong>EXAME ${t.exame || "44"}</strong> - ${t.nome_peca || t.peca || "PEÇA"}</span>
-                    <button class="btn" style="width:80px; margin:0; background:var(--success); color:white" onclick="verTreino('${id}')">ABRIR</button>
+                    <span>
+                        <strong style="color:var(--gold)">EXAME ${t.exame || "---"}</strong><br>
+                        <strong style="text-transform:uppercase">${t.nome_peca || t.peca || "PEÇA NÃO IDENTIFICADA"}</strong><br>
+                        <small style="opacity:0.7">${t.data_envio || ""}</small>
+                    </span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn" style="width:40px; margin:0; background:#334155; color:var(--gold)" onclick="compartilharTreino('${id}')" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn" style="width:100px; margin:0; background:var(--success); color:white" onclick="verTreino('${id}')"><i class="fas fa-eye"></i> ABRIR</button>
+                    </div>
                 </div>`;
         });
 
-        // Renderiza Post-its
+        // --- PROCESSAR POST-ITS (NC e TESES) ---
         ['nc', 'tese'].forEach(type => {
             const f = document.getElementById('feed-'+type); f.innerHTML = "";
             const items = d['v13_'+type] || {};
             const color = type === 'nc' ? '#f472b6' : '#3b82f6';
             Object.keys(items).reverse().forEach(id => {
-                f.innerHTML += `<div class="post-it" style="background:${color}"><strong>${items[id].t}</strong><br>${items[id].c}</div>`;
+                f.innerHTML += `
+                    <div class="post-it" style="background:${color}">
+                        <strong>${items[id].t}</strong>
+                        <p style="font-size:0.85rem; margin-top:5px; white-space: pre-wrap;">${items[id].c}</p>
+                    </div>`;
             });
         });
     });
 
+    // VISUALIZADOR DE PEÇA (Sincronizado com o salvar.js)
     window.verTreino = (id) => {
         get(ref(db, 'producao_v13/' + id)).then((s) => {
+            if(!s.exists()) return alert("Peça não encontrada!");
             const p = s.val();
             const win = window.open('', '_blank');
+            
+            // Tenta pegar de 'linhas' ou 'conteudo' para compatibilidade
             const baseLinhas = p.linhas || p.conteudo || [];
             
             const linhasHtml = baseLinhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #eee; min-height:30px;">
-                    <div style="width:40px; color:#999; border-right:2px solid #fbbf24; padding:5px; text-align:right; flex-shrink:0;">\${i+1}</div>
-                    <div style="flex:1; padding:5px 10px; font-family:monospace; font-size:16px; white-space:pre-wrap;">\${l || ""}</div>
+                <div style="display:flex; border-bottom:1px solid #eee; padding:6px 0; align-items:center;">
+                    <span style="width:35px; font-size:11px; color:#999; border-right:1px solid #fbbf24; margin-right:10px; font-weight:bold;">${i+1}</span>
+                    <span style="flex:1; font-family:'Courier New', monospace; font-size:16px; color:#1e293b; word-break:break-word;">${l || ""}</span>
                 </div>`).join('');
 
-            win.document.write(\`
+            win.document.write(`
                 <html>
-                <head><meta name="viewport" content="width=850"></head>
-                <body style="margin:0; background:#0f172a; padding:20px;">
-                    <div style="background:white; width:800px; margin:auto; border-radius:8px; overflow:hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                        <div style="background:#1e293b; color:white; padding:20px; text-align:center; border-bottom:5px solid #fbbf24;">
-                            <h2 style="color:#fbbf24; margin:0;">\${p.nome_peca || "PEÇA ELITE"}</h2>
-                            <small>EXAME \${p.exame || "44"} | \${p.data_envio || ""}</small>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Visualizar: ${p.nome_peca}</title>
+                    <style>
+                        body { margin:0; padding:15px; background:#0f172a; font-family:sans-serif; }
+                        .paper { background:white; padding:25px; border-radius:12px; max-width:800px; margin:auto; box-shadow:0 10px 25px rgba(0,0,0,0.5); }
+                        .header { border-bottom:4px solid #fbbf24; margin-bottom:20px; padding-bottom:10px; text-align:center; }
+                        h3 { margin:0; color:#020617; text-transform:uppercase; }
+                        @media print { .no-print { display:none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="paper">
+                        <div class="header">
+                            <small>EXAME ${p.exame || "---"}</small>
+                            <h3>${p.nome_peca || p.peca}</h3>
+                            <small>${p.data_envio}</small>
                         </div>
-                        <div style="padding:10px;">\${linhasHtml}</div>
-                        <div style="padding:20px; background:#f8fafc; display:flex; gap:10px;">
-                            <button onclick="window.print()" style="flex:1; padding:15px; background:#fbbf24; border:none; border-radius:5px; font-weight:bold;">PDF / IMPRIMIR</button>
-                            <button onclick="window.close()" style="flex:1; padding:15px; background:black; color:white; border:none; border-radius:5px; font-weight:bold;">FECHAR</button>
+                        ${linhasHtml}
+                        <div class="no-print" style="margin-top:25px; display:flex; gap:10px;">
+                            <button onclick="window.print()" style="flex:1; padding:15px; background:#fbbf24; color:black; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">IMPRIMIR / PDF</button>
+                            <button onclick="window.close()" style="flex:1; padding:15px; background:black; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">FECHAR</button>
                         </div>
                     </div>
                 </body>
-                </html>\`);
+                </html>
+            `);
         });
+    };
+
+    // COMPARTILHAR VIA WHATSAPP/SISTEMA
+    window.compartilharTreino = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        if(!s.exists()) return;
+        const p = s.val();
+        const baseLinhas = p.linhas || p.conteudo || [];
+        
+        const texto = baseLinhas
+            .map((l, i) => `${String(i + 1).padStart(2, '0')}. ${l || ""}`)
+            .filter(l => l.length > 5)
+            .join('\n');
+
+        const msg = `📝 *TREINO ELITE OAB*\n🏆 *Exame:* ${p.exame || "---"}\n⚖️ *Peça:* ${p.nome_peca || p.peca}\n📅 *Data:* ${p.data_envio}\n\n${texto}`;
+        
+        if (navigator.share) {
+            navigator.share({ title: p.nome_peca, text: msg });
+        } else {
+            navigator.clipboard.writeText(msg);
+            alert("Conteúdo da peça copiado para a área de transferência!");
+        }
     };
 </script>
 </body>

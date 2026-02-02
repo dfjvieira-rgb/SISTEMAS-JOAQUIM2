@@ -29,10 +29,10 @@
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
-        /* AJUSTE: CONTAINER DO EDITOR */
+        /* EDITOR CONTAINER - GARANTE CENTRALIZAÇÃO NO PC */
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
         
-        /* AJUSTE: FOLHA (PAPER) */
+        /* PAPER - RESPEITA O MOBILE SEM QUEBRAR O PC */
         .paper { 
             background: var(--paper-color); 
             width: 100%; 
@@ -41,6 +41,7 @@
             margin-bottom: 50px; 
             position: relative;
             z-index: 15;
+            transition: width 0.3s ease;
         }
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
@@ -48,7 +49,7 @@
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
-        /* CORREÇÃO DE DIGITAÇÃO E VISUALIZAÇÃO */
+        /* LINHAS E DIGITAÇÃO (OTIMIZADO) */
         .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; background: white; border-bottom: 1px solid var(--line-color); }
         .linha-folha { 
             flex: 1 !important; 
@@ -61,8 +62,8 @@
             font-family: 'Courier New', monospace !important;
         }
 
-        /* AJUSTE: HUB MOBILE SEMPRE NO TOPO */
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 10000; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        /* HUB MOBILE - SEMPRE NO TOPO DE TUDO */
+        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #mobile-hub.active .fab-sub { display: flex; }
@@ -71,14 +72,15 @@
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
             .editor-container { padding: 5px; padding-top: 10px; } 
-            .paper { margin-bottom: 100px; width: 98% !important; }
+            .paper { margin-bottom: 120px; width: 98% !important; } /* Margem extra para o teclado/foguete */
         }
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; z-index: 3000; }
         #pdf-split-view.active { display: block; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
+        .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     </style>
 </head>
 <body class="dark-mode">
@@ -155,7 +157,7 @@
     window.ultimaLinha = 1;
     let isFinalizing = false;
 
-    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR
+    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR (ATIVA CORRETOR)
     const originalMontar = FolhaEngine.montar;
     FolhaEngine.montar = function(id) {
         originalMontar.apply(this, arguments);
@@ -163,6 +165,7 @@
             input.setAttribute('spellcheck', 'true');
             input.setAttribute('autocorrect', 'on');
             input.setAttribute('autocapitalize', 'sentences');
+            input.setAttribute('autocomplete', 'on');
         });
     };
 
@@ -191,7 +194,7 @@
                     });
                 }
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Erro no load:", e); }
     };
 
     window.dispararSalvar = async () => {

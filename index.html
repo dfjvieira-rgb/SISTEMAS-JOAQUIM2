@@ -166,6 +166,19 @@
         }
         isFinalizing = false;
     };
+     // CORREÇÃO DO VADE MECUM E PDFS
+    window.verPDF = (tipo) => {
+        const frame = document.getElementById('pdf-frame');
+        const view = document.getElementById('pdf-split-view');
+       
+        let path = "";
+        if (tipo === 'P') path = `ro${window.activeEx}.pdf`;
+        else if (tipo === 'G') path = `ro${window.activeEx}-gabarito.pdf`;
+        else if (tipo === 'V') path = `vade.pdf`;
+       
+        frame.src = path;
+        view.classList.add('active');
+    };
 
     // Funções de interface permanecem as mesmas
     window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };
@@ -242,3 +255,4 @@
 </script>
 </body>
 </html>
+

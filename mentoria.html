@@ -8,16 +8,26 @@
     <style>
         :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
+        
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
         .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; transition: 0.3s; font-size: 14px; }
+        
         .feed { max-height: 450px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
         .feed::-webkit-scrollbar { width: 5px; }
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        
         .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--success); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .card-h span { font-size: 13px; line-height: 1.4; flex: 1; }
+        
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; box-sizing: border-box; }
         .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; position: relative; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
+        
+        @media (max-width: 768px) { 
+            .dashboard { grid-template-columns: 1fr; } 
+            header h2 { font-size: 1.2rem; }
+            .btn { padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -30,7 +40,7 @@
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="color:var(--success); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
+            <h3 style="color:var(--success); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> TREINOS</h3>
             <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; font-size: 10px; padding: 5px 10px;" onclick="window.limparHistoricoCompleto()">
                 <i class="fas fa-trash-sweep"></i> LIMPAR TUDO
             </button>
@@ -47,7 +57,7 @@
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6; font-size: 1rem;"><i class="fas fa-gavel"></i> TESES BLINDADAS</h3>
+        <h3 style="color:#3b82f6; font-size: 1rem;"><i class="fas fa-gavel"></i> TESES</h3>
         <input id="tese-t" placeholder="Título da Tese">
         <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
         <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">GRAVAR TESE</button>
@@ -83,7 +93,7 @@
     };
 
     window.limparHistoricoCompleto = () => {
-        if(confirm("Apagar TODOS os treinos salvos?")) {
+        if(confirm("Apagar TODOS os treinos? Dicas e Teses serão mantidas.")) {
             remove(ref(db, 'producao_v13')).then(() => alert("Limpo!"));
         }
     };
@@ -101,9 +111,9 @@
             fP.innerHTML += `
                 <div class="card-h" style="border-left-color: ${cor}">
                     <span><strong>${t.nome_peca || "Sem Nome"}</strong><br><small>${t.data_envio || ""}</small></span>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 10px;" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 10px;" onclick="deletarItem('producao_v13/${id}')"><i class="fas fa-trash"></i></button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn" style="width:auto; margin:0; background:${cor}; padding: 8px;" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; padding: 8px;" onclick="deletarItem('producao_v13/${id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
         });
@@ -118,47 +128,44 @@
         });
     });
 
-    // FUNÇÃO AJUSTADA: FOLHA DE PRODUÇÃO MOBILE RESPONSIVA
+    // FUNÇÃO VER TREINO COM AJUSTE DE ESCALA MOBILE (FULL SCREEN)
     window.verTreino = (id) => {
         onValue(ref(db, 'producao_v13/' + id), (s) => {
             const p = s.val();
             if(!p || !p.linhas) return;
             const w = window.open('', '_blank');
             const linhasHtml = p.linhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #eee; padding:6px 0; font-family: 'Courier New', monospace; font-size:14px; align-items: flex-start;">
-                    <span style="width:30px; min-width:30px; color:#999; border-right:1px solid #ddd; margin-right:8px; text-align:right; padding-right:5px; font-size:11px;">${i+1}</span>
-                    <span style="flex:1; color:#000; word-break: break-word; white-space: pre-wrap;">${l || ""}</span>
+                <div style="display:flex; border-bottom:1px solid #eee; padding:10px 0; font-family: 'Courier New', monospace; font-size:16px; align-items: flex-start;">
+                    <span style="width:35px; min-width:35px; color:#94a3b8; border-right:1px solid #e2e8f0; margin-right:10px; text-align:right; padding-right:8px; font-size:12px; margin-top:3px;">${i+1}</span>
+                    <span style="flex:1; color:#1e293b; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${l || ""}</span>
                 </div>
             `).join('');
-
+            
             w.document.write(`
                 <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+                    <title>REVISÃO: ${p.nome_peca}</title>
                     <style>
-                        body { background:#f0f0f0; margin:0; padding:10px; font-family: sans-serif; }
-                        .folha { 
-                            background:#fff; 
-                            margin: 0 auto; 
-                            padding: 20px; 
-                            box-shadow: 0 0 10px rgba(0,0,0,0.1); 
-                            max-width: 800px; /* No PC fica elegante */
-                            width: 95%;      /* No Mobile ocupa tudo */
+                        body { background:#f8fafc; margin:0; padding:0; font-family: sans-serif; -webkit-text-size-adjust: 100%; }
+                        .paper { background:#fff; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+                        .header { text-align:center; border:2px solid #020617; padding:15px; margin-bottom:20px; background: #fff; }
+                        .btn-back { width:100%; padding:18px; background:#020617; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:16px; margin-top:25px; cursor:pointer; }
+                        @media (min-width: 768px) {
+                            body { padding: 40px; }
+                            .paper { max-width: 850px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; padding: 40px; min-height: auto; }
                         }
-                        .header-folha { text-align:center; border:2px solid #000; padding:10px; margin-bottom:15px; }
-                        .no-print { width:100%; padding:15px; margin-top:20px; background:#fbbf24; border:none; font-weight:bold; border-radius:8px; }
-                        @media print { .no-print { display:none; } body { padding:0; } .folha { width:100%; box-shadow:none; } }
                     </style>
                 </head>
                 <body>
-                    <div class="folha">
-                        <div class="header-folha">
-                            <b style="font-size:14px; text-transform:uppercase;">Folha de Resposta Oficial</b><br>
-                            <small>${p.nome_peca} | Exame ${p.exame}</small>
+                    <div class="paper">
+                        <div class="header">
+                            <b style="font-size:16px; display:block; margin-bottom:5px;">${p.nome_peca}</b>
+                            <span style="font-size:12px; color:#64748b;">EXAME OAB ${p.exame} | DATA: ${p.data_envio}</span>
                         </div>
-                        <div style="border:1px solid #eee;">${linhasHtml}</div>
-                        <button class="no-print" onclick="window.print()">GERAR PDF / IMPRIMIR</button>
-                        <button class="no-print" style="background:#64748b; color:white; margin-top:10px;" onclick="window.close()">VOLTAR</button>
+                        <div class="content">${linhasHtml}</div>
+                        <button class="btn-back" onclick="window.close()">VOLTAR À REVISÃO</button>
                     </div>
                 </body>
                 </html>

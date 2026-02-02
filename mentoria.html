@@ -1,142 +1,33 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HISTÓRICO MENTORIA | ELITE</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
-        
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
-        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; }
-        
-        .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 13px; text-transform: uppercase; }
-        
-        .feed { max-height: 500px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
-        .feed::-webkit-scrollbar { width: 4px; }
-        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-        .card-h span { font-size: 13px; line-height: 1.4; flex: 1; margin-right: 10px; }
-        
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
-
-        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
-    </style>
-</head>
-<body>
-
-<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
-    <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <button class="btn" style="width:auto; margin:0; background:white;" onclick="window.close()">VOLTAR</button>
-</header>
-
-<main class="dashboard">
-    <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:var(--gold); margin:0; font-size: 1.1rem;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
-        <div id="feed-producao" class="feed">Sincronizando...</div>
-    </section>
-
-    <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Título">
-        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">GRAVAR</button>
-        <div id="feed-nc" class="feed"></div>
-    </section>
-
-    <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6;"><i class="fas fa-gavel"></i> TESES</h3>
-        <input id="tese-t" placeholder="Título">
-        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">GRAVAR</button>
-        <div id="feed-tese" class="feed"></div>
-    </section>
-</main>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    const config = { 
-        apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
-        authDomain: "masteroab-db5e1.firebaseapp.com", 
-        projectId: "masteroab-db5e1", 
-        databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com" 
-    };
-    
-    const app = initializeApp(config);
-    const db = getDatabase(app);
-
-    window.salvarRapido = (type) => {
-        const t = document.getElementById(type+'-t');
-        const c = document.getElementById(type+'-c');
-        if(t.value && c.value) {
-            push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
-            t.value = ""; c.value = "";
-        }
-    };
-
-    onValue(ref(db), (snap) => {
-        const d = snap.val() || {};
-        const fP = document.getElementById('feed-producao'); 
-        fP.innerHTML = "";
-        const treinos = d.producao_v13 || {};
-        
-        Object.keys(treinos).reverse().forEach(id => {
-            const t = treinos[id];
-            if(id.includes("RASCUNHO_ATUAL")) return;
-            
-            fP.innerHTML += `
-                <div class="card-h">
-                    <span>
-                        <strong style="color:var(--gold)">EXAME ${t.exame || "???"}</strong><br>
-                        <strong style="text-transform:uppercase">${t.nome_peca || t.peca || "SEM TÍTULO"}</strong><br>
-                        <small style="opacity:0.7">${t.data_envio || ""}</small>
-                    </span>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn" style="width:40px; margin:0; background:#334155; color:var(--gold)" onclick="compartilharTreino('${id}')"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn" style="width:100px; margin:0; background:var(--success); color:white" onclick="verTreino('${id}')">ABRIR</button>
-                    </div>
-                </div>`;
-        });
-
-        ['nc', 'tese'].forEach(type => {
-            const f = document.getElementById('feed-'+type); f.innerHTML = "";
-            const items = d['v13_'+type] || {};
-            const color = type === 'nc' ? '#f472b6' : '#3b82f6';
-            Object.keys(items).reverse().forEach(id => {
-                f.innerHTML += `<div class="post-it" style="background:${color}"><strong>${items[id].t}</strong><p style="font-size:0.85rem; margin-top:5px; white-space: pre-wrap;">${items[id].c}</p></div>`;
-            });
-        });
-    });
-
-    window.verTreino = (id) => {
+window.verTreino = (id) => {
         get(ref(db, 'producao_v13/' + id)).then((s) => {
+            if(!s.exists()) return alert("Peça não encontrada!");
             const p = s.val();
             const win = window.open('', '_blank');
             const baseLinhas = p.linhas || p.conteudo || [];
             
             const linhasHtml = baseLinhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #e2e8f0; min-height:28px; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'};">
-                    <span style="width:35px; font-size:10px; color:#94a3b8; border-right:2px solid #fbbf24; margin-right:12px; padding:8px 4px; text-align:right; font-weight:900; background:#f1f5f9;">${i+1}</span>
-                    <span style="flex:1; font-family:'Courier New', monospace; font-size:16px; color:#1e293b; word-break:break-word; padding:6px 4px; line-height:1.5;">${l || ""}</span>
+                <div style="display:flex; border-bottom:1px solid #e2e8f0; min-height:30px; background: ${i % 2 === 0 ? '#ffffff' : '#f8fafc'}; width:100%;">
+                    <div style="min-width:40px; width:40px; font-size:11px; color:#94a3b8; border-right:3px solid #fbbf24; padding:8px 5px; text-align:right; font-weight:900; background:#f1f5f9; flex-shrink:0;">
+                        ${i+1}
+                    </div>
+                    <div style="flex:1; font-family:'Courier New', monospace; font-size:16px; color:#1e293b; word-break:break-word; padding:6px 10px; line-height:1.6; white-space: pre-wrap;">
+                        ${l || ""}
+                    </div>
                 </div>`).join('');
 
             win.document.write(`
                 <html>
                 <head>
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
                     <style>
                         body { margin:0; padding:10px; background:#0f172a; font-family:sans-serif; }
-                        .paper { background:white; border-radius:12px; max-width:600px; margin:auto; overflow:hidden; }
-                        .header { background:#1e293b; color:white; padding:20px; text-align:center; border-bottom:4px solid #fbbf24; }
-                        .header h3 { margin:5px 0; color:#fbbf24; text-transform:uppercase; }
-                        .footer { position:sticky; bottom:0; background:white; padding:15px; border-top:1px solid #eee; display:flex; gap:10px; }
+                        .paper { background:white; border-radius:12px; max-width:100%; margin:auto; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 10px 20px rgba(0,0,0,0.4); }
+                        .header { background:#1e293b; color:white; padding:15px; text-align:center; border-bottom:4px solid #fbbf24; }
+                        .header h3 { margin:5px 0; color:#fbbf24; text-transform:uppercase; font-size:1rem; }
+                        .content { width:100%; overflow-x:hidden; }
+                        .footer { position:sticky; bottom:0; background:white; padding:12px; border-top:2px solid #fbbf24; display:flex; gap:10px; }
+                        button { flex:1; padding:15px; border:none; border-radius:8px; font-weight:bold; text-transform:uppercase; font-size:12px; }
                         @media print { .no-print { display:none; } }
                     </style>
                 </head>
@@ -144,29 +35,18 @@
                     <div class="paper">
                         <div class="header">
                             <small>EXAME ${p.exame || "---"}</small>
-                            <h3>${p.nome_peca || p.peca}</h3>
+                            <h3>${p.nome_peca || p.peca || "PEÇA ELITE"}</h3>
                             <small>${p.data_envio}</small>
                         </div>
-                        ${linhasHtml}
+                        <div class="content">
+                            ${linhasHtml}
+                        </div>
                         <div class="footer no-print">
-                            <button onclick="window.print()" style="flex:1; padding:15px; background:#fbbf24; border:none; border-radius:8px; font-weight:bold;">GERAR PDF</button>
-                            <button onclick="window.close()" style="flex:1; padding:15px; background:black; color:white; border:none; border-radius:8px; font-weight:bold;">FECHAR</button>
+                            <button onclick="window.print()" style="background:#fbbf24; color:black;">PDF / Imprimir</button>
+                            <button onclick="window.close()" style="background:black; color:white;">Fechar</button>
                         </div>
                     </div>
                 </body>
                 </html>`);
         });
     };
-
-    window.compartilharTreino = async (id) => {
-        const s = await get(ref(db, 'producao_v13/' + id));
-        const p = s.val();
-        const baseLinhas = p.linhas || p.conteudo || [];
-        const texto = baseLinhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(l => l.length > 5).join('\n');
-        const msg = `📝 *TREINO ELITE OAB*\n*Exame:* ${p.exame}\n*Peça:* ${p.nome_peca}\n\n${texto}`;
-        if (navigator.share) navigator.share({ title: p.nome_peca, text: msg });
-        else { navigator.clipboard.writeText(msg); alert("Copiado!"); }
-    };
-</script>
-</body>
-</html>

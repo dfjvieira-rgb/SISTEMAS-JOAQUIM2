@@ -1,16 +1,20 @@
-// salvar.js - VERSÃO BLINDADA [2026-02-01]
+// salvar.js - VERSÃO ELITE [2026-02-01] - CORREÇÃO DE IDENTIFICAÇÃO
 import { ref, set, serverTimestamp, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 export const engineSaveElite = async (db, exame, isFinal = false) => {
     const syncText = document.getElementById('sync-text');
     const syncIndicator = document.getElementById('sync-indicator');
 
+    // Captura o título da peça diretamente do cabeçalho do papel
     const elementoIdentificador = document.getElementById('identificador-peca');
-    let tituloPeca = elementoIdentificador ? elementoIdentificador.innerText : "TREINO_AVULSO";
-
-    // Limpa o título para evitar nomes genéricos do scanner
-    if (tituloPeca.includes("SCANNER") || tituloPeca.includes("IDENTIFICANDO") || tituloPeca.includes("INATIVO")) {
-        tituloPeca = "TREINO_AVULSO";
+    let tituloPeca = "TREINO_AVULSO";
+    
+    if (elementoIdentificador) {
+        const textoScaneado = elementoIdentificador.innerText.trim();
+        // Se o scanner já identificou a peça, usa o nome real (ex: RECURSO ORDINÁRIO)
+        if (textoScaneado && !textoScaneado.includes("SCANNER") && !textoScaneado.includes("INATIVO")) {
+            tituloPeca = textoScaneado;
+        }
     }
 
     const exameOficial = exame || localStorage.getItem('activeEx') || "44";
@@ -19,37 +23,30 @@ export const engineSaveElite = async (db, exame, isFinal = false) => {
         const linhasConteudo = Array.from(document.querySelectorAll('.linha-folha'))
                                     .map(input => input.value || "");
 
+        // PAYLOAD AJUSTADO PARA O PADRÃO DA MENTORIA V13
         const payload = {
             exame: exameOficial,
-            nome_peca: tituloPeca, 
-            linhas: linhasConteudo,
+            peca: tituloPeca, // Nome da peça (fundamental para não aparecer undefined)
+            conteudo: linhasConteudo,
+            data: new Date().toLocaleString('pt-BR'),
             timestamp: serverTimestamp(),
-            data_envio: new Date().toLocaleString('pt-BR'),
             status: isFinal ? "FINALIZADO" : "RASCUNHO"
         };
 
-        const safePecaName = tituloPeca.replace(/\s+/g, '_'); 
-
-        // LÓGICA DE CAMINHO RESTRUTURADA
-        let savePath;
-        
         if (isFinal) {
-            // Para o Histórico da Mentoria: Salvamos dentro de producao_v13 com um ID único (push)
-            // Isso garante que apareça na lista de treinos realizados
+            // SALVAMENTO NO HISTÓRICO OFICIAL
             const historicoRef = ref(db, `producao_v13/historico`);
             const novaPecaRef = push(historicoRef); 
             await set(novaPecaRef, payload);
-            console.log("[FIREBASE] Enviado para Histórico Produção V13");
         } else {
-            // Para o Rascunho Atual: Sobrescreve sempre o mesmo nó para não poluir o banco
-            savePath = `producao_v13/${exameOficial}_RASCUNHO_ATUAL`;
-            await set(ref(db, savePath), payload);
-            console.log("[FIREBASE] Rascunho Auto-Save concluído.");
+            // SALVAMENTO DO RASCUNHO ATUAL
+            const rascunhoPath = `producao_v13/${exameOficial}_RASCUNHO_ATUAL`;
+            await set(ref(db, rascunhoPath), payload);
         }
 
-        // Feedback Visual Elite
+        // Feedback visual
         if (syncText) {
-            syncText.innerText = isFinal ? "PEÇA FINALIZADA ✅" : "AUTO-SAVED";
+            syncText.innerText = isFinal ? "HISTÓRICO SALVO ✅" : "AUTO-SAVED";
             if (syncIndicator) syncIndicator.classList.add('sync-success');
             setTimeout(() => {
                 syncText.innerText = "SYNC ON";
@@ -59,7 +56,7 @@ export const engineSaveElite = async (db, exame, isFinal = false) => {
         
         return true;
     } catch (error) {
-        console.error("Erro crítico no salvamento:", error);
+        console.error("Erro no salvamento:", error);
         if (syncText) syncText.innerText = "ERRO DE CONEXÃO";
         return false;
     }

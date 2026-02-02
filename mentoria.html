@@ -26,7 +26,6 @@
         @media (max-width: 768px) { 
             .dashboard { grid-template-columns: 1fr; } 
             header h2 { font-size: 1.2rem; }
-            .btn { padding: 15px; }
         }
     </style>
 </head>
@@ -40,7 +39,7 @@
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="color:var(--success); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> TREINOS</h3>
+            <h3 style="color:var(--success); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
             <button class="btn" style="width:auto; margin:0; background:#ef4444; color:white; font-size: 10px; padding: 5px 10px;" onclick="window.limparHistoricoCompleto()">
                 <i class="fas fa-trash-sweep"></i> LIMPAR TUDO
             </button>
@@ -133,13 +132,13 @@
         const s = await get(ref(db, 'producao_v13/' + id));
         const p = s.val();
         if(!p || !p.linhas) return;
-        const textoPeca = p.linhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(linha => linha.split(". ")[1].length > 0).join('\n');
-        const mensagem = `📝 *TREINO ELITE OAB*\n\n*Peça:* ${p.nome_peca}\n*Exame:* ${p.exame}\n*Data:* ${p.data_envio}\n\n--- CONTEÚDO ---\n${textoPeca}`;
+        const textoPeca = p.linhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(linha => linha.split(". ")[1].trim().length > 0).join('\n');
+        const mensagem = `📝 *TREINO ELITE OAB*\n\n*Peça:* ${p.nome_peca}\n*Data:* ${p.data_envio}\n\n--- CONTEÚDO ---\n${textoPeca}`;
         if (navigator.share) {
             try { await navigator.share({ title: p.nome_peca, text: mensagem }); } catch (err) {}
         } else {
             await navigator.clipboard.writeText(mensagem);
-            alert("Texto copiado! Agora é só colar no WhatsApp.");
+            alert("Texto copiado para o WhatsApp!");
         }
     };
 
@@ -149,39 +148,38 @@
             if(!p || !p.linhas) return;
             const w = window.open('', '_blank');
             const linhasHtml = p.linhas.map((l, i) => `
-                <div style="display:flex; border-bottom:1px solid #eee; padding:10px 0; font-family: 'Courier New', monospace; font-size:16px; align-items: flex-start;">
-                    <span style="width:35px; min-width:35px; color:#94a3b8; border-right:1px solid #e2e8f0; margin-right:10px; text-align:right; padding-right:8px; font-size:12px; margin-top:3px;">${i+1}</span>
-                    <span style="flex:1; color:#1e293b; word-break: break-word; white-space: pre-wrap; line-height: 1.5;">${l || ""}</span>
+                <div style="display:flex; border-bottom:1px solid #f1f5f9; min-height:24px; align-items:flex-start;">
+                    <div style="width:30px; min-width:30px; color:#cbd5e1; font-size:10px; text-align:right; padding-right:8px; padding-top:4px; border-right:1px solid #f1f5f9; margin-right:10px; font-family:sans-serif;">${i+1}</div>
+                    <div style="flex:1; padding:2px 0; font-family:'Courier New', monospace; font-size:16px; line-height:1.5; color:#334155; word-break:break-word;">${l || ""}</div>
                 </div>
             `).join('');
+            
             w.document.write(`
+                <!DOCTYPE html>
                 <html>
                 <head>
                     <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
                     <style>
-                        body { background:#f8fafc; margin:0; padding:0; font-family: sans-serif; -webkit-text-size-adjust: 100%; }
-                        .paper { background:#fff; min-height: 100vh; padding: 15px; box-sizing: border-box; }
-                        .header { text-align:center; border:2px solid #020617; padding:15px; margin-bottom:20px; }
-                        .btn-back { width:100%; padding:18px; background:#020617; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:16px; margin-top:25px; }
-                        @media (min-width: 768px) {
-                            body { padding: 40px; }
-                            .paper { max-width: 850px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border-radius: 8px; padding: 40px; min-height: auto; }
-                        }
+                        body { margin:0; padding:10px; background:#f8fafc; font-family:sans-serif; }
+                        .paper { background:#fff; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-radius:8px; max-width:800px; margin:0 auto; }
+                        .header { text-align:center; border-bottom:2px solid #fbbf24; padding-bottom:10px; margin-bottom:20px; }
+                        .btn-voltar { display:block; width:100%; padding:15px; background:#020617; color:#fff; text-align:center; text-decoration:none; border-radius:8px; font-weight:bold; margin-top:20px; cursor:pointer; border:none; }
                     </style>
                 </head>
                 <body>
                     <div class="paper">
                         <div class="header">
-                            <b style="font-size:16px; display:block; margin-bottom:5px;">${p.nome_peca}</b>
-                            <span style="font-size:12px; color:#64748b;">EXAME OAB ${p.exame} | DATA: ${p.data_envio}</span>
+                            <h3 style="margin:0; color:#020617;">${p.nome_peca}</h3>
+                            <small style="color:#64748b;">Enviado em: ${p.data_envio}</small>
                         </div>
-                        <div>${linhasHtml}</div>
-                        <button class="btn-back" onclick="window.close()">VOLTAR</button>
+                        ${linhasHtml}
+                        <button class="btn-voltar" onclick="window.close()">FECHAR VISUALIZAÇÃO</button>
                     </div>
                 </body>
                 </html>
             `);
+            w.document.close();
         }, {onlyOnce: true});
     };
 </script>

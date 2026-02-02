@@ -16,7 +16,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
-        header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 2000; }
+        header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
         @keyframes pulse-discreto {
@@ -26,19 +26,21 @@
         }
         .sync-success { color: #10b981 !important; animation: pulse-discreto 1.2s infinite; font-weight: 900; }
 
-        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 1001; }
+        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
-        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; }
+        /* AJUSTE: CONTAINER DO EDITOR */
+        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
         
+        /* AJUSTE: FOLHA (PAPER) */
         .paper { 
             background: var(--paper-color); 
             width: 100%; 
             max-width: 850px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-            margin-bottom: 100px; 
+            margin-bottom: 50px; 
             position: relative;
-            overflow: hidden;
+            z-index: 15;
         }
         
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
@@ -46,45 +48,37 @@
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
-        /* --- BLOCO DE CORREÇÃO MOBILE (TECLADO E DIGITAÇÃO) --- */
+        /* CORREÇÃO DE DIGITAÇÃO E VISUALIZAÇÃO */
         .linha-container { display: flex !important; width: 100% !important; padding: 0 5px; background: white; border-bottom: 1px solid var(--line-color); }
-        
-        /* Força os atributos de sistema no input gerado pelo FolhaEngine */
         .linha-folha { 
             flex: 1 !important; 
-            width: 100% !important; 
-            min-width: 0 !important; 
-            font-size: 16px !important; /* Tamanho crítico para evitar zoom no iOS/Android */
-            padding: 12px 8px !important;
+            font-size: 16px !important; 
+            padding: 10px 8px !important;
             border: none !important;
             outline: none !important;
             background: transparent !important;
             color: var(--text-color) !important;
             font-family: 'Courier New', monospace !important;
-            /* Ativa recursos do teclado via CSS onde possível */
-            text-rendering: optimizeLegibility;
-        }
-        
-        /* Ajuste de toque no mobile */
-        @media (max-width: 768px) {
-            .sidebar { display: none !important; }
-            #mobile-hub { display: flex; }
-            .editor-container { padding: 5px; } 
-            .paper { margin-bottom: 80px; width: 100% !important; border-radius: 0; }
-            .linha-folha { padding: 15px 10px !important; } /* Área de toque maior */
         }
 
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
+        /* AJUSTE: HUB MOBILE SEMPRE NO TOPO */
+        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 10000; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #mobile-hub.active .fab-sub { display: flex; }
 
-        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; }
+        @media (max-width: 768px) {
+            .sidebar { display: none !important; }
+            #mobile-hub { display: flex; }
+            .editor-container { padding: 5px; padding-top: 10px; } 
+            .paper { margin-bottom: 100px; width: 98% !important; }
+        }
+
+        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: relative; height: 100%; z-index: 3000; }
         #pdf-split-view.active { display: block; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 20000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
-        .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     </style>
 </head>
 <body class="dark-mode">
@@ -134,7 +128,7 @@
     </div>
 
     <div id="pdf-split-view">
-        <button style="position:absolute; top:10px; right:10px; background:var(--gold); border:none; width:45px; height:45px; border-radius:8px; z-index:1001;" onclick="window.fecharPDF()"><i class="fas fa-times"></i></button>
+        <button style="position:absolute; top:10px; right:10px; background:var(--gold); border:none; width:45px; height:45px; border-radius:8px; z-index:5001;" onclick="window.fecharPDF()"><i class="fas fa-times"></i></button>
         <iframe id="pdf-frame" style="width:100%; height:100%; border:none;"></iframe>
     </div>
 </main>
@@ -161,21 +155,18 @@
     window.ultimaLinha = 1;
     let isFinalizing = false;
 
-    // MELHORIA NO ENGINE: Habilita recursos de teclado ao montar a folha
+    // INTERCEPTOR DE DIGITAÇÃO PARA CELULAR
     const originalMontar = FolhaEngine.montar;
     FolhaEngine.montar = function(id) {
         originalMontar.apply(this, arguments);
-        // Após montar, injetamos as propriedades de teclado em cada input
         document.querySelectorAll('.linha-folha').forEach(input => {
             input.setAttribute('spellcheck', 'true');
             input.setAttribute('autocorrect', 'on');
             input.setAttribute('autocapitalize', 'sentences');
-            input.setAttribute('autocomplete', 'on');
         });
     };
 
     window.alert = (msg) => {
-        console.log("🛡️ Bloqueado:", msg);
         const st = document.getElementById('sync-text');
         if (st && (msg.includes("Sincronizado") || msg.includes("sucesso"))) {
             st.innerText = "PEÇA SALVA ✅";
@@ -189,10 +180,8 @@
 
     window.carregarRascunho = async () => {
         const syncText = document.getElementById('sync-text');
-        if(syncText) syncText.innerText = "BUSCANDO...";
         try {
-            const loadPath = `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`;
-            const snapshot = await get(ref(db, loadPath));
+            const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             if (snapshot.exists()) {
                 const dados = snapshot.val();
                 if (dados && dados.linhas) {
@@ -200,25 +189,19 @@
                         const input = document.getElementById(`L${i + 1}`);
                         if (input) input.value = texto;
                     });
-                    if(syncText) syncText.innerText = "RECUPERADO ✅";
                 }
-            } else {
-                if(syncText) syncText.innerText = "NENHUM SALVO";
             }
-        } catch (e) { console.error("Erro no load:", e); }
-        setTimeout(() => { if(syncText) syncText.innerText = "SYNC ON"; }, 2000);
+        } catch (e) { console.error(e); }
     };
 
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
-        try { await engineSaveElite(db, window.activeEx, false); } catch(e) { console.error("Erro Auto-save:", e); }
+        try { await engineSaveElite(db, window.activeEx, false); } catch(e) {}
     };
 
     window.finalizarPeca = async () => {
         if(!confirm("Deseja finalizar e enviar ao histórico oficial?")) return;
         isFinalizing = true;
-        const st = document.getElementById('sync-text');
-        if(st) st.innerText = "ENVIANDO...";
         try {
             const ok = await engineSaveElite(db, window.activeEx, true);
             if(ok) window.alert("Sincronizado!"); 

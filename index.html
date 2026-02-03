@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>JOAQUIM ELITE 2026 - MASTER</title>
-    
+   
     <link rel="icon" href="data:,">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -28,7 +28,7 @@
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
 
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; }
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; position: relative; }
 
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
@@ -39,6 +39,16 @@
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
         .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
         #mobile-hub.active .fab-sub { display: flex; }
+
+        /* AJUSTE DE IMPRESSÃO (RESOLVE O PROBLEMA DA PÁGINA 1) */
+        @media print {
+            body { overflow: visible !important; height: auto !important; background: white !important; }
+            header, .sidebar, .sticky-tools, #mobile-hub, #pdf-viewer, .modal { display: none !important; }
+            main { display: block !important; overflow: visible !important; }
+            .editor-container { display: block !important; overflow: visible !important; background: white !important; }
+            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; max-width: none !important; min-height: auto !important; }
+            #folha-total { overflow: visible !important; }
+        }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -129,8 +139,7 @@
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
-        
-        // Pequeno atraso para o motor da folha renderizar antes de carregar o rascunho
+       
         setTimeout(async () => {
             await carregarRascunho();
             window.forcarRadar();
@@ -143,10 +152,8 @@
         try {
             const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             const ed = document.getElementById('editor-principal');
-            if (snap.exists() && ed) {
-                ed.innerText = snap.val().conteudo;
-            }
-        } catch (e) { console.error("Erro rascunho:", e); }
+            if (snap.exists() && ed) ed.innerText = snap.val().conteudo;
+        } catch (e) { console.error(e); }
     }
 
     async function salvarAutomatico() {
@@ -220,7 +227,6 @@
         }
     };
 
-    // MARTELO SEGURO: INJETA NO FINAL PARA NÃO QUEBRAR LINHAS
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         const ed = document.getElementById('editor-principal');
@@ -246,4 +252,4 @@
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>
-</html>
+</html> 

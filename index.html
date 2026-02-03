@@ -11,6 +11,7 @@
         :root {
             --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
             --paper-color: #ffffff; --mentoria: #a855f7; --sidebar-w: 240px;
+            --checklist-w: 200px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -53,11 +54,30 @@
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
+        /* SIDEBAR ESQUERDA */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
 
+        /* CHECKLIST DIREITA (NOVO) */
+        .checklist-panel {
+            width: var(--checklist-w);
+            background: #0f172a;
+            border-left: 2px solid var(--gold);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            color: white;
+            font-size: 0.7rem;
+            overflow-y: auto;
+        }
+        .checklist-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 5px; border-radius: 4px; transition: 0.2s; }
+        .checklist-item:hover { background: rgba(251, 191, 36, 0.1); }
+        .checklist-item input { accent-color: var(--gold); }
+
         .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
@@ -76,6 +96,9 @@
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+        @media (max-width: 1024px) {
+            .checklist-panel { display: none; }
+        }
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
@@ -90,7 +113,7 @@
 <header>
     <div style="color:white; font-weight:900; font-size: 0.9rem;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
     
-    <div id="cronometro-container" onclick="window.toggleTimer()" title="Clique para Pausar/Continuar">
+    <div id="cronometro-container" onclick="window.toggleTimer()" title="Pausar/Continuar">
         <i class="fas fa-play timer-icon" id="timer-status-icon"></i>
         <div id="cronometro">00:00:00</div>
     </div>
@@ -124,6 +147,23 @@
             <div id="folha-total"></div>
         </div>
     </section>
+
+    <aside class="checklist-panel">
+        <h4 style="color:var(--gold); font-size: 0.8rem; margin-bottom: 10px; text-align: center;">CHECKLIST ELITE</h4>
+        <label class="checklist-item"><input type="checkbox"> Endereçamento</label>
+        <label class="checklist-item"><input type="checkbox"> Qualificação Partes</label>
+        <label class="checklist-item"><input type="checkbox"> Nome da Peça + Art</label>
+        <label class="checklist-item"><input type="checkbox"> Fatos (Breve)</label>
+        <label class="checklist-item"><input type="checkbox"> Preliminares / Prejudiciais</label>
+        <label class="checklist-item"><input type="checkbox"> Mérito (F+F+P)</label>
+        <label class="checklist-item"><input type="checkbox"> Pedidos Reiteração</label>
+        <label class="checklist-item"><input type="checkbox"> Honorários (791-A)</label>
+        <label class="checklist-item"><input type="checkbox"> Requerimentos Finais</label>
+        <label class="checklist-item"><input type="checkbox"> Provas e Intimações</label>
+        <label class="checklist-item"><input type="checkbox"> Valor da Causa</label>
+        <label class="checklist-item"><input type="checkbox"> Fechamento Padrão</label>
+        <button class="btn" style="font-size: 9px; margin-top: 20px;" onclick="window.limparChecklist()">RESETE</button>
+    </aside>
 
     <section id="pdf-viewer">
         <div class="pdf-controls">
@@ -167,36 +207,32 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
 
-    // Lógica do Cronômetro com Pause
+    // Lógica do Cronômetro
     let segundos = 0;
     let timerAtivo = true;
-    
     window.toggleTimer = () => {
         timerAtivo = !timerAtivo;
         const container = document.getElementById('cronometro-container');
         const icon = document.getElementById('timer-status-icon');
-        
-        if(timerAtivo) {
-            container.classList.remove('pausado');
-            icon.className = 'fas fa-play timer-icon';
-        } else {
-            container.classList.add('pausado');
-            icon.className = 'fas fa-pause timer-icon';
-        }
+        container.classList.toggle('pausado', !timerAtivo);
+        icon.className = timerAtivo ? 'fas fa-play timer-icon' : 'fas fa-pause timer-icon';
     };
 
     function iniciarCronometro() {
         setInterval(() => {
             if(timerAtivo) {
                 segundos++;
-                const h = Math.floor(segundos / 3600);
-                const m = Math.floor((segundos % 3600) / 60);
-                const s = segundos % 60;
-                document.getElementById('cronometro').innerText = 
-                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                const h = Math.floor(segundos / 3600).toString().padStart(2, '0');
+                const m = Math.floor((segundos % 3600) / 60).toString().padStart(2, '0');
+                const s = (segundos % 60).toString().padStart(2, '0');
+                document.getElementById('cronometro').innerText = `${h}:${m}:${s}`;
             }
         }, 1000);
     }
+
+    window.limparChecklist = () => {
+        document.querySelectorAll('.checklist-panel input').forEach(i => i.checked = false);
+    };
 
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
@@ -226,7 +262,6 @@
         else if (t === 'V') { url = `./vade.pdf`; title.innerText = "VADE MECUM"; }
         frame.src = url;
         viewer.classList.add('active');
-        if(window.innerWidth < 768) window.toggleFoguete();
     };
 
     window.fecharPDF = () => {
@@ -234,37 +269,23 @@
         document.getElementById('pdf-frame').src = "";
     };
 
-    window.abrirExames = () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "MUDAR EXAME";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.style.padding="15px"; b.style.borderBottom="1px solid #eee"; b.innerText=`EXAME ${i}`;
-            b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
-            content.appendChild(b);
-        }
-        modal.style.display = 'flex';
-        window.toggleFoguete();
-    };
-
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
-        if(confirm("Salvar no Histórico?")) {
+        if(confirm("Deseja salvar esta peça no seu histórico elite?")) {
             await engineSaveElite(db, window.activeEx, true, ed.innerText);
-            alert("SALVO!");
+            alert("PEÇA SALVA COM SUCESSO!");
         }
     };
 
+    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
-        window.toggleFoguete();
     };
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PERGAMINHO";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS DE PEÇAS";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
@@ -273,7 +294,6 @@
             content.appendChild(b);
         });
         modal.style.display = 'flex';
-        window.toggleFoguete();
     };
 
     window.forcarRadar = () => {
@@ -285,7 +305,18 @@
     };
 
     window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
-    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
+    window.abrirExames = () => {
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+        for(let i=44; i>=35; i--) {
+            const b = document.createElement('div'); b.style.padding="15px"; b.style.borderBottom="1px solid #eee"; b.innerText=`EXAME ${i}`;
+            b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
+            content.appendChild(b);
+        }
+        modal.style.display = 'flex';
+    };
 </script>
 </body>
 </html>

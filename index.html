@@ -30,14 +30,11 @@
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
 
         .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 50px; position: relative; z-index: 15; }
+        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 50px; position: relative; z-index: 15; border-radius: 4px; overflow: hidden; }
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
 
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
-
-        .linha-container { display: flex !important; width: 100% !important; border-bottom: 1px solid var(--line-color); background: white; }
-        .linha-folha { flex: 1 !important; font-size: 16px !important; padding: 10px 8px !important; border: none !important; outline: none !important; background: transparent !important; color: #000 !important; font-family: 'Courier New', monospace !important; }
 
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
@@ -48,7 +45,6 @@
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
             .paper { width: 100% !important; margin-bottom: 120px; }
-            #pdf-split-view.active { width: 100% !important; border-left: none; }
         }
 
         #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: absolute; right: 0; top: 0; height: 100%; z-index: 6000; }
@@ -86,7 +82,7 @@
             <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO - TOQUE AQUI</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
+                <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Visualizar</button>
                 <button class="btn-lib" style="color:var(--mentoria)" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> Mentoria</button>
             </div>
             <div id="folha-total"></div>
@@ -121,7 +117,7 @@
 
 <script type="module">
     import { db } from './firebase-config.js';
-    import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
     import { FolhaEngine } from './folha-engine.js';
@@ -130,34 +126,57 @@
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
-    window.ultimaLinha = 1;
+    window.FolhaEngine = FolhaEngine;
     let isFinalizing = false;
 
+    // --- CARREGAR RASCUNHO (BLINDADO) ---
     window.carregarRascunho = async () => {
+        const editor = document.getElementById('editor-principal');
+        if (!editor) return;
+
         try {
             const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             if (snapshot.exists()) {
                 const dados = snapshot.val();
-                const textoParaCarregar = dados.linhas || dados.conteudo || [];
-                textoParaCarregar.forEach((texto, i) => {
-                    const input = document.getElementById(`L${i + 1}`);
-                    if (input) input.value = texto;
-                });
+                editor.innerText = dados.conteudo || "";
+            } else {
+                const local = localStorage.getItem(`rascunho_${window.activeEx}`);
+                if (local) editor.innerText = local;
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { console.error("Erro Load:", e); }
+    };
+
+    // --- SALVAMENTO AUTOMÁTICO ---
+    const setupAutoSave = () => {
+        const editor = document.getElementById('editor-principal');
+        if (editor) {
+            editor.addEventListener('input', () => {
+                localStorage.setItem(`rascunho_${window.activeEx}`, editor.innerText);
+            });
+        }
     };
 
     window.dispararSalvar = async () => {
         if (isFinalizing) return;
-        await engineSaveElite(db, window.activeEx, false);
+        const editor = document.getElementById('editor-principal');
+        if (!editor || !editor.innerText.trim()) return;
+
+        try {
+            await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
+                conteudo: editor.innerText,
+                timestamp: new Date().getTime()
+            });
+        } catch (e) { console.error("Erro Sync:", e); }
     };
 
     window.finalizarPeca = async () => {
+        const editor = document.getElementById('editor-principal');
         if(!confirm("Deseja enviar ao histórico oficial?")) return;
         isFinalizing = true;
-        const ok = await engineSaveElite(db, window.activeEx, true);
+        
+        const ok = await engineSaveElite(db, window.activeEx, true, editor.innerText);
         if(ok) {
-            document.getElementById('sync-text').innerText = "SINCRO-HISTORY ";
+            document.getElementById('sync-text').innerText = "SINCRO-HISTORY";
             document.getElementById('sync-indicator').classList.add('sync-success');
             setTimeout(() => {
                 document.getElementById('sync-text').innerText = "SYNC ON";
@@ -167,25 +186,18 @@
         isFinalizing = false;
     };
 
-    // CORREÇÃO DEFINITIVA DO VADE MECUM E PDFS
     window.verPDF = (tipo) => {
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
-        
         let path = "";
-        const cacheBuster = `?t=${new Date().getTime()}`;
+        const cb = `?t=${new Date().getTime()}`;
 
-        if (tipo === 'P') path = `ro${window.activeEx}.pdf${cacheBuster}`;
-        else if (tipo === 'G') path = `ro${window.activeEx}-gabarito.pdf${cacheBuster}`;
-        else if (tipo === 'V') path = `vade.pdf${cacheBuster}`;
+        if (tipo === 'P') path = `ro${window.activeEx}.pdf${cb}`;
+        else if (tipo === 'G') path = `ro${window.activeEx}-gabarito.pdf${cb}`;
+        else if (tipo === 'V') path = `vade.pdf${cb}`;
         
-        // Limpa o src anterior para evitar que o iframe segure o arquivo antigo
         frame.src = "about:blank";
-        
-        setTimeout(() => {
-            frame.src = path;
-            view.classList.add('active');
-        }, 50);
+        setTimeout(() => { frame.src = path; view.classList.add('active'); }, 50);
     };
 
     window.fecharPDF = () => {
@@ -196,22 +208,17 @@
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
         await window.carregarRascunho();
+        setupAutoSave();
         setTimeout(window.forcarRadar, 1500);
         setInterval(window.dispararSalvar, 30000);
-        
-        document.getElementById('folha-total').addEventListener('focusin', (e) => {
-            if (e.target.classList.contains('linha-folha')) {
-                window.ultimaLinha = parseInt(e.target.id.replace('L', '')) || 1;
-            }
-        });
     };
 
-    // UI Helpers
     window.toggleFoguete = () => {
         const hub = document.getElementById('mobile-hub');
         hub.classList.toggle('active');
         document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
+
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna) {
@@ -220,9 +227,16 @@
             document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
         }
     };
+
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };
-    
+    window.limparFolha = () => { 
+        if(confirm("Apagar tudo?")) {
+            const editor = document.getElementById('editor-principal');
+            if(editor) editor.innerText = "";
+            localStorage.removeItem(`rascunho_${window.activeEx}`);
+        }
+    };
+
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "TROCAR EXAME";
@@ -246,7 +260,7 @@
             const b = document.createElement('div'); b.className='opt-btn';
             b.innerHTML = `<span>${k}</span> <i class="fas fa-file-alt"></i>`;
             b.onclick = () => {
-                FolhaEngine.injetarTextoMultilinhas(pecas[k], window.ultimaLinha);
+                FolhaEngine.injetarTextoMultilinhas(pecas[k]);
                 modal.style.display='none';
             };
             content.appendChild(b);
@@ -256,7 +270,7 @@
 
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) FolhaEngine.injetarTextoMultilinhas(dna, window.ultimaLinha);
+        if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
     };
 </script>
 </body>

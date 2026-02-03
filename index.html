@@ -24,7 +24,7 @@
         .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; transition: 0.2s; }
         .btn-side:hover { filter: brightness(1.2); }
 
-        /* EDITOR CONTAINER - Onde o scroll acontece */
+        /* EDITOR CONTAINER - AJUSTADO PARA TRAVAR O SCROLL */
         .editor-container { 
             flex: 1; 
             overflow-y: auto !important; 
@@ -35,9 +35,10 @@
             background: var(--bg-paper); 
             width: 100%; 
             position: relative;
+            scroll-behavior: smooth;
         }
 
-        /* FERRAMENTAS FIXAS NO TOPO */
+        /* FERRAMENTAS FIXAS (STICKY) */
         .sticky-tools {
             position: sticky;
             top: 0;
@@ -49,17 +50,17 @@
             border-radius: 0 0 8px 8px;
         }
 
-        /* A FOLHA BLINDADA EM 150 LINHAS */
+        /* A FOLHA BLINDADA - SINCRONIZADA COM O ENGINE */
         .paper { 
             background: var(--paper-color); 
             width: 100%; 
             max-width: 850px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
             margin-top: 15px;
-            margin-bottom: 50px;
+            margin-bottom: 100px; /* Espaço para o Hub Mobile */
             position: relative; 
             z-index: 15; 
-            height: 5250px !important; /* 150 * 35px */
+            height: 5250px !important; /* 150 linhas exatas */
             min-height: 5250px !important;
             max-height: 5250px !important;
             flex-shrink: 0;
@@ -70,28 +71,22 @@
         .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
         .btn-lib { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
-        /* HUB MOBILE (FOGUETE) */
+        /* HUB MOBILE */
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #mobile-hub.active .fab-sub { display: flex; }
 
-        /* RESPONSIVIDADE MOBILE */
         @media (max-width: 768px) {
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
             .editor-container { padding: 0 5px; }
-            .paper { margin-bottom: 150px; }
-            .btn-lib span { display: none; } /* Esconde texto nos botões pequenos se necessário */
+            .btn-lib span { display: none; }
         }
 
-        /* MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
         .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        
-        .sync-success { color: #10b981 !important; animation: pulse 1.2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -117,7 +112,7 @@
 
     <section class="editor-container">
         <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO - TOQUE AQUI</div>
+            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Ver</button>
@@ -160,13 +155,11 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
 
-    // Inicia a Folha
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
         await carregarRascunho();
         setTimeout(window.forcarRadar, 1000);
         
-        // Auto-save a cada 30 seg
         setInterval(async () => {
             const ed = document.getElementById('editor-principal');
             if (ed && ed.innerText.trim()) {
@@ -189,7 +182,7 @@
         const ed = document.getElementById('editor-principal');
         if(!confirm("Finalizar e salvar no Histórico Oficial?")) return;
         const ok = await engineSaveElite(db, window.activeEx, true, ed.innerText);
-        if(ok) alert("Peça Blindada no Histórico!");
+        if(ok) alert("Peça Blindada!");
     };
 
     window.toggleFoguete = () => {

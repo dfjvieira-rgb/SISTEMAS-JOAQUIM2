@@ -14,63 +14,81 @@
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+       
+        /* Layout Digital */
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
-
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
-
         .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
-
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; position: relative; }
 
+        /* Mobile & PDF */
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; flex: 1; border: none; }
-
         #mobile-hub { display: flex; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
         .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
         #mobile-hub.active .fab-sub { display: flex; }
 
-        /* INTERVENÇÃO CIRÚRGICA: MULTIPÁGINAS SEM REPETIÇÃO */
+        /* --- A SOLUÇÃO RADICAL DE IMPRESSÃO --- */
         @media print {
+            /* 1. Reset Total do Body */
             html, body {
-                overflow: visible !important;
                 height: auto !important;
-                position: static !important;
-                background: white !important;
+                overflow: visible !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                display: block !important;
             }
-            header, .sidebar, .sticky-tools, #mobile-hub, #pdf-viewer, .modal {
+
+            /* 2. Remove TUDO que não é a folha */
+            header, .sidebar, .sticky-tools, #mobile-hub, #pdf-viewer, .modal, .toolbar-liberdade {
                 display: none !important;
             }
+
+            /* 3. Força o container a "explodir" para fora do scroll */
             main, .editor-container {
                 display: block !important;
+                position: relative !important;
+                height: auto !important;
+                min-height: auto !important;
                 overflow: visible !important;
-                position: static !important;
-                background: white !important;
             }
+
+            /* 4. A Paper deve ser um bloco contínuo */
             .paper {
+                display: block !important;
+                position: relative !important;
+                width: 100% !important;
+                max-width: none !important;
+                height: auto !important;
+                min-height: auto !important;
                 box-shadow: none !important;
                 margin: 0 !important;
-                width: 100% !important;
-                position: static !important;
-                display: block !important;
-                min-height: auto !important;
+                padding: 0 !important;
             }
+
             #folha-total, #editor-principal {
+                display: block !important;
+                height: auto !important;
                 overflow: visible !important;
-                position: static !important;
+            }
+
+            /* 5. Impede que o navegador tente "enfiar" tudo em uma página */
+            .linha-fgv {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
                 display: block !important;
             }
-            .linha-fgv { page-break-inside: avoid !important; }
         }
 
         @media (max-width: 768px) {

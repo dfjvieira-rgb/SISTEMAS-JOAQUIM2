@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO MASTER BLINDADA [RESTORED TAB + MOBILE READY]
+// FolhaEngine.js - VERSÃO MASTER INTEGRADA [VADE + PERGAMINHO RESTAURADOS]
 export const FolhaEngine = {
     montar: (containerId) => {
         const container = document.getElementById(containerId);
@@ -32,7 +32,6 @@ export const FolhaEngine = {
                     font-weight: 900;
                     border-bottom: 1px solid #cbd5e1;
                     color: #1e293b;
-                    box-sizing: border-box;
                 }
                 .area-editor {
                     outline: none;
@@ -48,7 +47,6 @@ export const FolhaEngine = {
                     background-size: 100% 35px;
                     background-repeat: repeat-y;
                 }
-                /* Garante que novos parágrafos não tenham margens extras */
                 .area-editor div, .area-editor p { margin: 0; padding: 0; line-height: 35px; }
 
                 @media (max-width: 768px) {
@@ -81,7 +79,7 @@ export const FolhaEngine = {
         folha.appendChild(editor);
         container.appendChild(folha);
 
-        // --- LÓGICA DO TAB RESTAURADA ---
+        // TAB FUNCIONANDO
         editor.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
                 e.preventDefault();
@@ -96,50 +94,51 @@ export const FolhaEngine = {
                 sel.addRange(range);
             }
         });
+    },
 
-        // Limpa formatação ao colar
-        editor.addEventListener('paste', (e) => {
-            e.preventDefault();
-            const text = e.clipboardData.getData('text/plain');
-            document.execCommand('insertText', false, text);
-        });
+    // FUNÇÃO QUE O PERGAMINHO CHAMA
+    injetarEstrutura: (texto) => {
+        const editor = document.getElementById('editor-principal');
+        if (!editor) return;
+        // Limpa o editor para receber a nova estrutura ou adiciona no fim
+        editor.innerText = texto; 
+        editor.focus();
+    },
+
+    // FUNÇÃO PARA O VADE MECUM (MARTELO)
+    abrirVadeMecum: () => {
+        const modal = document.getElementById('modal-vade');
+        if (modal) {
+            modal.style.display = 'flex';
+        } else {
+            alert("Vade Mecum ainda não carregado no HTML.");
+        }
     },
 
     visualizarImpressao: () => {
         const editor = document.getElementById('editor-principal');
         if (!editor) return;
-        
-        const conteudo = editor.innerText;
-        const linhas = conteudo.split('\n');
-        const exameAtivo = localStorage.getItem('activeEx') || "---";
-
+        const linhas = editor.innerText.split('\n');
         const overlay = document.createElement('div');
         overlay.style = "position:fixed; inset:0; background:rgba(15,23,42,0.98); z-index:999999; overflow-y:auto; padding:20px; display:flex; flex-direction:column; align-items:center;";
         
         const papel = document.createElement('div');
         papel.style = "background:white; width:100%; max-width:850px; box-shadow:0 0 50px #000; padding-bottom:50px;";
 
-        let html = `
-            <div style="text-align:center; border:3px solid #000; padding:15px; margin:20px; font-family:Arial,sans-serif; font-weight:900;">
-                CADERNO DE RESPOSTAS - EXAME ${exameAtivo}
-            </div>
-        `;
-
+        let html = `<div style="text-align:center; border:3px solid #000; padding:15px; margin:20px; font-weight:900;">CADERNO DEFINITIVO</div>`;
         for(let i=1; i<=150; i++) {
             const txt = linhas[i-1] || "";
             html += `
                 <div style="display:flex; min-height:35px; border-bottom:1px solid #eee; align-items:stretch;">
-                    <span style="width:40px; min-width:40px; border-right:2px solid #000; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; background:#f8fafc;">${i}</span>
-                    <span style="flex:1; padding:0 15px; font-family:'Courier New', monospace; font-size:18px; font-weight:bold; line-height:35px; white-space:pre-wrap; word-break:break-word;">${txt}</span>
+                    <span style="width:40px; border-right:2px solid #000; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; background:#f8fafc;">${i}</span>
+                    <span style="flex:1; padding:0 15px; font-family:'Courier New', monospace; font-size:18px; font-weight:bold; line-height:35px; white-space:pre-wrap;">${txt}</span>
                 </div>`;
         }
-        
         papel.innerHTML = html;
         const btn = document.createElement('button');
-        btn.innerHTML = "<b>VOLTAR AO EDITOR</b>";
+        btn.innerText = "VOLTAR";
         btn.style = "margin-bottom:20px; padding:15px 40px; background:#fbbf24; border:none; border-radius:8px; cursor:pointer; font-weight:bold;";
         btn.onclick = () => overlay.remove();
-
         overlay.appendChild(btn);
         overlay.appendChild(papel);
         document.body.appendChild(overlay);

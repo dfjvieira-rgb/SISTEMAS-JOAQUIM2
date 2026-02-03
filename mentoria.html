@@ -32,7 +32,6 @@
         .post-it-content { flex: 1; }
         .post-it-actions { display: flex; flex-direction: column; gap: 8px; }
 
-        /* Estilo da Tag de Palavra-Chave */
         .kw-tag { background: black; color: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
 
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
@@ -44,9 +43,13 @@
 </head>
 <body>
 
-<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
+<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px; flex-wrap: wrap; gap: 10px;">
     <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
+    <div style="display:flex; gap:10px;">
+        <button class="btn" style="width:auto; margin:0; background:var(--gatilho); color:white;" onclick="window.injetarGatilhosElite()">INJETAR GATILHOS</button>
+        <button class="btn" style="width:auto; margin:0; background:var(--info); color:white;" onclick="window.injetarPrazosTrabalho()">INJETAR PRAZOS</button>
+        <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
+    </div>
 </header>
 
 <main class="dashboard">
@@ -59,7 +62,7 @@
         <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
         <input id="tese-t" placeholder="Nome da Tese">
         <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido..."></textarea>
-        <input id="tese-kw" style="border-color: var(--keyword)" placeholder="PALAVRAS-CHAVE (Separe por vírgula)">
+        <input id="tese-kw" style="border-color: var(--keyword)" placeholder="PALAVRAS-CHAVE (Scanner FGV)">
         <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR / ATUALIZAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
@@ -81,9 +84,9 @@
     </section>
 
     <section class="panel" style="border-top-color: var(--gatilho);">
-        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-star"></i> GATILHOS DE OURO (VADE)</h3>
-        <input id="gat-t" placeholder="Tema">
-        <textarea id="gat-c" placeholder="Artigos e Súmulas..."></textarea>
+        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-star"></i> GATILHOS DE OURO (VADE / PRAZOS)</h3>
+        <input id="gat-t" placeholder="Tema ou Prazo">
+        <textarea id="gat-c" placeholder="Artigos, Súmulas ou Dias úteis..."></textarea>
         <button class="btn" style="background:var(--gatilho); color:white" onclick="salvarRapido('gat')">SALVAR / ATUALIZAR</button>
         <div id="feed-gat" class="feed"></div>
     </section>
@@ -108,7 +111,7 @@
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
-        const kw = document.getElementById(type+'-kw'); // Apenas para teses por enquanto
+        const kw = document.getElementById(type+'-kw');
         
         if(t.value && c.value) {
             const data = { t: t.value, c: c.value, ts: serverTimestamp() };
@@ -131,11 +134,9 @@
         const tInput = document.getElementById(type+'-t');
         const cInput = document.getElementById(type+'-c');
         const kwInput = document.getElementById(type+'-kw');
-        
         tInput.value = titulo;
         cInput.value = conteudo;
         if(kwInput) kwInput.value = keywords;
-        
         editId[type] = id;
         tInput.classList.add('modo-edicao');
         cInput.classList.add('modo-edicao');
@@ -144,7 +145,28 @@
     };
 
     window.apagarRegistro = (path, id) => {
-        if(confirm("Deseja excluir?")) remove(ref(db, path + '/' + id));
+        if(confirm("Excluir permanentemente da base elite?")) remove(ref(db, path + '/' + id));
+    };
+
+    window.injetarGatilhosElite = () => {
+        const gats = [
+            { t: "ESTABILIDADE GESTANTE", c: "Art. 10, II, 'b', ADCT / Súmula 244 TST. Pedir reintegração ou indenização." },
+            { t: "EQUIPARAÇÃO SALARIAL", c: "Art. 461 CLT. Mesma função, mesma localidade, diferença < 2 anos na função." }
+        ];
+        gats.forEach(g => push(ref(db, 'v13_gat'), { ...g, ts: serverTimestamp() }));
+        alert("Gatilhos de Mérito injetados!");
+    };
+
+    window.injetarPrazosTrabalho = () => {
+        const prazos = [
+            { t: "PRAZO RECURSAL (REGRA)", c: "8 dias úteis (RO, RR, AP, AI). Art. 893 ao 897-A CLT." },
+            { t: "EMBARGOS DE DECLARAÇÃO", c: "5 dias úteis. Art. 897-A CLT. Interrompe o prazo para outros recursos." },
+            { t: "CONTESTAÇÃO", c: "Até a audiência. Art. 847 CLT." },
+            { t: "MANIFESTAÇÃO LAUDO", c: "15 dias. Art. 477, §1º CPC (Subsidiário)." },
+            { t: "PRAZO AÇÃO RESCISÓRIA", c: "2 anos do trânsito em julgado. Art. 975 CPC." }
+        ];
+        prazos.forEach(p => push(ref(db, 'v13_gat'), { ...p, ts: serverTimestamp() }));
+        alert("Prazos Processuais injetados na aba Gatilhos!");
     };
 
     onValue(ref(db), (snap) => {
@@ -172,14 +194,14 @@
                 const cSan = item.c.replace(/'/g, "\\'").replace(/\n/g, "\\n");
                 const kwSan = (item.kw || "").replace(/'/g, "\\'");
 
-                let keywordsHtml = item.kw ? `<div class="kw-tag"><i class="fas fa-key"></i> ${item.kw}</div>` : "";
+                let kwHtml = item.kw ? `<div class="kw-tag"><i class="fas fa-key"></i> ${item.kw}</div>` : "";
 
                 f.innerHTML += `
                     <div class="post-it" style="background:${configPost[type]}">
                         <div class="post-it-content">
                             <strong style="font-size:0.85rem">${item.t}</strong>
                             <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap;">${item.c}</p>
-                            ${keywordsHtml}
+                            ${kwHtml}
                         </div>
                         <div class="post-it-actions">
                             <button class="btn-action btn-edit" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}', '${kwSan}')"><i class="fas fa-pen"></i></button>

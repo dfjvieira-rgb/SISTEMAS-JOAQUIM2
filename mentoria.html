@@ -9,7 +9,7 @@
         :root { 
             --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
             --success: #22c55e; --danger: #ef4444; --info: #3b82f6; 
-            --gatilho: #10b981; --keyword: #f97316;
+            --gatilho: #10b981; --keyword: #f97316; --questoes: #6366f1;
         }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
         
@@ -26,13 +26,12 @@
         .feed::-webkit-scrollbar { width: 4px; }
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
-        
         .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.1); }
         .post-it-content { flex: 1; }
         .post-it-actions { display: flex; flex-direction: column; gap: 8px; }
 
         .kw-tag { background: black; color: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
+        .res-label { display: block; color: #312e81; font-size: 10px; font-weight: 900; margin-top: 8px; text-decoration: underline; }
 
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
         input:focus, textarea:focus { border-color: var(--gold); outline: none; }
@@ -46,47 +45,36 @@
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px; flex-wrap: wrap; gap: 10px;">
     <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
     <div style="display:flex; gap:10px;">
-        <button class="btn" style="width:auto; margin:0; background:var(--gatilho); color:white;" onclick="window.injetarGatilhosElite()">INJETAR GATILHOS</button>
-        <button class="btn" style="width:auto; margin:0; background:var(--info); color:white;" onclick="window.injetarPrazosTrabalho()">INJETAR PRAZOS</button>
+        <button class="btn" style="width:auto; margin:0; background:var(--questoes); color:white;" onclick="window.injetarQuestoesElite()">INJETAR QUESTÕES + RESOLUÇÕES</button>
         <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
     </div>
 </header>
 
 <main class="dashboard">
-    <section class="panel" style="grid-column: 1 / -1;">
-        <h3 style="color:var(--gold); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
-        <div id="feed-producao" class="feed">Conectando...</div>
+    <section class="panel" style="border-top-color: var(--questoes); grid-column: span 2;">
+        <h3 style="color:var(--questoes); font-size: 0.9rem;"><i class="fas fa-question-circle"></i> TREINO DE QUESTÕES (RESOLUÇÃO FGV)</h3>
+        <div style="display: flex; gap: 10px;">
+            <input id="q-t" placeholder="Pergunta / Enunciado">
+            <input id="q-kw" style="border-color: var(--keyword); width: 40%;" placeholder="Fundamento Jurídico (Art./Súmula)">
+        </div>
+        <textarea id="q-c" style="height: 100px;" placeholder="Resolução completa conforme o espelho..."></textarea>
+        <button class="btn" style="background:var(--questoes); color:white" onclick="salvarRapido('q')">SALVAR NO BANCO DE QUESTÕES</button>
+        <div id="feed-q" class="feed" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px;"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
         <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
         <input id="tese-t" placeholder="Nome da Tese">
         <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido..."></textarea>
-        <input id="tese-kw" style="border-color: var(--keyword)" placeholder="PALAVRAS-CHAVE (Scanner FGV)">
+        <input id="tese-kw" style="border-color: var(--keyword)" placeholder="PALAVRAS-CHAVE">
         <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR / ATUALIZAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 
-    <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6; font-size: 0.9rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Assunto">
-        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR / ATUALIZAR</button>
-        <div id="feed-nc" class="feed"></div>
-    </section>
-
-    <section class="panel" style="border-top-color: #a855f7;">
-        <h3 style="color:#a855f7; font-size: 0.9rem;"><i class="fas fa-search"></i> QUAL A PEÇA?</h3>
-        <input id="qp-t" placeholder="Momento Processual">
-        <textarea id="qp-c" placeholder="Por que é essa peça?"></textarea>
-        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR / ATUALIZAR</button>
-        <div id="feed-qp" class="feed"></div>
-    </section>
-
     <section class="panel" style="border-top-color: var(--gatilho);">
-        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-star"></i> GATILHOS DE OURO (VADE / PRAZOS)</h3>
+        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-star"></i> GATILHOS (VADE / PRAZOS)</h3>
         <input id="gat-t" placeholder="Tema ou Prazo">
-        <textarea id="gat-c" placeholder="Artigos, Súmulas ou Dias úteis..."></textarea>
+        <textarea id="gat-c" placeholder="Artigos e Súmulas..."></textarea>
         <button class="btn" style="background:var(--gatilho); color:white" onclick="salvarRapido('gat')">SALVAR / ATUALIZAR</button>
         <div id="feed-gat" class="feed"></div>
     </section>
@@ -106,102 +94,80 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let editId = { qp: null, nc: null, tese: null, gat: null };
+    let editId = { qp: null, nc: null, tese: null, gat: null, q: null };
 
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
         const kw = document.getElementById(type+'-kw');
-        
         if(t.value && c.value) {
             const data = { t: t.value, c: c.value, ts: serverTimestamp() };
             if(kw) data.kw = kw.value;
-
             if (editId[type]) {
                 set(ref(db, `v13_${type}/${editId[type]}`), data);
                 editId[type] = null;
-                t.classList.remove('modo-edicao');
-                c.classList.remove('modo-edicao');
+                t.classList.remove('modo-edicao'); c.classList.remove('modo-edicao');
             } else {
                 push(ref(db, 'v13_'+type), data);
             }
-            t.value = ""; c.value = "";
-            if(kw) kw.value = "";
+            t.value = ""; c.value = ""; if(kw) kw.value = "";
         }
     };
 
     window.prepararEdicao = (type, id, titulo, conteudo, keywords = "") => {
-        const tInput = document.getElementById(type+'-t');
-        const cInput = document.getElementById(type+'-c');
-        const kwInput = document.getElementById(type+'-kw');
-        tInput.value = titulo;
-        cInput.value = conteudo;
-        if(kwInput) kwInput.value = keywords;
+        document.getElementById(type+'-t').value = titulo;
+        document.getElementById(type+'-c').value = conteudo;
+        if(document.getElementById(type+'-kw')) document.getElementById(type+'-kw').value = keywords;
         editId[type] = id;
-        tInput.classList.add('modo-edicao');
-        cInput.classList.add('modo-edicao');
-        tInput.focus();
+        document.getElementById(type+'-t').classList.add('modo-edicao');
+        document.getElementById(type+'-c').classList.add('modo-edicao');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    window.apagarRegistro = (path, id) => {
-        if(confirm("Excluir permanentemente da base elite?")) remove(ref(db, path + '/' + id));
-    };
+    window.apagarRegistro = (path, id) => { if(confirm("Deseja excluir?")) remove(ref(db, path + '/' + id)); };
 
-    window.injetarGatilhosElite = () => {
-        const gats = [
-            { t: "ESTABILIDADE GESTANTE", c: "Art. 10, II, 'b', ADCT / Súmula 244 TST. Pedir reintegração ou indenização." },
-            { t: "EQUIPARAÇÃO SALARIAL", c: "Art. 461 CLT. Mesma função, mesma localidade, diferença < 2 anos na função." }
+    window.injetarQuestoesElite = () => {
+        const questoes = [
+            { 
+                t: "Caso de empregado que se recusa a usar EPI. Pode ser demitido por justa causa?", 
+                kw: "Art. 158, parágrafo único, 'a' da CLT", 
+                c: "Sim. A recusa injustificada do empregado ao uso dos equipamentos de proteção individual fornecidos pela empresa constitui ato faltoso, podendo ensejar a dispensa por justa causa, conforme o Art. 158, parágrafo único, alínea 'a', da CLT." 
+            },
+            { 
+                t: "O que ocorre se o preposto não souber os fatos na audiência?", 
+                kw: "Art. 843, §1º da CLT", 
+                c: "O desconhecimento dos fatos pelo preposto importa em confissão ficta quanto à matéria fática, pois é dever do preposto ter conhecimento dos fatos, embora não precise ter presenciado os mesmos, nos termos do Art. 843, §1º da CLT." 
+            },
+            { 
+                t: "Qual a responsabilidade do sócio retirante após a reforma?", 
+                kw: "Art. 10-A da CLT", 
+                c: "O sócio retirante responde subsidiariamente pelas obrigações trabalhistas da sociedade relativas ao período em que figurou como sócio, somente em ações ajuizadas até dois anos depois de averbada a modificação do contrato, conforme a ordem de preferência do Art. 10-A da CLT." 
+            }
         ];
-        gats.forEach(g => push(ref(db, 'v13_gat'), { ...g, ts: serverTimestamp() }));
-        alert("Gatilhos de Mérito injetados!");
-    };
-
-    window.injetarPrazosTrabalho = () => {
-        const prazos = [
-            { t: "PRAZO RECURSAL (REGRA)", c: "8 dias úteis (RO, RR, AP, AI). Art. 893 ao 897-A CLT." },
-            { t: "EMBARGOS DE DECLARAÇÃO", c: "5 dias úteis. Art. 897-A CLT. Interrompe o prazo para outros recursos." },
-            { t: "CONTESTAÇÃO", c: "Até a audiência. Art. 847 CLT." },
-            { t: "MANIFESTAÇÃO LAUDO", c: "15 dias. Art. 477, §1º CPC (Subsidiário)." },
-            { t: "PRAZO AÇÃO RESCISÓRIA", c: "2 anos do trânsito em julgado. Art. 975 CPC." }
-        ];
-        prazos.forEach(p => push(ref(db, 'v13_gat'), { ...p, ts: serverTimestamp() }));
-        alert("Prazos Processuais injetados na aba Gatilhos!");
+        questoes.forEach(q => push(ref(db, 'v13_q'), { ...q, ts: serverTimestamp() }));
+        alert("Questões e Resoluções estruturadas injetadas!");
     };
 
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
+        const configPost = { 'qp': '#a855f7', 'nc': '#f472b6', 'tese': '#3b82f6', 'gat': '#10b981', 'q': '#6366f1' };
         
-        // --- FEED PEÇAS ---
-        const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
-        const treinos = d.producao_v13 || {};
-        Object.keys(treinos).reverse().forEach(id => {
-            if(id.includes("RASCUNHO_ATUAL")) return;
-            fP.innerHTML += `<div class="card-h">
-                <span><strong style="color:var(--gold)">EXAME ${treinos[id].exame}</strong> - ${treinos[id].nome_peca || "PEÇA"}</span>
-                <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
-            </div>`;
-        });
-
-        // --- FEED POST-ITS ---
-        const configPost = { 'qp': '#a855f7', 'nc': '#f472b6', 'tese': '#3b82f6', 'gat': '#10b981' };
         Object.keys(configPost).forEach(type => {
-            const f = document.getElementById('feed-'+type); f.innerHTML = "";
+            const f = document.getElementById('feed-'+type); if(!f) return;
+            f.innerHTML = "";
             const items = d['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
                 const tSan = item.t.replace(/'/g, "\\'");
                 const cSan = item.c.replace(/'/g, "\\'").replace(/\n/g, "\\n");
                 const kwSan = (item.kw || "").replace(/'/g, "\\'");
-
-                let kwHtml = item.kw ? `<div class="kw-tag"><i class="fas fa-key"></i> ${item.kw}</div>` : "";
-
                 f.innerHTML += `
                     <div class="post-it" style="background:${configPost[type]}">
                         <div class="post-it-content">
-                            <strong style="font-size:0.85rem">${item.t}</strong>
+                            <strong style="font-size:0.8rem">${item.t}</strong>
+                            <span class="res-label">RESOLUÇÃO PADRÃO FGV:</span>
                             <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap;">${item.c}</p>
-                            ${kwHtml}
+                            ${item.kw ? `<div class="kw-tag">${item.kw}</div>` : ""}
                         </div>
                         <div class="post-it-actions">
                             <button class="btn-action btn-edit" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}', '${kwSan}')"><i class="fas fa-pen"></i></button>

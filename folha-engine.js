@@ -1,96 +1,86 @@
-// FolhaEngine.js - VERSÃO SELEÇÃO MÚLTIPLA + ENTER SHIFT
+// FolhaEngine.js - VERSÃO SELEÇÃO FLUIDA [2026-02-02]
 export const FolhaEngine = {
-    LIMITE_OAB: 60, 
-
     montar: (containerId) => {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = "";
         
-        if (!document.getElementById('style-folha-elite')) {
+        if (!document.getElementById('style-folha-fluida')) {
             const style = document.createElement('style');
-            style.id = 'style-folha-elite';
+            style.id = 'style-folha-fluida';
             style.innerHTML = `
-                .linha-wrapper { 
-                    background: #fff; 
-                    border-bottom: 1px solid #d1d5db; 
-                    display: flex; 
-                    height: 35px; 
+                .folha-container {
+                    display: grid;
+                    grid-template-columns: 45px 1fr;
+                    background: #fff;
+                    font-family: 'Courier New', monospace;
+                    line-height: 35px; /* Altura da linha */
                     position: relative;
                 }
-                /* Permite que a seleção do mouse "atravesse" as linhas */
-                .linha-folha::selection {
-                    background: #3b82f6;
-                    color: white;
+                .numeracao {
+                    background: #f8fafc;
+                    border-right: 2px solid #cbd5e1;
+                    text-align: center;
+                    color: #94a3b8;
+                    font-size: 0.8rem;
+                    user-select: none;
                 }
-                .linha-num { 
-                    width: 40px; display: flex; align-items: center; justify-content: center; 
-                    font-size: 0.7rem; color: #94a3b8; border-right: 1px solid #d1d5db; 
-                    background: #f8fafc; user-select: none; 
+                .area-editor {
+                    outline: none;
+                    padding-left: 15px;
+                    font-size: 19px;
+                    font-weight: 700;
+                    color: #000;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    background-image: linear-gradient(#d1d5db 1px, transparent 1px);
+                    background-size: 100% 35px; /* Alinha a régua com o texto */
                 }
-                .linha-folha { 
-                    flex: 1; border: none; outline: none; padding: 0 15px; 
-                    font-size: 19px !important; font-family: 'Courier New', monospace !important; 
-                    font-weight: 700 !important; color: #000 !important;
-                    background: transparent;
-                }
+                /* Cor da seleção do mouse */
+                .area-editor::selection { background: #bfdbfe; }
             `;
             document.head.appendChild(style);
         }
 
-        for(let i=1; i<=150; i++) {
-            const row = document.createElement('div');
-            row.className = 'linha-wrapper';
-            row.innerHTML = `<div class="linha-num">${i}</div>
-                <input class="linha-folha" id="L${i}" maxlength="95" spellcheck="false" autocomplete="off" data-index="${i}">`;
-            container.appendChild(row);
+        const folha = document.createElement('div');
+        folha.className = 'folha-container';
 
-            const input = row.querySelector('input');
+        // 1. Criar coluna de numeração (1 a 150)
+        let numsHtml = "";
+        for(let i=1; i<=150; i++) numsHtml += `<div>${i}</div>`;
+        
+        const numCol = document.createElement('div');
+        numCol.className = 'numeracao';
+        numCol.innerHTML = numsHtml;
 
-            input.addEventListener('keydown', (e) => {
-                const idx = parseInt(input.getAttribute('data-index'));
-                const proximo = document.getElementById(`L${idx + 1}`);
-                const anterior = document.getElementById(`L${idx - 1}`);
+        // 2. Criar área única de edição (Permite seleção múltipla)
+        const editor = document.createElement('div');
+        editor.className = 'area-editor';
+        editor.contentEditable = "true";
+        editor.spellcheck = false;
 
-                // --- ENTER SHIFT (ABRE ESPAÇO) ---
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const pos = input.selectionStart;
-                    const textoAtual = input.value;
-                    const fica = textoAtual.substring(0, pos).trim();
-                    const desce = textoAtual.substring(pos).trim();
+        folha.appendChild(numCol);
+        folha.appendChild(editor);
+        container.appendChild(folha);
 
-                    for (let j = 150; j > idx + 1; j--) {
-                        const linhaAlvo = document.getElementById(`L${j}`);
-                        const linhaAcima = document.getElementById(`L${j - 1}`);
-                        if (linhaAlvo && linhaAcima) {
-                            linhaAlvo.value = linhaAcima.value;
-                        }
-                    }
-                    if (proximo) {
-                        input.value = fica; 
-                        proximo.value = desce; 
-                        proximo.focus();
-                        proximo.setSelectionRange(0, 0);
-                    }
-                }
+        // --- LÓGICA DO TECLADO ---
+        editor.addEventListener('keydown', (e) => {
+            // TAB: Insere 4 espaços
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const doc = editor.ownerDocument.defaultView;
+                const sel = doc.getSelection();
+                const range = sel.getRangeAt(0);
+                const tabNode = document.createTextNode("    ");
+                range.insertNode(tabNode);
+                range.setStartAfter(tabNode);
+                range.setEndAfter(tabNode); 
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
 
-                // --- TAB (PARÁGRAFO) ---
-                if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const start = input.selectionStart;
-                    input.value = input.value.substring(0, start) + "    " + input.value.substring(input.selectionEnd);
-                    input.selectionStart = input.selectionEnd = start + 4;
-                }
-
-                // --- NAVEGAÇÃO ---
-                if (e.key === 'ArrowUp') { e.preventDefault(); if (anterior) anterior.focus(); }
-                if (e.key === 'ArrowDown') { e.preventDefault(); if (proximo) proximo.focus(); }
-            });
-        }
-    },
-
-    injetarTextoMultilinhas: (textoBruto, linhaInicial) => {
-        // ... (Mesma lógica de injeção anterior)
+            // ENTER: O navegador já lida com o Enter nativamente no contenteditable,
+            // mas aqui garantimos que ele siga o estilo da folha.
+        });
     }
 };

@@ -13,13 +13,12 @@
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
         
         .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
         
-        .btn-action { width: 34px; height: 34px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; transition: 0.2s; }
-        .btn-del { background: var(--danger); }
-        .btn-edit { background: var(--info); color: white; }
+        .btn-action { width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
+        .btn-del { background: var(--danger); color: white; }
+        .btn-edit { background: var(--info); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .btn-share { background: #334155; color: var(--gold); }
-        .btn-open { background: var(--success); flex: 1; font-weight: 900; text-transform: uppercase; font-size: 11px; }
+        .btn-open { background: var(--success); flex: 1; font-weight: 900; text-transform: uppercase; font-size: 11px; color: white; }
 
         .feed { max-height: 400px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
         .feed::-webkit-scrollbar { width: 4px; }
@@ -27,11 +26,14 @@
 
         .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border: 1px solid rgba(0,0,0,0.1); }
-        .post-it-content { flex: 1; pointer-events: none; }
-        .post-it-actions { display: flex; flex-direction: column; gap: 5px; }
+        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.1); }
+        .post-it-content { flex: 1; }
+        .post-it-actions { display: flex; flex-direction: column; gap: 8px; }
 
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; background: #1e293b; }
+
+        .modo-edicao { border-color: var(--gold) !important; background: #2d3748 !important; }
 
         @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
@@ -88,7 +90,6 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Variável para controlar se estamos editando um item específico
     let editId = { qp: null, nc: null, tese: null };
 
     window.salvarRapido = (type) => {
@@ -96,11 +97,11 @@
         const c = document.getElementById(type+'-c');
         if(t.value && c.value) {
             if (editId[type]) {
-                // Atualiza item existente
                 set(ref(db, `v13_${type}/${editId[type]}`), { t: t.value, c: c.value, ts: serverTimestamp() });
                 editId[type] = null;
+                t.classList.remove('modo-edicao');
+                c.classList.remove('modo-edicao');
             } else {
-                // Cria novo item
                 push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
             }
             t.value = ""; c.value = "";
@@ -108,31 +109,19 @@
     };
 
     window.prepararEdicao = (type, id, titulo, conteudo) => {
-        document.getElementById(type+'-t').value = titulo;
-        document.getElementById(type+'-c').value = conteudo;
+        const tInput = document.getElementById(type+'-t');
+        const cInput = document.getElementById(type+'-c');
+        tInput.value = titulo;
+        cInput.value = conteudo;
         editId[type] = id;
-        document.getElementById(type+'-t').focus();
+        tInput.classList.add('modo-edicao');
+        cInput.classList.add('modo-edicao');
+        tInput.focus();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     window.apagarRegistro = (path, id) => {
         if(confirm("Excluir permanentemente?")) remove(ref(db, path + '/' + id));
-    };
-
-    window.compartilharRegistro = async (id) => {
-        const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return;
-        const p = s.val();
-        const baseLinhas = p.linhas || p.conteudo || [];
-        const texto = Array.isArray(baseLinhas) ? baseLinhas.join('\n') : baseLinhas;
-        const msg = `📝 *ELITE OAB*\n🏆 *Exame:* ${p.exame}\n⚖️ *Peça:* ${p.nome_peca || p.peca}\n\n${texto}`;
-        
-        if (navigator.share) {
-            navigator.share({ title: 'Minha Peça Elite', text: msg });
-        } else {
-            navigator.clipboard.writeText(msg);
-            alert("Texto copiado!");
-        }
     };
 
     onValue(ref(db), (snap) => {
@@ -142,53 +131,42 @@
         const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
         const treinos = d.producao_v13 || {};
         Object.keys(treinos).reverse().forEach(id => {
+            if(id.includes("RASCUNHO_ATUAL")) return;
             const t = treinos[id];
-            if(id.includes("RASCUNHO_ATUAL")) return; 
             fP.innerHTML += `
                 <div class="card-h">
-                    <span style="font-size:13px;"><strong style="color:var(--gold)">EXAME ${t.exame}</strong> ${t.nome_peca || "PEÇA"}</span>
+                    <span><strong style="color:var(--gold)">EXAME ${t.exame}</strong> ${t.nome_peca || "PEÇA"}</span>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn-action btn-share" onclick="compartilharRegistro('${id}')"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn-action btn-open" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action btn-open" onclick="window.open Treino..."><i class="fas fa-eye"></i></button>
                         <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
         });
 
-        // --- FEED POST-ITS (NC, TESE, QP) ---
-        const configPost = { 'nc': '#f472b6', 'tese': '#3b82f6', 'qp': '#a855f7' };
+        // --- FEED POST-ITS (QP, NC, TESE) ---
+        const configPost = { 'qp': '#a855f7', 'nc': '#f472b6', 'tese': '#3b82f6' };
         Object.keys(configPost).forEach(type => {
             const f = document.getElementById('feed-'+type); f.innerHTML = "";
             const items = d['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
+                const tSan = item.t.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const cSan = item.c.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n");
+
                 f.innerHTML += `
                     <div class="post-it" style="background:${configPost[type]}">
                         <div class="post-it-content">
                             <strong style="font-size:0.85rem">${item.t}</strong>
-                            <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap; opacity:0.9;">${item.c}</p>
+                            <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap;">${item.c}</p>
                         </div>
                         <div class="post-it-actions">
-                            <button class="btn-action" style="background:rgba(255,255,255,0.3); color:black;" onclick="prepararEdicao('${type}', '${id}', '${item.t.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}')"><i class="fas fa-pen"></i></button>
-                            <button class="btn-action" style="background:rgba(0,0,0,0.2); color:white;" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
+                            <button class="btn-action btn-edit" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn-action btn-del" style="background:rgba(0,0,0,0.3)" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;
             });
         });
     });
-
-    window.verTreino = (id) => {
-        get(ref(db, 'producao_v13/' + id)).then((s) => {
-            if(!s.exists()) return;
-            const p = s.val();
-            const win = window.open('', '_blank');
-            const baseLinhas = p.linhas || p.conteudo || [];
-            const linhasHtml = Array.isArray(baseLinhas) 
-                ? baseLinhas.map((l, i) => `<div style="display:flex; border-bottom:1px solid #eee; padding:4px 0;"><span style="width:30px; color:#999; font-size:12px;">${i+1}</span><span>${l || ""}</span></div>`).join('')
-                : `<div style="white-space:pre-wrap;">${baseLinhas}</div>`;
-            win.document.write(`<html><body style="padding:20px; font-family:sans-serif;"><h2>${p.nome_peca}</h2>${linhasHtml}</body></html>`);
-        });
-    };
 </script>
 </body>
 </html>

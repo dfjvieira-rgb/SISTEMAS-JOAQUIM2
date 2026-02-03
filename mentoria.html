@@ -6,10 +6,13 @@
     <title>HISTÓRICO MENTORIA | ELITE 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; --gatilho: #10b981; }
+        :root { 
+            --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
+            --success: #22c55e; --danger: #ef4444; --info: #3b82f6; 
+            --gatilho: #10b981; --keyword: #f97316;
+        }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
         
-        /* Layout adaptativo para as 4 inteligências */
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1400px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
         
@@ -17,23 +20,23 @@
         
         .btn-action { width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
         .btn-del { background: var(--danger); color: white; }
-        .btn-edit { background: var(--info); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-share { background: #334155; color: var(--gold); }
-        .btn-open { background: var(--success); flex: 1; font-weight: 900; text-transform: uppercase; font-size: 11px; color: white; }
+        .btn-edit { background: var(--info); color: white; }
 
         .feed { max-height: 400px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
         .feed::-webkit-scrollbar { width: 4px; }
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
         
         .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.1); }
         .post-it-content { flex: 1; }
         .post-it-actions { display: flex; flex-direction: column; gap: 8px; }
 
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; transition: 0.3s; }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; background: #1e293b; }
+        /* Estilo da Tag de Palavra-Chave */
+        .kw-tag { background: black; color: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
 
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
         .modo-edicao { border-color: var(--gold) !important; background: #2d3748 !important; }
 
         @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } }
@@ -43,46 +46,44 @@
 
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
     <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <div style="display:flex; gap:10px;">
-        <button class="btn" style="width:auto; margin:0; background:var(--gatilho); color:white;" onclick="injetarGatilhosTrabalho()">INJETAR GATILHOS (LABORAL)</button>
-        <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
-    </div>
+    <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="grid-column: 1 / -1;">
-        <h3 style="color:var(--gold); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO (PDFs & PEÇAS)</h3>
-        <div id="feed-producao" class="feed">Conectando ao Firebase...</div>
-    </section>
-
-    <section class="panel" style="border-top-color: #a855f7;">
-        <h3 style="color:#a855f7; font-size: 0.9rem;"><i class="fas fa-search"></i> QUAL A PEÇA?</h3>
-        <input id="qp-t" placeholder="Momento Processual / Gatilho">
-        <textarea id="qp-c" placeholder="Explicação da escolha da peça..."></textarea>
-        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR / ATUALIZAR</button>
-        <div id="feed-qp" class="feed"></div>
-    </section>
-
-    <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6; font-size: 0.9rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Assunto (Ex: RO vs RR)">
-        <textarea id="nc-c" placeholder="Diferença crucial que a FGV cobra..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR / ATUALIZAR</button>
-        <div id="feed-nc" class="feed"></div>
+        <h3 style="color:var(--gold); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
+        <div id="feed-producao" class="feed">Conectando...</div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
         <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
         <input id="tese-t" placeholder="Nome da Tese">
         <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido..."></textarea>
+        <input id="tese-kw" style="border-color: var(--keyword)" placeholder="PALAVRAS-CHAVE (Separe por vírgula)">
         <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR / ATUALIZAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 
+    <section class="panel" style="border-top-color: #f472b6;">
+        <h3 style="color:#f472b6; font-size: 0.9rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Assunto">
+        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR / ATUALIZAR</button>
+        <div id="feed-nc" class="feed"></div>
+    </section>
+
+    <section class="panel" style="border-top-color: #a855f7;">
+        <h3 style="color:#a855f7; font-size: 0.9rem;"><i class="fas fa-search"></i> QUAL A PEÇA?</h3>
+        <input id="qp-t" placeholder="Momento Processual">
+        <textarea id="qp-c" placeholder="Por que é essa peça?"></textarea>
+        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR / ATUALIZAR</button>
+        <div id="feed-qp" class="feed"></div>
+    </section>
+
     <section class="panel" style="border-top-color: var(--gatilho);">
         <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-star"></i> GATILHOS DE OURO (VADE)</h3>
-        <input id="gat-t" placeholder="Tema (Ex: Estabilidade Gestante)">
-        <textarea id="gat-c" placeholder="Artigos e Súmulas obrigatórios..."></textarea>
+        <input id="gat-t" placeholder="Tema">
+        <textarea id="gat-c" placeholder="Artigos e Súmulas..."></textarea>
         <button class="btn" style="background:var(--gatilho); color:white" onclick="salvarRapido('gat')">SALVAR / ATUALIZAR</button>
         <div id="feed-gat" class="feed"></div>
     </section>
@@ -107,24 +108,34 @@
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
+        const kw = document.getElementById(type+'-kw'); // Apenas para teses por enquanto
+        
         if(t.value && c.value) {
+            const data = { t: t.value, c: c.value, ts: serverTimestamp() };
+            if(kw) data.kw = kw.value;
+
             if (editId[type]) {
-                set(ref(db, `v13_${type}/${editId[type]}`), { t: t.value, c: c.value, ts: serverTimestamp() });
+                set(ref(db, `v13_${type}/${editId[type]}`), data);
                 editId[type] = null;
                 t.classList.remove('modo-edicao');
                 c.classList.remove('modo-edicao');
             } else {
-                push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
+                push(ref(db, 'v13_'+type), data);
             }
             t.value = ""; c.value = "";
+            if(kw) kw.value = "";
         }
     };
 
-    window.prepararEdicao = (type, id, titulo, conteudo) => {
+    window.prepararEdicao = (type, id, titulo, conteudo, keywords = "") => {
         const tInput = document.getElementById(type+'-t');
         const cInput = document.getElementById(type+'-c');
+        const kwInput = document.getElementById(type+'-kw');
+        
         tInput.value = titulo;
         cInput.value = conteudo;
+        if(kwInput) kwInput.value = keywords;
+        
         editId[type] = id;
         tInput.classList.add('modo-edicao');
         cInput.classList.add('modo-edicao');
@@ -133,75 +144,51 @@
     };
 
     window.apagarRegistro = (path, id) => {
-        if(confirm("Deseja excluir este conhecimento da sua base?")) remove(ref(db, path + '/' + id));
-    };
-
-    window.injetarGatilhosTrabalho = () => {
-        const gatilhos = [
-            { t: "ESTABILIDADE GESTANTE", c: "Art. 10, II, 'b', ADCT e Súmula 244 do TST. (Obs: Mesmo em contrato determinado)." },
-            { t: "HONORÁRIOS SUCUMBENCIAIS", c: "Art. 791-A da CLT. (Fixados entre 5% e 15%)." },
-            { t: "EQUIPARAÇÃO SALARIAL", c: "Art. 461 da CLT e Súmula 6 do TST. (Cuidado com a Reforma: mesma empresa/estabelecimento)." },
-            { t: "HORAS EXTRAS (ÔNUS)", c: "Art. 74, §2º da CLT e Súmula 338 do TST (Cartão de ponto é prova do patrão)." }
-        ];
-        gatilhos.forEach(g => push(ref(db, 'v13_gat'), { t: g.t, c: g.c, ts: serverTimestamp() }));
-        alert("Gatilhos de Ouro injetados com sucesso!");
+        if(confirm("Deseja excluir?")) remove(ref(db, path + '/' + id));
     };
 
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
         
-        // --- FEED PEÇAS (HISTÓRICO) ---
+        // --- FEED PEÇAS ---
         const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
         const treinos = d.producao_v13 || {};
         Object.keys(treinos).reverse().forEach(id => {
             if(id.includes("RASCUNHO_ATUAL")) return;
-            const t = treinos[id];
-            fP.innerHTML += `
-                <div class="card-h">
-                    <span><strong style="color:var(--gold)">EXAME ${t.exame}</strong> - ${t.nome_peca || "PEÇA FINALIZADA"}</span>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn-action btn-open" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
+            fP.innerHTML += `<div class="card-h">
+                <span><strong style="color:var(--gold)">EXAME ${treinos[id].exame}</strong> - ${treinos[id].nome_peca || "PEÇA"}</span>
+                <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
+            </div>`;
         });
 
-        // --- FEED POST-ITS (QP, NC, TESE, GAT) ---
+        // --- FEED POST-ITS ---
         const configPost = { 'qp': '#a855f7', 'nc': '#f472b6', 'tese': '#3b82f6', 'gat': '#10b981' };
         Object.keys(configPost).forEach(type => {
             const f = document.getElementById('feed-'+type); f.innerHTML = "";
             const items = d['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
-                const tSan = item.t.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                const cSan = item.c.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, "\\n");
+                const tSan = item.t.replace(/'/g, "\\'");
+                const cSan = item.c.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+                const kwSan = (item.kw || "").replace(/'/g, "\\'");
+
+                let keywordsHtml = item.kw ? `<div class="kw-tag"><i class="fas fa-key"></i> ${item.kw}</div>` : "";
 
                 f.innerHTML += `
                     <div class="post-it" style="background:${configPost[type]}">
                         <div class="post-it-content">
                             <strong style="font-size:0.85rem">${item.t}</strong>
                             <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap;">${item.c}</p>
+                            ${keywordsHtml}
                         </div>
                         <div class="post-it-actions">
-                            <button class="btn-action btn-edit" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn-action btn-edit" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}', '${kwSan}')"><i class="fas fa-pen"></i></button>
                             <button class="btn-action btn-del" style="background:rgba(0,0,0,0.3)" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;
             });
         });
     });
-
-    window.verTreino = (id) => {
-        get(ref(db, 'producao_v13/' + id)).then((s) => {
-            if(!s.exists()) return;
-            const p = s.val();
-            const win = window.open('', '_blank');
-            const texto = Array.isArray(p.linhas || p.conteudo) 
-                ? (p.linhas || p.conteudo).map((l, i) => `<div style="border-bottom:1px solid #eee; padding:2px;"><b>${i+1}</b> ${l}</div>`).join('') 
-                : `<div>${p.linhas || p.conteudo}</div>`;
-            win.document.write(`<html><body style="font-family:sans-serif; padding:20px;"><h2>EXAME ${p.exame} - ${p.nome_peca}</h2>${texto}</body></html>`);
-        });
-    };
 </script>
 </body>
 </html>

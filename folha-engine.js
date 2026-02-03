@@ -1,11 +1,11 @@
-// FolhaEngine.js - VERSÃO BLINDADA [2026-02-02]
+// FolhaEngine.js - VERSÃO FIXADA (SCROLL + 150 LINHAS) [2026-02-02]
 export const FolhaEngine = {
     montar: (containerId) => {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = "";
         
-        const styleId = 'style-folha-fluida';
+        const styleId = 'style-folha-fluida-v2';
         if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
             style.id = styleId;
@@ -18,7 +18,8 @@ export const FolhaEngine = {
                     line-height: 35px;
                     position: relative;
                     border: 1px solid #d1d5db;
-                    min-height: 800px;
+                    /* Força a altura de 150 linhas (150 * 35px) */
+                    min-height: 5250px; 
                 }
                 .numeracao {
                     background: #f1f5f9;
@@ -28,6 +29,8 @@ export const FolhaEngine = {
                     font-size: 0.8rem;
                     user-select: none;
                     font-weight: bold;
+                    /* Impede a numeração de encolher */
+                    min-height: 1000%; 
                 }
                 .area-editor {
                     outline: none;
@@ -37,10 +40,12 @@ export const FolhaEngine = {
                     color: #000 !important;
                     white-space: pre-wrap;
                     word-wrap: break-word;
-                    min-height: 1000px;
+                    /* Faz o editor ocupar todo o espaço da folha */
+                    min-height: 5250px; 
                     background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
                     background-size: 100% 35px;
                     background-attachment: local;
+                    cursor: text;
                 }
                 .area-editor::selection { background: #bfdbfe; color: #1e3a8a; }
             `;
@@ -53,7 +58,7 @@ export const FolhaEngine = {
         const numCol = document.createElement('div');
         numCol.className = 'numeracao';
         let nums = "";
-        for(let i=1; i<=150; i++) nums += `<div style="height:35px">${i}</div>`;
+        for(let i=1; i<=150; i++) nums += `<div style="height:35px; display:flex; align-items:center; justify-content:center;">${i}</div>`;
         numCol.innerHTML = nums;
 
         const editor = document.createElement('div');
@@ -66,6 +71,7 @@ export const FolhaEngine = {
         folha.appendChild(editor);
         container.appendChild(folha);
 
+        // Garante que o Tab funcione
         editor.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
                 e.preventDefault();

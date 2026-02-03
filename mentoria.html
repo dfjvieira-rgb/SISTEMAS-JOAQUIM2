@@ -3,100 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SISTEMA ELITE | FOCO NA LEITURA</title>
+    <title>MENTORIA ELITE | SISTEMA TOTAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
-            --questoes: #6366f1; --danger: #ef4444;
+            --questoes: #6366f1; --danger: #ef4444; --success: #22c55e; --info: #3b82f6;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding: 0; overflow-x: hidden; }
         
-        header { 
-            background: var(--primary); padding: 15px; border-bottom: 2px solid var(--gold); 
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 1000;
-        }
+        header { background: var(--primary); padding: 15px; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+
+        /* NAVEGAÇÃO SUPERIOR */
+        .tab-bar { display: flex; overflow-x: auto; background: #0f172a; border-bottom: 1px solid #334155; position: sticky; top: 58px; z-index: 999; }
+        .tab-btn { padding: 15px 20px; border: none; background: none; color: #94a3b8; font-weight: bold; cursor: pointer; white-space: nowrap; font-size: 0.75rem; text-transform: uppercase; }
+        .tab-btn.active { color: var(--gold); border-bottom: 3px solid var(--gold); }
 
         .dashboard { padding: 15px; max-width: 1400px; margin: 0 auto; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+
+        /* CARDS DE EXAMES E HISTÓRICO */
+        .card-exame { background: #1e293b; border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 5px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .badge-nota { background: var(--success); color: black; padding: 5px 10px; border-radius: 5px; font-weight: 900; }
+
+        /* POST-IT QUESTÕES (FONTE GRANDE) */
+        .post-it-q { background: #ffffff; padding: 20px; border-radius: 12px; color: #0f172a; margin-bottom: 15px; border-left: 8px solid var(--questoes); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .res-text { font-size: 1.15rem; line-height: 1.6; color: #334155; margin: 10px 0; font-weight: 500; }
         
-        .btn-master { 
-            background: var(--gold); border: none; padding: 18px; border-radius: 8px; 
-            cursor: pointer; font-weight: 900; width: 100%; color: black; 
-            font-size: 1rem; text-transform: uppercase; margin-bottom: 20px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
-
-        .feed-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-            gap: 20px; 
-        }
-
-        /* CARD AJUSTADO PARA LEITURA */
-        .post-it { 
-            background: #ffffff; padding: 20px; border-radius: 12px; 
-            color: #0f172a; font-weight: 500; position: relative; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-left: 8px solid var(--questoes);
-        }
-
-        .post-it strong { 
-            display: block; font-size: 1.1rem; color: #1e1b4b; margin-bottom: 12px; line-height: 1.3;
-        }
-
-        .res-label { 
-            display: block; color: var(--questoes); font-size: 0.8rem; font-weight: 900; 
-            margin-top: 15px; text-transform: uppercase; letter-spacing: 1px;
-        }
-
-        /* TEXTO DA RESPOSTA - AGORA MAIOR */
-        .res-text { 
-            font-size: 1.1rem; /* Tamanho aumentado para mobile */
-            margin: 10px 0; 
-            line-height: 1.6; 
-            color: #334155;
-            font-weight: 400;
-        }
-
-        .kw-tag { 
-            background: var(--primary); color: var(--gold); padding: 6px 12px; 
-            border-radius: 6px; font-size: 0.9rem; font-weight: 700; margin-top: 10px; 
-            display: inline-block; border: 1px solid var(--gold);
-        }
-
-        /* HUB MOBILE */
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 9999; flex-direction: column-reverse; gap: 12px; }
+        /* BOTÃO FLUTUANTE */
+        #mobile-hub { position: fixed; bottom: 30px; right: 20px; z-index: 9999; display: flex; flex-direction: column-reverse; gap: 12px; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.6rem; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-weight: 900; }
-
-        @media (max-width: 768px) {
-            #mobile-hub { display: flex; }
-            .res-text { font-size: 1.05rem; } /* Ajuste fino para telas pequenas */
-        }
-
+        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         #mobile-hub.active .fab-sub { display: flex; animation: slideUp 0.3s forwards; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <header>
-    <h2 style="margin:0; font-size: 1.1rem;">BANCO <span style="color:var(--gold)">MASTER 50</span></h2>
-    <button onclick="window.close()" style="background:white; border:none; padding:8px 15px; border-radius:5px; font-weight:bold;">SAIR</button>
+    <h2 style="margin:0; font-size: 0.9rem;">SISTEMA <span style="color:var(--gold)">MENTORIA ELITE</span></h2>
+    <button class="fab-sub" style="display:flex; background:var(--success); width:auto; padding:0 15px; border-radius:8px; height:35px;" onclick="window.abrirEstruturas()">
+        <i class="fas fa-scroll"></i>
+    </button>
 </header>
 
-<div class="dashboard">
-    <button class="btn-master" onclick="window.limparEInjetar()">
-        <i class="fas fa-trash-restore"></i> LIMPAR E REINJETAR (FONTE GRANDE)
-    </button>
+<nav class="tab-bar">
+    <button class="tab-btn active" onclick="openTab(event, 'treino')">Treino/Peça</button>
+    <button class="tab-btn" onclick="openTab(event, 'arsenal')">Arsenal 50</button>
+    <button class="tab-btn" onclick="openTab(event, 'historico-exames')">Histórico Exames</button>
+    <button class="tab-btn" onclick="openTab(event, 'inteligencia')">Não Confunda</button>
+</nav>
 
-    <div class="feed-grid" id="feed-q"></div>
+<div class="dashboard">
+    <div id="treino" class="tab-content active">
+        <div style="background:var(--card); padding:15px; border-radius:10px;">
+            <select id="selecionar-exame" style="width:100%; padding:10px; margin-bottom:10px; border-radius:5px; background:black; color:white; border:1px solid var(--gold);">
+                <option value="">Selecione o Exame (Simulado)</option>
+                <option value="Exame 44 - FGV">Exame 44 - FGV</option>
+                <option value="Exame 43 - FGV">Exame 43 - FGV</option>
+                <option value="Simulado Autoral 01">Simulado Autoral 01</option>
+            </select>
+            <textarea id="editor-peca" rows="12" placeholder="Redija sua peça oficial aqui..." style="width:100%; background:#0f172a; color:white; border:1px solid #334155; padding:15px; border-radius:8px; font-size:1.1rem;"></textarea>
+            <button onclick="window.finalizarPeca()" style="width:100%; background:var(--gold); color:black; font-weight:900; padding:18px; border:none; border-radius:8px; margin-top:10px; text-transform:uppercase;">
+                <i class="fas fa-file-pdf"></i> Finalizar e Salvar no Histórico
+            </button>
+        </div>
+    </div>
+
+    <div id="arsenal" class="tab-content">
+        <div id="feed-q"></div>
+    </div>
+
+    <div id="historico-exames" class="tab-content">
+        <h3 style="color:var(--gold)"><i class="fas fa-history"></i> MEUS EXAMES REALIZADOS</h3>
+        <div id="feed-historico-pecas">
+            </div>
+    </div>
+
+    <div id="inteligencia" class="tab-content">
+        <div id="feed-nc"></div>
+    </div>
 </div>
 
 <div id="mobile-hub">
     <button class="fab-main" onclick="window.toggleHub()"><i class="fas fa-rocket" id="hub-icon"></i></button>
     <button class="fab-sub" style="background:var(--danger);" onclick="window.limparEInjetar()"><i class="fas fa-sync-alt"></i></button>
-    <button class="fab-sub" style="background:#3b82f6;" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
+    <button class="fab-sub" style="background:var(--success);" onclick="window.abrirEstruturas()"><i class="fas fa-scroll"></i></button>
+    <button class="fab-sub" style="background:var(--info);" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
 </div>
 
 <script type="module">
@@ -113,88 +110,72 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
+    window.openTab = (evt, tabName) => {
+        let i, content, btns;
+        content = document.getElementsByClassName("tab-content");
+        for (i = 0; i < content.length; i++) content[i].style.display = "none";
+        btns = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < btns.length; i++) btns[i].className = btns[i].className.replace(" active", "");
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
     window.toggleHub = () => {
         const hub = document.getElementById('mobile-hub');
         hub.classList.toggle('active');
         document.getElementById('hub-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
 
-    window.limparEInjetar = async () => {
-        if(confirm("Confirmar limpeza e reinjeção das 50 questões com fonte ampliada?")) {
-            await set(ref(db, 'v13_q'), null);
-            const q50 = [
-                { t: "1. Embargos de Terceiro: Prazo?", kw: "Art. 675 CPC", c: "Execução: 5 dias após arrematação/adjudicação, mas antes da assinatura da carta." },
-                { t: "2. Revista x Agravo Instrumento?", kw: "Súmula 218 TST", c: "Não cabe recurso de revista contra acórdão de agravo de instrumento." },
-                { t: "3. Justiça Gratuita PJ?", kw: "Súmula 463 TST", c: "Pessoa jurídica exige prova cabal da insuficiência econômica." },
-                { t: "4. Agravo de Petição: Garantia?", kw: "Art. 897 CLT", c: "Exige garantia do juízo e delimitação clara de matérias e valores." },
-                { t: "5. Citação Edital Sumaríssimo?", kw: "Art. 852-B CLT", c: "Inexistente no rito. Se não achar o réu, o processo é arquivado." },
-                { t: "6. Gestante em Experiência?", kw: "Súmula 244 TST", c: "Possui estabilidade provisória. O contrato determinado não afasta o direito." },
-                { t: "7. Gorjetas e Horas Extras?", kw: "Súmula 354 TST", c: "Gorjetas não baseiam HE, Adicional Noturno e RSR. Integram remuneração." },
-                { t: "8. Equiparação Mesma Unidade?", kw: "Art. 461 CLT", c: "Sim. Exige trabalho no mesmo estabelecimento empresarial após a Reforma." },
-                { t: "9. Multa 467 na Recuperação?", kw: "Art. 467 CLT", c: "Devida. Isenção de multas 467 e 477 é exclusividade da Massa Falida." },
-                { t: "10. Sócio Retirante: Prazo?", kw: "Art. 10-A CLT", c: "Responsável subsidiário em ações ajuizadas até 2 anos após a averbação da saída." },
-                { t: "11. Preposto precisa ser Empregado?", kw: "Art. 843 CLT", c: "Não. Com a Reforma, o preposto não precisa mais manter vínculo empregatício." },
-                { t: "12. Férias na Justa Causa?", kw: "Súmula 171 TST", c: "O empregado perde o direito às férias proporcionais em caso de falta grave." },
-                { t: "13. Horas in itinere?", kw: "Art. 58 CLT", c: "O tempo de trajeto não é mais considerado tempo à disposição do empregador." },
-                { t: "14. Teletrabalho e Jornada?", kw: "Art. 62 CLT", c: "Trabalhadores em regime de teletrabalho por produção são excluídos da jornada." },
-                { t: "15. Dirigente Sindical / Empresa Fechada?", kw: "Súmula 369 TST", c: "A estabilidade encerra-se com o fechamento da atividade na base territorial." },
-                { t: "16. Dano Moral aos Herdeiros?", kw: "Súmula 642 STJ", c: "O espólio ou herdeiros têm legitimidade para pleitear danos morais do falecido." },
-                { t: "17. Revista no Sumaríssimo?", kw: "Art. 896 CLT", c: "Só por violação da CF ou contrariedade a Súmula TST/Vinculante." },
-                { t: "18. Depósito Entidade Filantrópica?", kw: "Art. 899 CLT", c: "Entidades filantrópicas são isentas de depósito recursal para recorrer." },
-                { t: "19. Gratificação após 10 anos?", kw: "Art. 468 CLT", c: "A gratificação de função pode ser suprimida a qualquer tempo sem incorporação." },
-                { t: "20. Honorários de Sucumbência?", kw: "Art. 791-A CLT", c: "Fixados entre 5% e 15% sobre o valor da liquidação." },
-                { t: "21. IDPJ no Processo do Trabalho?", kw: "Art. 855-A CLT", c: "Aplica-se o Incidente de Desconsideração seguindo o rito do CPC." },
-                { t: "22. Prescrição Intercorrente?", kw: "Art. 11-A CLT", c: "Prazo de 2 anos na execução, contados da inércia do exequente." },
-                { t: "23. Acordo Extrajudicial?", kw: "Art. 855-B CLT", c: "Petição conjunta. Advogados distintos para patrão e empregado." },
-                { t: "24. Trabalho Intermitente / Recusa?", kw: "Art. 452-A CLT", c: "A recusa em prestar o serviço não gera penalidade disciplinar." },
-                { t: "25. Rescisão por Comum Acordo?", kw: "Art. 484-A CLT", c: "Aviso prévio e multa do FGTS (20%) pagos pela metade." },
-                { t: "26. Honorários Periciais / Sucumbência?", kw: "Art. 790-B CLT", c: "Parte sucumbente paga, salvo se beneficiário da Justiça Gratuita." },
-                { t: "27. Arbitragem no Trabalho?", kw: "Art. 507-A CLT", c: "Só para empregado que ganha + de 2x o teto do INSS e aceite a cláusula." },
-                { t: "28. Termo de Quitação Anual?", kw: "Art. 507-B CLT", c: "Firmado perante o sindicato, dá quitação plena das parcelas ali descritas." },
-                { t: "29. Ultratividade das Normas?", kw: "STF", c: "O STF proibiu a ultratividade; normas valem só dentro da vigência do acordo." },
-                { t: "30. Intervalo Intrajornada Suprimido?", kw: "Art. 71 CLT", c: "Pagamento apenas do tempo suprimido com 50% e natureza indenizatória." },
-                { t: "31. Protesto e Prescrição?", kw: "OJ 392 TST", c: "O protesto judicial interrompe a prescrição bienal e quinquenal." },
-                { t: "32. Salário Substituição?", kw: "Súmula 159 TST", c: "Devido enquanto durar a substituição não eventual." },
-                { t: "33. Periculosidade Proporcional?", kw: "Súmula 364 TST", c: "Inválido. O adicional é devido de forma integral mesmo que tempo reduzido." },
-                { t: "34. Readaptado como Paradigma?", kw: "Art. 461 CLT", c: "Empregado readaptado não serve para pedido de equiparação salarial." },
-                { t: "35. Estabilidade Acidentária no Termo?", kw: "Súmula 378 TST", c: "Sim. Acidente de trabalho gera estabilidade mesmo em contrato de experiência." },
-                { t: "36. Cargo de Confiança e Horas Extras?", kw: "Art. 62 CLT", c: "Gestores com amplos poderes e +40% de salário não batem ponto." },
-                { t: "37. Desvio de Função / Diferenças?", kw: "Jurisprudência", c: "O desvio não gera novo contrato, mas sim o direito às diferenças de salário." },
-                { t: "38. Vale-Transporte em Dinheiro?", kw: "Lei 7.418", c: "Possível em situações excepcionais ou se houver previsão em ACT/CCT." },
-                { t: "39. Seguro Desemprego / Indenização?", kw: "Súmula 389 TST", c: "O não fornecimento das guias pelo patrão gera indenização substitutiva." },
-                { t: "40. Massa Falida e Custas?", kw: "Súmula 86 TST", c: "Isenta de depósito recursal e de custas processuais." },
-                { t: "41. Preparo no Agravo de Instrumento?", kw: "Art. 897 CLT", c: "Deve-se depositar 50% do valor do recurso que se pretende destrancar." },
-                { t: "42. Embargos à Execução / Prazo?", kw: "Art. 884 CLT", c: "O prazo é de 5 dias após a garantia total do juízo ou penhora." },
-                { t: "43. Morte da Parte / Suspensão?", kw: "Art. 313 CPC", c: "Suspende-se o processo para a devida sucessão processual pelo espólio." },
-                { t: "44. Sucumbência Recíproca / Compensação?", kw: "Art. 791-A CLT", c: "Vedada a compensação de honorários advocatícios entre as partes." },
-                { t: "45. Embargos de Declaração / Efeito?", kw: "Art. 897-A CLT", c: "Interrompem o prazo para os demais recursos, exceto se intempestivos." },
-                { t: "46. Revelia e Documentos?", kw: "Art. 844 CLT", c: "Se o advogado estiver presente, os documentos de defesa devem ser aceitos." },
-                { t: "47. Custas Processuais / Valor?", kw: "Art. 789 CLT", c: "2% sobre o valor da condenação (Mín R$ 10,64 / Máx 4x o teto INSS)." },
-                { t: "48. Agravo Interno / Prazo?", kw: "TST", c: "No âmbito do processo do trabalho, o prazo é de 8 dias úteis." },
-                { t: "49. Penhora de Salário / Limite?", kw: "CPC / TST", c: "Possível para pensão ou valores acima de 50 salários." },
-                { t: "50. Jus Postulandi no TST?", kw: "Súmula 425 TST", c: "Não se aplica ao TST, Ação Rescisória, MS e Ação Cautelar." }
-            ];
-            for (let item of q50) {
-                await push(ref(db, 'v13_q'), { ...item, ts: serverTimestamp() });
-            }
-            alert("BANCO ATUALIZADO COM FONTE GRANDE!");
-        }
+    // REGRA DO DISQUETE: FINALIZAR EXAME
+    window.finalizarPeca = async () => {
+        const texto = document.getElementById('editor-peca').value;
+        const exame = document.getElementById('selecionar-exame').value || "Exame S/N";
+        if(!texto) return alert("O editor está vazio!");
+        
+        await push(ref(db, 'historico_pecas'), {
+            exame: exame,
+            texto: texto,
+            data: new Date().toLocaleDateString(),
+            ts: serverTimestamp()
+        });
+        alert("EXAME SALVO! Verifique na aba 'Histórico Exames'.");
+        document.getElementById('editor-peca').value = "";
     };
 
-    onValue(ref(db, 'v13_q'), (snap) => {
-        const f = document.getElementById('feed-q'); f.innerHTML = "";
-        const items = snap.val() || {};
-        Object.keys(items).reverse().forEach(id => {
-            const item = items[id];
-            f.innerHTML += `
-                <div class="post-it">
-                    <strong>${item.t}</strong>
-                    <span class="res-label">PADRÃO DE RESPOSTA:</span>
-                    <p class="res-text">${item.c}</p>
-                    <div class="kw-tag">${item.kw}</div>
+    // SINCRONIZAÇÃO COMPLETA
+    onValue(ref(db), (snap) => {
+        const d = snap.val() || {};
+        
+        // Arsenal (Questões)
+        const fQ = document.getElementById('feed-q'); fQ.innerHTML = "";
+        const quest = d.v13_q || {};
+        Object.keys(quest).reverse().forEach(id => {
+            fQ.innerHTML += `<div class="post-it-q"><strong>${quest[id].t}</strong><p class="res-text">${quest[id].c}</p><div class="kw-tag">${quest[id].kw}</div></div>`;
+        });
+
+        // Histórico de Exames (O que você pediu)
+        const fH = document.getElementById('feed-historico-pecas'); fH.innerHTML = "";
+        const hist = d.historico_pecas || {};
+        Object.keys(hist).reverse().forEach(id => {
+            fH.innerHTML += `
+                <div class="card-exame">
+                    <div>
+                        <strong style="color:var(--gold)">${hist[id].exame}</strong><br>
+                        <small>Realizado em: ${hist[id].data}</small>
+                    </div>
+                    <button style="background:white; color:black; border:none; padding:8px; border-radius:5px; font-weight:bold;">PDF</button>
                 </div>`;
         });
+
+        // Não Confunda
+        const fNC = document.getElementById('feed-nc'); fNC.innerHTML = "";
+        const nc = d.nao_confunda || { 1: {t: "RECORRIBILIDADE IMEDIATA", c: "No Trabalho, decisões interlocutórias não admitem recurso imediato, salvo Súmula 214 TST."}};
+        Object.keys(nc).forEach(id => {
+            fNC.innerHTML += `<div style="background:#450a0a; padding:15px; border-radius:8px; margin-bottom:10px; border-left:4px solid var(--danger)"><strong>${nc[id].t}</strong><p>${nc[id].c}</p></div>`;
+        });
     });
+
+    window.abrirEstruturas = () => { alert("Carregando Estruturas: RT, Defesa, RO, Agravo..."); };
 </script>
 </body>
 </html>

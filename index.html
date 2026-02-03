@@ -19,58 +19,79 @@
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* AJUSTE CRÍTICO: PERMITIR SCROLL INFINITO NA FOLHA */
+        /* SIDEBAR (Desktop) */
+        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
+        .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-side:hover { filter: brightness(1.2); }
+
+        /* EDITOR CONTAINER - Onde o scroll acontece */
         .editor-container { 
             flex: 1; 
-            overflow-y: scroll !important; 
+            overflow-y: auto !important; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            padding: 20px; 
+            padding: 0 10px; 
             background: var(--bg-paper); 
             width: 100%; 
-            position: relative; 
-            z-index: 10; 
+            position: relative;
         }
 
-        /* AJUSTE CRÍTICO: PAPER DEVE ESTICAR ATÉ AS 150 LINHAS */
+        /* FERRAMENTAS FIXAS NO TOPO */
+        .sticky-tools {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            max-width: 850px;
+            z-index: 1000;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* A FOLHA BLINDADA EM 150 LINHAS */
         .paper { 
             background: var(--paper-color); 
             width: 100%; 
             max-width: 850px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-            margin-bottom: 100px; 
+            margin-top: 15px;
+            margin-bottom: 50px;
             position: relative; 
             z-index: 15; 
-            border-radius: 4px;
-            height: auto !important; /* Libera a altura fixa */
-            min-height: 5250px !important; /* Força 150 linhas (150 * 35px) */
+            height: 5250px !important; /* 150 * 35px */
+            min-height: 5250px !important;
+            max-height: 5250px !important;
+            flex-shrink: 0;
+            overflow: hidden;
         }
 
-        #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
-        .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); position: sticky; top: 0; z-index: 100; }
-        .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
+        #identificador-peca { width: 100%; padding: 12px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1rem; cursor: pointer; }
+        .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
+        .btn-lib { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
+        /* HUB MOBILE (FOGUETE) */
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; box-shadow: 0 5px 25px rgba(0,0,0,0.6); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; }
         .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #fff; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
         #mobile-hub.active .fab-sub { display: flex; }
 
+        /* RESPONSIVIDADE MOBILE */
         @media (max-width: 768px) {
             .sidebar { display: none !important; }
             #mobile-hub { display: flex; }
-            .paper { width: 100% !important; margin-bottom: 120px; }
+            .editor-container { padding: 0 5px; }
+            .paper { margin-bottom: 150px; }
+            .btn-lib span { display: none; } /* Esconde texto nos botões pequenos se necessário */
         }
 
-        #pdf-split-view { display: none; width: 48%; background: #333; border-left: 4px solid var(--gold); position: absolute; right: 0; top: 0; height: 100%; z-index: 6000; }
-        #pdf-split-view.active { display: block; }
-
+        /* MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
-        .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
         
-        .sync-success { color: #10b981 !important; animation: pulse-discreto 1.2s infinite; font-weight: 900; }
-        @keyframes pulse-discreto { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .sync-success { color: #10b981 !important; animation: pulse 1.2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -85,24 +106,26 @@
 <main>
     <aside class="sidebar">
         <button class="btn-side" style="background:var(--gold); color:#000;" onclick="window.abrirExames()"><i class="fas fa-bullseye"></i> <span>Exames</span></button>
-        <button id="btn-finalizar" class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> <span>Finalizar Peça</span></button>
-        <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-history"></i> <span>Mentoria IA</span></button>
+        <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> <span>Finalizar</span></button>
+        <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-history"></i> <span>Histórico</span></button>
         <button class="btn-side" style="background:#334155; color:var(--gold);" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> <span>Pergaminho</span></button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> <span>Martelo</span></button>
         <hr style="opacity:0.2; margin:10px 0;">
         <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b> <span>Peça</span></button>
         <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b> <span>Gabarito</span></button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b> <span>Vade Mecum</span></button>
     </aside>
 
     <section class="editor-container">
-        <div class="paper">
+        <div class="sticky-tools">
             <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO - TOQUE AQUI</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Visualizar</button>
+                <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Ver</button>
                 <button class="btn-lib" style="color:var(--mentoria)" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> Mentoria</button>
             </div>
+        </div>
+
+        <div class="paper">
             <div id="folha-total"></div>
         </div>
     </section>
@@ -113,23 +136,14 @@
         <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-history"></i></button>
         <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
-        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')"><b>P</b></button>
-        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')"><b>G</b></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.verPDF('V')"><b>V</b></button>
-    </div>
-
-    <div id="pdf-split-view">
-        <button style="position:absolute; top:10px; right:10px; background:var(--gold); border:none; width:45px; height:45px; border-radius:8px; z-index:7000; color:black;" onclick="window.fecharPDF()"><i class="fas fa-times"></i></button>
-        <iframe id="pdf-frame" style="width:100%; height:100%; border:none; background:white;"></iframe>
     </div>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:3px solid var(--gold)"></h2>
+        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:3px solid var(--gold); font-size: 1.2rem;"></h2>
         <div id="modal-content" style="max-height: 60vh; overflow-y: auto;"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:10px; font-weight:900; margin-top:15px;">VOLTAR</button>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:10px; font-weight:900; margin-top:15px; cursor:pointer;">FECHAR</button>
     </div>
 </div>
 
@@ -145,66 +159,15 @@
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
-    let isFinalizing = false;
 
-    window.carregarRascunho = async () => {
-        const editor = document.getElementById('editor-principal');
-        if (!editor) return;
-        try {
-            const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-            if (snapshot.exists()) {
-                editor.innerText = snapshot.val().conteudo || "";
-            } else {
-                const local = localStorage.getItem(`rascunho_${window.activeEx}`);
-                if (local) editor.innerText = local;
-            }
-        } catch (e) { console.error(e); }
-    };
-
-    window.finalizarPeca = async () => {
-        const editor = document.getElementById('editor-principal');
-        if(!confirm("Deseja enviar ao histórico oficial?")) return;
-        isFinalizing = true;
-        const ok = await engineSaveElite(db, window.activeEx, true, editor.innerText);
-        if(ok) {
-            document.getElementById('sync-text').innerText = "SINCRO-HISTORY";
-            document.getElementById('sync-indicator').classList.add('sync-success');
-            setTimeout(() => {
-                document.getElementById('sync-text').innerText = "SYNC ON";
-                document.getElementById('sync-indicator').classList.remove('sync-success');
-            }, 3000);
-        }
-        isFinalizing = false;
-    };
-
-    window.verPDF = (tipo) => {
-        const frame = document.getElementById('pdf-frame');
-        const view = document.getElementById('pdf-split-view');
-        let path = "";
-        if (tipo === 'P') path = `ro${window.activeEx}.pdf`;
-        else if (tipo === 'G') path = `ro${window.activeEx}-gabarito.pdf`;
-        else if (tipo === 'V') path = `vade.pdf`;
-        frame.src = "about:blank";
-        setTimeout(() => { frame.src = path; view.classList.add('active'); }, 50);
-    };
-
-    window.fecharPDF = () => {
-        document.getElementById('pdf-split-view').classList.remove('active');
-        document.getElementById('pdf-frame').src = "about:blank";
-    };
-
+    // Inicia a Folha
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
-        await window.carregarRascunho();
-        const editor = document.getElementById('editor-principal');
-        if(editor) {
-            editor.addEventListener('input', () => {
-                localStorage.setItem(`rascunho_${window.activeEx}`, editor.innerText);
-            });
-        }
-        setTimeout(window.forcarRadar, 1500);
+        await carregarRascunho();
+        setTimeout(window.forcarRadar, 1000);
+        
+        // Auto-save a cada 30 seg
         setInterval(async () => {
-            if (isFinalizing) return;
             const ed = document.getElementById('editor-principal');
             if (ed && ed.innerText.trim()) {
                 await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
@@ -215,26 +178,29 @@
         }, 30000);
     };
 
+    async function carregarRascunho() {
+        const ed = document.getElementById('editor-principal');
+        if (!ed) return;
+        const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
+        if (snap.exists()) ed.innerText = snap.val().conteudo;
+    }
+
+    window.finalizarPeca = async () => {
+        const ed = document.getElementById('editor-principal');
+        if(!confirm("Finalizar e salvar no Histórico Oficial?")) return;
+        const ok = await engineSaveElite(db, window.activeEx, true, ed.innerText);
+        if(ok) alert("Peça Blindada no Histórico!");
+    };
+
     window.toggleFoguete = () => {
         const hub = document.getElementById('mobile-hub');
         hub.classList.toggle('active');
         document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
 
-    window.forcarRadar = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        if (dna) {
-            const analise = RadarEngine.analisar(dna);
-            RadarEngine.renderizar(analise);
-            document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
-        }
+    window.limparFolha = () => {
+        if(confirm("Limpar toda a folha?")) document.getElementById('editor-principal').innerText = "";
     };
-
-    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.limparFolha = () => { if(confirm("Apagar tudo?")) { 
-        document.getElementById('editor-principal').innerText = ""; 
-        localStorage.removeItem(`rascunho_${window.activeEx}`);
-    }};
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
@@ -264,9 +230,23 @@
         modal.style.display='flex';
     };
 
+    window.forcarRadar = () => {
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        if (dna) {
+            const analise = RadarEngine.analisar(dna);
+            RadarEngine.renderizar(analise);
+            document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
+        }
+    };
+
+    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
+    };
+    window.verPDF = (t) => {
+        const url = t === 'P' ? `ro${window.activeEx}.pdf` : `ro${window.activeEx}-gabarito.pdf`;
+        window.open(url, '_blank');
     };
 </script>
 </body>

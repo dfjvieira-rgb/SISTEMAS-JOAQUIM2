@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - SPLIT</title>
+    <title>JOAQUIM ELITE 2026 - MASTER</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -17,47 +17,35 @@
 
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         
-        /* LAYOUT PRINCIPAL EM GRID PARA DIVISÃO DE TELA */
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
-        .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; }
+        .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-side:hover { filter: brightness(1.2); }
 
-        /* CONTAINER DO EDITOR (ESQUERDA) */
-        .editor-workspace { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            background: var(--bg-paper); 
-            overflow-y: auto; 
-            transition: all 0.3s ease;
-        }
-
+        /* EDITOR WORKSPACE */
+        .editor-workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; transition: all 0.3s ease; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); }
+        #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
 
         .paper-area { display: flex; justify-content: center; padding: 20px 10px; }
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; }
 
-        /* CONTAINER DO PDF (DIREITA) */
+        /* PDF VIEWER (SPLIT) */
         #pdf-viewer { 
-            width: 0; 
-            background: #334155; 
-            border-left: 0 solid var(--gold); 
+            width: 0; background: #334155; border-left: 0 solid var(--gold); 
             transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: flex; 
-            flex-direction: column; 
-            position: relative;
+            display: flex; flex-direction: column; position: relative;
         }
         #pdf-viewer.active { width: 50%; border-left-width: 4px; }
-        
-        iframe { width: 100%; flex: 1; border: none; }
+        iframe { width: 100%; flex: 1; border: none; background: white; }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
 
+        /* HUB MOBILE */
         #mobile-hub { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; flex-direction: column-reverse; gap: 10px; }
-        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -65,16 +53,17 @@
             #mobile-hub { display: flex; }
         }
 
+        /* MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 90%; max-width: 500px; padding: 20px; border-radius: 15px; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
     </style>
 </head>
 <body class="dark-mode">
 
 <header>
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
-    <div id="sync-status" style="color:var(--gold); font-size:11px; font-weight:bold;">SYNC ON</div>
+    <div id="sync-status" style="color:var(--gold); font-size:11px; font-weight:bold;">SYNC ON - EXAME <span id="ex-display">--</span></div>
 </header>
 
 <main>
@@ -113,17 +102,17 @@
     </section>
 
     <div id="mobile-hub">
-        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket"></i></button>
+        <button class="fab-main" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
         <button class="fab-main" style="background:#3b82f6; color:white; width:50px; height:50px; margin-bottom:10px;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-main" style="background:#10b981; color:white; width:50px; height:50px; margin-bottom:10px;" onclick="window.verPDF('V')"><i class="fas fa-book"></i></button>
+        <button class="fab-main" style="background:#000; color:var(--gold); width:50px; height:50px; margin-bottom:10px; border: 1px solid var(--gold)" onclick="window.verPDF('V')"><b>V</b></button>
     </div>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold)"></h2>
+        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold); font-size:1.1rem;"></h2>
         <div id="modal-content" style="max-height: 50vh; overflow-y: auto;"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:8px; margin-top:10px;">VOLTAR</button>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">VOLTAR</button>
     </div>
 </div>
 
@@ -141,6 +130,7 @@
     window.FolhaEngine = FolhaEngine;
 
     window.onload = async () => {
+        document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
         await carregarRascunho();
         setTimeout(window.forcarRadar, 1000);
@@ -149,6 +139,7 @@
 
     async function carregarRascunho() {
         const ed = document.getElementById('editor-principal');
+        if(!ed) return;
         const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
         if (snap.exists()) ed.innerText = snap.val().conteudo || "";
     }
@@ -162,17 +153,32 @@
         }
     }
 
-    // --- RELIGAÇÃO DO MARTELO ---
-    window.injetarTeses = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) {
-            FolhaEngine.injetarTextoMultilinhas(dna);
-        } else {
-            alert("DNA não localizado para o Exame " + window.activeEx);
+    // --- RESTAURAÇÃO DA LISTA DE EXAMES ---
+    window.abrirExames = () => {
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+        
+        for(let i=44; i>=35; i--) {
+            const b = document.createElement('div');
+            b.className = 'opt-btn';
+            b.innerHTML = `<span>Exame OAB ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.onclick = () => {
+                localStorage.setItem('activeEx', i.toString());
+                window.location.reload();
+            };
+            content.appendChild(b);
         }
+        modal.style.display = 'flex';
     };
 
-    // --- RELIGAÇÃO DO PERGAMINHO ---
+    window.injetarTeses = () => {
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
+        else alert("Teses não encontradas para o Exame " + window.activeEx);
+    };
+
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "ESTRUTURAS";
@@ -187,17 +193,14 @@
         modal.style.display = 'flex';
     };
 
-    // --- FUNÇÃO SPLIT-VIEW (PDF) ---
     window.verPDF = (t) => {
         const viewer = document.getElementById('pdf-viewer');
         const frame = document.getElementById('pdf-frame');
         const title = document.getElementById('pdf-title');
-        
         let url = "";
-        if (t === 'P') { url = `ro${window.activeEx}.pdf`; title.innerText = "PEÇA DO EXAME"; }
-        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; title.innerText = "GABARITO OFICIAL"; }
+        if (t === 'P') { url = `ro${window.activeEx}.pdf`; title.innerText = "PEÇA"; }
+        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; title.innerText = "GABARITO"; }
         else if (t === 'V') { url = `vade.pdf`; title.innerText = "VADE MECUM"; }
-        
         frame.src = url;
         viewer.classList.add('active');
     };
@@ -209,14 +212,13 @@
 
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
-        if(confirm("Deseja salvar esta peça no Histórico Oficial?")) {
+        if(confirm("Deseja salvar no Histórico Oficial?")) {
             await engineSaveElite(db, window.activeEx, true, ed.innerText);
-            alert("PEÇA BLINDADA NO HISTÓRICO!");
+            alert("PEÇA SALVA!");
         }
     };
 
     window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
-    window.toggleFoguete = () => document.querySelector('.sidebar').classList.toggle('active-mobile'); // Implementação simples
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna) {
@@ -225,7 +227,6 @@
             document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
         }
     };
-    window.abrirExames = () => { /* Mesma lógica do modal de exames anterior */ };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>

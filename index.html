@@ -14,30 +14,32 @@
             --paper-color: #ffffff; --mentoria: #a855f7; --sidebar-w: 240px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
+        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* SIDEBAR PC */
+        /* SIDEBAR DESKTOP */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
 
-        /* EDITOR */
-        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
+        /* EDITOR WORKSPACE */
+        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; position: relative; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
-        .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
+        .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; color: #475569; }
 
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; }
+        /* FOLHA 150 LINHAS */
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; position: relative; z-index: 10; }
 
-        /* PDF VIEWER */
+        /* PDF VIEWER SPLIT */
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        iframe { width: 100%; flex: 1; border: none; }
+        iframe { width: 100%; flex: 1; border: none; background: white; }
 
         /* HUB MOBILE FOGUETE */
         #mobile-hub { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
@@ -134,8 +136,13 @@
 
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
-        FolhaEngine.montar('folha-total');
+        // Inicia a folha
+        window.FolhaEngine.montar('folha-total');
+        
+        // Carrega rascunho do Firebase
         await carregarRascunho();
+        
+        // Inicia Radar e Autosave
         setTimeout(window.forcarRadar, 1500);
         setInterval(salvarAutomatico, 30000);
     };
@@ -177,7 +184,7 @@
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PERGAMINHO (ESTRUTURAS)";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
@@ -194,8 +201,8 @@
         const frame = document.getElementById('pdf-frame');
         const title = document.getElementById('pdf-title');
         let url = "";
-        if (t === 'P') { url = `ro${window.activeEx}.pdf`; title.innerText = "PEÇA"; }
-        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; title.innerText = "GABARITO"; }
+        if (t === 'P') { url = `ro${window.activeEx}.pdf`; title.innerText = "ENUNCIADO DA PEÇA"; }
+        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; title.innerText = "GABARITO OFICIAL"; }
         else if (t === 'V') { url = `vade.pdf`; title.innerText = "VADE MECUM"; }
         frame.src = url;
         viewer.classList.add('active');
@@ -211,13 +218,19 @@
         const ed = document.getElementById('editor-principal');
         if(confirm("Deseja salvar no Histórico Oficial?")) {
             await engineSaveElite(db, window.activeEx, true, ed.innerText);
-            alert("PEÇA SALVA!");
+            alert("PEÇA FINALIZADA!");
         }
     };
 
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
+        const ed = document.getElementById('editor-principal');
+        if(dna && ed) {
+            ed.focus();
+            window.FolhaEngine.injetarTextoMultilinhas(dna);
+        } else {
+            alert("Espelho não localizado para o exame " + window.activeEx);
+        }
     };
 
     window.forcarRadar = () => {

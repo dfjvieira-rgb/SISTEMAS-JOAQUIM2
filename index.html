@@ -6,7 +6,6 @@
     <title>JOAQUIM ELITE 2026 - MASTER</title>
     
     <link rel="icon" href="data:,">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -20,11 +19,9 @@
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* SIDEBAR PC */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
 
-        /* EDITOR */
         .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
@@ -33,13 +30,11 @@
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; }
 
-        /* PDF VIEWER */
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; flex: 1; border: none; }
 
-        /* HUB MOBILE FOGUETE */
         #mobile-hub { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
         .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
@@ -51,7 +46,6 @@
             #mobile-hub { display: flex; }
         }
 
-        /* MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 92%; max-width: 500px; padding: 20px; border-radius: 15px; }
         .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; color: black; }
@@ -105,6 +99,7 @@
         <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
+        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
         <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
         <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
@@ -215,9 +210,38 @@
         }
     };
 
+    // MARTELO REFORMULADO: INJETA ONDE O CURSOR ESTIVER
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
+        if(!dna) return alert("DNA não encontrado.");
+
+        const ed = document.getElementById('editor-principal');
+        if(!ed) return;
+
+        const selection = window.getSelection();
+        
+        // Verifica se o clique está dentro do editor
+        if (selection.rangeCount > 0 && ed.contains(selection.anchorNode)) {
+            const range = selection.getRangeAt(0);
+            range.deleteContents(); // Remove seleção se houver
+            
+            // Cria um nó de texto com as teses
+            const textNode = document.createTextNode(dna);
+            range.insertNode(textNode);
+            
+            // Move o cursor para o final do texto injetado
+            range.setStartAfter(textNode);
+            range.setEndAfter(textNode);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        } else {
+            // Se não houver cursor, joga no final e avisa
+            ed.innerText += "\n" + dna;
+            alert("Lugar não selecionado! Injetado no final da peça.");
+        }
+        
+        ed.focus();
+        if(window.innerWidth < 768 && document.getElementById('mobile-hub').classList.contains('active')) window.toggleFoguete();
     };
 
     window.forcarRadar = () => {

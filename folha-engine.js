@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO SELEÇÃO FLUIDA [2026-02-02]
+// FolhaEngine.js - VERSÃO TOTAL [SELEÇÃO MOUSE + INJEÇÃO + TECLADO]
 export const FolhaEngine = {
     montar: (containerId) => {
         const container = document.getElementById(containerId);
@@ -13,31 +13,34 @@ export const FolhaEngine = {
                     display: grid;
                     grid-template-columns: 45px 1fr;
                     background: #fff;
-                    font-family: 'Courier New', monospace;
-                    line-height: 35px; /* Altura da linha */
+                    font-family: 'Courier New', Courier, monospace;
+                    line-height: 35px;
                     position: relative;
+                    border: 1px solid #d1d5db;
                 }
                 .numeracao {
-                    background: #f8fafc;
+                    background: #f1f5f9;
                     border-right: 2px solid #cbd5e1;
                     text-align: center;
-                    color: #94a3b8;
+                    color: #64748b;
                     font-size: 0.8rem;
                     user-select: none;
+                    font-weight: bold;
                 }
                 .area-editor {
                     outline: none;
                     padding-left: 15px;
-                    font-size: 19px;
-                    font-weight: 700;
-                    color: #000;
+                    font-size: 19px !important;
+                    font-weight: 700 !important;
+                    color: #000 !important;
                     white-space: pre-wrap;
                     word-wrap: break-word;
-                    background-image: linear-gradient(#d1d5db 1px, transparent 1px);
-                    background-size: 100% 35px; /* Alinha a régua com o texto */
+                    min-height: 5250px; /* 150 linhas * 35px */
+                    background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+                    background-size: 100% 35px;
+                    background-attachment: local;
                 }
-                /* Cor da seleção do mouse */
-                .area-editor::selection { background: #bfdbfe; }
+                .area-editor::selection { background: #bfdbfe; color: #1e3a8a; }
             `;
             document.head.appendChild(style);
         }
@@ -45,17 +48,17 @@ export const FolhaEngine = {
         const folha = document.createElement('div');
         folha.className = 'folha-container';
 
-        // 1. Criar coluna de numeração (1 a 150)
-        let numsHtml = "";
-        for(let i=1; i<=150; i++) numsHtml += `<div>${i}</div>`;
-        
+        // 1. Numeração lateral
         const numCol = document.createElement('div');
         numCol.className = 'numeracao';
-        numCol.innerHTML = numsHtml;
+        let nums = "";
+        for(let i=1; i<=150; i++) nums += `<div style="height:35px">${i}</div>`;
+        numCol.innerHTML = nums;
 
-        // 2. Criar área única de edição (Permite seleção múltipla)
+        // 2. Editor Único (Permite Seleção de Múltiplas Linhas)
         const editor = document.createElement('div');
         editor.className = 'area-editor';
+        editor.id = 'editor-principal'; // ID fixo para injeção
         editor.contentEditable = "true";
         editor.spellcheck = false;
 
@@ -63,24 +66,42 @@ export const FolhaEngine = {
         folha.appendChild(editor);
         container.appendChild(folha);
 
-        // --- LÓGICA DO TECLADO ---
+        // --- TECLADO LIBERADO (TAB E ENTER) ---
         editor.addEventListener('keydown', (e) => {
-            // TAB: Insere 4 espaços
             if (e.key === 'Tab') {
                 e.preventDefault();
-                const doc = editor.ownerDocument.defaultView;
-                const sel = doc.getSelection();
+                const sel = window.getSelection();
                 const range = sel.getRangeAt(0);
                 const tabNode = document.createTextNode("    ");
                 range.insertNode(tabNode);
                 range.setStartAfter(tabNode);
-                range.setEndAfter(tabNode); 
+                range.setEndAfter(tabNode);
                 sel.removeAllRanges();
                 sel.addRange(range);
             }
-
-            // ENTER: O navegador já lida com o Enter nativamente no contenteditable,
-            // mas aqui garantimos que ele siga o estilo da folha.
+            // O Enter aqui já funciona nativamente pulando a linha
         });
+    },
+
+    // REATIVADO: Função de Injetar (Botão Pergaminho / Estruturas)
+    injetarTextoMultilinhas: (textoBruto) => {
+        const editor = document.getElementById('editor-principal');
+        if (!editor) return;
+
+        // Limpa o texto e formata
+        const limpo = textoBruto.replace(/<[^>]*>?/gm, '').trim();
+        const textoFormatado = limpo.replace(/(^\w|\.\s+\w)/gm, s => s.toUpperCase());
+
+        // Adiciona ao editor mantendo o foco
+        editor.innerText += (editor.innerText ? "\n\n" : "") + textoFormatado;
+        editor.focus();
+        
+        // Move o cursor para o final do texto injetado
+        const range = document.createRange();
+        const sel = window.getSelection();
+        range.selectNodeContents(editor);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
     }
 };

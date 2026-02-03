@@ -11,7 +11,7 @@
             --paper-color: #ffffff; --mentoria: #a855f7; --sidebar-w: 240px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
@@ -21,25 +21,26 @@
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
 
-        /* EDITOR WORKSPACE */
-        .editor-workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; }
-        .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        /* EDITOR */
+        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
+        .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
 
-        .paper-area { display: flex; justify-content: center; padding: 20px 10px; }
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; }
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; }
 
         /* PDF VIEWER */
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        iframe { width: 100%; flex: 1; border: none; background: white; }
+        iframe { width: 100%; flex: 1; border: none; }
 
-        /* HUB MOBILE - EXAMES, PERGAMINHO, VADE E MENTORIA */
-        #mobile-hub { display: none; position: fixed; bottom: 15px; right: 15px; z-index: 9999; flex-direction: column-reverse; gap: 10px; align-items: center; }
-        .fab-main { width: 50px; height: 50px; border-radius: 50%; border: none; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
+        /* HUB MOBILE FOGUETE (RESTAURADO) */
+        #mobile-hub { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
+        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
+        #mobile-hub.active .fab-sub { display: flex; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -48,9 +49,9 @@
         }
 
         /* MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 92%; max-width: 500px; padding: 20px; border-radius: 15px; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; color: #000; }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; color: black; }
     </style>
 </head>
 <body class="dark-mode">
@@ -65,7 +66,7 @@
         <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES</button>
         <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> FINALIZAR</button>
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA</button>
-        <button class="btn-side" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> ESTRUTURAS</button>
+        <button class="btn-side" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
         <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
@@ -73,7 +74,7 @@
         <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
     </aside>
 
-    <section class="editor-workspace">
+    <section class="editor-container">
         <div class="sticky-tools">
             <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO</div>
             <div class="toolbar-liberdade">
@@ -82,32 +83,34 @@
                 <button class="btn-lib" style="background:#ef4444; color:white" onclick="window.fecharPDF()">FECHAR PDF</button>
             </div>
         </div>
-        <div class="paper-area">
-            <div id="folha-total" class="paper"></div>
+        <div class="paper">
+            <div id="folha-total"></div>
         </div>
     </section>
 
     <section id="pdf-viewer">
         <div class="pdf-controls">
             <span id="pdf-title" style="font-size:10px; font-weight:900;">DOCUMENTO</span>
-            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">X</button>
+            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer; color:black">X</button>
         </div>
         <iframe id="pdf-frame" src=""></iframe>
     </section>
 
     <div id="mobile-hub">
-        <button class="fab-main" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
-        <button class="fab-main" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
-        <button class="fab-main" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')"><b>V</b></button>
-        <button class="fab-main" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
+        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
+        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')"><b>V</b></button>
     </div>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold); font-size:1.1rem;"></h2>
-        <div id="modal-content" style="max-height: 50vh; overflow-y: auto;"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">VOLTAR</button>
+        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold); font-size:1.1rem; color: black;"></h2>
+        <div id="modal-content" style="max-height: 60vh; overflow-y: auto;"></div>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">FECHAR</button>
     </div>
 </div>
 
@@ -133,10 +136,11 @@
     };
 
     async function carregarRascunho() {
-        const ed = document.getElementById('editor-principal');
-        if(!ed) return;
         const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-        if (snap.exists()) ed.innerText = snap.val().conteudo || "";
+        if (snap.exists()) {
+            const ed = document.getElementById('editor-principal');
+            if(ed) ed.innerText = snap.val().conteudo;
+        }
     }
 
     async function salvarAutomatico() {
@@ -148,41 +152,34 @@
         }
     }
 
+    window.toggleFoguete = () => {
+        const hub = document.getElementById('mobile-hub');
+        hub.classList.toggle('active');
+        document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
+    };
+
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
-            const b = document.createElement('div');
-            b.className = 'opt-btn';
-            b.innerHTML = `<span>Exame OAB ${i}</span> <i class="fas fa-chevron-right"></i>`;
-            b.onclick = () => {
-                localStorage.setItem('activeEx', i.toString());
-                window.location.reload();
-            };
+            const b = document.createElement('div'); b.className = 'opt-btn';
+            b.innerHTML = `<span>OAB EXAME ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
             content.appendChild(b);
         }
         modal.style.display = 'flex';
     };
 
-    window.injetarTeses = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) {
-            FolhaEngine.injetarTextoMultilinhas(dna);
-        } else {
-            alert("Espelho não encontrado para este exame.");
-        }
-    };
-
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
+        document.getElementById('modal-title').innerText = "PERGAMINHO (ESTRUTURAS)";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className = 'opt-btn';
-            b.innerHTML = `<span>${k}</span> <i class="fas fa-file-signature"></i>`;
+            b.innerHTML = `<span>${k}</span> <i class="fas fa-file-alt"></i>`;
             b.onclick = () => { FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; };
             content.appendChild(b);
         });
@@ -199,6 +196,7 @@
         else if (t === 'V') { url = `vade.pdf`; title.innerText = "VADE MECUM"; }
         frame.src = url;
         viewer.classList.add('active');
+        if(window.innerWidth < 768) window.toggleFoguete(); // Fecha o hub ao abrir PDF
     };
 
     window.fecharPDF = () => {
@@ -210,12 +208,15 @@
         const ed = document.getElementById('editor-principal');
         if(confirm("Deseja salvar no Histórico Oficial?")) {
             await engineSaveElite(db, window.activeEx, true, ed.innerText);
-            alert("PEÇA SALVA NO HISTÓRICO!");
+            alert("PEÇA SALVA!");
         }
     };
 
-    window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
-    
+    window.injetarTeses = () => {
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
+    };
+
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if (dna && RadarEngine) {
@@ -224,6 +225,8 @@
             document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();
         }
     };
+
+    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.getElementById('editor-principal').innerText = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>

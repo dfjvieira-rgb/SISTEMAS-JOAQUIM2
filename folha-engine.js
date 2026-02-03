@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO ABNT LIBERADA [2026-02-02]
+// FolhaEngine.js - VERSÃO "HARD-CODED" PARA TECLADO TOTALMENTE LIBERADO
 export const FolhaEngine = {
     LIMITE_OAB: 75, 
 
@@ -11,49 +11,14 @@ export const FolhaEngine = {
             const style = document.createElement('style');
             style.id = 'style-folha-elite';
             style.innerHTML = `
-                .linha-wrapper { 
-                    background: #fff; 
-                    border-bottom: 1px solid #d1d5db; 
-                    display: flex; 
-                    height: 35px; /* Altura padrão para leitura */
-                    position: relative;
-                }
-                /* Régua Visual de Limite OAB */
-                .linha-wrapper::after {
-                    content: "";
-                    position: absolute;
-                    right: 85px;
-                    top: 0;
-                    bottom: 0;
-                    width: 1px;
-                    background: rgba(255, 0, 0, 0.2);
-                    pointer-events: none;
-                }
-                .linha-num { 
-                    width: 45px; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center; 
-                    font-size: 0.8rem; 
-                    color: #94a3b8; 
-                    border-right: 2px solid #cbd5e1; 
-                    background: #f8fafc; 
-                    user-select: none;
-                    font-weight: bold;
-                }
+                .linha-wrapper { background: #fff; border-bottom: 1px solid #d1d5db; display: flex; height: 35px; }
+                .linha-num { width: 45px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #94a3b8; border-right: 2px solid #cbd5e1; background: #f8fafc; user-select: none; font-weight: bold; }
                 .linha-folha { 
-                    flex: 1; 
-                    border: none; 
-                    outline: none; 
-                    padding: 0 15px; 
-                    font-size: 19px !important; 
-                    font-family: 'Courier New', Courier, monospace !important; 
-                    font-weight: 700 !important; 
-                    color: #000 !important; 
-                    background: transparent;
-                    letter-spacing: 0.5px;
+                    flex: 1; border: none; outline: none; padding: 0 15px; 
+                    font-size: 19px !important; font-family: 'Courier New', monospace !important; 
+                    font-weight: 700 !important; color: #000 !important; background: transparent;
                 }
-                .linha-folha:focus { background: #fffdf0; }
+                .linha-folha:focus { background: #fffdeb !important; }
             `;
             document.head.appendChild(style);
         }
@@ -67,27 +32,29 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
-            // --- MAPEAMENTO DE TECLAS LIBERADAS ---
+            // --- A MÁGICA PARA LIBERAR O TECLADO AQUI ---
             input.addEventListener('keydown', function(e) {
                 const idx = parseInt(this.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // 1. TAB LIBERADO: Insere 4 espaços (Parágrafo)
+                // LIBERAÇÃO DO TAB (O cursor não sai da folha, ele cria o parágrafo)
                 if (e.key === 'Tab') {
-                    e.preventDefault(); 
+                    e.preventDefault(); // CANCELA a função do sistema de pular campo
                     const start = this.selectionStart;
-                    this.value = this.value.substring(0, start) + "    " + this.value.substring(this.selectionEnd);
+                    const end = this.selectionEnd;
+                    // Insere 4 espaços no local exato do cursor
+                    this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
                     this.selectionStart = this.selectionEnd = start + 4;
                 }
 
-                // 2. ENTER LIBERADO: Pula para a linha de baixo
+                // LIBERAÇÃO DO ENTER (O cursor pula para a linha de baixo instantaneamente)
                 if (e.key === 'Enter') {
-                    e.preventDefault();
+                    e.preventDefault(); // CANCELA o envio de formulário
                     if (proximo) proximo.focus();
                 }
 
-                // 3. SETAS LIBERADAS: Navegação vertical
+                // LIBERAÇÃO DAS SETAS (Navegação vertical fluida)
                 if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     if (anterior) anterior.focus();
@@ -97,7 +64,7 @@ export const FolhaEngine = {
                     if (proximo) proximo.focus();
                 }
 
-                // 4. BACKSPACE INTELIGENTE: Volta linha se estiver no início
+                // BACKSPACE INTELIGENTE (Se a linha estiver vazia, volta para a anterior)
                 if (e.key === 'Backspace' && this.selectionStart === 0 && this.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -112,7 +79,6 @@ export const FolhaEngine = {
     injetarTextoMultilinhas: (textoBruto, linhaInicial) => {
         if (!textoBruto) return;
         let currentLinha = linhaInicial;
-        // Limpa tags e quebra por parágrafos reais
         const textoProcessado = textoBruto.replace(/<[^>]*>?/gm, '').split('\n');
 
         textoProcessado.forEach(paragrafo => {

@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO ELITE CORRIGIDA [2026-02-02]
+// FolhaEngine.js - VERSÃO 100% FUNCIONAL [ENTER + TAB + SETAS]
 export const FolhaEngine = {
     LIMITE_OAB: 75, 
 
@@ -16,7 +16,6 @@ export const FolhaEngine = {
                     border-bottom: 1px solid #d1d5db; 
                     display: flex; 
                     height: 35px; 
-                    position: relative; 
                 }
                 .linha-num { 
                     width: 45px; 
@@ -38,9 +37,7 @@ export const FolhaEngine = {
                     font-family: 'Courier New', Courier, monospace !important; 
                     font-weight: 600 !important; 
                     color: #000 !important; 
-                    background: transparent;
                 }
-                .linha-folha:focus { background: #fffdeb; }
             `;
             document.head.appendChild(style);
         }
@@ -48,48 +45,35 @@ export const FolhaEngine = {
         for(let i=1; i<=150; i++) {
             const row = document.createElement('div');
             row.className = 'linha-wrapper';
-            row.innerHTML = `
-                <div class="linha-num">${i}</div>
-                <input class="linha-folha" id="L${i}" spellcheck="false" autocomplete="off" data-index="${i}">
-            `;
+            row.innerHTML = `<div class="linha-num">${i}</div>
+                <input class="linha-folha" id="L${i}" data-index="${i}" spellcheck="false" autocomplete="off">`;
             container.appendChild(row);
 
             const input = row.querySelector('input');
 
-            input.addEventListener('keydown', (e) => {
-                const idx = parseInt(input.getAttribute('data-index'));
+            // BLOCO DE COMANDOS CRÍTICOS
+            input.addEventListener('keydown', function(e) {
+                const idx = parseInt(this.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // 1. FUNCIONALIDADE DO TAB (Simula Parágrafo OAB)
+                // CORREÇÃO DO TAB (PARÁGRAFO)
                 if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const start = input.selectionStart;
-                    const val = input.value;
-                    // Insere 4 espaços (padrão de recuo)
-                    input.value = val.substring(0, start) + "    " + val.substring(input.selectionEnd);
-                    input.selectionStart = input.selectionEnd = start + 4;
+                    e.preventDefault(); 
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    // Insere 4 espaços de recuo
+                    this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                    this.selectionStart = this.selectionEnd = start + 4;
                 }
 
-                // 2. FUNCIONALIDADE DO ENTER (Pula para próxima linha)
+                // CORREÇÃO DO ENTER (PULA LINHA)
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (proximo) {
-                        proximo.focus();
-                    }
+                    if (proximo) proximo.focus();
                 }
 
-                // 3. BACKSPACE (Volta linha se estiver no início)
-                if (e.key === 'Backspace' && input.selectionStart === 0 && input.value === '') {
-                    if (anterior) {
-                        e.preventDefault();
-                        anterior.focus();
-                        const len = anterior.value.length;
-                        anterior.setSelectionRange(len, len);
-                    }
-                }
-
-                // 4. SETAS (Cima e Baixo)
+                // NAVEGAÇÃO POR SETAS
                 if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     if (anterior) anterior.focus();
@@ -97,6 +81,15 @@ export const FolhaEngine = {
                 if (e.key === 'ArrowDown') {
                     e.preventDefault();
                     if (proximo) proximo.focus();
+                }
+
+                // BACKSPACE NO INÍCIO DA LINHA
+                if (e.key === 'Backspace' && this.selectionStart === 0 && this.value === '') {
+                    if (anterior) {
+                        e.preventDefault();
+                        anterior.focus();
+                        anterior.setSelectionRange(anterior.value.length, anterior.value.length);
+                    }
                 }
             });
         }

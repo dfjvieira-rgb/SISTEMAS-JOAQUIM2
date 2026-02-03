@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO 100% FUNCIONAL [ENTER + TAB + SETAS]
+// FolhaEngine.js - VERSÃO ABNT LIBERADA [2026-02-02]
 export const FolhaEngine = {
     LIMITE_OAB: 75, 
 
@@ -15,7 +15,19 @@ export const FolhaEngine = {
                     background: #fff; 
                     border-bottom: 1px solid #d1d5db; 
                     display: flex; 
-                    height: 35px; 
+                    height: 35px; /* Altura padrão para leitura */
+                    position: relative;
+                }
+                /* Régua Visual de Limite OAB */
+                .linha-wrapper::after {
+                    content: "";
+                    position: absolute;
+                    right: 85px;
+                    top: 0;
+                    bottom: 0;
+                    width: 1px;
+                    background: rgba(255, 0, 0, 0.2);
+                    pointer-events: none;
                 }
                 .linha-num { 
                     width: 45px; 
@@ -23,21 +35,25 @@ export const FolhaEngine = {
                     align-items: center; 
                     justify-content: center; 
                     font-size: 0.8rem; 
-                    color: #64748b; 
+                    color: #94a3b8; 
                     border-right: 2px solid #cbd5e1; 
-                    background: #f1f5f9; 
-                    user-select: none; 
+                    background: #f8fafc; 
+                    user-select: none;
+                    font-weight: bold;
                 }
                 .linha-folha { 
                     flex: 1; 
                     border: none; 
                     outline: none; 
                     padding: 0 15px; 
-                    font-size: 18px !important; 
+                    font-size: 19px !important; 
                     font-family: 'Courier New', Courier, monospace !important; 
-                    font-weight: 600 !important; 
+                    font-weight: 700 !important; 
                     color: #000 !important; 
+                    background: transparent;
+                    letter-spacing: 0.5px;
                 }
+                .linha-folha:focus { background: #fffdf0; }
             `;
             document.head.appendChild(style);
         }
@@ -51,29 +67,27 @@ export const FolhaEngine = {
 
             const input = row.querySelector('input');
 
-            // BLOCO DE COMANDOS CRÍTICOS
+            // --- MAPEAMENTO DE TECLAS LIBERADAS ---
             input.addEventListener('keydown', function(e) {
                 const idx = parseInt(this.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // CORREÇÃO DO TAB (PARÁGRAFO)
+                // 1. TAB LIBERADO: Insere 4 espaços (Parágrafo)
                 if (e.key === 'Tab') {
                     e.preventDefault(); 
                     const start = this.selectionStart;
-                    const end = this.selectionEnd;
-                    // Insere 4 espaços de recuo
-                    this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                    this.value = this.value.substring(0, start) + "    " + this.value.substring(this.selectionEnd);
                     this.selectionStart = this.selectionEnd = start + 4;
                 }
 
-                // CORREÇÃO DO ENTER (PULA LINHA)
+                // 2. ENTER LIBERADO: Pula para a linha de baixo
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     if (proximo) proximo.focus();
                 }
 
-                // NAVEGAÇÃO POR SETAS
+                // 3. SETAS LIBERADAS: Navegação vertical
                 if (e.key === 'ArrowUp') {
                     e.preventDefault();
                     if (anterior) anterior.focus();
@@ -83,7 +97,7 @@ export const FolhaEngine = {
                     if (proximo) proximo.focus();
                 }
 
-                // BACKSPACE NO INÍCIO DA LINHA
+                // 4. BACKSPACE INTELIGENTE: Volta linha se estiver no início
                 if (e.key === 'Backspace' && this.selectionStart === 0 && this.value === '') {
                     if (anterior) {
                         e.preventDefault();
@@ -98,6 +112,7 @@ export const FolhaEngine = {
     injetarTextoMultilinhas: (textoBruto, linhaInicial) => {
         if (!textoBruto) return;
         let currentLinha = linhaInicial;
+        // Limpa tags e quebra por parágrafos reais
         const textoProcessado = textoBruto.replace(/<[^>]*>?/gm, '').split('\n');
 
         textoProcessado.forEach(paragrafo => {

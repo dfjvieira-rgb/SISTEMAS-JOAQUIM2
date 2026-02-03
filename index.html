@@ -35,7 +35,7 @@
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; flex: 1; border: none; }
 
-        #mobile-hub { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        #mobile-hub { display: flex; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
         .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
         #mobile-hub.active .fab-sub { display: flex; }
@@ -43,7 +43,6 @@
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
-            #mobile-hub { display: flex; }
         }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
@@ -130,15 +129,24 @@
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
-        await carregarRascunho();
-        setTimeout(window.forcarRadar, 1500);
+        
+        // Pequeno atraso para o motor da folha renderizar antes de carregar o rascunho
+        setTimeout(async () => {
+            await carregarRascunho();
+            window.forcarRadar();
+        }, 500);
+
         setInterval(salvarAutomatico, 30000);
     };
 
     async function carregarRascunho() {
-        const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-        const ed = document.getElementById('editor-principal');
-        if (snap.exists() && ed) ed.innerText = snap.val().conteudo;
+        try {
+            const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
+            const ed = document.getElementById('editor-principal');
+            if (snap.exists() && ed) {
+                ed.innerText = snap.val().conteudo;
+            }
+        } catch (e) { console.error("Erro rascunho:", e); }
     }
 
     async function salvarAutomatico() {
@@ -158,7 +166,7 @@
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
+        document.getElementById('modal-title').innerText = "MUDAR EXAME";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
@@ -168,11 +176,12 @@
             content.appendChild(b);
         }
         modal.style.display = 'flex';
+        if(window.innerWidth < 768) window.toggleFoguete();
     };
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "PERGAMINHO (ESTRUTURAS)";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {
@@ -182,6 +191,7 @@
             content.appendChild(b);
         });
         modal.style.display = 'flex';
+        if(window.innerWidth < 768) window.toggleFoguete();
     };
 
     window.verPDF = (t) => {
@@ -206,42 +216,21 @@
         const ed = document.getElementById('editor-principal');
         if(confirm("Deseja salvar no Histórico Oficial?")) {
             await engineSaveElite(db, window.activeEx, true, ed.innerText);
-            alert("PEÇA SALVA!");
+            alert("SALVO NO HISTÓRICO!");
         }
     };
 
-    // MARTELO REFORMULADO: INJETA ONDE O CURSOR ESTIVER
+    // MARTELO SEGURO: INJETA NO FINAL PARA NÃO QUEBRAR LINHAS
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if(!dna) return alert("DNA não encontrado.");
-
         const ed = document.getElementById('editor-principal');
-        if(!ed) return;
-
-        const selection = window.getSelection();
-        
-        // Verifica se o clique está dentro do editor
-        if (selection.rangeCount > 0 && ed.contains(selection.anchorNode)) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents(); // Remove seleção se houver
-            
-            // Cria um nó de texto com as teses
-            const textNode = document.createTextNode(dna);
-            range.insertNode(textNode);
-            
-            // Move o cursor para o final do texto injetado
-            range.setStartAfter(textNode);
-            range.setEndAfter(textNode);
-            selection.removeAllRanges();
-            selection.addRange(range);
+        if(dna && ed) {
+            ed.focus();
+            FolhaEngine.injetarTextoMultilinhas(dna);
+            if(window.innerWidth < 768 && document.getElementById('mobile-hub').classList.contains('active')) window.toggleFoguete();
         } else {
-            // Se não houver cursor, joga no final e avisa
-            ed.innerText += "\n" + dna;
-            alert("Lugar não selecionado! Injetado no final da peça.");
+            alert("Espelho não localizado para o Exame " + window.activeEx);
         }
-        
-        ed.focus();
-        if(window.innerWidth < 768 && document.getElementById('mobile-hub').classList.contains('active')) window.toggleFoguete();
     };
 
     window.forcarRadar = () => {
@@ -253,7 +242,7 @@
         }
     };
 
-    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.getElementById('editor-principal').innerText = ""; };
+    window.limparFolha = () => { if(confirm("Apagar tudo?")) { document.getElementById('editor-principal').innerText = ""; } };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>

@@ -16,7 +16,29 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
+        
+        /* Header com Cronômetro */
+        header { 
+            background: var(--primary); 
+            height: 60px; 
+            padding: 0 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--gold); 
+            z-index: 5000; 
+        }
+        #cronometro {
+            background: rgba(0,0,0,0.4);
+            color: var(--gold);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            font-size: 1.1rem;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
         /* Sidebar Desktop */
@@ -38,33 +60,18 @@
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; flex: 1; border: none; background: white; }
 
-        /* MOBILE HUB - REFORMULADO */
+        /* MOBILE HUB */
         #mobile-hub { display: flex; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 10px; align-items: center; }
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
-        
-        .fab-sub { 
-            width: 45px; height: 45px; border-radius: 50%; border: none; color: white; 
-            display: none; align-items: center; justify-content: center; 
-            font-size: 1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
-            transition: 0.3s; 
-        }
+        .fab-sub { width: 45px; height: 45px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
         #mobile-hub.active .fab-sub { display: flex; animation: slideUp 0.3s ease forwards; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* IMPRESSÃO MULTIPÁGINA */
-        @media print {
-            header, .sidebar, .sticky-tools, #mobile-hub, #pdf-viewer, .modal, .toolbar-liberdade { display: none !important; }
-            html, body { height: auto !important; overflow: visible !important; position: static !important; background: white !important; }
-            main, .editor-container { display: block !important; height: auto !important; overflow: visible !important; position: static !important; }
-            .paper { display: block !important; position: static !important; width: 100% !important; max-width: none !important; height: auto !important; min-height: auto !important; box-shadow: none !important; margin: 0 !important; }
-            #folha-total, #editor-principal { display: block !important; position: static !important; height: auto !important; overflow: visible !important; }
-            .linha-fgv { page-break-inside: avoid !important; break-inside: avoid !important; }
-        }
-
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
+            header { padding: 0 10px; }
         }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
@@ -74,7 +81,10 @@
 <body class="dark-mode">
 
 <header>
-    <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
+    <div style="color:white; font-weight:900; font-size: 0.9rem;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
+    
+    <div id="cronometro">00:00:00</div>
+
     <div id="sync-status" style="color:var(--gold); font-size:11px; font-weight:bold;">EXAME <span id="ex-display">--</span></div>
 </header>
 
@@ -115,11 +125,9 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        
         <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
         <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
-        
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
@@ -149,9 +157,23 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
 
+    // Lógica do Cronômetro
+    let segundos = 0;
+    function iniciarCronometro() {
+        setInterval(() => {
+            segundos++;
+            const h = Math.floor(segundos / 3600);
+            const m = Math.floor((segundos % 3600) / 60);
+            const s = segundos % 60;
+            document.getElementById('cronometro').innerText = 
+                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }, 1000);
+    }
+
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
+        iniciarCronometro();
         setTimeout(async () => {
             const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             const ed = document.getElementById('editor-principal');

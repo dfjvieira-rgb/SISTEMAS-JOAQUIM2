@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO ELITE [2026-02-01]
+// FolhaEngine.js - VERSÃO LIBERADA ABNT [2026-02-02]
 export const FolhaEngine = {
     LIMITE_OAB: 60, 
 
@@ -11,125 +11,115 @@ export const FolhaEngine = {
             const style = document.createElement('style');
             style.id = 'style-folha-elite';
             style.innerHTML = `
-                .linha-wrapper { background: #fff; border-bottom: 1px solid #d1d5db; display: flex; height: 35px; position: relative; }
-                .linha-wrapper::after { content: ""; position: absolute; right: 60px; top: 0; bottom: 0; width: 2px; background: rgba(239, 68, 68, 0.4); pointer-events: none; }
-                .linha-num { width: 40px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #94a3b8; border-right: 1px solid #d1d5db; background: #f8fafc; user-select: none; }
-                .linha-folha { 
-                    flex: 1; border: none; outline: none; padding: 0 15px; padding-right: 95px !important; 
-                    font-size: 19px !important; font-family: 'Courier New', Courier, monospace !important; 
-                    font-weight: 700 !important; color: #000 !important; letter-spacing: 0.5px;
-                    background: transparent;
+                .linha-wrapper { 
+                    background: #fff; 
+                    border-bottom: 1px solid #d1d5db; 
+                    display: flex; 
+                    height: 32px; /* Altura padrão ABNT/FGV */
+                    position: relative; 
                 }
-                @keyframes pulse-discreto { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-                .sync-success { color: #10b981 !important; animation: pulse-discreto 1.5s infinite; font-weight: 900 !important; }
+                /* Margem Direita (Linha Vermelha de limite) */
+                .linha-wrapper::after { 
+                    content: ""; 
+                    position: absolute; 
+                    right: 80px; 
+                    top: 0; 
+                    bottom: 0; 
+                    width: 1px; 
+                    background: rgba(239, 68, 68, 0.4); 
+                    pointer-events: none; 
+                }
+                .linha-num { 
+                    width: 45px; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    font-size: 0.8rem; 
+                    color: #64748b; 
+                    border-right: 2px solid #cbd5e1; 
+                    background: #f1f5f9; 
+                    user-select: none; 
+                    font-weight: bold;
+                }
+                .linha-folha { 
+                    flex: 1; 
+                    border: none; 
+                    outline: none; 
+                    padding: 0 15px; 
+                    font-size: 18px !important; 
+                    font-family: 'Courier New', Courier, monospace !important; 
+                    font-weight: 600 !important; 
+                    color: #1a1a1a !important; 
+                    background: transparent;
+                    line-height: 32px;
+                }
+                .linha-folha:focus { background: #fffdeb; }
             `;
             document.head.appendChild(style);
         }
 
+        // Criando as 150 linhas
         for(let i=1; i<=150; i++) {
             const row = document.createElement('div');
             row.className = 'linha-wrapper';
-            row.innerHTML = `<div class="linha-num">${i}</div>
-                <input class="linha-folha" id="L${i}" maxlength="95" spellcheck="false" autocomplete="off" data-index="${i}">`;
+            row.innerHTML = `
+                <div class="linha-num">${i}</div>
+                <input class="linha-folha" id="L${i}" spellcheck="false" autocomplete="off" data-index="${i}">
+            `;
             container.appendChild(row);
 
             const input = row.querySelector('input');
 
-            // QUEBRA AUTOMÁTICA (Melhoria mantida)
-            input.addEventListener('input', (e) => {
-                if (e.inputType === 'deleteContentBackward') return;
-                if (input.value.length >= FolhaEngine.LIMITE_OAB) {
-                    const val = input.value;
-                    const lastSpc = val.lastIndexOf(" ");
-                    if (lastSpc > 0) {
-                        const stays = val.substring(0, lastSpc);
-                        const jumps = val.substring(lastSpc).trim();
-                        const next = document.getElementById(`L${i + 1}`);
-                        if (next) {
-                            input.value = stays;
-                            next.value = (jumps + " " + next.value).trim();
-                            next.focus();
-                        }
-                    }
-                }
-            });
-
-            // NAVEGAÇÃO E EDIÇÃO (Shift Vertical)
+            // NAVEGAÇÃO FLUIDA
             input.addEventListener('keydown', (e) => {
                 const idx = parseInt(input.getAttribute('data-index'));
                 const proximo = document.getElementById(`L${idx + 1}`);
                 const anterior = document.getElementById(`L${idx - 1}`);
 
-                // ENTER: Empurra para baixo sem duplicar
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    const pos = input.selectionStart;
-                    const textoAtual = input.value;
-                    const fica = textoAtual.substring(0, pos).trim();
-                    const desce = textoAtual.substring(pos).trim();
-
-                    // Abre o espaço primeiro (Shift Vertical)
-                    for (let j = 150; j > idx + 1; j--) {
-                        const linhaAlvo = document.getElementById(`L${j}`);
-                        const linhaAcima = document.getElementById(`L${j - 1}`);
-                        if (linhaAlvo && linhaAcima) {
-                            linhaAlvo.value = linhaAcima.value;
-                        }
-                    }
-
-                    if (proximo) {
-                        input.value = fica; 
-                        proximo.value = desce; 
-                        proximo.focus();
-                        proximo.setSelectionRange(0, 0);
-                    }
+                    if (proximo) proximo.focus();
                 }
 
-                // BACKSPACE: Volta para linha anterior se vazio
                 if (e.key === 'Backspace' && input.value === '') {
                     if (anterior) {
                         e.preventDefault();
                         anterior.focus();
+                        // Move cursor para o final da linha anterior
                         const len = anterior.value.length;
                         anterior.setSelectionRange(len, len);
                     }
                 }
 
-                // DELETE: Puxa o texto de baixo para cima
-                if (e.key === 'Delete') {
-                    if (e.ctrlKey) { 
-                        e.preventDefault();
-                        input.value = "";
-                    } 
-                    else if (input.value === '') { 
-                        e.preventDefault();
-                        for (let j = idx; j < 150; j++) {
-                            const atual = document.getElementById(`L${j}`);
-                            const prox = document.getElementById(`L${j + 1}`);
-                            if (atual && prox) atual.value = prox.value;
-                        }
-                        const ultima = document.getElementById('L150');
-                        if (ultima) ultima.value = "";
-                    }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (anterior) anterior.focus();
                 }
 
-                if (e.key === 'ArrowUp') { e.preventDefault(); if (anterior) anterior.focus(); }
-                if (e.key === 'ArrowDown') { e.preventDefault(); if (proximo) proximo.focus(); }
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (proximo) proximo.focus();
+                }
             });
         }
     },
 
     injetarTextoMultilinhas: (textoBruto, linhaInicial) => {
+        if (!textoBruto) return;
         let currentLinha = linhaInicial;
-        const limpo = textoBruto.replace(/<[^>]*>?/gm, '').trim();
-        const textoProcessado = limpo.toLowerCase().replace(/(^\w|\.\s+\w)/gm, s => s.toUpperCase());
-        const paragrafos = textoProcessado.split('\n');
+        
+        // Limpeza e Formatação básica
+        const textoProcessado = textoBruto
+            .replace(/<[^>]*>?/gm, '') // Remove HTML
+            .split('\n');
 
-        paragrafos.forEach(paragrafo => {
+        textoProcessado.forEach(paragrafo => {
             let palavras = paragrafo.split(' ');
             let acumulador = "";
+
             palavras.forEach(p => {
-                if ((acumulador + p).length > FolhaEngine.LIMITE_OAB) {
+                // Se a palavra for muito longa ou o acumulador encher
+                if ((acumulador + p).length > 75) { 
                     const el = document.getElementById(`L${currentLinha}`);
                     if (el) el.value = acumulador.trim();
                     currentLinha++;
@@ -138,6 +128,8 @@ export const FolhaEngine = {
                     acumulador += p + " ";
                 }
             });
+
+            // Salva o resto do parágrafo
             const elFinal = document.getElementById(`L${currentLinha}`);
             if (elFinal) elFinal.value = acumulador.trim();
             currentLinha++;

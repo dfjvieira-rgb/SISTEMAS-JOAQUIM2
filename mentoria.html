@@ -6,23 +6,30 @@
     <title>HISTÓRICO MENTORIA | ELITE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; --danger: #ef4444; }
+        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
         
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
         
-        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 12px; text-transform: uppercase; }
-        .btn-del { background: var(--danger) !important; color: white !important; width: 35px; height: 35px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
         
+        .btn-action { width: 34px; height: 34px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; transition: 0.2s; }
+        .btn-del { background: var(--danger); }
+        .btn-edit { background: var(--info); color: white; }
+        .btn-share { background: #334155; color: var(--gold); }
+        .btn-open { background: var(--success); flex: 1; font-weight: 900; text-transform: uppercase; font-size: 11px; }
+
         .feed { max-height: 400px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
         .feed::-webkit-scrollbar { width: 4px; }
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: flex-start; }
-        .post-it-content { flex: 1; }
+        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border: 1px solid rgba(0,0,0,0.1); }
+        .post-it-content { flex: 1; pointer-events: none; }
+        .post-it-actions { display: flex; flex-direction: column; gap: 5px; }
 
         input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
 
@@ -32,44 +39,44 @@
 <body>
 
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
-    <h2 style="font-weight:900">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <button class="btn" style="width:auto; margin:0; background:white;" onclick="window.close()">VOLTAR</button>
+    <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
+    <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:var(--gold); margin:0;"><i class="fas fa-history"></i> HISTÓRICO OFICIAL DE PEÇAS</h3>
-        <div id="feed-producao" class="feed">Conectando ao banco...</div>
+        <h3 style="color:var(--gold); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
+        <div id="feed-producao" class="feed">Conectando...</div>
     </section>
 
     <section class="panel" style="border-top-color: #a855f7;">
-        <h3 style="color:#a855f7;"><i class="fas fa-search"></i> QUAL A PEÇA? (VEREDITO)</h3>
-        <input id="qp-t" placeholder="Momento Processual (Ex: Após Sentença)">
-        <textarea id="qp-c" placeholder="A peça será X porque o enunciado disse Y..."></textarea>
-        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR VEREDITO</button>
+        <h3 style="color:#a855f7; font-size: 0.9rem;"><i class="fas fa-search"></i> QUAL A PEÇA?</h3>
+        <input id="qp-t" placeholder="Momento Processual">
+        <textarea id="qp-c" placeholder="Por que é essa peça?"></textarea>
+        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR / ATUALIZAR</button>
         <div id="feed-qp" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Assunto (Ex: Agravo x REsp)">
+        <h3 style="color:#f472b6; font-size: 0.9rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Assunto">
         <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR INSIGHT</button>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR / ATUALIZAR</button>
         <div id="feed-nc" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
+        <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
         <input id="tese-t" placeholder="Título da Tese">
-        <textarea id="tese-c" placeholder="Fundamentação legal..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR TESE</button>
+        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR / ATUALIZAR</button>
         <div id="feed-tese" class="feed"></div>
     </section>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -81,28 +88,57 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // SALVAR UNIVERSAL
+    // Variável para controlar se estamos editando um item específico
+    let editId = { qp: null, nc: null, tese: null };
+
     window.salvarRapido = (type) => {
         const t = document.getElementById(type+'-t');
         const c = document.getElementById(type+'-c');
         if(t.value && c.value) {
-            push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
+            if (editId[type]) {
+                // Atualiza item existente
+                set(ref(db, `v13_${type}/${editId[type]}`), { t: t.value, c: c.value, ts: serverTimestamp() });
+                editId[type] = null;
+            } else {
+                // Cria novo item
+                push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
+            }
             t.value = ""; c.value = "";
         }
     };
 
-    // APAGAR UNIVERSAL
+    window.prepararEdicao = (type, id, titulo, conteudo) => {
+        document.getElementById(type+'-t').value = titulo;
+        document.getElementById(type+'-c').value = conteudo;
+        editId[type] = id;
+        document.getElementById(type+'-t').focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     window.apagarRegistro = (path, id) => {
-        if(confirm("Deseja excluir este registro permanentemente?")) {
-            remove(ref(db, path + '/' + id));
+        if(confirm("Excluir permanentemente?")) remove(ref(db, path + '/' + id));
+    };
+
+    window.compartilharRegistro = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        if(!s.exists()) return;
+        const p = s.val();
+        const baseLinhas = p.linhas || p.conteudo || [];
+        const texto = Array.isArray(baseLinhas) ? baseLinhas.join('\n') : baseLinhas;
+        const msg = `📝 *ELITE OAB*\n🏆 *Exame:* ${p.exame}\n⚖️ *Peça:* ${p.nome_peca || p.peca}\n\n${texto}`;
+        
+        if (navigator.share) {
+            navigator.share({ title: 'Minha Peça Elite', text: msg });
+        } else {
+            navigator.clipboard.writeText(msg);
+            alert("Texto copiado!");
         }
     };
 
-    // ESCUTA EM TEMPO REAL
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
         
-        // --- PEÇAS ---
+        // --- FEED PEÇAS ---
         const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
         const treinos = d.producao_v13 || {};
         Object.keys(treinos).reverse().forEach(id => {
@@ -110,29 +146,32 @@
             if(id.includes("RASCUNHO_ATUAL")) return; 
             fP.innerHTML += `
                 <div class="card-h">
-                    <span><strong style="color:var(--gold)">EXAME ${t.exame}</strong> | ${t.nome_peca || "PEÇA"}<br><small>${t.data_envio || ""}</small></span>
+                    <span style="font-size:13px;"><strong style="color:var(--gold)">EXAME ${t.exame}</strong> ${t.nome_peca || "PEÇA"}</span>
                     <div style="display:flex; gap:5px;">
-                        <button class="btn" style="width:70px; margin:0; background:var(--success); color:white" onclick="verTreino('${id}')">ABRIR</button>
-                        <button class="btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn-action btn-share" onclick="compartilharRegistro('${id}')"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-action btn-open" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
         });
 
-        // --- POST-ITS (NC, TESE, QP) ---
-        const configPost = {
-            'nc': { color: '#f472b6', feed: 'feed-nc' },
-            'tese': { color: '#3b82f6', feed: 'feed-tese' },
-            'qp': { color: '#a855f7', feed: 'feed-qp' }
-        };
-
+        // --- FEED POST-ITS (NC, TESE, QP) ---
+        const configPost = { 'nc': '#f472b6', 'tese': '#3b82f6', 'qp': '#a855f7' };
         Object.keys(configPost).forEach(type => {
-            const f = document.getElementById(configPost[type].feed); f.innerHTML = "";
+            const f = document.getElementById('feed-'+type); f.innerHTML = "";
             const items = d['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
+                const item = items[id];
                 f.innerHTML += `
-                    <div class="post-it" style="background:${configPost[type].color}">
-                        <div class="post-it-content"><strong>${items[id].t}</strong><p style="font-size:0.8rem; margin:5px 0 0 0; white-space:pre-wrap;">${items[id].c}</p></div>
-                        <button class="btn-del" style="background:rgba(0,0,0,0.2) !important;" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
+                    <div class="post-it" style="background:${configPost[type]}">
+                        <div class="post-it-content">
+                            <strong style="font-size:0.85rem">${item.t}</strong>
+                            <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap; opacity:0.9;">${item.c}</p>
+                        </div>
+                        <div class="post-it-actions">
+                            <button class="btn-action" style="background:rgba(255,255,255,0.3); color:black;" onclick="prepararEdicao('${type}', '${id}', '${item.t.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}')"><i class="fas fa-pen"></i></button>
+                            <button class="btn-action" style="background:rgba(0,0,0,0.2); color:white;" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
+                        </div>
                     </div>`;
             });
         });
@@ -144,7 +183,9 @@
             const p = s.val();
             const win = window.open('', '_blank');
             const baseLinhas = p.linhas || p.conteudo || [];
-            const linhasHtml = baseLinhas.map((l, i) => `<div style="display:flex; border-bottom:1px solid #eee; padding:4px 0;"><span style="width:30px; color:#999; font-size:12px;">${i+1}</span><span style="font-family:monospace;">${l || ""}</span></div>`).join('');
+            const linhasHtml = Array.isArray(baseLinhas) 
+                ? baseLinhas.map((l, i) => `<div style="display:flex; border-bottom:1px solid #eee; padding:4px 0;"><span style="width:30px; color:#999; font-size:12px;">${i+1}</span><span>${l || ""}</span></div>`).join('')
+                : `<div style="white-space:pre-wrap;">${baseLinhas}</div>`;
             win.document.write(`<html><body style="padding:20px; font-family:sans-serif;"><h2>${p.nome_peca}</h2>${linhasHtml}</body></html>`);
         });
     };

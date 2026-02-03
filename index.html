@@ -81,7 +81,7 @@
 
     <section class="editor-workspace">
         <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO</div>
+            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIV-CLIQUE</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Ver</button>
@@ -117,6 +117,7 @@
 </div>
 
 <script type="module">
+    // IMPORTAÇÕES DA RAIZ
     import { db } from './firebase-config.js';
     import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
@@ -133,7 +134,7 @@
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
         await carregarRascunho();
-        setTimeout(window.forcarRadar, 1000);
+        setTimeout(window.forcarRadar, 1500);
         setInterval(salvarAutomatico, 30000);
     };
 
@@ -153,7 +154,6 @@
         }
     }
 
-    // --- RESTAURAÇÃO DA LISTA DE EXAMES ---
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
@@ -219,9 +219,10 @@
     };
 
     window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
+    
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if (dna) {
+        if (dna && RadarEngine) {
             const analise = RadarEngine.analisar(dna);
             RadarEngine.renderizar(analise);
             document.getElementById('identificador-peca').innerText = analise.id.toUpperCase();

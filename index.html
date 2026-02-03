@@ -19,21 +19,36 @@
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        @keyframes pulse-discreto {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1); }
+        /* AJUSTE CRÍTICO: PERMITIR SCROLL INFINITO NA FOLHA */
+        .editor-container { 
+            flex: 1; 
+            overflow-y: scroll !important; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            background: var(--bg-paper); 
+            width: 100%; 
+            position: relative; 
+            z-index: 10; 
         }
-        .sync-success { color: #10b981 !important; animation: pulse-discreto 1.2s infinite; font-weight: 900; }
 
-        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; z-index: 2000; }
-        .btn-side { width: 100%; min-height: 44px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; text-transform: uppercase; }
+        /* AJUSTE CRÍTICO: PAPER DEVE ESTICAR ATÉ AS 150 LINHAS */
+        .paper { 
+            background: var(--paper-color); 
+            width: 100%; 
+            max-width: 850px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            margin-bottom: 100px; 
+            position: relative; 
+            z-index: 15; 
+            border-radius: 4px;
+            height: auto !important; /* Libera a altura fixa */
+            min-height: 5250px !important; /* Força 150 linhas (150 * 35px) */
+        }
 
-        .editor-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 20px; background: var(--bg-paper); width: 100%; position: relative; z-index: 10; }
-        .paper { background: var(--paper-color); width: 100%; max-width: 850px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 50px; position: relative; z-index: 15; border-radius: 4px; overflow: hidden; }
         #identificador-peca { width: 100%; padding: 15px; background: #f1f5f9; border-bottom: 2px solid var(--gold); text-align: center; font-weight: 900; color: #1e293b; font-size: 1.1rem; cursor: pointer; }
-
-        .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); }
+        .toolbar-liberdade { display: flex; background: #fff; border-bottom: 1px solid var(--line-color); position: sticky; top: 0; z-index: 100; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #eee; text-transform: uppercase; }
 
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
@@ -53,6 +68,9 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #000; }
         .opt-btn { width: 100%; padding: 20px; margin-bottom: 10px; border-radius: 12px; border: 2px solid #ddd; background: #f1f5f9; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+        
+        .sync-success { color: #10b981 !important; animation: pulse-discreto 1.2s infinite; font-weight: 900; }
+        @keyframes pulse-discreto { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -129,51 +147,24 @@
     window.FolhaEngine = FolhaEngine;
     let isFinalizing = false;
 
-    // --- CARREGAR RASCUNHO (BLINDADO) ---
     window.carregarRascunho = async () => {
         const editor = document.getElementById('editor-principal');
         if (!editor) return;
-
         try {
             const snapshot = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             if (snapshot.exists()) {
-                const dados = snapshot.val();
-                editor.innerText = dados.conteudo || "";
+                editor.innerText = snapshot.val().conteudo || "";
             } else {
                 const local = localStorage.getItem(`rascunho_${window.activeEx}`);
                 if (local) editor.innerText = local;
             }
-        } catch (e) { console.error("Erro Load:", e); }
-    };
-
-    // --- SALVAMENTO AUTOMÁTICO ---
-    const setupAutoSave = () => {
-        const editor = document.getElementById('editor-principal');
-        if (editor) {
-            editor.addEventListener('input', () => {
-                localStorage.setItem(`rascunho_${window.activeEx}`, editor.innerText);
-            });
-        }
-    };
-
-    window.dispararSalvar = async () => {
-        if (isFinalizing) return;
-        const editor = document.getElementById('editor-principal');
-        if (!editor || !editor.innerText.trim()) return;
-
-        try {
-            await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
-                conteudo: editor.innerText,
-                timestamp: new Date().getTime()
-            });
-        } catch (e) { console.error("Erro Sync:", e); }
+        } catch (e) { console.error(e); }
     };
 
     window.finalizarPeca = async () => {
         const editor = document.getElementById('editor-principal');
         if(!confirm("Deseja enviar ao histórico oficial?")) return;
         isFinalizing = true;
-        
         const ok = await engineSaveElite(db, window.activeEx, true, editor.innerText);
         if(ok) {
             document.getElementById('sync-text').innerText = "SINCRO-HISTORY";
@@ -190,12 +181,9 @@
         const frame = document.getElementById('pdf-frame');
         const view = document.getElementById('pdf-split-view');
         let path = "";
-        const cb = `?t=${new Date().getTime()}`;
-
-        if (tipo === 'P') path = `ro${window.activeEx}.pdf${cb}`;
-        else if (tipo === 'G') path = `ro${window.activeEx}-gabarito.pdf${cb}`;
-        else if (tipo === 'V') path = `vade.pdf${cb}`;
-        
+        if (tipo === 'P') path = `ro${window.activeEx}.pdf`;
+        else if (tipo === 'G') path = `ro${window.activeEx}-gabarito.pdf`;
+        else if (tipo === 'V') path = `vade.pdf`;
         frame.src = "about:blank";
         setTimeout(() => { frame.src = path; view.classList.add('active'); }, 50);
     };
@@ -208,9 +196,23 @@
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
         await window.carregarRascunho();
-        setupAutoSave();
+        const editor = document.getElementById('editor-principal');
+        if(editor) {
+            editor.addEventListener('input', () => {
+                localStorage.setItem(`rascunho_${window.activeEx}`, editor.innerText);
+            });
+        }
         setTimeout(window.forcarRadar, 1500);
-        setInterval(window.dispararSalvar, 30000);
+        setInterval(async () => {
+            if (isFinalizing) return;
+            const ed = document.getElementById('editor-principal');
+            if (ed && ed.innerText.trim()) {
+                await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
+                    conteudo: ed.innerText,
+                    timestamp: new Date().getTime()
+                });
+            }
+        }, 30000);
     };
 
     window.toggleFoguete = () => {
@@ -229,13 +231,10 @@
     };
 
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.limparFolha = () => { 
-        if(confirm("Apagar tudo?")) {
-            const editor = document.getElementById('editor-principal');
-            if(editor) editor.innerText = "";
-            localStorage.removeItem(`rascunho_${window.activeEx}`);
-        }
-    };
+    window.limparFolha = () => { if(confirm("Apagar tudo?")) { 
+        document.getElementById('editor-principal').innerText = ""; 
+        localStorage.removeItem(`rascunho_${window.activeEx}`);
+    }};
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
@@ -259,10 +258,7 @@
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className='opt-btn';
             b.innerHTML = `<span>${k}</span> <i class="fas fa-file-alt"></i>`;
-            b.onclick = () => {
-                FolhaEngine.injetarTextoMultilinhas(pecas[k]);
-                modal.style.display='none';
-            };
+            b.onclick = () => { FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; };
             content.appendChild(b);
         });
         modal.style.display='flex';

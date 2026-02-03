@@ -1,11 +1,11 @@
-// FolhaEngine.js - VERSÃO MASTER INTEGRADA [VADE + PERGAMINHO RESTAURADOS]
+// FolhaEngine.js - VERSÃO DEFINITIVA [ANTI-UNDEFINED]
 export const FolhaEngine = {
     montar: (containerId) => {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = "";
         
-        const styleId = 'style-folha-master-v4';
+        const styleId = 'style-folha-v4-final';
         if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
             style.id = styleId;
@@ -48,7 +48,6 @@ export const FolhaEngine = {
                     background-repeat: repeat-y;
                 }
                 .area-editor div, .area-editor p { margin: 0; padding: 0; line-height: 35px; }
-
                 @media (max-width: 768px) {
                     .folha-container { grid-template-columns: 40px 1fr; }
                     .area-editor { font-size: 17px !important; padding: 0 10px !important; }
@@ -79,7 +78,7 @@ export const FolhaEngine = {
         folha.appendChild(editor);
         container.appendChild(folha);
 
-        // TAB FUNCIONANDO
+        // TAB RESTAURADO
         editor.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
                 e.preventDefault();
@@ -96,22 +95,22 @@ export const FolhaEngine = {
         });
     },
 
-    // FUNÇÃO QUE O PERGAMINHO CHAMA
-    injetarEstrutura: (texto) => {
+    // FUNÇÃO PARA O PERGAMINHO
+    injetarTexto: (texto) => {
         const editor = document.getElementById('editor-principal');
-        if (!editor) return;
-        // Limpa o editor para receber a nova estrutura ou adiciona no fim
-        editor.innerText = texto; 
-        editor.focus();
+        if (editor) {
+            editor.innerText = texto;
+            editor.focus();
+        } else {
+            console.error("Editor não encontrado para injetar texto.");
+        }
     },
 
-    // FUNÇÃO PARA O VADE MECUM (MARTELO)
-    abrirVadeMecum: () => {
+    // FUNÇÃO PARA O VADE (MARTELO)
+    toggleVade: () => {
         const modal = document.getElementById('modal-vade');
         if (modal) {
-            modal.style.display = 'flex';
-        } else {
-            alert("Vade Mecum ainda não carregado no HTML.");
+            modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
         }
     },
 
@@ -120,12 +119,13 @@ export const FolhaEngine = {
         if (!editor) return;
         const linhas = editor.innerText.split('\n');
         const overlay = document.createElement('div');
+        overlay.id = "view-overlay";
         overlay.style = "position:fixed; inset:0; background:rgba(15,23,42,0.98); z-index:999999; overflow-y:auto; padding:20px; display:flex; flex-direction:column; align-items:center;";
         
         const papel = document.createElement('div');
         papel.style = "background:white; width:100%; max-width:850px; box-shadow:0 0 50px #000; padding-bottom:50px;";
 
-        let html = `<div style="text-align:center; border:3px solid #000; padding:15px; margin:20px; font-weight:900;">CADERNO DEFINITIVO</div>`;
+        let html = `<div style="text-align:center; border:3px solid #000; padding:15px; margin:20px; font-weight:900;">CADERNO DE RESPOSTAS</div>`;
         for(let i=1; i<=150; i++) {
             const txt = linhas[i-1] || "";
             html += `

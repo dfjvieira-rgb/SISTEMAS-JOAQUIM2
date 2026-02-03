@@ -17,7 +17,6 @@
         
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         
-        /* Header com Cronômetro */
         header { 
             background: var(--primary); 
             height: 60px; 
@@ -28,24 +27,35 @@
             border-bottom: 2px solid var(--gold); 
             z-index: 5000; 
         }
-        #cronometro {
+
+        /* CRONÔMETRO INTERATIVO */
+        #cronometro-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             background: rgba(0,0,0,0.4);
+            padding: 5px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        #cronometro-container:hover { border-color: var(--gold); }
+        #cronometro-container.pausado { opacity: 0.5; border-color: #64748b; }
+
+        #cronometro {
             color: var(--gold);
-            padding: 4px 12px;
-            border-radius: 6px;
             font-family: 'Courier New', Courier, monospace;
             font-weight: 900;
             font-size: 1.1rem;
-            border: 1px solid rgba(251, 191, 36, 0.3);
         }
+        .timer-icon { color: var(--gold); font-size: 0.8rem; }
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        /* Sidebar Desktop */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
 
-        /* Editor Area */
         .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
@@ -54,13 +64,11 @@
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; position: relative; }
 
-        /* PDF Viewer */
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; flex: 1; border: none; background: white; }
 
-        /* MOBILE HUB */
         #mobile-hub { display: flex; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 10px; align-items: center; }
         .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
         .fab-sub { width: 45px; height: 45px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
@@ -71,7 +79,6 @@
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
-            header { padding: 0 10px; }
         }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
@@ -83,7 +90,10 @@
 <header>
     <div style="color:white; font-weight:900; font-size: 0.9rem;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
     
-    <div id="cronometro">00:00:00</div>
+    <div id="cronometro-container" onclick="window.toggleTimer()" title="Clique para Pausar/Continuar">
+        <i class="fas fa-play timer-icon" id="timer-status-icon"></i>
+        <div id="cronometro">00:00:00</div>
+    </div>
 
     <div id="sync-status" style="color:var(--gold); font-size:11px; font-weight:bold;">EXAME <span id="ex-display">--</span></div>
 </header>
@@ -157,16 +167,34 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
 
-    // Lógica do Cronômetro
+    // Lógica do Cronômetro com Pause
     let segundos = 0;
+    let timerAtivo = true;
+    
+    window.toggleTimer = () => {
+        timerAtivo = !timerAtivo;
+        const container = document.getElementById('cronometro-container');
+        const icon = document.getElementById('timer-status-icon');
+        
+        if(timerAtivo) {
+            container.classList.remove('pausado');
+            icon.className = 'fas fa-play timer-icon';
+        } else {
+            container.classList.add('pausado');
+            icon.className = 'fas fa-pause timer-icon';
+        }
+    };
+
     function iniciarCronometro() {
         setInterval(() => {
-            segundos++;
-            const h = Math.floor(segundos / 3600);
-            const m = Math.floor((segundos % 3600) / 60);
-            const s = segundos % 60;
-            document.getElementById('cronometro').innerText = 
-                `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            if(timerAtivo) {
+                segundos++;
+                const h = Math.floor(segundos / 3600);
+                const m = Math.floor((segundos % 3600) / 60);
+                const s = segundos % 60;
+                document.getElementById('cronometro').innerText = 
+                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
         }, 1000);
     }
 

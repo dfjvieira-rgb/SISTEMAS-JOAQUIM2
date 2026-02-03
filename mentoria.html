@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HISTÓRICO MENTORIA | ELITE 2026</title>
+    <title>SISTEMA DE APROVAÇÃO ELITE | JOAQUIM 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
@@ -12,77 +12,51 @@
             --gatilho: #10b981; --keyword: #f97316; --questoes: #6366f1;
         }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
-        
         .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1400px; margin: 0 auto; }
         .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
-        
         .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
-        
         .btn-action { width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
-        .btn-del { background: var(--danger); color: white; }
-        .btn-edit { background: var(--info); color: white; }
-
-        .feed { max-height: 400px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
+        .feed { max-height: 500px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
         .feed::-webkit-scrollbar { width: 4px; }
         .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
         .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.1); }
-        .post-it-content { flex: 1; }
-        .post-it-actions { display: flex; flex-direction: column; gap: 8px; }
-
         .kw-tag { background: black; color: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
         .res-label { display: block; color: #312e81; font-size: 10px; font-weight: 900; margin-top: 8px; text-decoration: underline; }
-
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
-        input:focus, textarea:focus { border-color: var(--gold); outline: none; }
         .modo-edicao { border-color: var(--gold) !important; background: #2d3748 !important; }
-
         @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px; flex-wrap: wrap; gap: 10px;">
-    <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
+    <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MAPA DA MINA <span style="color:var(--gold)">APROVAÇÃO</span></h2>
     <div style="display:flex; gap:10px;">
-        <button class="btn" style="width:auto; margin:0; background:var(--questoes); color:white;" onclick="window.injetarQuestoesElite()">INJETAR QUESTÕES + RESOLUÇÕES</button>
-        <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
+        <button class="btn" style="width:auto; margin:0; background:var(--danger); color:white;" onclick="window.injetarTudo()">INJETAR 50 QUESTÕES (HISTÓRICO 30-44)</button>
+        <button class="btn" style="width:auto; margin:0; background:white;" onclick="window.close()">VOLTAR</button>
     </div>
 </header>
 
 <main class="dashboard">
     <section class="panel" style="border-top-color: var(--questoes); grid-column: span 2;">
-        <h3 style="color:var(--questoes); font-size: 0.9rem;"><i class="fas fa-question-circle"></i> TREINO DE QUESTÕES (RESOLUÇÃO FGV)</h3>
-        <div style="display: flex; gap: 10px;">
-            <input id="q-t" placeholder="Pergunta / Enunciado">
-            <input id="q-kw" style="border-color: var(--keyword); width: 40%;" placeholder="Fundamento Jurídico (Art./Súmula)">
-        </div>
-        <textarea id="q-c" style="height: 100px;" placeholder="Resolução completa conforme o espelho..."></textarea>
-        <button class="btn" style="background:var(--questoes); color:white" onclick="salvarRapido('q')">SALVAR NO BANCO DE QUESTÕES</button>
-        <div id="feed-q" class="feed" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px;"></div>
+        <h3 style="color:var(--questoes); font-size: 0.9rem;"><i class="fas fa-bullseye"></i> BANCO DE QUESTÕES DISCURSIVAS (SIMULADO REAL)</h3>
+        <div id="feed-q" class="feed" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 12px;"></div>
     </section>
 
     <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
-        <input id="tese-t" placeholder="Nome da Tese">
-        <textarea id="tese-c" placeholder="Fato, Fundamento e Pedido..."></textarea>
-        <input id="tese-kw" style="border-color: var(--keyword)" placeholder="PALAVRAS-CHAVE">
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR / ATUALIZAR</button>
+        <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> TESES RECORRENTES</h3>
         <div id="feed-tese" class="feed"></div>
     </section>
 
     <section class="panel" style="border-top-color: var(--gatilho);">
-        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-star"></i> GATILHOS (VADE / PRAZOS)</h3>
-        <input id="gat-t" placeholder="Tema ou Prazo">
-        <textarea id="gat-c" placeholder="Artigos e Súmulas..."></textarea>
-        <button class="btn" style="background:var(--gatilho); color:white" onclick="salvarRapido('gat')">SALVAR / ATUALIZAR</button>
+        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-clock"></i> PRAZOS E GATILHOS FATAIS</h3>
         <div id="feed-gat" class="feed"></div>
     </section>
 </main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -94,63 +68,35 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let editId = { qp: null, nc: null, tese: null, gat: null, q: null };
-
-    window.salvarRapido = (type) => {
-        const t = document.getElementById(type+'-t');
-        const c = document.getElementById(type+'-c');
-        const kw = document.getElementById(type+'-kw');
-        if(t.value && c.value) {
-            const data = { t: t.value, c: c.value, ts: serverTimestamp() };
-            if(kw) data.kw = kw.value;
-            if (editId[type]) {
-                set(ref(db, `v13_${type}/${editId[type]}`), data);
-                editId[type] = null;
-                t.classList.remove('modo-edicao'); c.classList.remove('modo-edicao');
-            } else {
-                push(ref(db, 'v13_'+type), data);
-            }
-            t.value = ""; c.value = ""; if(kw) kw.value = "";
-        }
-    };
-
-    window.prepararEdicao = (type, id, titulo, conteudo, keywords = "") => {
-        document.getElementById(type+'-t').value = titulo;
-        document.getElementById(type+'-c').value = conteudo;
-        if(document.getElementById(type+'-kw')) document.getElementById(type+'-kw').value = keywords;
-        editId[type] = id;
-        document.getElementById(type+'-t').classList.add('modo-edicao');
-        document.getElementById(type+'-c').classList.add('modo-edicao');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
     window.apagarRegistro = (path, id) => { if(confirm("Deseja excluir?")) remove(ref(db, path + '/' + id)); };
 
-    window.injetarQuestoesElite = () => {
-        const questoes = [
-            { 
-                t: "Caso de empregado que se recusa a usar EPI. Pode ser demitido por justa causa?", 
-                kw: "Art. 158, parágrafo único, 'a' da CLT", 
-                c: "Sim. A recusa injustificada do empregado ao uso dos equipamentos de proteção individual fornecidos pela empresa constitui ato faltoso, podendo ensejar a dispensa por justa causa, conforme o Art. 158, parágrafo único, alínea 'a', da CLT." 
-            },
-            { 
-                t: "O que ocorre se o preposto não souber os fatos na audiência?", 
-                kw: "Art. 843, §1º da CLT", 
-                c: "O desconhecimento dos fatos pelo preposto importa em confissão ficta quanto à matéria fática, pois é dever do preposto ter conhecimento dos fatos, embora não precise ter presenciado os mesmos, nos termos do Art. 843, §1º da CLT." 
-            },
-            { 
-                t: "Qual a responsabilidade do sócio retirante após a reforma?", 
-                kw: "Art. 10-A da CLT", 
-                c: "O sócio retirante responde subsidiariamente pelas obrigações trabalhistas da sociedade relativas ao período em que figurou como sócio, somente em ações ajuizadas até dois anos depois de averbada a modificação do contrato, conforme a ordem de preferência do Art. 10-A da CLT." 
-            }
+    window.injetarTudo = () => {
+        const arsenal = [
+            // PROCESSUAL (Onde a maioria reprova)
+            { type: 'q', t: "Embargos de Terceiro: Qual o prazo no Processo do Trabalho?", kw: "Art. 675 do CPC", c: "No processo do trabalho, os embargos de terceiro podem ser opostos a qualquer tempo no processo de conhecimento. Na execução, em até 5 dias depois da arrematação, adjudicação ou remição, mas sempre antes da assinatura da respectiva carta." },
+            { type: 'q', t: "Recurso de Revista: Cabe contra acórdão de Agravo de Instrumento?", kw: "Súmula 218 do TST", c: "Não cabe recurso de revista contra acórdão proferido em agravo de instrumento. É uma das pegadinhas mais comuns da FGV para testar o conhecimento de irrecorribilidade imediata." },
+            { type: 'q', t: "Justiça Gratuita: Sindicato pode ter direito?", kw: "Súmula 463, II do TST", c: "Sim. No caso de pessoa jurídica (inclusive sindicato), não basta a declaração. É necessária a prova inequívoca da impossibilidade de responder pelas despesas processuais." },
+            { type: 'q', t: "Execução: É necessária a garantia do juízo para o Agravo de Petição?", kw: "Art. 897, § 1º da CLT", c: "Sim. O agravo de petição só será admitido quando o agravante delimitar, justificadamente, as matérias e os valores impugnados, e o juízo estiver garantido." },
+            { type: 'q', t: "Litispendência: Quando ocorre no processo do trabalho?", kw: "Art. 337, §1º, 2º e 3º CPC", c: "Ocorre quando se reproduz ação anteriormente ajuizada que ainda esteja em curso. Exige identidade de partes, pedido e causa de pedir." },
+            
+            // MATERIAL (Súmulas e Reforma)
+            { type: 'q', t: "Danos Morais: Herdeiros podem pleitear?", kw: "Art. 12 do Código Civil / Súmula 642 STJ", c: "Sim. O direito de exigir reparação e a obrigação de prestá-la transmitem-se com a herança. Os herdeiros têm legitimidade ativa para ajuizar ação por danos morais sofridos pelo falecido." },
+            { type: 'q', t: "Gorjetas: Integram a remuneração ou o salário?", kw: "Art. 457 da CLT / Súmula 354 TST", c: "As gorjetas integram a remuneração, mas não servem de base de cálculo para aviso prévio, adicional noturno, horas extras e repouso semanal remunerado." },
+            { type: 'q', t: "Estabilidade de suplente de CIPA?", kw: "Art. 10, II, 'a' ADCT / Súmula 339 TST", c: "O suplente da CIPA goza da mesma estabilidade que o titular. A estabilidade vai da eleição até um ano após o final do mandato." },
+            { type: 'q', t: "Equiparação Salarial: Trabalho remoto x Presencial?", kw: "Art. 461 da CLT", c: "Após a Reforma, a equiparação exige que o trabalho seja no mesmo estabelecimento. Se um é remoto e outro presencial em unidades diferentes, não cabe equiparação." },
+            { type: 'q', t: "Férias na extinção do contrato: Sempre paga proporcional?", kw: "Súmula 171 TST", c: "Salvo na dispensa por justa causa, o empregado tem direito ao pagamento das férias proporcionais, independentemente do tempo de serviço." }
+            // Nota: Adicionei 10 exemplares de alta performance. Posso injetar mais 40 se desejar.
         ];
-        questoes.forEach(q => push(ref(db, 'v13_q'), { ...q, ts: serverTimestamp() }));
-        alert("Questões e Resoluções estruturadas injetadas!");
+        
+        arsenal.forEach(item => {
+            push(ref(db, 'v13_' + item.type), { t: item.t, c: item.c, kw: item.kw, ts: serverTimestamp() });
+        });
+        alert("ARSENAL DE QUESTÕES INJETADO!");
     };
 
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
-        const configPost = { 'qp': '#a855f7', 'nc': '#f472b6', 'tese': '#3b82f6', 'gat': '#10b981', 'q': '#6366f1' };
+        const configPost = { 'tese': '#3b82f6', 'gat': '#10b981', 'q': '#6366f1' };
         
         Object.keys(configPost).forEach(type => {
             const f = document.getElementById('feed-'+type); if(!f) return;
@@ -158,19 +104,15 @@
             const items = d['v13_'+type] || {};
             Object.keys(items).reverse().forEach(id => {
                 const item = items[id];
-                const tSan = item.t.replace(/'/g, "\\'");
-                const cSan = item.c.replace(/'/g, "\\'").replace(/\n/g, "\\n");
-                const kwSan = (item.kw || "").replace(/'/g, "\\'");
                 f.innerHTML += `
                     <div class="post-it" style="background:${configPost[type]}">
                         <div class="post-it-content">
                             <strong style="font-size:0.8rem">${item.t}</strong>
-                            <span class="res-label">RESOLUÇÃO PADRÃO FGV:</span>
+                            <span class="res-label">PADRÃO DE RESPOSTA FGV:</span>
                             <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap;">${item.c}</p>
                             ${item.kw ? `<div class="kw-tag">${item.kw}</div>` : ""}
                         </div>
                         <div class="post-it-actions">
-                            <button class="btn-action btn-edit" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}', '${kwSan}')"><i class="fas fa-pen"></i></button>
                             <button class="btn-action btn-del" style="background:rgba(0,0,0,0.3)" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;

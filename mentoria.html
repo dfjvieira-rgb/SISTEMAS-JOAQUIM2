@@ -3,56 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SISTEMA DE APROVAÇÃO ELITE | JOAQUIM 2026</title>
+    <title>ARSENAL 50 QUESTÕES | ELITE 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
             --success: #22c55e; --danger: #ef4444; --info: #3b82f6; 
-            --gatilho: #10b981; --keyword: #f97316; --questoes: #6366f1;
+            --questoes: #6366f1; --keyword: #f97316;
         }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1400px; margin: 0 auto; }
-        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
-        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
-        .btn-action { width: 36px; height: 36px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: 0.2s; }
-        .feed { max-height: 500px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
-        .feed::-webkit-scrollbar { width: 4px; }
-        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid rgba(0,0,0,0.1); }
-        .kw-tag { background: black; color: var(--gold); padding: 2px 6px; border-radius: 4px; font-size: 10px; text-transform: uppercase; margin-top: 5px; display: inline-block; }
-        .res-label { display: block; color: #312e81; font-size: 10px; font-weight: 900; margin-top: 8px; text-decoration: underline; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #0f172a; border: 2px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
-        .modo-edicao { border-color: var(--gold) !important; background: #2d3748 !important; }
-        @media (max-width: 1024px) { .dashboard { grid-template-columns: 1fr; } }
+        .dashboard { max-width: 1400px; margin: 0 auto; }
+        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 20px; border: 1px solid #334155; }
+        .btn-master { background: var(--gold); border: none; padding: 20px; border-radius: 12px; cursor: pointer; font-weight: 900; width: 100%; color: black; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 20px; box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); transition: 0.3s; }
+        .btn-master:hover { transform: scale(1.01); box-shadow: 0 0 30px rgba(251, 191, 36, 0.5); }
+        .feed-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; margin-top: 20px; }
+        .post-it { background: var(--questoes); padding: 15px; border-radius: 10px; color: black; font-weight: 600; position: relative; border: 1px solid rgba(0,0,0,0.1); box-shadow: 5px 5px 15px rgba(0,0,0,0.2); }
+        .kw-tag { background: black; color: var(--gold); padding: 4px 8px; border-radius: 4px; font-size: 11px; margin-top: 10px; display: inline-block; }
+        .res-label { display: block; color: #1e1b4b; font-size: 11px; font-weight: 900; margin-top: 10px; text-decoration: underline; }
+        .btn-del { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.2); border: none; color: white; width: 25px; height: 25px; border-radius: 50%; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px; flex-wrap: wrap; gap: 10px;">
-    <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MAPA DA MINA <span style="color:var(--gold)">APROVAÇÃO</span></h2>
-    <div style="display:flex; gap:10px;">
-        <button class="btn" style="width:auto; margin:0; background:var(--danger); color:white;" onclick="window.injetarTudo()">INJETAR 50 QUESTÕES (HISTÓRICO 30-44)</button>
-        <button class="btn" style="width:auto; margin:0; background:white;" onclick="window.close()">VOLTAR</button>
-    </div>
+<header style="text-align:center; padding: 20px 0; border-bottom: 2px solid var(--gold); margin-bottom: 30px;">
+    <h1 style="margin:0; font-size: 1.5rem;">BANCO DE QUESTÕES <span style="color:var(--gold)">MASTER 50</span></h1>
+    <p style="font-size: 0.9rem; opacity: 0.8;">Cobertura Completa: Exames 30 ao 44 + Apostas 45</p>
 </header>
 
-<main class="dashboard">
-    <section class="panel" style="border-top-color: var(--questoes); grid-column: span 2;">
-        <h3 style="color:var(--questoes); font-size: 0.9rem;"><i class="fas fa-bullseye"></i> BANCO DE QUESTÕES DISCURSIVAS (SIMULADO REAL)</h3>
-        <div id="feed-q" class="feed" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 12px;"></div>
-    </section>
+<div class="dashboard">
+    <button class="btn-master" onclick="window.injetarArsenal50()">
+        <i class="fas fa-rocket"></i> INJETAR ARSENAL COMPLETO (50 QUESTÕES)
+    </button>
 
-    <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> TESES RECORRENTES</h3>
-        <div id="feed-tese" class="feed"></div>
-    </section>
-
-    <section class="panel" style="border-top-color: var(--gatilho);">
-        <h3 style="color:var(--gatilho); font-size: 0.9rem;"><i class="fas fa-clock"></i> PRAZOS E GATILHOS FATAIS</h3>
-        <div id="feed-gat" class="feed"></div>
-    </section>
-</main>
+    <div class="panel">
+        <h3 style="color:var(--gold);"><i class="fas fa-university"></i> QUESTÕES DISCURSIVAS E PADRÕES DE RESPOSTA</h3>
+        <div id="feed-q" class="feed-grid"></div>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -68,55 +55,87 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    window.apagarRegistro = (path, id) => { if(confirm("Deseja excluir?")) remove(ref(db, path + '/' + id)); };
-
-    window.injetarTudo = () => {
-        const arsenal = [
-            // PROCESSUAL (Onde a maioria reprova)
-            { type: 'q', t: "Embargos de Terceiro: Qual o prazo no Processo do Trabalho?", kw: "Art. 675 do CPC", c: "No processo do trabalho, os embargos de terceiro podem ser opostos a qualquer tempo no processo de conhecimento. Na execução, em até 5 dias depois da arrematação, adjudicação ou remição, mas sempre antes da assinatura da respectiva carta." },
-            { type: 'q', t: "Recurso de Revista: Cabe contra acórdão de Agravo de Instrumento?", kw: "Súmula 218 do TST", c: "Não cabe recurso de revista contra acórdão proferido em agravo de instrumento. É uma das pegadinhas mais comuns da FGV para testar o conhecimento de irrecorribilidade imediata." },
-            { type: 'q', t: "Justiça Gratuita: Sindicato pode ter direito?", kw: "Súmula 463, II do TST", c: "Sim. No caso de pessoa jurídica (inclusive sindicato), não basta a declaração. É necessária a prova inequívoca da impossibilidade de responder pelas despesas processuais." },
-            { type: 'q', t: "Execução: É necessária a garantia do juízo para o Agravo de Petição?", kw: "Art. 897, § 1º da CLT", c: "Sim. O agravo de petição só será admitido quando o agravante delimitar, justificadamente, as matérias e os valores impugnados, e o juízo estiver garantido." },
-            { type: 'q', t: "Litispendência: Quando ocorre no processo do trabalho?", kw: "Art. 337, §1º, 2º e 3º CPC", c: "Ocorre quando se reproduz ação anteriormente ajuizada que ainda esteja em curso. Exige identidade de partes, pedido e causa de pedir." },
+    window.injetarArsenal50 = () => {
+        const q50 = [
+            // PARTE 1: PROCESSUAL (TEMAS 30-44)
+            { t: "1. Embargos de Terceiro: Qual o prazo?", kw: "Art. 675 CPC", c: "Conhecimento: a qualquer tempo. Execução: 5 dias após arrematação/adjudicação, antes da carta." },
+            { t: "2. Recurso de Revista: Cabe contra Agravo de Instrumento?", kw: "Súmula 218 TST", c: "Não cabe recurso de revista contra acórdão proferido em agravo de instrumento (irrecorribilidade imediata)." },
+            { t: "3. Justiça Gratuita PJ: Basta declarar?", kw: "Súmula 463, II TST", c: "Não. Pessoa jurídica deve comprovar cabalmente a insuficiência de recursos." },
+            { t: "4. Agravo de Petição: Exige garantia do juízo?", kw: "Art. 897, §1º CLT", c: "Sim. Exige garantia e delimitação justificada de matérias e valores." },
+            { t: "5. Litispendência: Requisitos?", kw: "Art. 337 CPC", c: "Identidade de partes, causa de pedir e pedido em ação em curso." },
+            { t: "6. Rito Sumaríssimo: Citação por edital?", kw: "Art. 852-B, II CLT", c: "Não se admite. O autor deve indicar o endereço correto sob pena de arquivamento." },
+            { t: "7. Testemunhas no Sumaríssimo: Quantas?", kw: "Art. 852-H, §2º CLT", c: "Máximo de 2 para cada parte." },
+            { t: "8. Revelia: O advogado pode permanecer na audiência?", kw: "Art. 844, §5º CLT", c: "Sim. Mesmo revel o réu, se o advogado estiver presente, serão aceitos a contestação e documentos." },
+            { type: 'q', t: "9. Depósito Recursal: Entidade filantrópica paga?", kw: "Art. 899, §10 CLT", c: "Isenta de depósito recursal. Beneficiários da justiça gratuita e empresas em recuperação judicial também." },
+            { t: "10. Multa 467 CLT na Recuperação Judicial?", kw: "Art. 467 CLT", c: "Sim. A isenção da multa do 467 e 477 só se aplica à Massa Falida (Súmula 388 TST)." },
             
-            // MATERIAL (Súmulas e Reforma)
-            { type: 'q', t: "Danos Morais: Herdeiros podem pleitear?", kw: "Art. 12 do Código Civil / Súmula 642 STJ", c: "Sim. O direito de exigir reparação e a obrigação de prestá-la transmitem-se com a herança. Os herdeiros têm legitimidade ativa para ajuizar ação por danos morais sofridos pelo falecido." },
-            { type: 'q', t: "Gorjetas: Integram a remuneração ou o salário?", kw: "Art. 457 da CLT / Súmula 354 TST", c: "As gorjetas integram a remuneração, mas não servem de base de cálculo para aviso prévio, adicional noturno, horas extras e repouso semanal remunerado." },
-            { type: 'q', t: "Estabilidade de suplente de CIPA?", kw: "Art. 10, II, 'a' ADCT / Súmula 339 TST", c: "O suplente da CIPA goza da mesma estabilidade que o titular. A estabilidade vai da eleição até um ano após o final do mandato." },
-            { type: 'q', t: "Equiparação Salarial: Trabalho remoto x Presencial?", kw: "Art. 461 da CLT", c: "Após a Reforma, a equiparação exige que o trabalho seja no mesmo estabelecimento. Se um é remoto e outro presencial em unidades diferentes, não cabe equiparação." },
-            { type: 'q', t: "Férias na extinção do contrato: Sempre paga proporcional?", kw: "Súmula 171 TST", c: "Salvo na dispensa por justa causa, o empregado tem direito ao pagamento das férias proporcionais, independentemente do tempo de serviço." }
-            // Nota: Adicionei 10 exemplares de alta performance. Posso injetar mais 40 se desejar.
+            // PARTE 2: MATERIAL (ESTABILIDADES E REFORMA)
+            { t: "11. Gestante em experiência: Tem estabilidade?", kw: "Súmula 244, III TST", c: "Sim. O direito à estabilidade provisória aplica-se aos contratos por tempo determinado." },
+            { t: "12. Dirigente Sindical: Estabilidade se a empresa fechar?", kw: "Súmula 369, IV TST", c: "Não. Extinta a atividade na base territorial, encerra-se a estabilidade." },
+            { t: "13. Gorjetas: Base para horas extras?", kw: "Súmula 354 TST", c: "Não. Integram remuneração, mas não baseiam HE, Adicional Noturno e RSR." },
+            { t: "14. Equiparação: Mesmo estabelecimento?", kw: "Art. 461 CLT", c: "Sim. Após 2017, exige-se trabalho no mesmo estabelecimento empresarial." },
+            { t: "15. Férias: Proporcional na Justa Causa?", kw: "Súmula 171 TST", c: "Não. Na justa causa o empregado perde o direito às férias proporcionais." },
+            { t: "16. Dano Moral: Transmite aos herdeiros?", kw: "Art. 12 CC / Súmula 642 STJ", c: "Sim. O direito de exigir reparação transmite-se com a herança." },
+            { t: "17. Teletrabalho: Controle de jornada?", kw: "Art. 62, III CLT", c: "Em regra, excluídos do controle, salvo se houver controle patronal efetivo." },
+            { t: "18. Trabalho Intermitente: Recusa gera multa?", kw: "Art. 452-A CLT", c: "A recusa da oferta não descaracteriza a subordinação nem gera penalidade." },
+            { t: "19. Horas in itinere: Computam na jornada?", kw: "Art. 58, §2º CLT", c: "Não. O tempo de trajeto não é mais considerado tempo à disposição." },
+            { t: "20. Honorários Sucumbenciais: Qual percentual?", kw: "Art. 791-A CLT", c: "Mínimo de 5% e máximo de 15% sobre o valor da liquidação." },
+            
+            // PARTE 3: TESES COMPLEXAS (APOSTAS)
+            { t: "21. Sócio Retirante: Prazo de responsabilidade?", kw: "Art. 10-A CLT", c: "Até 2 anos após a averbação da modificação do contrato." },
+            { t: "22. Preposto: Precisa ser empregado?", kw: "Art. 843, §3º CLT", c: "Não. A CLT desobriga a condição de empregado para o preposto." },
+            { t: "23. Acordo Extrajudicial: Suspende prescrição?", kw: "Art. 855-E CLT", c: "Sim. A petição de homologação suspende a prescrição." },
+            { t: "24. Gratificação de Função: Pode retirar após 10 anos?", kw: "Art. 468, §2º CLT", c: "Sim. A reforma autoriza a retirada da gratificação independentemente do tempo." },
+            { t: "25. Rescisão por Comum Acordo: Quanto de multa FGTS?", kw: "Art. 484-A CLT", c: "Multa de 20% (metade) e aviso prévio pela metade se indenizado." },
+            { t: "26. Honorários Periciais: Quem paga se o autor é sucumbente?", kw: "Art. 790-B CLT", c: "O sucumbente, salvo se beneficiário da JG (observar decisão do STF)." },
+            { t: "27. Contribuição Sindical: Requisito?", kw: "Art. 579 CLT", c: "Autorização prévia, voluntária, individual e expressa do trabalhador." },
+            { t: "28. Ultratividade das Normas Coletivas?", kw: "Súmula 277 TST (Suspensa)", c: "Não há ultratividade. O que foi negociado vale apenas para o prazo do acordo." },
+            { t: "29. Arbitragem no Trabalho: Quando cabe?", kw: "Art. 507-A CLT", c: "Remuneração superior a 2x o teto do INSS, por iniciativa do empregado." },
+            { t: "30. Quitação Anual: Onde é feita?", kw: "Art. 507-B CLT", c: "Perante o Sindicato da categoria profissional." },
+            
+            // ... CONTINUAÇÃO DAS 50 (PROCESSO E EXECUÇÃO)
+            { t: "31. IDPJ: Cabe no processo do trabalho?", kw: "Art. 855-A CLT", c: "Sim. Segue o rito dos arts. 133 a 137 do CPC." },
+            { t: "32. Agravo Interno: Prazo?", kw: "Art. 1.021 CPC", c: "Prazo de 8 dias úteis no processo do trabalho." },
+            { t: "33. Recurso de Revista em Rito Sumaríssimo: Hipóteses?", kw: "Art. 896, §9º CLT", c: "Violação da CF ou contrariedade a Súmula TST ou Súmula Vinculante STF." },
+            { t: "34. Prescrição Intercorrente: Prazo?", kw: "Art. 11-A CLT", c: "2 anos na execução, se a parte deixar de cumprir determinação judicial." },
+            { t: "35. Protesto Judicial: Interrompe prescrição?", kw: "OJ 392 SDI-1 TST", c: "Sim. Interrompe tanto a bienal quanto a quinquenal." },
+            { t: "36. Salário Substituição: Direito?", kw: "Súmula 159 TST", c: "Sim, enquanto durar a substituição que não tenha caráter meramente eventual." },
+            { t: "37. Adicional de Periculosidade: Proporcional?", kw: "Súmula 364 TST", c: "Indevido. Se a exposição for habitual, é devido o adicional integral." },
+            { t: "38. Equiparação Salarial: Readaptação previdenciária?", kw: "Art. 461, §4º CLT", c: "O readaptado não serve de paradigma para fins de equiparação." },
+            { t: "39. Estabilidade: Acidente de trabalho em contrato determinado?", kw: "Súmula 378, III TST", c: "Sim. Tem direito à estabilidade acidentária mesmo em contrato a termo." },
+            { t: "40. Horas Extras: Cargo de confiança?", kw: "Art. 62, II CLT", c: "Não tem direito a HE se exercer encargo de gestão e ganhar +40% de salário." },
+            { t: "41. Intervalo Intrajornada: Pagamento se suprimido?", kw: "Art. 71, §4º CLT", c: "Pagamento apenas do período suprimido, com acréscimo de 50%, natureza indenizatória." },
+            { t: "42. Desvio de Função: Gera novo contrato?", kw: "Jurisprudência", c: "Não. Gera apenas o direito às diferenças salariais." },
+            { t: "43. Vale-transporte: Supressão por dinheiro?", kw: "Lei 7.418/85", c: "O empregador pode antecipar em dinheiro se previsto em convenção coletiva." },
+            { t: "44. Seguro Desemprego: Indenização substitutiva?", kw: "Súmula 389, II TST", c: "Devida se o empregador não liberar as guias por culpa sua." },
+            { t: "45. Depósito Recursal: Massa Falida paga?", kw: "Súmula 86 TST", c: "Não. Massa falida é isenta de custas e depósito." },
+            { t: "46. Agravo de Instrumento: Qual o valor do preparo?", kw: "Art. 897, §7º CLT", c: "Custa 50% do valor do recurso que se pretende destrancar." },
+            { t: "47. Execução: Prazo para embargos à execução?", kw: "Art. 884 CLT", c: "5 dias após a garantia do juízo." },
+            { t: "48. Suspensão Processual: Morte de uma das partes?", kw: "Art. 313 CPC", c: "Suspende-se o processo até a habilitação dos herdeiros." },
+            { t: "49. Sucumbência Recíproca: Vedação de compensação?", kw: "Art. 791-A, §3º CLT", c: "É vedada a compensação de honorários na sucumbência parcial." },
+            { t: "50. Embargos de Declaração: Interrompem o prazo?", kw: "Art. 897-A CLT", c: "Sim. Interrompem o prazo para interposição de outros recursos." }
         ];
-        
-        arsenal.forEach(item => {
-            push(ref(db, 'v13_' + item.type), { t: item.t, c: item.c, kw: item.kw, ts: serverTimestamp() });
+
+        q50.forEach(q => {
+            push(ref(db, 'v13_q'), { t: q.t, c: q.c, kw: q.kw, ts: serverTimestamp() });
         });
-        alert("ARSENAL DE QUESTÕES INJETADO!");
+        alert("SISTEMA ALIMENTADO: 50 QUESTÕES INJETADAS!");
     };
 
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
-        const configPost = { 'tese': '#3b82f6', 'gat': '#10b981', 'q': '#6366f1' };
-        
-        Object.keys(configPost).forEach(type => {
-            const f = document.getElementById('feed-'+type); if(!f) return;
-            f.innerHTML = "";
-            const items = d['v13_'+type] || {};
-            Object.keys(items).reverse().forEach(id => {
-                const item = items[id];
-                f.innerHTML += `
-                    <div class="post-it" style="background:${configPost[type]}">
-                        <div class="post-it-content">
-                            <strong style="font-size:0.8rem">${item.t}</strong>
-                            <span class="res-label">PADRÃO DE RESPOSTA FGV:</span>
-                            <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap;">${item.c}</p>
-                            ${item.kw ? `<div class="kw-tag">${item.kw}</div>` : ""}
-                        </div>
-                        <div class="post-it-actions">
-                            <button class="btn-action btn-del" style="background:rgba(0,0,0,0.3)" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
-                        </div>
-                    </div>`;
-            });
+        const f = document.getElementById('feed-q'); f.innerHTML = "";
+        const items = d['v13_q'] || {};
+        Object.keys(items).reverse().forEach(id => {
+            const item = items[id];
+            f.innerHTML += `
+                <div class="post-it">
+                    <button class="btn-del" onclick="apagarRegistro('v13_q', '${id}')">×</button>
+                    <strong>${item.t}</strong>
+                    <span class="res-label">RESOLUÇÃO ELITE:</span>
+                    <p style="font-size:0.8rem; margin: 8px 0;">${item.c}</p>
+                    <div class="kw-tag">${item.kw}</div>
+                </div>`;
         });
     });
 </script>

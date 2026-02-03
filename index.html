@@ -11,20 +11,18 @@
             --paper-color: #ffffff; --mentoria: #a855f7; --sidebar-w: 240px;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
-        
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
+        /* SIDEBAR (PC) */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
-        .btn-side:hover { filter: brightness(1.2); }
 
-        /* EDITOR WORKSPACE */
-        .editor-workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; transition: all 0.3s ease; }
+        /* EDITOR */
+        .editor-workspace { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
@@ -33,19 +31,14 @@
         .paper-area { display: flex; justify-content: center; padding: 20px 10px; }
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; }
 
-        /* PDF VIEWER (SPLIT) */
-        #pdf-viewer { 
-            width: 0; background: #334155; border-left: 0 solid var(--gold); 
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            display: flex; flex-direction: column; position: relative;
-        }
-        #pdf-viewer.active { width: 50%; border-left-width: 4px; }
-        iframe { width: 100%; flex: 1; border: none; background: white; }
+        /* PDF VIEWER */
+        #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
 
-        /* HUB MOBILE */
-        #mobile-hub { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; flex-direction: column-reverse; gap: 10px; }
-        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        /* HUB MOBILE MELHORADO */
+        #mobile-hub { display: none; position: fixed; bottom: 20px; right: 20px; z-index: 9999; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        .fab-main { width: 55px; height: 55px; border-radius: 50%; border: none; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.3s; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -56,7 +49,7 @@
         /* MODAL */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 90%; max-width: 500px; padding: 20px; border-radius: 15px; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; }
     </style>
 </head>
 <body class="dark-mode">
@@ -81,11 +74,11 @@
 
     <section class="editor-workspace">
         <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIV-CLIQUE</div>
+            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Ver</button>
-                <button class="btn-lib" style="background:#000; color:white" onclick="window.fecharPDF()">FECHAR PDF</button>
+                <button class="btn-lib" style="background:#ef4444; color:white" onclick="window.fecharPDF()">FECHAR PDF</button>
             </div>
         </div>
         <div class="paper-area">
@@ -96,15 +89,16 @@
     <section id="pdf-viewer">
         <div class="pdf-controls">
             <span id="pdf-title" style="font-size:10px; font-weight:900;">DOCUMENTO</span>
-            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 10px; border-radius:4px; font-weight:bold; cursor:pointer;">FECHAR X</button>
+            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">X</button>
         </div>
         <iframe id="pdf-frame" src=""></iframe>
     </section>
 
     <div id="mobile-hub">
-        <button class="fab-main" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
-        <button class="fab-main" style="background:#3b82f6; color:white; width:50px; height:50px; margin-bottom:10px;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-main" style="background:#000; color:var(--gold); width:50px; height:50px; margin-bottom:10px; border: 1px solid var(--gold)" onclick="window.verPDF('V')"><b>V</b></button>
+        <button class="fab-main" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        <button class="fab-main" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
+        <button class="fab-main" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')"><b>V</b></button>
+        <button class="fab-main" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
     </div>
 </main>
 
@@ -117,7 +111,6 @@
 </div>
 
 <script type="module">
-    // IMPORTAÇÕES DA RAIZ
     import { db } from './firebase-config.js';
     import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
@@ -159,7 +152,6 @@
         document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
-        
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div');
             b.className = 'opt-btn';
@@ -176,12 +168,11 @@
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
-        else alert("Teses não encontradas para o Exame " + window.activeEx);
     };
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS (PERGAMINHO)";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         Object.keys(pecas).forEach(k => {

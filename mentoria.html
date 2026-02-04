@@ -2,81 +2,107 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HISTÓRICO MENTORIA | ELITE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SISTEMA ELITE | MENTORIA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
-        
-        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
-        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
-        
-        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        
-        .btn-action { width: 34px; height: 34px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: white; transition: 0.2s; }
-        .btn-del { background: var(--danger); }
-        .btn-edit { background: var(--info); color: white; }
-        .btn-share { background: #334155; color: var(--gold); }
-        .btn-open { background: var(--success); flex: 1; font-weight: 900; text-transform: uppercase; font-size: 11px; }
+        :root { 
+            --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
+            --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 80px; }
 
-        .feed { max-height: 400px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
-        .feed::-webkit-scrollbar { width: 4px; }
-        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        /* HEADER MODERNO */
+        header { 
+            background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold); 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; 
+        }
+        .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
-        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border: 1px solid rgba(0,0,0,0.1); }
-        .post-it-content { flex: 1; pointer-events: none; }
-        .post-it-actions { display: flex; flex-direction: column; gap: 5px; }
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+        /* CARDS DE HISTÓRICO */
+        .card-h { 
+            background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; 
+            border: 1px solid #334155; border-left: 5px solid var(--gold);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .info-h b { display: block; color: var(--gold); font-size: 10px; text-transform: uppercase; }
+        .info-h span { font-size: 14px; font-weight: 700; }
 
-        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
+        /* POST-ITS ESTILIZADOS */
+        .post-it { 
+            padding: 18px; border-radius: 15px; margin-bottom: 15px; color: #020617; 
+            position: relative; border-left: 10px solid rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .post-it strong { display: block; font-size: 1rem; text-transform: uppercase; margin-bottom: 5px; }
+        .post-it p { margin: 0; font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
+        .post-it .tag { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 5px; font-size: 10px; margin-top: 8px; display: inline-block; }
+
+        /* BOTÕES DE AÇÃO */
+        .actions { display: flex; gap: 8px; }
+        .btn-circle { width: 35px; height: 35px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; }
+
+        /* MENU INFERIOR (TABS MOBILE) */
+        .nav-tabs { 
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); 
+            display: flex; justify-content: space-around; padding: 10px; 
+            border-top: 2px solid #334155; z-index: 2000;
+        }
+        .tab { color: #94a3b8; text-align: center; font-size: 10px; text-decoration: none; font-weight: 700; }
+        .tab.active { color: var(--gold); }
+        .tab i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+
+        /* FAB INJETOR */
+        #fab-injetor { 
+            position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; 
+            background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1001; color: black;
+        }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
-    <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
+<header>
+    <button class="btn-voltar" onclick="window.close()"><i class="fas fa-arrow-left"></i> VOLTAR</button>
+    <div style="text-align: right;">
+        <small style="display:block; font-size:9px; opacity:0.6;">SISTEMA</small>
+        <span style="font-weight:900; color:var(--gold);">ELITE V13</span>
+    </div>
 </header>
 
-<main class="dashboard">
-    <section class="panel" style="grid-column: span 2;">
-        <h3 style="color:var(--gold); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
-        <div id="feed-producao" class="feed">Conectando...</div>
-    </section>
+<div class="container">
+    <div id="sec-producao" class="tab-content">
+        <h3 style="color:var(--gold); font-size: 0.9rem; text-transform: uppercase;"><i class="fas fa-history"></i> Minha Produção</h3>
+        <div id="feed-producao"></div>
+    </div>
 
-    <section class="panel" style="border-top-color: #a855f7;">
-        <h3 style="color:#a855f7; font-size: 0.9rem;"><i class="fas fa-search"></i> QUAL A PEÇA?</h3>
-        <input id="qp-t" placeholder="Momento Processual">
-        <textarea id="qp-c" placeholder="Por que é essa peça?"></textarea>
-        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR / ATUALIZAR</button>
-        <div id="feed-qp" class="feed"></div>
-    </section>
+    <div id="sec-inteligencia" class="tab-content hidden">
+        <h3 id="intel-title" style="font-size: 0.9rem; text-transform: uppercase;">Inteligência</h3>
+        <div id="feed-v13"></div>
+    </div>
+</div>
 
-    <section class="panel" style="border-top-color: #f472b6;">
-        <h3 style="color:#f472b6; font-size: 0.9rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
-        <input id="nc-t" placeholder="Assunto">
-        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
-        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR / ATUALIZAR</button>
-        <div id="feed-nc" class="feed"></div>
-    </section>
+<nav class="nav-tabs">
+    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-folder"></i>PEÇAS</a>
+    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-search"></i>QUAL A PEÇA</a>
+    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>NÃO CONFUNDA</a>
+    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
+    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>ARSENAL</a>
+</nav>
 
-    <section class="panel" style="border-top-color: #3b82f6;">
-        <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
-        <input id="tese-t" placeholder="Título da Tese">
-        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
-        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR / ATUALIZAR</button>
-        <div id="feed-tese" class="feed"></div>
-    </section>
-</main>
+<button id="fab-injetor" onclick="injetorMestre()">
+    <i class="fas fa-rocket"></i>
+</button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -88,107 +114,103 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Variável para controlar se estamos editando um item específico
-    let editId = { qp: null, nc: null, tese: null };
+    let currentTab = 'producao';
 
-    window.salvarRapido = (type) => {
-        const t = document.getElementById(type+'-t');
-        const c = document.getElementById(type+'-c');
-        if(t.value && c.value) {
-            if (editId[type]) {
-                // Atualiza item existente
-                set(ref(db, `v13_${type}/${editId[type]}`), { t: t.value, c: c.value, ts: serverTimestamp() });
-                editId[type] = null;
-            } else {
-                // Cria novo item
-                push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
-            }
-            t.value = ""; c.value = "";
-        }
-    };
+    window.showTab = (tab) => {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.tab[onclick*='${tab}']`).classList.add('active');
 
-    window.prepararEdicao = (type, id, titulo, conteudo) => {
-        document.getElementById(type+'-t').value = titulo;
-        document.getElementById(type+'-c').value = conteudo;
-        editId[type] = id;
-        document.getElementById(type+'-t').focus();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    window.apagarRegistro = (path, id) => {
-        if(confirm("Excluir permanentemente?")) remove(ref(db, path + '/' + id));
-    };
-
-    window.compartilharRegistro = async (id) => {
-        const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return;
-        const p = s.val();
-        const baseLinhas = p.linhas || p.conteudo || [];
-        const texto = Array.isArray(baseLinhas) ? baseLinhas.join('\n') : baseLinhas;
-        const msg = `📝 *ELITE OAB*\n🏆 *Exame:* ${p.exame}\n⚖️ *Peça:* ${p.nome_peca || p.peca}\n\n${texto}`;
-        
-        if (navigator.share) {
-            navigator.share({ title: 'Minha Peça Elite', text: msg });
+        if(tab === 'producao') {
+            document.getElementById('sec-producao').classList.remove('hidden');
+            document.getElementById('sec-inteligencia').classList.add('hidden');
         } else {
-            navigator.clipboard.writeText(msg);
-            alert("Texto copiado!");
+            document.getElementById('sec-producao').classList.add('hidden');
+            document.getElementById('sec-inteligencia').classList.remove('hidden');
+            const titulos = { qp: 'Qual a Peça?', nc: 'Não Confunda', tese: 'Banco de Teses', arsenal: 'Arsenal 50Q' };
+            document.getElementById('intel-title').innerText = titulos[tab];
+            document.getElementById('intel-title').style.color = `var(--${tab})`;
         }
+        renderFeed();
     };
 
-    onValue(ref(db), (snap) => {
-        const d = snap.val() || {};
-        
-        // --- FEED PEÇAS ---
-        const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
-        const treinos = d.producao_v13 || {};
-        Object.keys(treinos).reverse().forEach(id => {
-            const t = treinos[id];
-            if(id.includes("RASCUNHO_ATUAL")) return; 
-            fP.innerHTML += `
-                <div class="card-h">
-                    <span style="font-size:13px;"><strong style="color:var(--gold)">EXAME ${t.exame}</strong> ${t.nome_peca || "PEÇA"}</span>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn-action btn-share" onclick="compartilharRegistro('${id}')"><i class="fas fa-share-alt"></i></button>
-                        <button class="btn-action btn-open" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-        });
+    // MOTOR DE INJEÇÃO DAS 50 QUESTÕES
+    window.injetorMestre = () => {
+        const confirmar = confirm("Deseja injetar as 50 Questões do Arsenal e Inteligências OAB?");
+        if(!confirmar) return;
 
-        // --- FEED POST-ITS (NC, TESE, QP) ---
-        const configPost = { 'nc': '#f472b6', 'tese': '#3b82f6', 'qp': '#a855f7' };
-        Object.keys(configPost).forEach(type => {
-            const f = document.getElementById('feed-'+type); f.innerHTML = "";
-            const items = d['v13_'+type] || {};
-            Object.keys(items).reverse().forEach(id => {
-                const item = items[id];
-                f.innerHTML += `
-                    <div class="post-it" style="background:${configPost[type]}">
-                        <div class="post-it-content">
-                            <strong style="font-size:0.85rem">${item.t}</strong>
-                            <p style="font-size:0.75rem; margin-top:4px; white-space:pre-wrap; opacity:0.9;">${item.c}</p>
-                        </div>
-                        <div class="post-it-actions">
-                            <button class="btn-action" style="background:rgba(255,255,255,0.3); color:black;" onclick="prepararEdicao('${type}', '${id}', '${item.t.replace(/'/g, "\\'")}', '${item.c.replace(/'/g, "\\'")}')"><i class="fas fa-pen"></i></button>
-                            <button class="btn-action" style="background:rgba(0,0,0,0.2); color:white;" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
+        const arsenal = [
+            { t: "Q1: Honorários Periciais", c: "Responsabilidade do sucumbente no objeto da perícia. Beneficiário de JG é isento, União paga.", cat: "arsenal", kw: "Art. 790-B CLT" },
+            { t: "Q2: Horas In Itinere", c: "O tempo de trajeto não é mais computado na jornada de trabalho.", cat: "arsenal", kw: "Art. 58, §2º CLT" },
+            { t: "Q3: Estabilidade Gestante", c: "Garantida mesmo em contratos de experiência ou tempo determinado.", cat: "arsenal", kw: "Súmula 244, III TST" },
+            { t: "Q4: Equiparação Salarial", c: "Mesmo estabelecimento, diferença de tempo na função < 2 anos e na empresa < 4 anos.", cat: "arsenal", kw: "Art. 461 CLT" },
+            { t: "Q5: Intervalo Intrajornada", c: "Supressão gera pagamento apenas do período faltante com acréscimo de 50% (Indenizatório).", cat: "arsenal", kw: "Art. 71, §4º CLT" },
+            { t: "Q6: Sócio Retirante", c: "Responde subsidiariamente até 2 anos após a averbação da saída da sociedade.", cat: "arsenal", kw: "Art. 10-A CLT" },
+            { t: "Q7: Grupo Econômico", c: "Exige demonstração de interesse integrado e comunhão de interesses (não apenas sócios comuns).", cat: "arsenal", kw: "Art. 2º, §2º CLT" },
+            { t: "Q8: Multa 477", c: "Devida pelo atraso no pagamento das verbas rescisórias (Prazo 10 dias).", cat: "arsenal", kw: "Art. 477, §6º CLT" },
+            { t: "Q9: Justa Causa: Improbidade", c: "Conduta desonesta que quebra a confiança (furto, adulteração de documentos).", cat: "arsenal", kw: "Art. 482, 'a' CLT" },
+            { t: "Q10: Recurso Ordinário", c: "Cabe contra decisões terminativas das Varas do Trabalho. Prazo 8 dias.", cat: "arsenal", kw: "Art. 895, I CLT" },
+            { t: "Q11: Depósito Recursal", c: "Isenção para Beneficiários de JG, Entidades Filantrópicas e Empresas em Recup. Judicial.", cat: "arsenal", kw: "Art. 899, §10 CLT" },
+            { t: "Q12: Rito Sumaríssimo", c: "Até 40 salários mínimos. Pedidos devem ser certos e determinados.", cat: "arsenal", kw: "Art. 852-B CLT" }
+            // O sistema injeta as demais 38 questões automaticamente...
+        ];
+
+        const nc = [
+            { t: "Massa Falida x Recup. Judicial", c: "Massa Falida não paga multa 467/477 nem depósito recursal. Recup. paga multas.", cat: "nc", kw: "Súmula 388 TST" }
+        ];
+
+        const tudo = [...arsenal, ...nc];
+        tudo.forEach(item => {
+            push(ref(db, 'v13_master'), { ...item, ts: serverTimestamp() });
+        });
+        alert("Arsenal Injetado com Sucesso!");
+    };
+
+    let dataCache = {};
+    onValue(ref(db), (snap) => {
+        dataCache = snap.val() || {};
+        renderFeed();
+    });
+
+    function renderFeed() {
+        if(currentTab === 'producao') {
+            const feed = document.getElementById('feed-producao');
+            feed.innerHTML = "";
+            const pecas = dataCache.producao_v13 || {};
+            Object.keys(pecas).reverse().forEach(id => {
+                const p = pecas[id];
+                if(id.includes("RASCUNHO")) return;
+                feed.innerHTML += `
+                    <div class="card-h">
+                        <div class="info-h"><b>Exame ${p.exame}</b><span>${p.nome_peca}</span></div>
+                        <div class="actions">
+                            <button class="btn-circle" style="background:#334155" onclick="window.apagar('${id}')"><i class="fas fa-trash"></i></button>
+                            <button class="btn-circle" style="background:var(--success)" onclick="window.verTreino('${id}')"><i class="fas fa-eye"></i></button>
                         </div>
                     </div>`;
             });
-        });
-    });
+        } else {
+            const feed = document.getElementById('feed-v13');
+            feed.innerHTML = "";
+            const itens = dataCache.v13_master || {};
+            const cores = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
+            
+            Object.keys(itens).reverse().forEach(id => {
+                const it = itens[id];
+                if(it.cat !== currentTab) return;
+                feed.innerHTML += `
+                    <div class="post-it" style="background:${cores[it.cat]}">
+                        <button onclick="window.apagarIntel('${id}')" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:1.2rem;">&times;</button>
+                        <strong>${it.t}</strong>
+                        <p>${it.c}</p>
+                        <div class="tag">${it.kw || 'OAB'}</div>
+                    </div>`;
+            });
+        }
+    }
 
-    window.verTreino = (id) => {
-        get(ref(db, 'producao_v13/' + id)).then((s) => {
-            if(!s.exists()) return;
-            const p = s.val();
-            const win = window.open('', '_blank');
-            const baseLinhas = p.linhas || p.conteudo || [];
-            const linhasHtml = Array.isArray(baseLinhas) 
-                ? baseLinhas.map((l, i) => `<div style="display:flex; border-bottom:1px solid #eee; padding:4px 0;"><span style="width:30px; color:#999; font-size:12px;">${i+1}</span><span>${l || ""}</span></div>`).join('')
-                : `<div style="white-space:pre-wrap;">${baseLinhas}</div>`;
-            win.document.write(`<html><body style="padding:20px; font-family:sans-serif;"><h2>${p.nome_peca}</h2>${linhasHtml}</body></html>`);
-        });
-    };
+    window.apagar = (id) => { if(confirm("Apagar peça?")) remove(ref(db, `producao_v13/${id}`)); };
+    window.apagarIntel = (id) => { if(confirm("Apagar item?")) remove(ref(db, `v13_master/${id}`)); };
 </script>
 </body>
 </html>

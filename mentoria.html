@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELITE V13 | COMANDOS P-G-V</title>
+    <title>ELITE V13 | EXAME FORMATADO</title>
     <style>
         :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -12,33 +12,29 @@
         header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* CARDS DO FEED */
-        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--gold); }
+        /* CARDS ESTILIZADOS */
+        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .item-content { flex: 1; }
-        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1.2px; }
-        .item-desc { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; }
+        .item-desc { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; line-height: 1.2; }
         
-        .row-actions { display: flex; gap: 10px; }
+        .row-actions { display: flex; gap: 10px; margin-left: 10px; }
         .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
         .btn-view { background: var(--gold); color: black; border: none; }
         .btn-delete { background: #da3633; border: none; }
 
-        /* MODAL E COMANDOS P G V */
+        /* MODAL E PGV */
         #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
-        .view-header { width: 100%; background: #0f172a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
-        
-        .pgv-group { display: flex; gap: 8px; }
-        .btn-pgv { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; color: var(--gold); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .btn-pgv:active { background: var(--gold); color: black; }
-        
-        .btn-voltar { background: var(--gold); color: black; border: none; padding: 8px 15px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 11px; }
+        .view-header { width: 100%; background: #0f172a; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
+        .pgv-group { display: flex; gap: 10px; }
+        .btn-pgv { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; color: var(--gold); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; }
+        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 12px; text-transform: uppercase; }
         
         .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; }
         .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
         .num-linha { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #000; }
         .texto-linha { flex: 1; padding: 0 20px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #000; line-height: 35px; text-transform: uppercase; text-align: justify; white-space: nowrap; overflow: hidden; }
 
-        /* NAV */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 30px 0; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .nav-item.active { color: var(--gold); border-top: 2px solid var(--gold); }
@@ -48,7 +44,7 @@
 
 <header>
     <div style="font-weight: 900; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
-    <div style="font-size: 10px; color: #4ade80;">● MODO ESTUDO</div>
+    <div style="font-size: 10px; color: #4ade80; font-weight: bold;">● PRODUÇÃO ATIVA</div>
 </header>
 
 <div class="container" id="main-feed"></div>
@@ -56,9 +52,9 @@
 <div id="view-modal">
     <div class="view-header">
         <div class="pgv-group">
-            <button class="btn-pgv" onclick="window.cmd('P')">P</button>
-            <button class="btn-pgv" onclick="window.cmd('G')">G</button>
-            <button class="btn-pgv" onclick="window.cmd('V')">V</button>
+            <button class="btn-pgv">P</button>
+            <button class="btn-pgv">G</button>
+            <button class="btn-pgv">V</button>
         </div>
         <button class="btn-voltar" onclick="window.closeView()">SAIR</button>
     </div>
@@ -66,10 +62,10 @@
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" id="btn-producao" onclick="tab('producao')">📁 PEÇAS</button>
-    <button class="nav-item" id="btn-questoes" onclick="tab('questoes')">🎓 QUESTÕES</button>
-    <button class="nav-item" id="btn-tese" onclick="tab('tese')">⚖️ TESES</button>
-    <button class="nav-item" id="btn-nc" onclick="tab('nc')">⚠️ NC</button>
+    <button class="nav-item active" onclick="tab('producao')">📁 PEÇAS</button>
+    <button class="nav-item" onclick="tab('questoes')">🎓 QUESTÕES</button>
+    <button class="nav-item" onclick="tab('tese')">⚖️ TESES</button>
+    <button class="nav-item" onclick="tab('nc')">⚠️ NC</button>
 </nav>
 
 <script type="module">
@@ -88,12 +84,7 @@
     let activeTab = 'producao';
     let cache = {};
 
-    window.tab = (t) => {
-        activeTab = t;
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('btn-' + (t==='questoes'?'questoes':t)).classList.add('active');
-        render();
-    };
+    window.tab = (t) => { activeTab = t; render(); };
 
     onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
 
@@ -105,12 +96,18 @@
             const pecas = cache.producao_v13 || {};
             Object.keys(pecas).reverse().forEach(id => {
                 const p = pecas[id];
-                if (p.nome_peca || p.linhas) {
+                if (p.nome_peca || p.linhas || p.texto) {
+                    // Lógica para Formatação do Título Exame + Peça
+                    let labelExame = p.activeEx || p.exame || "SIMULADO";
+                    if(!isNaN(labelExame)) labelExame = "EXAME " + labelExame; // Se for só número, vira 'EXAME 35'
+                    
+                    const nomePeca = p.nome_peca || "PEÇA SEM TÍTULO";
+                    
                     feed.innerHTML += `
                         <div class="item-row">
                             <div class="item-content">
-                                <span class="item-title">EXAME: ${p.activeEx || p.exame || "OFF"}</span>
-                                <span class="item-desc">${p.nome_peca || 'PEÇA'}</span>
+                                <span class="item-title">${labelExame}</span>
+                                <span class="item-desc">${nomePeca}</span>
                             </div>
                             <div class="row-actions">
                                 <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
@@ -120,11 +117,15 @@
                 }
             });
         }
+        // ... Renderização simplificada para as outras abas para manter foco ...
     }
 
     window.verPeca = (id) => {
         const p = cache.producao_v13[id];
-        let raw = p.linhas ? (Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas) : (p.texto || "");
+        let raw = "";
+        if(p.linhas) raw = Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas;
+        else raw = p.texto || p.conteudo || p.corpo || "";
+        
         const lines = raw.split('\n');
         let html = "";
         for(let i=1; i<=150; i++) {
@@ -135,14 +136,9 @@
         window.scrollTo(0,0);
     };
 
-    // FUNÇÃO DOS BOTÕES P G V
-    window.cmd = (tipo) => {
-        alert("Comando " + tipo + " acionado. Aqui abriremos a estrutura de: " + tipo);
-        // Aqui você pode integrar para abrir os PDFs de enunciado ou gabarito futuramente.
-    };
-
     window.closeView = () => document.getElementById('view-modal').style.display = 'none';
-    window.apagarPeca = (id) => { if(confirm("Apagar produção?")) remove(ref(db, `producao_v13/${id}`)); };
+    window.apagarPeca = (id) => { if(confirm("Deseja apagar esta produção?")) remove(ref(db, `producao_v13/${id}`)); };
+
 </script>
 </body>
 </html>

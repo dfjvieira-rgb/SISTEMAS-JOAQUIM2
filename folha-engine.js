@@ -1,4 +1,4 @@
-// FolhaEngine.js - VERSÃO DEFINITIVA [TAB RESTAURADO + SINCRONIA TOTAL COM INDEX]
+// FolhaEngine.js - VERSÃO DEFINITIVA [JUSTIFICADA + SINCRONIA TOTAL]
 export const FolhaEngine = {
     montar: (containerId) => {
         const container = document.getElementById(containerId);
@@ -48,8 +48,10 @@ export const FolhaEngine = {
                     background-size: 100% 35px;
                     background-repeat: repeat-y;
                     background-position: 0 -1px;
+                    /* JUSTIFICAÇÃO BLINDADA */
+                    text-align: justify;
+                    text-justify: inter-word;
                 }
-                /* Impede que o navegador crie margens ao dar Enter */
                 .area-editor div, .area-editor p { margin: 0; padding: 0; line-height: 35px; }
 
                 @media (max-width: 768px) {
@@ -89,12 +91,8 @@ export const FolhaEngine = {
                 const sel = window.getSelection();
                 if (!sel.rangeCount) return;
                 const range = sel.getRangeAt(0);
-                
-                // Cria nó de texto com 4 espaços
                 const tabNode = document.createTextNode("    ");
                 range.insertNode(tabNode);
-                
-                // Move o cursor para depois dos espaços
                 range.setStartAfter(tabNode);
                 range.setEndAfter(tabNode);
                 sel.removeAllRanges();
@@ -102,7 +100,6 @@ export const FolhaEngine = {
             }
         });
 
-        // Limpa formatação ao colar (Paste Limpo)
         editor.addEventListener('paste', (e) => {
             e.preventDefault();
             const text = e.clipboardData.getData('text/plain');
@@ -110,23 +107,20 @@ export const FolhaEngine = {
         });
     },
 
-    // FUNÇÃO QUE O PERGAMINHO E MARTELO CHAMAM NO SEU INDEX
     injetarTextoMultilinhas: (textoBruto) => {
         const editor = document.getElementById('editor-principal');
         if (!editor) return;
         
-        // Remove possíveis tags HTML se o texto vier sujo
         const limpo = textoBruto.replace(/<[^>]*>?/gm, '').trim();
         
-        // Injeta o texto: se estiver vazio, coloca no topo. Se não, pula linha.
         if (editor.innerText.trim() === "") {
             editor.innerText = limpo;
         } else {
+            // Adiciona quebra de linha dupla para separar das inteligências anteriores
             editor.innerText += "\n\n" + limpo;
         }
         
         editor.focus();
-        // Move scroll para o final do texto inserido
         editor.scrollTop = editor.scrollHeight;
     },
 
@@ -156,7 +150,7 @@ export const FolhaEngine = {
             html += `
                 <div style="display:flex; min-height:35px; border-bottom:1px solid #eee; align-items:stretch;">
                     <span style="width:40px; min-width:40px; border-right:2px solid #000; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; background:#f1f5f9; color:#000;">${i}</span>
-                    <span style="flex:1; padding:5px 15px; font-family:'Courier New', monospace; font-size:18px; font-weight:bold; line-height:25px; white-space:pre-wrap; word-break:break-word; color:#000;">${txt}</span>
+                    <span style="flex:1; padding:5px 15px; font-family:'Courier New', monospace; font-size:18px; font-weight:bold; line-height:25px; white-space:pre-wrap; word-break:break-word; color:#000; text-align:justify;">${txt}</span>
                 </div>`;
         }
         

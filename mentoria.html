@@ -2,93 +2,81 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE - SISTEMA BLINDADO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HISTÓRICO MENTORIA | ELITE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
-            --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding: 0; padding-bottom: 100px; }
-
-        /* HEADER E VOLTAR */
-        header { 
-            background: var(--card); padding: 15px 20px; border-bottom: 3px solid var(--gold); 
-            display: flex; justify-content: space-between; align-items: center; 
-            position: sticky; top: 0; z-index: 1000; 
-        }
-        .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; text-decoration: none; }
-
-        .dashboard { padding: 15px; max-width: 1200px; margin: 0 auto; }
-
-        /* SEÇÃO HISTÓRICO - PRIORIDADE ABSOLUTA */
-        .secao-titulo { color: var(--gold); font-size: 13px; font-weight: 900; text-transform: uppercase; margin: 25px 0 10px 0; display: flex; align-items: center; gap: 8px; border-left: 4px solid var(--gold); padding-left: 10px; }
+        :root { --primary: #020617; --gold: #fbbf24; --card: #1e293b; --success: #22c55e; --danger: #ef4444; --info: #3b82f6; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
         
-        .card-peca { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--gold); }
-        .peca-info b { display: block; color: var(--gold); font-size: 11px; }
-        .peca-info span { font-size: 1.1rem; font-weight: 800; }
-
-        /* HUB DE INTELIGÊNCIA */
-        .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
-        .btn-hub { background: var(--card); border-radius: 15px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; border: 1px solid #475569; }
-        .btn-hub i { font-size: 1.8rem; }
-        .btn-hub span { font-size: 10px; font-weight: 900; text-transform: uppercase; }
+        .dashboard { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; max-width: 1200px; margin: 0 auto; }
+        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
         
-        .h-nc { border-bottom: 5px solid var(--nc); color: var(--nc); }
-        .h-qp { border-bottom: 5px solid var(--qp); color: var(--qp); }
-        .h-tese { border-bottom: 5px solid var(--tese); color: var(--tese); }
-        .h-arsenal { border-bottom: 5px solid var(--arsenal); color: var(--arsenal); }
+        .btn { background: var(--gold); border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
+        .btn:active { transform: scale(0.95); }
+        
+        .btn-action { width: 38px; height: 38px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; transition: 0.2s; }
+        .btn-del { background: var(--danger); }
+        .btn-share { background: #334155; color: var(--gold); }
+        .btn-open { background: var(--success); flex: 1; font-weight: 900; text-transform: uppercase; font-size: 11px; display: flex; gap: 5px; }
 
-        /* POST-ITS */
-        .post-it { background: white; color: #020617; padding: 22px; border-radius: 18px; margin-bottom: 15px; border-left: 12px solid; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .pi-title { font-size: 1.1rem; font-weight: 900; display: block; margin-bottom: 5px; text-transform: uppercase; }
-        .pi-desc { font-size: 1.05rem; line-height: 1.4; color: #1e293b; font-weight: 500; }
-        .pi-tag { background: #020617; color: var(--gold); padding: 5px 12px; border-radius: 6px; font-size: 12px; margin-top: 10px; display: inline-block; font-weight: 700; }
+        .feed { max-height: 400px; overflow-y: auto; margin-top: 10px; padding-right: 5px; }
+        .feed::-webkit-scrollbar { width: 4px; }
+        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
-        .btn-del { background: none; border: none; color: #ef4444; font-size: 1.4rem; cursor: pointer; }
+        .card-h { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .card-h span { flex: 1; min-width: 0; }
+        .card-h strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .post-it-content { flex: 1; }
 
-        /* BOTÃO FOGUETE - AGORA VISÍVEL E FIXO */
-        #fab-foguete { 
-            position: fixed; bottom: 30px; right: 20px; width: 70px; height: 70px; 
-            background: var(--gold); border-radius: 50%; border: none; font-size: 2rem; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 9999; color: black; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
+        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-family: inherit; }
+
+        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-<header>
-    <button onclick="window.history.back()" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR</button>
-    <h2 style="margin:0; font-size: 1.1rem;">ELITE <span style="color:var(--gold)">MASTER</span></h2>
+<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
+    <h2 style="font-weight:900; margin:0; font-size: 1.2rem;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
+    <button class="btn" style="width:auto; margin:0; background:white; padding: 8px 15px;" onclick="window.close()">VOLTAR</button>
 </header>
 
-<div class="dashboard">
-    <div class="secao-titulo" id="topo-historico"><i class="fas fa-history"></i> HISTÓRICO DE PEÇAS REALIZADAS</div>
-    <div id="feed-historico">
-        <p style="text-align:center; opacity:0.5; padding: 20px;">Carregando histórico do servidor...</p>
-    </div>
+<main class="dashboard">
+    <section class="panel" style="grid-column: span 2;">
+        <h3 style="color:var(--gold); margin:0; font-size: 1rem;"><i class="fas fa-history"></i> HISTÓRICO OFICIAL DE PEÇAS</h3>
+        <div id="feed-producao" class="feed">Conectando...</div>
+    </section>
 
-    <div class="secao-titulo" id="hub-ancora"><i class="fas fa-rocket"></i> HUB DE INTELIGÊNCIA</div>
-    <div class="hub-grid">
-        <div class="btn-hub h-nc" onclick="window.injetar('nc')"><i class="fas fa-brain"></i><span>Não Confunda</span></div>
-        <div class="btn-hub h-qp" onclick="window.injetar('qp')"><i class="fas fa-search"></i><span>Qual a Peça?</span></div>
-        <div class="btn-hub h-tese" onclick="window.injetar('tese')"><i class="fas fa-gavel"></i><span>Teses Ouro</span></div>
-        <div class="btn-hub h-arsenal" onclick="window.injetar('arsenal')"><i class="fas fa-bolt"></i><span>Arsenal 50Q</span></div>
-    </div>
+    <section class="panel" style="border-top-color: #a855f7;">
+        <h3 style="color:#a855f7; font-size: 0.9rem;"><i class="fas fa-search"></i> QUAL A PEÇA?</h3>
+        <input id="qp-t" placeholder="Momento Processual">
+        <textarea id="qp-c" placeholder="Por que é essa peça?"></textarea>
+        <button class="btn" style="background:#a855f7; color:white" onclick="salvarRapido('qp')">SALVAR</button>
+        <div id="feed-qp" class="feed"></div>
+    </section>
 
-    <div id="feed-inteligencia"></div>
-</div>
+    <section class="panel" style="border-top-color: #f472b6;">
+        <h3 style="color:#f472b6; font-size: 0.9rem;"><i class="fas fa-brain"></i> NÃO CONFUNDA</h3>
+        <input id="nc-t" placeholder="Assunto">
+        <textarea id="nc-c" placeholder="Diferença crucial..."></textarea>
+        <button class="btn" style="background:#f472b6; color:white" onclick="salvarRapido('nc')">SALVAR</button>
+        <div id="feed-nc" class="feed"></div>
+    </section>
 
-<button id="fab-foguete" onclick="document.getElementById('hub-ancora').scrollIntoView({behavior:'smooth'})">
-    <i class="fas fa-rocket"></i>
-</button>
+    <section class="panel" style="border-top-color: #3b82f6;">
+        <h3 style="color:#3b82f6; font-size: 0.9rem;"><i class="fas fa-gavel"></i> BANCO DE TESES</h3>
+        <input id="tese-t" placeholder="Título da Tese">
+        <textarea id="tese-c" placeholder="Fundamentação..."></textarea>
+        <button class="btn" style="background:#3b82f6; color:white" onclick="salvarRapido('tese')">SALVAR</button>
+        <div id="feed-tese" class="feed"></div>
+    </section>
+</main>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -100,71 +88,79 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // FUNÇÃO DE INJEÇÃO (INCLUINDO AS 50 QUESTÕES)
-    window.injetar = (tipo) => {
-        let conteudo = [];
-        if(tipo === 'arsenal') {
-            conteudo = [
-                { t: "Q1: Honorários Periciais", c: "Sucumbente na prova paga. Se tiver JG, a União paga.", kw: "Art. 790-B CLT" },
-                { t: "Q2: Horas In Itinere", c: "Não são mais tempo à disposição, independente do transporte.", kw: "Art. 58 CLT" },
-                { t: "Q3: Estabilidade Gestante", c: "Mesmo em contrato de experiência.", kw: "Súmula 244 TST" },
-                { t: "Q4: Equiparação Salarial", c: "Mesmo estabelecimento empresarial.", kw: "Art. 461 CLT" },
-                { t: "Q5: Intervalo", c: "Indenização de 50% sobre o tempo suprimido.", kw: "Art. 71 CLT" }
-                // ... (O motor está pronto para receber as 50)
-            ];
-            // Para brevidade nesta resposta, inseri as 5 principais, mas o motor aceita as 50.
-        } else if(tipo === 'nc') {
-            conteudo = [{ t: "Multa 467", c: "Massa Falida não paga. Recuperação Judicial paga.", kw: "Súmula 388 TST" }];
+    window.salvarRapido = (type) => {
+        const t = document.getElementById(type+'-t');
+        const c = document.getElementById(type+'-c');
+        if(t.value && c.value) {
+            push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
+            t.value = ""; c.value = "";
         }
-
-        conteudo.forEach(item => {
-            push(ref(db, 'v13_master'), { ...item, cat: tipo, ts: serverTimestamp() });
-        });
-        alert("INTELIGÊNCIA " + tipo.toUpperCase() + " ATUALIZADA!");
     };
 
-    // ESCUTA REAL DO HISTÓRICO E DAS INTELIGÊNCIAS
-    onValue(ref(db), (snap) => {
-        const data = snap.val() || {};
-        
-        // 1. CARREGAR HISTÓRICO (producao_v13)
-        const hFeed = document.getElementById('feed-historico');
-        hFeed.innerHTML = "";
-        const pecas = data.producao_v13 || {};
-        const keysPecas = Object.keys(pecas);
-        
-        if(keysPecas.length === 0) {
-            hFeed.innerHTML = "<p style='text-align:center; opacity:0.3;'>Nenhuma peça realizada ainda.</p>";
-        } else {
-            keysPecas.reverse().forEach(id => {
-                hFeed.innerHTML += `
-                    <div class="card-peca">
-                        <div class="peca-info">
-                            <b>EXAME ${pecas[id].exame || '--'}</b>
-                            <span>${pecas[id].nome_peca || 'Peça Sem Nome'}</span>
-                        </div>
-                        <button class="btn-del" onclick="remove(ref(db,'producao_v13/${id}'))"><i class="fas fa-trash"></i></button>
-                    </div>`;
-            });
-        }
+    window.apagarRegistro = (path, id) => {
+        if(confirm("Excluir permanentemente?")) remove(ref(db, path + '/' + id));
+    };
 
-        // 2. CARREGAR INTELIGÊNCIAS (v13_master)
-        const iFeed = document.getElementById('feed-inteligencia');
-        iFeed.innerHTML = "";
-        const itens = data.v13_master || {};
-        const cores = { nc: 'var(--nc)', qp: 'var(--qp)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
+    window.compartilharRegistro = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        if(!s.exists()) return;
+        const p = s.val();
+        const baseLinhas = p.linhas || p.conteudo || [];
+        const texto = baseLinhas.map((l, i) => `${i + 1}. ${l || ""}`).filter(l => l.length > 5).join('\n');
+        const msg = `📝 *ELITE OAB*\n🏆 *Exame:* ${p.exame}\n⚖️ *Peça:* ${p.nome_peca || p.peca}\n\n${texto}`;
         
-        Object.keys(itens).reverse().forEach(id => {
-            const it = itens[id];
-            iFeed.innerHTML += `
-                <div class="post-it" style="border-left-color:${cores[it.cat] || 'var(--gold)'}">
-                    <button class="btn-del" style="float:right;" onclick="remove(ref(db,'v13_master/${id}'))">&times;</button>
-                    <span class="pi-title" style="color:${cores[it.cat]}">${it.t}</span>
-                    <div class="pi-desc">${it.c}</div>
-                    <div class="pi-tag">${it.kw}</div>
+        if (navigator.share) {
+            navigator.share({ title: 'Minha Peça Elite', text: msg });
+        } else {
+            navigator.clipboard.writeText(msg);
+            alert("Copiado!");
+        }
+    };
+
+    onValue(ref(db), (snap) => {
+        const d = snap.val() || {};
+        
+        // --- PEÇAS ---
+        const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
+        const treinos = d.producao_v13 || {};
+        Object.keys(treinos).reverse().forEach(id => {
+            const t = treinos[id];
+            if(id.includes("RASCUNHO_ATUAL")) return; 
+            fP.innerHTML += `
+                <div class="card-h">
+                    <span><strong style="color:var(--gold)">EXAME ${t.exame}</strong> ${t.nome_peca || "PEÇA"}<br><small style="opacity:0.6">${t.data_envio || ""}</small></span>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-action btn-share" onclick="compartilharRegistro('${id}')" title="Compartilhar"><i class="fas fa-share-alt"></i></button>
+                        <button class="btn-action btn-open" onclick="verTreino('${id}')"><i class="fas fa-eye"></i> ABRIR</button>
+                        <button class="btn-action btn-del" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
+                    </div>
                 </div>`;
         });
+
+        const configPost = { 'nc': '#f472b6', 'tese': '#3b82f6', 'qp': '#a855f7' };
+        Object.keys(configPost).forEach(type => {
+            const f = document.getElementById('feed-'+type); f.innerHTML = "";
+            const items = d['v13_'+type] || {};
+            Object.keys(items).reverse().forEach(id => {
+                f.innerHTML += `
+                    <div class="post-it" style="background:${configPost[type]}">
+                        <div class="post-it-content"><strong>${items[id].t}</strong><p style="font-size:0.8rem; margin:5px 0 0 0; white-space:pre-wrap;">${items[id].c}</p></div>
+                        <button class="btn-del" style="width:30px; height:30px; background:rgba(0,0,0,0.2) !important; border-radius:4px; display:flex; align-items:center; justify-content:center; border:none; color:white; cursor:pointer;" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times" style="font-size:12px"></i></button>
+                    </div>`;
+            });
+        });
     });
+
+    window.verTreino = (id) => {
+        get(ref(db, 'producao_v13/' + id)).then((s) => {
+            if(!s.exists()) return;
+            const p = s.val();
+            const win = window.open('', '_blank');
+            const baseLinhas = p.linhas || p.conteudo || [];
+            const linhasHtml = baseLinhas.map((l, i) => `<div style="display:flex; border-bottom:1px solid #eee; padding:4px 0;"><span style="width:30px; color:#999; font-size:12px;">${i+1}</span><span style="font-family:monospace;">${l || ""}</span></div>`).join('');
+            win.document.write(`<html><body style="padding:20px; font-family:sans-serif;"><h2>${p.nome_peca}</h2>${linhasHtml}</body></html>`);
+        });
+    };
 </script>
 </body>
 </html>

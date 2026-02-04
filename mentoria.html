@@ -3,48 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA - HISTÓRICO ELITE V13</title>
+    <title>ELITE V13 | MENTORIA INTEGRADA</title>
     <style>
-        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --blue: #58a6ff; --red: #ff7b72; --cyan: #38bdf8; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
-        header { padding: 20px; text-align: center; border-bottom: 1px solid var(--border); font-weight: 900; color: var(--gold); }
+        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; }
+       
+        header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 1000; }
+        .btn-retorno-producao {
+            width: 100%; background: linear-gradient(90deg, #d29922, #b0801a); color: black;
+            border: none; padding: 14px; border-radius: 8px; font-weight: 900;
+            font-size: 13px; text-transform: uppercase; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(210, 153, 34, 0.3); margin-top: 10px;
+        }
+
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
-        .item-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 15px; margin-bottom: 10px; cursor: pointer; }
-        .tag { font-size: 10px; font-weight: 900; color: var(--gold); text-transform: uppercase; }
-        .tit { font-size: 16px; font-weight: 800; display: block; margin: 4px 0; }
-        #modal-peca { position: fixed; inset: 0; background: white; z-index: 5000; display: none; flex-direction: column; }
-        .folha-view { flex: 1; overflow-y: auto; padding: 10px 0; }
-        .ln { display: flex; border-bottom: 1px solid #eee; min-height: 28px; color: #000; font-family: Courier; }
-        .num-ln { width: 35px; background: #f0f0f0; border-right: 1px solid #000; text-align: center; font-size: 10px; font-weight: bold; line-height: 28px; }
-        .txt-ln { flex: 1; padding-left: 10px; line-height: 28px; text-transform: uppercase; }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 15px 0 30px 0; }
-        .nav-btn { flex: 1; background: none; border: none; color: #8b949e; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .nav-btn.active { color: var(--gold); border-top: 2px solid var(--gold); }
+
+        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--gold); }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-desc { font-size: 15px; font-weight: 700; color: #ffffff; text-transform: uppercase; }
+       
+        .row-actions { display: flex; gap: 8px; }
+        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-view { background: var(--gold); color: black; border: none; }
+
+        /* MODAL E FOLHA */
+        #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
+        .view-header { width: 100%; background: #0f172a; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
+        .pgv-group { display: flex; gap: 10px; }
+        .btn-pgv { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; color: var(--gold); font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 900; text-transform: uppercase; }
+       
+        .paper { width: 100%; max-width: 850px; background: white; margin: 20px auto; border: 1px solid #000; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+        .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
+        .num-linha { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #000; }
+        .texto-linha { flex: 1; padding: 0 20px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #000; line-height: 35px; text-transform: uppercase; text-align: justify; white-space: nowrap; overflow: hidden; }
+
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 30px 0; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        .nav-item.active { color: var(--gold); border-top: 2px solid var(--gold); }
+       
+        /* ESTILO PARA AS INTELIGÊNCIAS */
+        .card-info { background: var(--card); padding: 15px; border-radius: 10px; border-left: 4px solid var(--gold); margin-bottom: 10px; }
+        .card-info b { color: var(--gold); display: block; margin-bottom: 5px; font-size: 13px; }
+        .card-info p { margin: 0; font-size: 14px; line-height: 1.4; color: #fff; }
     </style>
 </head>
 <body>
 
-<header>MENTORIA ELITE V13</header>
-<div class="container" id="feed"></div>
+<header>
+    <div style="font-weight: 900; font-size: 18px; text-align: center;">MENTORIA <span style="color:var(--gold)">ELITE V13</span></div>
+    <button class="btn-retorno-producao" onclick="window.voltarAoEditor()">
+        📝 CONTINUAR PEÇA EM PRODUÇÃO
+    </button>
+</header>
 
-<div id="modal-peca">
-    <div style="background:#000; padding:15px; display:flex; justify-content:space-between;">
-        <span id="modal-tit" style="color:white; font-weight:bold;">PEÇA SALVA</span>
-        <button onclick="fecharModal()" style="background:var(--gold); border:none; padding:5px 15px; font-weight:bold;">FECHAR</button>
+<div class="container" id="main-feed"></div>
+
+<div id="view-modal">
+    <div class="view-header">
+        <div class="pgv-group">
+            <button class="btn-pgv">P</button>
+            <button class="btn-pgv">G</button>
+            <button class="btn-pgv">V</button>
+        </div>
+        <button class="btn-voltar" onclick="window.closeView()">SAIR</button>
     </div>
-    <div class="folha-view" id="modal-corpo"></div>
+    <div id="area-folha" class="paper"></div>
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-btn active" id="b-producao" onclick="setTab('producao')">📁 HISTÓRICO</button>
-    <button class="nav-btn" id="b-questoes" onclick="setTab('questoes')">🎓 QUESTÕES</button>
-    <button class="nav-btn" id="b-tese" onclick="setTab('tese')">⚖️ TESES</button>
-    <button class="nav-btn" id="b-nc" onclick="setTab('nc')">⚠️ NC</button>
+    <button id="nav-producao" class="nav-item active" onclick="tab('producao')">📁 HISTÓRICO</button>
+    <button id="nav-questoes" class="nav-item" onclick="tab('questoes')">🎓 QUESTÕES</button>
+    <button id="nav-tese" class="nav-item" onclick="tab('tese')">⚖️ TESES</button>
+    <button id="nav-nc" class="nav-item" onclick="tab('nc')">⚠️ NC</button>
 </nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+   
+    // IMPORTAÇÃO DAS INTELIGÊNCIAS SEPARADAS
     import { QuestoesOAB } from './questoes.js';
     import { InteligenciaNC } from './NC.js';
     import { BancoTeses } from './teses.js';
@@ -58,49 +98,89 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let tabAtiva = 'producao';
-    let cacheBD = {};
+    let activeTab = 'producao';
+    let cache = {};
 
-    onValue(ref(db, 'producao_v13'), snap => { cacheBD = snap.val() || {}; renderizar(); });
+    window.voltarAoEditor = () => { window.location.href = "index.html"; };
+   
+    window.tab = (t) => {
+        activeTab = t;
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById('nav-' + t).classList.add('active');
+        render();
+    };
 
-    window.setTab = (t) => {
-        tabAtiva = t;
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('b-'+t).classList.add('active');
-        renderizar();
-    }
+    onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
 
-    function renderizar() {
-        const f = document.getElementById('feed'); f.innerHTML = "";
-        if(tabAtiva === 'producao') {
-            Object.keys(cacheBD).reverse().forEach(id => {
-                const p = cacheBD[id];
-                f.innerHTML += `<div class="item-card" onclick="abrirPeca('${id}')">
-                    <span class="tag">EXAME ${p.activeEx}</span>
-                    <span class="tit">${p.nome_peca}</span>
-                    <small>Toque para abrir texto</small>
-                </div>`;
+    function render() {
+        const feed = document.getElementById('main-feed');
+        feed.innerHTML = "";
+       
+        if(activeTab === 'producao') {
+            const pecas = cache.producao_v13 || {};
+            Object.keys(pecas).reverse().forEach(id => {
+                const p = pecas[id];
+                if (p) {
+                    let labelExame = p.activeEx || p.exame || "SIMULADO";
+                    if(!isNaN(labelExame)) labelExame = "EXAME " + labelExame;
+                    feed.innerHTML += `
+                        <div class="item-row">
+                            <div class="item-content">
+                                <span class="item-title">${labelExame}</span>
+                                <span class="item-desc">${p.nome_peca || 'PEÇA FINALIZADA'}</span>
+                            </div>
+                            <div class="row-actions">
+                                <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
+                                <button class="btn-action" onclick="window.apagarPeca('${id}')">🗑️</button>
+                            </div>
+                        </div>`;
+                }
             });
-        } else if(tabAtiva === 'questoes') {
-            QuestoesOAB.forEach(q => f.innerHTML += `<div class="item-card" style="border-left:5px solid var(--blue)"><b>${q.t}</b><br><small>${q.c}</small></div>`);
-        } else if(tabAtiva === 'tese') {
-            BancoTeses.forEach(t => f.innerHTML += `<div class="item-card" style="border-left:5px solid var(--cyan)"><b>${t.t}</b><br><small>${t.c}</small></div>`);
-        } else if(tabAtiva === 'nc') {
-            InteligenciaNC.forEach(n => f.innerHTML += `<div class="item-card" style="border-left:5px solid var(--red)"><b>${n.t}</b><br><small>${n.c}</small></div>`);
+        }
+        else if (activeTab === 'questoes') {
+            QuestoesOAB.forEach(item => {
+                feed.innerHTML += `<div class="card-info" style="border-left-color: #58a6ff"><b>${item.t}</b><p>${item.c}</p></div>`;
+            });
+        }
+        else if (activeTab === 'tese') {
+            BancoTeses.forEach(item => {
+                feed.innerHTML += `<div class="card-info" style="border-left-color: var(--gold)"><b>${item.t}</b><p>${item.c}</p></div>`;
+            });
+        }
+        else if (activeTab === 'nc') {
+            InteligenciaNC.forEach(item => {
+                feed.innerHTML += `<div class="card-info" style="border-left-color: #ff7b72"><b>${item.t}</b><p>${item.c}</p></div>`;
+            });
         }
     }
 
-    window.abrirPeca = (id) => {
-        const p = cacheBD[id];
+    window.verPeca = (id) => {
+        const p = cache.producao_v13[id];
+        if(!p) return;
+        let raw = "";
+        if(p.linhas && Array.isArray(p.linhas)) raw = p.linhas.join('\n');
+        else if (p.texto) raw = p.texto;
+        else if (p.conteudo) raw = p.conteudo;
+        else if (p.corpo) raw = p.corpo;
+        else {
+            let maxStr = "";
+            for(let key in p) {
+                if(typeof p[key] === 'string' && p[key].length > maxStr.length && key !== 'nome_peca') maxStr = p[key];
+            }
+            raw = maxStr;
+        }
+        const lines = raw.split('\n');
         let html = "";
         for(let i=1; i<=150; i++) {
-            html += `<div class="ln"><div class="num-ln">${i}</div><div class="txt-ln">${p.linhas[i-1] || ""}</div></div>`;
+            html += `<div class="linha-folha"><div class="num-linha">${i}</div><div class="texto-linha">${lines[i-1] || ""}</div></div>`;
         }
-        document.getElementById('modal-corpo').innerHTML = html;
-        document.getElementById('modal-tit').innerText = p.nome_peca + " - EXAME " + p.activeEx;
-        document.getElementById('modal-peca').style.display = 'flex';
-    }
-    window.fecharModal = () => document.getElementById('modal-peca').style.display = 'none';
+        document.getElementById('area-folha').innerHTML = html;
+        document.getElementById('view-modal').style.display = 'flex';
+        window.scrollTo(0,0);
+    };
+
+    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
+    window.apagarPeca = (id) => { if(confirm("Deseja apagar esta produção?")) remove(ref(db, `producao_v13/${id}`)); };
 </script>
 </body>
-</html> 
+</html>

@@ -3,164 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE | READ-FRIENDLY</title>
+    <title>ELITE V13 | FOCUS MODE</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            /* Paleta Confortável (Boas Práticas Mobile) */
-            --bg: #0f172a; 
-            --card: #1e293b; 
-            --text-main: #e2e8f0; 
-            --text-dim: #94a3b8;
-            --gold: #fbbf24;
-            /* Cores de Identificação Suaves */
-            --nc: #fbcfe8; 
-            --qp: #ddd6fe; 
-            --tese: #bae6fd; 
-            --arsenal: #bbf7d0;
-            --danger: #fca5a5;
-            --success: #4ade80;
+            --bg: #0a0c10; --card: #161b22; --border: #30363d;
+            --text: #c9d1d9; --dim: #8b949e; --gold: #d29922;
         }
-        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 90px; line-height: 1.5; }
+
+        header { padding: 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; }
+        .btn-top { background: none; border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 6px; font-size: 12px; }
+
+        .container { padding: 15px; max-width: 700px; margin: 0 auto; }
         
-        body { 
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg); 
-            color: var(--text-main); 
-            margin: 0; 
-            padding-bottom: 100px;
-            line-height: 1.6; /* Conforto de leitura */
+        /* Lista de Peças e Itens - Minimalismo Puro */
+        .item-row { 
+            padding: 16px 0; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: flex-start;
         }
+        .item-body { flex: 1; padding-right: 15px; }
+        .item-title { display: block; font-weight: 700; color: var(--gold); font-size: 14px; margin-bottom: 4px; text-transform: uppercase; }
+        .item-desc { display: block; font-size: 15px; color: var(--text); }
+        .item-meta { display: block; font-size: 12px; color: var(--dim); margin-top: 6px; font-style: italic; }
 
-        header { 
-            background: var(--card); 
-            padding: 18px 20px; 
-            border-bottom: 1px solid #334155; 
-            display: flex; justify-content: space-between; align-items: center; 
-            position: sticky; top: 0; z-index: 1000;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        /* Botões de Ação Discretos */
+        .btn-icon { background: none; border: none; color: var(--dim); padding: 10px; font-size: 16px; cursor: pointer; }
+        .btn-icon:active { color: var(--gold); }
+
+        /* Navegação Estilo App Nativo */
+        .nav-bar { 
+            position: fixed; bottom: 0; width: 100%; background: var(--card);
+            border-top: 1px solid var(--border); display: flex; justify-content: space-around;
+            padding: 12px 0 25px 0; z-index: 1000;
         }
+        .nav-item { color: var(--dim); text-align: center; text-decoration: none; font-size: 10px; flex: 1; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { display: block; font-size: 20px; margin-bottom: 4px; }
 
-        .btn-voltar { 
-            background: #334155; color: white; border: none; padding: 10px 16px; 
-            border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer;
-        }
+        /* Painel de Escrita Discreto */
+        .write-box { background: var(--card); border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border); }
+        input, textarea { width: 100%; background: transparent; border: none; color: var(--text); border-bottom: 1px solid var(--border); margin-bottom: 10px; padding: 10px 0; font-size: 16px; outline: none; }
+        .btn-save { background: var(--gold); color: black; border: none; width: 100%; padding: 12px; border-radius: 6px; font-weight: 800; text-transform: uppercase; font-size: 12px; }
 
-        .container { padding: 16px; max-width: 800px; margin: 0 auto; }
-
-        /* Painel de Input Discreto */
-        .panel-input { 
-            background: var(--card); border-radius: 16px; padding: 20px; 
-            margin-bottom: 24px; border: 1px solid #334155;
-        }
+        /* Visualização de Peça (Papel de Prova) */
+        #view-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; color: #1a1a1a; z-index: 2000; display: none; padding: 25px; overflow-y: auto; }
+        .line-paper { display: flex; border-bottom: 1px solid #e0e0e0; padding: 6px 0; font-family: "Courier New", Courier, monospace; font-size: 14px; }
         
-        input, textarea { 
-            width: 100%; padding: 14px; margin: 8px 0; 
-            background: #0f172a; border: 1px solid #334155; 
-            color: white; border-radius: 10px; font-size: 16px; /* Evita zoom no iOS */
-        }
-
-        /* Histórico de Peças com Menos Contraste */
-        .card-h { 
-            background: var(--card); border-radius: 14px; padding: 18px; 
-            margin-bottom: 12px; border: 1px solid #334155;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .info-h b { display: block; color: var(--gold); font-size: 11px; letter-spacing: 1px; }
-        .info-h span { font-size: 15px; font-weight: 600; color: var(--text-main); }
-
-        /* Post-its em Tons Pastel (Fáceis de ler) */
-        .post-it { 
-            padding: 20px; border-radius: 16px; margin-bottom: 16px; 
-            color: #1e293b; position: relative;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        .post-it strong { display: block; font-size: 1.1rem; margin-bottom: 8px; color: #0f172a; }
-        .post-it p { margin: 0; font-size: 1rem; color: #334155; font-weight: 500; }
-
-        /* Ações Estilizadas */
-        .actions { display: flex; gap: 10px; }
-        .btn-circle { 
-            width: 42px; height: 42px; border-radius: 12px; border: none; 
-            display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; color: white; font-size: 18px;
-        }
-
-        /* Menu de Navegação - Ergonomia Mobile */
-        .nav-tabs { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            background: rgba(30, 41, 59, 0.95); 
-            backdrop-filter: blur(10px); /* Efeito moderno */
-            display: flex; justify-content: space-around; padding: 12px 5px; 
-            border-top: 1px solid #334155; z-index: 2000;
-        }
-        .tab { color: var(--text-dim); text-align: center; font-size: 10px; text-decoration: none; font-weight: 600; flex: 1; transition: 0.3s; }
-        .tab.active { color: var(--gold); }
-        .tab i { display: block; font-size: 1.4rem; margin-bottom: 4px; }
-
-        /* Botão Foguete Suave */
-        #fab-injetor { 
-            position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; 
-            background: var(--gold); border-radius: 18px; border: none; 
-            font-size: 1.4rem; box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 1001;
-        }
-
-        /* Modal de Visualização (Papel Real) */
-        #modal-view { 
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: #f8fafc; color: #1e293b; z-index: 3000; 
-            display:none; overflow-y:auto; padding: 25px;
-        }
-
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="modal-view">
-    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="margin:0">Visualização de Peça</h3>
-        <button onclick="fecharModal()" style="background:#0f172a; color:white; padding:10px 20px; border:none; border-radius:8px;">VOLTAR</button>
+<div id="view-modal">
+    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+        <h4 id="view-title" style="margin:0">PEÇA EXAME 45</h4>
+        <button onclick="closeView()" style="background:#000; color:#fff; border:none; padding:8px 15px; border-radius:4px;">FECHAR</button>
     </div>
-    <div id="modal-content" style="background:white; padding:20px; border-radius:10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);"></div>
+    <div id="view-content"></div>
 </div>
 
 <header>
-    <button class="btn-voltar" onclick="window.close()"><i class="fas fa-arrow-left"></i> SAIR</button>
-    <div style="text-align: right">
-        <span style="font-weight:800; color:var(--gold); font-size: 1.2rem;">ELITE <span style="color:white">V13</span></span>
-    </div>
+    <div style="font-weight: 900; letter-spacing: -1px; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
+    <button class="btn-top" onclick="injetorMestre()">INJETAR ESTRATÉGIA 45</button>
 </header>
 
 <div class="container">
-    <div id="panel-editor" class="panel-input hidden">
-        <h4 id="editor-title" style="margin:0 0 10px 0; color: var(--gold)">NOVA ANOTAÇÃO</h4>
-        <input id="inp-t" placeholder="Título ou Artigo">
-        <textarea id="inp-c" rows="4" placeholder="Fundamentação técnica..."></textarea>
-        <button id="btn-salvar" style="width:100%; padding: 15px; border-radius: 10px; border:none; font-weight: 800; cursor:pointer;">SALVAR NA MINHA BASE</button>
+    <div id="write-panel" class="hidden">
+        <div class="write-box">
+            <input id="inp-t" placeholder="Título (ex: Súmula 443 TST)">
+            <textarea id="inp-c" placeholder="Conteúdo da tese ou marcação de Vade..."></textarea>
+            <button class="btn-save" onclick="salvar()">SALVAR NA BASE</button>
+        </div>
     </div>
 
-    <div id="sec-producao">
-        <h3 style="color:var(--text-dim); font-size: 0.8rem; letter-spacing: 1px;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
-        <div id="feed-producao"></div>
-    </div>
-
-    <div id="sec-inteligencia" class="hidden">
-        <h3 id="intel-head" style="font-size: 0.8rem; letter-spacing: 1px;">INTELIGÊNCIA</h3>
-        <div id="feed-v13"></div>
-    </div>
+    <div id="main-feed"></div>
 </div>
 
-<nav class="nav-tabs">
-    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-scroll"></i>PEÇAS</a>
-    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-fingerprint"></i>QUAL PEÇA</a>
-    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-random"></i>CONFUNDA</a>
-    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-balance-scale"></i>TESES</a>
-    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-shield-alt"></i>ARSENAL</a>
+<nav class="nav-bar">
+    <a href="#" class="nav-item active" onclick="tab('producao')"><i class="fas fa-pen-nib"></i>PEÇAS</a>
+    <a href="#" class="nav-item" onclick="tab('tese')"><i class="fas fa-gavel"></i>TESES</a>
+    <a href="#" class="tab-injetor nav-item" onclick="tab('vade')"><i class="fas fa-book"></i>VADE</a>
+    <a href="#" class="nav-item" onclick="tab('nc')"><i class="fas fa-clone"></i>DIFERENÇAS</a>
+    <a href="#" class="nav-item" onclick="tab('arsenal')"><i class="fas fa-shield-alt"></i>ARSENAL</a>
 </nav>
-
-<button id="fab-injetor" onclick="injetorMestre()"><i class="fas fa-rocket"></i></button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -175,18 +102,104 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let currentTab = 'producao';
+    let activeTab = 'producao';
     let editId = null;
+    let cache = {};
 
-    window.showTab = (tab) => {
-        currentTab = tab;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelector(`.tab[onclick*='${tab}']`).classList.add('active');
-        
-        const isProd = tab === 'producao';
-        document.getElementById('sec-producao').classList.toggle('hidden', !isProd);
-        document.getElementById('sec-inteligencia').classList.toggle('hidden', isProd);
-        document.getElementById('panel-editor').classList.toggle('hidden', isProd);
-        
-        if(!isProd) {
-            const titulos = { qp: 'QUAL A PEÇA?', nc: 'NÃO CONFUNDA', tese: 'TESES OURO', arsenal: 'ARSENAL 50Q
+    window.tab = (t) => {
+        activeTab = t;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        document.querySelector(`[onclick="tab('${t}')"]`).classList.add('active');
+        document.getElementById('write-panel').classList.toggle('hidden', t === 'producao');
+        render();
+    };
+
+    window.salvar = () => {
+        const t = document.getElementById('inp-t').value;
+        const c = document.getElementById('inp-c').value;
+        if(!t || !c) return;
+        if(editId) set(ref(db, `v13_master/${editId}`), { t, c, cat: activeTab, ts: serverTimestamp() });
+        else push(ref(db, 'v13_master'), { t, c, cat: activeTab, ts: serverTimestamp() });
+        document.getElementById('inp-t').value = ""; document.getElementById('inp-c').value = ""; editId = null;
+    };
+
+    onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
+
+    function render() {
+        const feed = document.getElementById('main-feed');
+        feed.innerHTML = "";
+
+        if(activeTab === 'producao') {
+            const itens = cache.producao_v13 || {};
+            Object.keys(itens).reverse().forEach(id => {
+                if(id.includes("RASCUNHO")) return;
+                const p = itens[id];
+                feed.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-body" onclick="verPeca('${id}')">
+                            <span class="item-title">EXAME ${p.exame}</span>
+                            <span class="item-desc">${p.nome_peca}</span>
+                        </div>
+                        <div style="display:flex">
+                            <button class="btn-icon" onclick="share('${id}')"><i class="fab fa-whatsapp"></i></button>
+                            <button class="btn-icon" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        } else {
+            const itens = cache.v13_master || {};
+            Object.keys(itens).reverse().forEach(id => {
+                const it = itens[id];
+                if(it.cat !== activeTab) return;
+                feed.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-body">
+                            <span class="item-title">${it.t}</span>
+                            <span class="item-desc">${it.c}</span>
+                        </div>
+                        <div style="display:flex">
+                            <button class="btn-icon" onclick="prepararEdicao('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    window.verPeca = async (id) => {
+        const p = cache.producao_v13[id];
+        let html = "";
+        (p.linhas || []).forEach((l, i) => {
+            html += `<div class="line-paper"><span style="width:30px; color:#aaa; font-size:11px;">${i+1}</span><span>${l || ""}</span></div>`;
+        });
+        document.getElementById('view-title').innerText = p.nome_peca;
+        document.getElementById('view-content').innerHTML = html;
+        document.getElementById('view-modal').style.display = 'block';
+    };
+
+    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
+    window.apagar = (path, id) => { if(confirm("Apagar permanentemente?")) remove(ref(db, `${path}/${id}`)); };
+    window.prepararEdicao = (id, t, c) => {
+        editId = id;
+        document.getElementById('inp-t').value = t;
+        document.getElementById('inp-c').value = c;
+        window.scrollTo(0,0);
+    };
+
+    window.share = (id) => {
+        const p = cache.producao_v13[id];
+        const texto = (p.linhas || []).join('\n');
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("*MENTORIA ELITE*\n" + p.nome_peca + "\n\n" + texto)}`);
+    };
+
+    window.injetorMestre = () => {
+        const combo = [
+            { t: "ESTRATÉGIA VADE 45", c: "Marcar Súmula 331 TST com remissão ao Art. 942 CC (Responsabilidade Solidária).", cat: "vade" },
+            { t: "APOSTA 45: GRUPO ECONÔMICO", c: "Art. 2º, §2º e §3º CLT. Precisa de comunhão de interesses, não só sócios em comum.", cat: "tese" }
+        ];
+        combo.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
+        alert("Inteligência 45 Injetada!");
+    };
+</script>
+</body>
+</html>

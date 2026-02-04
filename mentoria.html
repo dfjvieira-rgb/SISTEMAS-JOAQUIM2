@@ -3,66 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE | MASTER</title>
+    <title>ELITE V13 | MASTER 2026</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --primary: #0f172a; --gold: #fbbf24; --bg: #F5F5F7; --card: #FFFFFF; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 110px; overflow-x: hidden; }
+        :root { 
+            --bg: #0a0c10; --card: #161b22; --border: #30363d;
+            --text: #c9d1d9; --dim: #8b949e; --gold: #d29922;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
+
+        header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         
-        header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
-        .btn-voltar { background: var(--gold); color: #000; border: none; padding: 10px 15px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
+        .container { padding: 15px; max-width: 700px; margin: 0 auto; }
 
-        .container { padding: 15px; max-width: 800px; margin: 0 auto; min-height: 80vh; }
-        .card-elite { background: var(--card); padding: 15px; border-radius: 12px; border-left: 5px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s ease-out; }
-        
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* PAINEL DE EDIÇÃO/INCLUSÃO */
+        .write-panel { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .write-panel input, .write-panel textarea { width: 100%; background: transparent; border: none; color: var(--text); border-bottom: 1px solid var(--border); margin-bottom: 12px; padding: 8px 0; outline: none; font-size: 16px; }
+        .btn-save { width: 100%; background: var(--gold); color: black; border: none; padding: 12px; border-radius: 6px; font-weight: 900; text-transform: uppercase; cursor: pointer; }
 
-        /* VISUALIZAÇÃO IGUAL AO SEU INDEX MASTER */
-        #visualizador-full { position: fixed; inset: 0; background: #cbd5e1; z-index: 99999; display: none; overflow-y: auto; flex-direction: column; align-items: center; }
-        .toolbar-view { width: 100%; background: var(--primary); padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; border-bottom: 2px solid var(--gold); }
-        .paper-render { width: 100%; max-width: 850px; background: white; margin: 20px 0; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        /* LISTAGEM */
+        .item-row { padding: 15px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; }
+        .item-body { flex: 1; padding-right: 10px; cursor: pointer; }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 4px; }
+        .item-desc { display: block; font-size: 15px; color: var(--text); white-space: pre-wrap; }
+        .actions { display: flex; gap: 5px; }
+        .btn-action { background: none; border: none; color: var(--dim); padding: 8px; font-size: 16px; cursor: pointer; }
 
-        /* MENU INFERIOR - INTELIGÊNCIAS */
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--primary); display: flex; padding: 10px 0 30px 0; border-top: 2px solid var(--gold); z-index: 1000; }
-        .nav-btn { flex: 1; text-align: center; background: none; border: none; color: white; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
-        .nav-btn i { display: block; font-size: 18px; margin-bottom: 4px; color: var(--gold); }
-        .nav-btn.active { color: var(--gold); transform: scale(1.1); }
+        /* NAVEGAÇÃO */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 25px 0; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { display: block; font-size: 18px; margin-bottom: 4px; }
 
-        .titulo-secao { font-weight: 900; color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid var(--gold); display: inline-block; }
+        /* VISUALIZADOR FOLHA FGV */
+        #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; align-items: center; overflow-y: auto; }
+        .paper { width: 100%; max-width: 850px; background: white; margin: 20px 0; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">MENTORIA</span></div>
-    <button class="btn-voltar" onclick="window.close()">
-        <i class="fas fa-arrow-left"></i> PRODUÇÃO
-    </button>
+    <div style="font-weight: 900; font-size: 18px;">ELITE <span style="color:var(--gold)">MASTER</span></div>
+    <button onclick="window.injetorMestre()" style="background:var(--gold); border:none; color:black; padding:6px 12px; border-radius:4px; font-size:10px; font-weight:900;">INJETAR 50Q</button>
 </header>
 
-<div class="container" id="conteudo-dinamico">
+<div class="container">
+    <div id="editor-container" class="write-panel" style="display:none;">
+        <input id="tit-input" placeholder="Título...">
+        <textarea id="cont-input" placeholder="Conteúdo técnico..." rows="3"></textarea>
+        <button class="btn-save" onclick="window.salvarDados()">SALVAR NA INTELIGÊNCIA</button>
     </div>
-
-<div id="visualizador-full">
-    <div class="toolbar-view">
-        <span id="nome-peca-view" style="color:white; font-weight:bold; font-size:12px;">FOLHA DE RESPOSTA</span>
-        <button onclick="window.fecharView()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:4px; font-weight:900; cursor:pointer;">FECHAR</button>
-    </div>
-    <div class="paper-render" id="area-folha-master"></div>
+    <div id="main-feed"></div>
 </div>
 
-<nav class="bottom-nav">
-    <button class="nav-btn" onclick="window.carregarHistorico(this)"><i class="fas fa-history"></i>Histórico</button>
-    <button class="nav-btn" onclick="window.carregarInteligencia('50 QUESTÕES', this)"><i class="fas fa-list-check"></i>50 Questões</button>
-    <button class="nav-btn" onclick="window.carregarInteligencia('NÃO CONFUNDA', this)"><i class="fas fa-brain"></i>N.C</button>
-    <button class="nav-btn" onclick="window.carregarInteligencia('QUAL A PEÇA', this)"><i class="fas fa-search"></i>Qual a Peça</button>
-    <button class="nav-btn" onclick="window.carregarInteligencia('TESES', this)"><i class="fas fa-gavel"></i>Teses</button>
+<div id="view-modal">
+    <div style="width:100%; background:#0f172a; padding:15px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;">
+        <span style="color:white; font-weight:bold;" id="peca-titulo">VISUALIZADOR FGV</span>
+        <button onclick="window.closeView()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:4px; font-weight:900;">VOLTAR</button>
+    </div>
+    <div id="area-folha" class="paper"></div>
+</div>
+
+<nav class="nav-bar">
+    <button class="nav-item active" onclick="tab('producao')"><i class="fas fa-pen-nib"></i>Peças</button>
+    <button class="nav-item" onclick="tab('questoes')"><i class="fas fa-list-check"></i>50 Questões</button>
+    <button class="nav-item" onclick="tab('tese')"><i class="fas fa-gavel"></i>Teses</button>
+    <button class="nav-item" onclick="tab('nc')"><i class="fas fa-clone"></i>Diferenças</button>
 </nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    
+    import { getDatabase, ref, onValue, push, set, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
         authDomain: "masteroab-db5e1.firebaseapp.com", 
@@ -72,84 +85,144 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let dadosCache = {};
+    let activeTab = 'producao';
+    let editId = null;
+    let cache = {};
 
-    // --- FUNÇÕES EXPOSTAS AO WINDOW (PARA O HTML ENXERGAR) ---
+    window.tab = (t) => {
+        activeTab = t; editId = null;
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        const btn = [...document.querySelectorAll('.nav-item')].find(el => el.getAttribute('onclick').includes(`'${t}'`));
+        if(btn) btn.classList.add('active');
+        document.getElementById('editor-container').style.display = (t === 'producao') ? 'none' : 'block';
+        render();
+    };
 
-    window.carregarHistorico = (btn) => {
-        atualizarMenu(btn);
-        onValue(ref(db, 'producao_v13'), snap => {
-            dadosCache = snap.val() || {};
-            const lista = document.getElementById('conteudo-dinamico');
-            lista.innerHTML = "<h2 class='titulo-secao'>PEÇAS PRODUZIDAS</h2>";
-            
-            const chaves = Object.keys(dadosCache).filter(k => !k.includes("RASCUNHO")).reverse();
-            
-            if(chaves.length === 0) {
-                lista.innerHTML += "<p>Nenhuma peça finalizada encontrada.</p>";
-                return;
-            }
+    window.salvarDados = () => {
+        const t = document.getElementById('tit-input').value;
+        const c = document.getElementById('cont-input').value;
+        if(!t || !c) return;
+        if(editId) set(ref(db, `v13_master/${editId}`), { t, c, cat: activeTab, ts: serverTimestamp() });
+        else push(ref(db, 'v13_master'), { t, c, cat: activeTab, ts: serverTimestamp() });
+        document.getElementById('tit-input').value = ""; document.getElementById('cont-input').value = ""; editId = null;
+    };
 
-            chaves.forEach(id => {
-                const p = dadosCache[id];
-                lista.innerHTML += `
-                    <div class="card-elite">
-                        <div>
-                            <small style="font-weight:bold; color:var(--primary)">OAB EXAME ${p.exame || '--'}</small>
-                            <h3 style="margin:5px 0; font-size:1rem;">${p.nome_peca || 'Peça Finalizada'}</h3>
+    onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
+
+    function render() {
+        const feed = document.getElementById('main-feed');
+        feed.innerHTML = "";
+        if(activeTab === 'producao') {
+            const itens = cache.producao_v13 || {};
+            Object.keys(itens).reverse().forEach(id => {
+                const p = itens[id];
+                feed.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-body" onclick="window.verPeca('${id}')">
+                            <span class="item-title">${id.includes("RASCUNHO") ? "RASCUNHO" : "FINALIZADA"} | EXAME ${p.exame || '--'}</span>
+                            <span class="item-desc">${p.nome_peca || 'Peça sem título'}</span>
                         </div>
-                        <button onclick="window.abrirPeca('${id}')" style="background:var(--primary); color:#fff; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:10px;">VER FOLHA</button>
+                        <button class="btn-action" onclick="window.apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
                     </div>`;
             });
-        });
-    };
-
-    window.carregarInteligencia = (tipo, btn) => {
-        atualizarMenu(btn);
-        const lista = document.getElementById('conteudo-dinamico');
-        lista.innerHTML = `
-            <h2 class='titulo-secao'>${tipo}</h2>
-            <div class="card-elite" style="flex-direction:column; align-items:flex-start;">
-                <p>Módulo de Inteligência <b>${tipo}</b> carregando dados do Exame Ativo...</p>
-                <small>Sincronizando com Banco de Dados Master 2026...</small>
-            </div>
-        `;
-    };
-
-    window.abrirPeca = (id) => {
-        const p = dadosCache[id];
-        const area = document.getElementById('area-folha-master');
-        document.getElementById('nome-peca-view').innerText = `VISUALIZANDO: ${p.nome_peca || 'PEÇA'}`;
-        
-        let texto = p.conteudo || "";
-        let linhas = texto.split('\n');
-        
-        let htmlFolha = `<div style="display: grid; grid-template-columns: 50px 1fr; border: 2px solid #000; background:#fff;">`;
-        htmlFolha += `<div style="background:#f1f5f9; border-right:2px solid #000;">`;
-        for(let i=1; i<=150; i++) {
-            htmlFolha += `<div style="height:35px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; border-bottom:1px solid #cbd5e1; color:#1e293b;">${i}</div>`;
+        } else {
+            const itens = cache.v13_master || {};
+            Object.keys(itens).reverse().forEach(id => {
+                const it = itens[id];
+                if(it.cat !== activeTab) return;
+                feed.innerHTML += `<div class="item-row"><div class="item-body"><span class="item-title">${it.t}</span><span class="item-desc">${it.c}</span></div>
+                    <div class="actions"><button class="btn-action" onclick="window.editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action" onclick="window.apagar('v13_master','${id}')"><i class="fas fa-times"></i></button></div></div>`;
+            });
         }
-        htmlFolha += `</div><div style="padding:0; background-image: linear-gradient(to bottom, transparent 34px, #e2e8f0 34px); background-size: 100% 35px;">`;
-        for(let i=0; i<150; i++) {
-            let txt = linhas[i] || "";
-            htmlFolha += `<div style="height:35px; line-height:35px; padding:0 20px; font-family:'Courier New', monospace; font-size:19px; font-weight:700; color:#000; text-transform:uppercase; overflow:hidden;">${txt}</div>`;
-        }
-        htmlFolha += `</div></div>`;
-
-        area.innerHTML = htmlFolha;
-        document.getElementById('visualizador-full').style.display = 'flex';
-    };
-
-    window.fecharView = () => document.getElementById('visualizador-full').style.display = 'none';
-
-    function atualizarMenu(btn) {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        if(btn) btn.classList.add('active');
     }
 
-    // Inicialização
-    window.carregarHistorico(document.querySelector('.nav-btn'));
+    window.verPeca = (id) => {
+        const p = cache.producao_v13[id];
+        if(!p) return;
+        const area = document.getElementById('area-folha');
+        
+        // MOTOR DE BUSCA UNIVERSAL (Lê linhas, conteudo ou texto)
+        let raw = "";
+        if(Array.isArray(p.linhas)) raw = p.linhas.join('\n');
+        else raw = p.conteudo || p.texto || p.corpo || "";
+        
+        let lns = raw.split('\n');
+        let h = `<div style="display: grid; grid-template-columns: 40px 1fr; background:#fff; border:1px solid #000;">`;
+        h += `<div style="background:#f0f0f0; border-right:1px solid #000; text-align:center; font-size:10px; color:#666;">`;
+        for(let i=1; i<=150; i++) h += `<div style="height:30px; line-height:30px; border-bottom:1px solid #ddd;">${i}</div>`;
+        h += `</div><div style="background-image: linear-gradient(#eee 1px, transparent 1px); background-size: 100% 30px; padding:0 15px;">`;
+        for(let i=0; i<150; i++) {
+            h += `<div style="height:30px; line-height:30px; font-family:Courier, monospace; font-size:18px; font-weight:bold; color:#000; text-transform:uppercase; overflow:hidden; white-space:nowrap;">${lns[i] || ""}</div>`;
+        }
+        h += `</div></div>`;
+        area.innerHTML = h;
+        document.getElementById('peca-titulo').innerText = p.nome_peca || "PEÇA";
+        document.getElementById('view-modal').style.display = 'flex';
+    };
 
+    window.editar = (id, t, c) => { editId = id; document.getElementById('tit-input').value = t; document.getElementById('cont-input').value = c; window.scrollTo(0,0); };
+    window.apagar = (path, id) => { if(confirm("Apagar?")) remove(ref(db, `${path}/${id}`)); };
+    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
+
+    window.injetorMestre = () => {
+        if(!confirm("Injetar 50 Questões + Inteligências Master?")) return;
+        const d = [
+            { t: "Q01: ADICIONAL TRANSFERÊNCIA", c: "Art. 469, §3º CLT. Provisoriedade. 25%.", cat: "questoes" },
+            { t: "Q02: HORAS IN ITINERE", c: "Art. 58, §2º CLT. Não computáveis pós-Reforma.", cat: "questoes" },
+            { t: "Q03: SOBREAVISO", c: "Art. 244, §2º CLT. 1/3 do salário. Limite 24h.", cat: "questoes" },
+            { t: "Q04: EQUIPAÇÃO SALARIAL", c: "Art. 461 CLT. Mesmo estabelecimento. Tempo < 2 anos.", cat: "questoes" },
+            { t: "Q05: ESTABILIDADE GESTANTE", c: "Súmula 244 TST. Mesmo em contrato fixo.", cat: "questoes" },
+            { t: "Q06: JUSTIÇA GRATUITA", c: "Art. 790, §3º CLT. Até 40% do teto RGPS.", cat: "questoes" },
+            { t: "Q07: FÉRIAS FRACIONADAS", c: "Art. 134, §1º CLT. 3 períodos (14/5/5 dias).", cat: "questoes" },
+            { t: "Q08: MULTA 477 CLT", c: "10 dias para pagar verbas e guias.", cat: "questoes" },
+            { t: "Q09: HONORÁRIOS SUCUMBENCIAIS", c: "Art. 791-A CLT. 5% a 15%.", cat: "questoes" },
+            { t: "Q10: PRESCRIÇÃO", c: "Art. 11 CLT. Bienal e Quinquenal.", cat: "questoes" },
+            { t: "Q11: SALÁRIO SUBSTITUIÇÃO", c: "Súmula 159 TST. Direito ao salário do substituído.", cat: "questoes" },
+            { t: "Q12: PERICULOSIDADE", c: "Art. 193 CLT. 30% sobre base.", cat: "questoes" },
+            { t: "Q13: INSALUBRIDADE", c: "Art. 192 CLT. 10/20/40% salário mínimo.", cat: "questoes" },
+            { t: "Q14: INTERVALO INTRAJORNADA", c: "Art. 71 CLT. Paga apenas tempo suprimido + 50%.", cat: "questoes" },
+            { t: "Q15: ESTABILIDADE ACIDENTÁRIA", c: "Art. 118 Lei 8.213/91. 12 meses após retorno.", cat: "questoes" },
+            { t: "Q16: GRUPO ECONÔMICO", c: "Art. 2, §2º CLT. Coordenação entre empresas.", cat: "questoes" },
+            { t: "Q17: INTERMITENTE", c: "Art. 452-A CLT. Convocação 3 dias antes.", cat: "questoes" },
+            { t: "Q18: RESCISÃO ACORDO", c: "Art. 484-A CLT. Metade do aviso e 20% multa FGTS.", cat: "questoes" },
+            { t: "Q19: CONTRIBUIÇÃO SINDICAL", c: "Art. 578 CLT. Requer autorização expressa.", cat: "questoes" },
+            { t: "Q20: TELETRABALHO", c: "Art. 75-A CLT. Contrato escrito obrigatório.", cat: "questoes" },
+            { t: "Q21: DESVIO FUNÇÃO", c: "Diferença salarial p/ função idêntica.", cat: "questoes" },
+            { t: "Q22: MULTA 467 CLT", c: "Incontroverso na 1ª audiência ou +50%.", cat: "questoes" },
+            { t: "Q23: DOMINGOS/FERIADOS", c: "Lei 605/49. Dobro sem folga compensatória.", cat: "questoes" },
+            { t: "Q24: ESTABILIDADE CIPA", c: "Art. 10 ADCT. Suplente também tem.", cat: "questoes" },
+            { t: "Q25: DANO EXTRA-PATRIMONIAL", c: "Art. 223-G CLT. Tabelamento por gravidade.", cat: "questoes" },
+            { t: "Q26: CARGO CONFIANÇA", c: "Art. 62, II CLT. Sem horas extras.", cat: "questoes" },
+            { t: "Q27: SOBREAVISO ANALOGIA", c: "Súmula 428 TST. Plantão à distância.", cat: "questoes" },
+            { t: "Q28: QUITAÇÃO ANUAL", c: "Art. 507-B CLT. Eficácia liberatória parcelas.", cat: "questoes" },
+            { t: "Q29: HOMOLOGAÇÃO ACORDO", c: "Art. 855-B CLT. Jurisdição voluntária.", cat: "questoes" },
+            { t: "Q30: MÁ-FÉ", c: "Art. 793-B CLT. Multa 1% a 10%.", cat: "questoes" },
+            { t: "Q31: TESTEMUNHAS", c: "Ord (3), Sum (2), Inq (6).", cat: "questoes" },
+            { t: "Q32: ÔNUS PROVA", c: "Art. 818 CLT. Autor (fato) / Réu (impedimento).", cat: "questoes" },
+            { t: "Q33: RECURSO ORDINÁRIO", c: "Art. 895 CLT. Prazo 8 dias.", cat: "questoes" },
+            { t: "Q34: AGRAVO INSTRUMENTO", c: "Art. 897, 'b' CLT. Destrancar recurso.", cat: "questoes" },
+            { t: "Q35: AGRAVO PETIÇÃO", c: "Art. 897, 'a' CLT. Na execução.", cat: "questoes" },
+            { t: "Q36: EMBARGOS DECLARAÇÃO", c: "Art. 897-A CLT. Omissão/Erro. 5 dias.", cat: "questoes" },
+            { t: "Q37: DEPÓSITO RECURSAL", c: "Garantia juízo. Teto limite TST.", cat: "questoes" },
+            { t: "Q38: RECURSO REVISTA", c: "Art. 896 CLT. Divergência ou CF.", cat: "questoes" },
+            { t: "Q39: AGRAVO INTERNO", c: "Art. 1021 CPC. Decisão monocrática.", cat: "questoes" },
+            { t: "Q40: CONTESTAÇÃO", c: "Art. 847 CLT. Defesa escrita ou oral.", cat: "questoes" },
+            { t: "Q41: RECONVENÇÃO", c: "Art. 343 CPC. Contra-atacar autor.", cat: "questoes" },
+            { t: "Q42: EXCEÇÃO INCOMPETÊNCIA", c: "Art. 800 CLT. 5 dias da notificação.", cat: "questoes" },
+            { t: "Q43: PREPOSTO", c: "Art. 843, §3º CLT. Não precisa ser empregado.", cat: "questoes" },
+            { t: "Q44: ARQUIVAMENTO", c: "Ausência Reclamante. Custas p/ nova ação.", cat: "questoes" },
+            { t: "Q45: REVELIA", c: "Ausência Reclamada. Confissão matéria fato.", cat: "questoes" },
+            { t: "Q46: JORNADA 12X36", c: "Art. 59-A CLT. Acordo individual escrito.", cat: "questoes" },
+            { t: "Q47: PRONTIDÃO", c: "Art. 244, §3º. 2/3 salário. Max 12h.", cat: "questoes" },
+            { t: "Q48: SUCESSÃO", c: "Art. 10 e 448 CLT. Sucessor responde.", cat: "questoes" },
+            { t: "Q49: PRESCRIÇÃO INTERCORRENTE", c: "Art. 11-A CLT. 2 anos na inércia.", cat: "questoes" },
+            { t: "Q50: HONORÁRIOS PERICIAIS", c: "Art. 790-B CLT. Parte sucumbente paga.", cat: "questoes" }
+        ];
+        d.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
+        alert("SISTEMA MASTER POPULADO!");
+    };
+    tab('producao');
 </script>
 </body>
 </html>

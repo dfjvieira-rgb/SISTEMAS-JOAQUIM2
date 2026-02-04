@@ -3,38 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELITE V13 | EXAME FORMATADO</title>
+    <title>ELITE V13 | MENTORIA FLOW</title>
     <style>
         :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 110px; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 120px; }
         
-        header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        /* HEADER E BOTÃO DE RETORNO AO EDITOR */
+        header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 1000; }
+        .btn-retorno-producao { 
+            width: 100%; background: linear-gradient(90deg, #d29922, #b0801a); color: black; 
+            border: none; padding: 14px; border-radius: 8px; font-weight: 900; 
+            font-size: 13px; text-transform: uppercase; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(210, 153, 34, 0.3); margin-top: 10px;
+        }
+
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* CARDS ESTILIZADOS */
-        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .item-content { flex: 1; }
-        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1.5px; }
-        .item-desc { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; line-height: 1.2; }
+        /* CARDS DE HISTÓRICO */
+        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 5px solid var(--gold); }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-desc { font-size: 15px; font-weight: 700; color: #ffffff; text-transform: uppercase; }
         
-        .row-actions { display: flex; gap: 10px; margin-left: 10px; }
-        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .row-actions { display: flex; gap: 8px; }
+        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-view { background: var(--gold); color: black; border: none; }
-        .btn-delete { background: #da3633; border: none; }
 
-        /* MODAL E PGV */
+        /* MODAL E COMANDOS P G V */
         #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
         .view-header { width: 100%; background: #0f172a; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
         .pgv-group { display: flex; gap: 10px; }
-        .btn-pgv { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; color: var(--gold); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; }
-        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 12px; text-transform: uppercase; }
+        .btn-pgv { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; color: var(--gold); font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 900; text-transform: uppercase; }
         
         .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; }
         .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
         .num-linha { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #000; }
         .texto-linha { flex: 1; padding: 0 20px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #000; line-height: 35px; text-transform: uppercase; text-align: justify; white-space: nowrap; overflow: hidden; }
 
+        /* NAV INFERIOR */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 30px 0; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .nav-item.active { color: var(--gold); border-top: 2px solid var(--gold); }
@@ -43,8 +51,10 @@
 <body>
 
 <header>
-    <div style="font-weight: 900; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
-    <div style="font-size: 10px; color: #4ade80; font-weight: bold;">● PRODUÇÃO ATIVA</div>
+    <div style="font-weight: 900; font-size: 18px; text-align: center;">MENTORIA <span style="color:var(--gold)">ELITE V13</span></div>
+    <button class="btn-retorno-producao" onclick="window.voltarAoEditor()">
+        📝 CONTINUAR PEÇA EM PRODUÇÃO
+    </button>
 </header>
 
 <div class="container" id="main-feed"></div>
@@ -62,7 +72,7 @@
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" onclick="tab('producao')">📁 PEÇAS</button>
+    <button class="nav-item active" onclick="tab('producao')">📁 HISTÓRICO</button>
     <button class="nav-item" onclick="tab('questoes')">🎓 QUESTÕES</button>
     <button class="nav-item" onclick="tab('tese')">⚖️ TESES</button>
     <button class="nav-item" onclick="tab('nc')">⚠️ NC</button>
@@ -84,6 +94,13 @@
     let activeTab = 'producao';
     let cache = {};
 
+    // FUNÇÃO QUE RETORNA PARA A PEÇA ATIVA (O EDITOR PRINCIPAL)
+    window.voltarAoEditor = () => {
+        // Se estiver em um WebView ou sistema integrado, ele volta para o index do Mentoria
+        window.location.href = "index.html"; 
+        // Caso use apenas uma página, você pode disparar uma função de toggle aqui
+    };
+
     window.tab = (t) => { activeTab = t; render(); };
 
     onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
@@ -96,36 +113,29 @@
             const pecas = cache.producao_v13 || {};
             Object.keys(pecas).reverse().forEach(id => {
                 const p = pecas[id];
-                if (p.nome_peca || p.linhas || p.texto) {
-                    // Lógica para Formatação do Título Exame + Peça
+                if (p.nome_peca || p.linhas) {
                     let labelExame = p.activeEx || p.exame || "SIMULADO";
-                    if(!isNaN(labelExame)) labelExame = "EXAME " + labelExame; // Se for só número, vira 'EXAME 35'
-                    
-                    const nomePeca = p.nome_peca || "PEÇA SEM TÍTULO";
+                    if(!isNaN(labelExame)) labelExame = "EXAME " + labelExame;
                     
                     feed.innerHTML += `
                         <div class="item-row">
                             <div class="item-content">
                                 <span class="item-title">${labelExame}</span>
-                                <span class="item-desc">${nomePeca}</span>
+                                <span class="item-desc">${p.nome_peca || 'PEÇA FINALIZADA'}</span>
                             </div>
                             <div class="row-actions">
                                 <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
-                                <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
+                                <button class="btn-action" onclick="window.apagarPeca('${id}')">🗑️</button>
                             </div>
                         </div>`;
                 }
             });
         }
-        // ... Renderização simplificada para as outras abas para manter foco ...
     }
 
     window.verPeca = (id) => {
         const p = cache.producao_v13[id];
-        let raw = "";
-        if(p.linhas) raw = Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas;
-        else raw = p.texto || p.conteudo || p.corpo || "";
-        
+        let raw = p.linhas ? (Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas) : (p.texto || "");
         const lines = raw.split('\n');
         let html = "";
         for(let i=1; i<=150; i++) {

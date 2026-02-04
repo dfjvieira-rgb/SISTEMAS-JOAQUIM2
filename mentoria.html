@@ -3,105 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SISTEMA ELITE | MENTORIA V13</title>
+    <title>MENTORIA ELITE | READ-FRIENDLY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
-            --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
-            --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
+            /* Paleta Confortável (Boas Práticas Mobile) */
+            --bg: #0f172a; 
+            --card: #1e293b; 
+            --text-main: #e2e8f0; 
+            --text-dim: #94a3b8;
+            --gold: #fbbf24;
+            /* Cores de Identificação Suaves */
+            --nc: #fbcfe8; 
+            --qp: #ddd6fe; 
+            --tese: #bae6fd; 
+            --arsenal: #bbf7d0;
+            --danger: #fca5a5;
+            --success: #4ade80;
         }
+        
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 100px; }
+        
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding-bottom: 100px;
+            line-height: 1.6; /* Conforto de leitura */
+        }
 
         header { 
-            background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold); 
+            background: var(--card); 
+            padding: 18px 20px; 
+            border-bottom: 1px solid #334155; 
             display: flex; justify-content: space-between; align-items: center; 
-            position: sticky; top: 0; z-index: 1000; 
+            position: sticky; top: 0; z-index: 1000;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
-        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
+        .btn-voltar { 
+            background: #334155; color: white; border: none; padding: 10px 16px; 
+            border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer;
+        }
 
-        /* FORMULÁRIO DE INCLUSÃO */
-        .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
+        .container { padding: 16px; max-width: 800px; margin: 0 auto; }
 
-        /* CARDS HISTÓRICO */
+        /* Painel de Input Discreto */
+        .panel-input { 
+            background: var(--card); border-radius: 16px; padding: 20px; 
+            margin-bottom: 24px; border: 1px solid #334155;
+        }
+        
+        input, textarea { 
+            width: 100%; padding: 14px; margin: 8px 0; 
+            background: #0f172a; border: 1px solid #334155; 
+            color: white; border-radius: 10px; font-size: 16px; /* Evita zoom no iOS */
+        }
+
+        /* Histórico de Peças com Menos Contraste */
         .card-h { 
-            background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px; 
-            border: 1px solid #334155; border-left: 5px solid var(--gold);
+            background: var(--card); border-radius: 14px; padding: 18px; 
+            margin-bottom: 12px; border: 1px solid #334155;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .info-h b { display: block; color: var(--gold); font-size: 10px; text-transform: uppercase; }
-        .info-h span { font-size: 14px; font-weight: 700; }
+        .info-h b { display: block; color: var(--gold); font-size: 11px; letter-spacing: 1px; }
+        .info-h span { font-size: 15px; font-weight: 600; color: var(--text-main); }
 
-        /* POST-ITS */
+        /* Post-its em Tons Pastel (Fáceis de ler) */
         .post-it { 
-            padding: 18px; border-radius: 15px; margin-bottom: 15px; color: #020617; 
-            position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            padding: 20px; border-radius: 16px; margin-bottom: 16px; 
+            color: #1e293b; position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
-        .post-it strong { display: block; font-size: 1rem; text-transform: uppercase; }
-        .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
+        .post-it strong { display: block; font-size: 1.1rem; margin-bottom: 8px; color: #0f172a; }
+        .post-it p { margin: 0; font-size: 1rem; color: #334155; font-weight: 500; }
 
-        .actions { display: flex; gap: 8px; }
-        .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
-        .btn-circle:active { transform: scale(0.9); }
+        /* Ações Estilizadas */
+        .actions { display: flex; gap: 10px; }
+        .btn-circle { 
+            width: 42px; height: 42px; border-radius: 12px; border: none; 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; color: white; font-size: 18px;
+        }
 
-        /* MENU INFERIOR */
+        /* Menu de Navegação - Ergonomia Mobile */
         .nav-tabs { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); 
-            display: flex; justify-content: space-around; padding: 10px; 
-            border-top: 2px solid #334155; z-index: 2000;
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            background: rgba(30, 41, 59, 0.95); 
+            backdrop-filter: blur(10px); /* Efeito moderno */
+            display: flex; justify-content: space-around; padding: 12px 5px; 
+            border-top: 1px solid #334155; z-index: 2000;
         }
-        .tab { color: #94a3b8; text-align: center; font-size: 10px; text-decoration: none; font-weight: 700; flex: 1; }
+        .tab { color: var(--text-dim); text-align: center; font-size: 10px; text-decoration: none; font-weight: 600; flex: 1; transition: 0.3s; }
         .tab.active { color: var(--gold); }
-        .tab i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+        .tab i { display: block; font-size: 1.4rem; margin-bottom: 4px; }
 
-        #fab-injetor { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1001; color: black; }
+        /* Botão Foguete Suave */
+        #fab-injetor { 
+            position: fixed; bottom: 90px; right: 20px; width: 56px; height: 56px; 
+            background: var(--gold); border-radius: 18px; border: none; 
+            font-size: 1.4rem; box-shadow: 0 8px 16px rgba(0,0,0,0.4); z-index: 1001;
+        }
+
+        /* Modal de Visualização (Papel Real) */
+        #modal-view { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: #f8fafc; color: #1e293b; z-index: 3000; 
+            display:none; overflow-y:auto; padding: 25px;
+        }
 
         .hidden { display: none; }
-        
-        /* MODAL DE VISUALIZAÇÃO */
-        #modal-view { position: fixed; top:0; left:0; width:100%; height:100%; background:white; color:black; z-index: 3000; display:none; overflow-y:auto; padding: 20px; }
     </style>
 </head>
 <body>
 
 <div id="modal-view">
-    <button onclick="fecharModal()" style="background:var(--primary); color:white; padding:10px; border:none; border-radius:5px; margin-bottom:20px;">FECHAR VISUALIZAÇÃO</button>
-    <div id="modal-content"></div>
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="margin:0">Visualização de Peça</h3>
+        <button onclick="fecharModal()" style="background:#0f172a; color:white; padding:10px 20px; border:none; border-radius:8px;">VOLTAR</button>
+    </div>
+    <div id="modal-content" style="background:white; padding:20px; border-radius:10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);"></div>
 </div>
 
 <header>
-    <button class="btn-voltar" onclick="window.close()"><i class="fas fa-arrow-left"></i> VOLTAR</button>
-    <h2 style="font-size: 1rem; margin:0;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
+    <button class="btn-voltar" onclick="window.close()"><i class="fas fa-arrow-left"></i> SAIR</button>
+    <div style="text-align: right">
+        <span style="font-weight:800; color:var(--gold); font-size: 1.2rem;">ELITE <span style="color:white">V13</span></span>
+    </div>
 </header>
 
 <div class="container">
     <div id="panel-editor" class="panel-input hidden">
-        <h4 id="editor-title" style="margin-top:0;">Incluir Novo</h4>
-        <input id="inp-t" placeholder="Título / Assunto">
-        <textarea id="inp-c" rows="3" placeholder="Conteúdo detalhado..."></textarea>
-        <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px;">SALVAR NA INTELIGÊNCIA</button>
+        <h4 id="editor-title" style="margin:0 0 10px 0; color: var(--gold)">NOVA ANOTAÇÃO</h4>
+        <input id="inp-t" placeholder="Título ou Artigo">
+        <textarea id="inp-c" rows="4" placeholder="Fundamentação técnica..."></textarea>
+        <button id="btn-salvar" style="width:100%; padding: 15px; border-radius: 10px; border:none; font-weight: 800; cursor:pointer;">SALVAR NA MINHA BASE</button>
     </div>
 
     <div id="sec-producao">
-        <h3 style="color:var(--gold); font-size: 0.9rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
+        <h3 style="color:var(--text-dim); font-size: 0.8rem; letter-spacing: 1px;"><i class="fas fa-history"></i> HISTÓRICO DE TREINOS</h3>
         <div id="feed-producao"></div>
     </div>
 
     <div id="sec-inteligencia" class="hidden">
-        <h3 id="intel-head" style="font-size: 0.9rem;">INTELIGÊNCIA</h3>
+        <h3 id="intel-head" style="font-size: 0.8rem; letter-spacing: 1px;">INTELIGÊNCIA</h3>
         <div id="feed-v13"></div>
     </div>
 </div>
 
 <nav class="nav-tabs">
-    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-file-signature"></i>PEÇAS</a>
-    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-search"></i>PEÇA?</a>
-    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
-    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
-    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
+    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-scroll"></i>PEÇAS</a>
+    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-fingerprint"></i>QUAL PEÇA</a>
+    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-random"></i>CONFUNDA</a>
+    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-balance-scale"></i>TESES</a>
+    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-shield-alt"></i>ARSENAL</a>
 </nav>
 
 <button id="fab-injetor" onclick="injetorMestre()"><i class="fas fa-rocket"></i></button>
@@ -122,7 +178,6 @@
     let currentTab = 'producao';
     let editId = null;
 
-    // NAVEGAÇÃO
     window.showTab = (tab) => {
         currentTab = tab;
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -134,112 +189,4 @@
         document.getElementById('panel-editor').classList.toggle('hidden', isProd);
         
         if(!isProd) {
-            const titulos = { qp: 'Qual a Peça?', nc: 'Não Confunda', tese: 'Banco de Teses', arsenal: 'Arsenal 50Q' };
-            document.getElementById('intel-head').innerText = titulos[tab].toUpperCase();
-            document.getElementById('intel-head').style.color = `var(--${tab})`;
-            document.getElementById('btn-salvar').style.background = `var(--${tab})`;
-        }
-        render();
-    };
-
-    // SALVAR INTELIGÊNCIA
-    document.getElementById('btn-salvar').onclick = () => {
-        const t = document.getElementById('inp-t').value;
-        const c = document.getElementById('inp-c').value;
-        if(!t || !c) return alert("Preencha tudo!");
-
-        if(editId) {
-            set(ref(db, `v13_master/${editId}`), { t, c, cat: currentTab, ts: serverTimestamp() });
-            editId = null;
-        } else {
-            push(ref(db, 'v13_master'), { t, c, cat: currentTab, ts: serverTimestamp() });
-        }
-        document.getElementById('inp-t').value = "";
-        document.getElementById('inp-c').value = "";
-    };
-
-    // COMPARTILHAR WHATSAPP
-    window.compartilhar = async (id) => {
-        const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return;
-        const p = s.val();
-        const texto = Array.isArray(p.linhas) ? p.linhas.join('\n') : (p.conteudo || "");
-        const msg = encodeURIComponent(`*MENTORIA ELITE - PEÇA PARA CORREÇÃO*\n\n*Exame:* ${p.exame}\n*Peça:* ${p.nome_peca}\n\n${texto}`);
-        window.open(`https://api.whatsapp.com/send?text=${msg}`);
-    };
-
-    // VISUALIZAR PEÇA (MODAL)
-    window.verTreino = async (id) => {
-        const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return;
-        const p = s.val();
-        const linhas = Array.isArray(p.linhas) ? p.linhas : [];
-        let html = `<h2>${p.nome_peca} - Exame ${p.exame}</h2><hr>`;
-        linhas.forEach((l, i) => {
-            html += `<div style="display:flex; border-bottom:1px solid #eee; padding:5px 0;"><span style="width:30px; color:#999;">${i+1}</span><span>${l || ""}</span></div>`;
-        });
-        document.getElementById('modal-content').innerHTML = html;
-        document.getElementById('modal-view').style.display = 'block';
-    };
-
-    window.fecharModal = () => document.getElementById('modal-view').style.display = 'none';
-
-    // RENDERIZAÇÃO
-    let cache = {};
-    onValue(ref(db), (snap) => { cache = snap.val() || {}; render(); });
-
-    function render() {
-        if(currentTab === 'producao') {
-            const f = document.getElementById('feed-producao'); f.innerHTML = "";
-            const itens = cache.producao_v13 || {};
-            Object.keys(itens).reverse().forEach(id => {
-                if(id.includes("RASCUNHO")) return;
-                const p = itens[id];
-                f.innerHTML += `
-                    <div class="card-h">
-                        <div class="info-h"><b>Exame ${p.exame}</b><span>${p.nome_peca}</span></div>
-                        <div class="actions">
-                            <button class="btn-circle" style="background:#25d366" onclick="compartilhar('${id}')"><i class="fab fa-whatsapp"></i></button>
-                            <button class="btn-circle" style="background:var(--info)" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn-circle" style="background:var(--danger)" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`;
-            });
-        } else {
-            const f = document.getElementById('feed-v13'); f.innerHTML = "";
-            const itens = cache.v13_master || {};
-            const cores = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
-            Object.keys(itens).reverse().forEach(id => {
-                const it = itens[id];
-                if(it.cat !== currentTab) return;
-                f.innerHTML += `
-                    <div class="post-it" style="background:${cores[it.cat]}">
-                        <strong>${it.t}</strong><p>${it.c}</p>
-                        <div class="actions">
-                            <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
-                        </div>
-                    </div>`;
-            });
-        }
-    }
-
-    window.apagar = (path, id) => { if(confirm("Excluir?")) remove(ref(db, `${path}/${id}`)); };
-    window.editar = (id, t, c) => {
-        editId = id;
-        document.getElementById('inp-t').value = t;
-        document.getElementById('inp-c').value = c;
-        window.scrollTo({top:0, behavior:'smooth'});
-    };
-
-    window.injetorMestre = () => {
-        if(!confirm("Injetar Teses 50Q?")) return;
-        const q = [
-            { t: "Q1: Honorários Periciais", c: "Sucumbente na perícia paga. JG isenta.", cat: "arsenal" },
-            { t: "Q2: Horas In Itinere", c: "Não computa na jornada.", cat: "arsenal" }
-        ];
-        q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-    };
-</script>
-</body>
-</html>
+            const titulos = { qp: 'QUAL A PEÇA?', nc: 'NÃO CONFUNDA', tese: 'TESES OURO', arsenal: 'ARSENAL 50Q

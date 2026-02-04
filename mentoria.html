@@ -3,76 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE V13 | MASTER</title>
+    <title>MENTORIA ELITE | MASTER</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --bg: #F5F5F7; --card: #FFFFFF; --texto: #1D1D1F; --destaque: #0071E3; --borda: #D2D2D7; --linha: #E5E5E5;
-        }
-        body.dark-mode { 
-            --bg: #0F172A; --card: #1E293B; --texto: #F8FAFC; --destaque: #38BDF8; --borda: #334155; --linha: #1E293B;
-        }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: var(--texto); margin: 0; padding-bottom: 110px; transition: 0.3s; }
+        :root { --primary: #0f172a; --gold: #fbbf24; --bg: #F5F5F7; --card: #FFFFFF; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 110px; }
         
-        header { background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--destaque); display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index: 1000; }
-        .container { padding: 15px; max-width: 700px; margin: 0 auto; }
+        header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
+        .btn-voltar { background: var(--gold); color: #000; border: none; padding: 10px 15px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
 
-        .card-elite { background: var(--card); padding: 20px; margin-bottom: 15px; border-radius: 12px; border: 1px solid var(--borda); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card-elite small { color: var(--destaque); font-weight: 900; font-size: 10px; text-transform: uppercase; }
-        .card-elite h3 { margin: 10px 0; font-size: 1.1rem; color: var(--texto); }
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
+        .card-elite { background: var(--card); padding: 20px; border-radius: 12px; border-left: 5px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
         
-        .acoes { margin-top: 15px; padding-top: 12px; border-top: 1px solid var(--linha); display: flex; gap: 20px; }
-        .btn-acao-lite { background: none; border: none; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--texto); display: flex; align-items: center; gap: 6px; }
+        /* VISUALIZAÇÃO IGUAL AO SEU INDEX */
+        #visualizador-full { position: fixed; inset: 0; background: #cbd5e1; z-index: 99999; display: none; overflow-y: auto; flex-direction: column; align-items: center; }
+        .toolbar-view { width: 100%; background: var(--primary); padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; border-bottom: 2px solid var(--gold); }
+        .paper-render { width: 100%; max-width: 850px; background: white; margin: 20px 0; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
 
-        /* MODAL PAPEL DE PROVA (Sincronizado com o seu FolhaEngine) */
-        #modal-visualizar { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #F8FAF8; color: #000; z-index: 99999; display: none; overflow-y: auto; padding: 10px; }
-        .cabecalho-modal { position: sticky; top: 0; background: #fff; z-index: 10; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        .folha-falsa { max-width: 850px; margin: 0 auto; background: white; border: 2px solid #000; }
-        .linha-oab { display: flex; border-bottom: 1px solid #e2e8f0; min-height: 35px; align-items: center; }
-        .num-L { width: 50px; background: #f1f5f9; color: #1e293b; font-size: 11px; font-weight: 900; border-right: 2px solid #000; display: flex; justify-content: center; align-items: center; height: 35px; flex-shrink: 0; }
-        .txt-L { flex: 1; padding: 0 20px; font-family: 'Courier New', monospace; font-size: 19px; font-weight: 700; color: #000; text-transform: uppercase; white-space: pre-wrap; word-break: break-word; }
-
-        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--borda); display: flex; padding: 12px 0 35px 0; z-index: 1000; }
-        .nav-btn { flex: 1; text-align: center; text-decoration: none; color: #64748B; font-size: 10px; font-weight: 800; }
-        .nav-btn.active { color: var(--destaque); }
-        .nav-btn i { display: block; font-size: 20px; margin-bottom: 5px; }
+        /* MENU INFERIOR - AS INTELIGÊNCIAS */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--primary); display: flex; padding: 10px 0 30px 0; border-top: 2px solid var(--gold); z-index: 1000; }
+        .nav-btn { flex: 1; text-align: center; background: none; border: none; color: white; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .nav-btn i { display: block; font-size: 18px; margin-bottom: 4px; color: var(--gold); }
+        .nav-btn.active { color: var(--gold); }
     </style>
 </head>
 <body>
 
-<div id="modal-visualizar">
-    <div class="cabecalho-modal">
-        <div style="font-weight:900; font-size: 14px;"><i class="fas fa-file-alt"></i> CADERNO DE RESPOSTAS</div>
-        <button onclick="fecharPeca()" style="background:#000; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:900; cursor:pointer; display:flex; align-items:center; gap:8px;">
-            <i class="fas fa-arrow-left"></i> VOLTAR
-        </button>
-    </div>
-    <div id="folha-render" class="folha-falsa"></div>
-</div>
-
 <header>
-    <div style="font-weight: 900; font-size: 1.2rem;">JOAQUIM <span style="color:var(--destaque)">MENTORIA</span></div>
-    <div style="display:flex; gap:10px;">
-        <button onclick="window.close()" style="background:none; border:1px solid var(--borda); padding:5px 12px; border-radius:15px; color:var(--texto); font-weight:bold; font-size:11px;">SAIR</button>
-        <button onclick="document.body.classList.toggle('dark-mode')" style="background:none; border:1px solid var(--borda); padding:5px 10px; border-radius:15px; color:var(--texto);"><i class="fas fa-adjust"></i></button>
-    </div>
+    <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">MENTORIA</span></div>
+    <button class="btn-voltar" onclick="window.close()">
+        <i class="fas fa-arrow-left"></i> VOLTAR PARA PRODUÇÃO
+    </button>
 </header>
 
-<div class="container" id="feed-conteudo">
+<div class="container" id="conteudo-dinamico">
     </div>
 
+<div id="visualizador-full">
+    <div class="toolbar-view">
+        <span id="nome-peca-view" style="color:white; font-weight:bold; font-size:12px;">CADERNO DE RESPOSTAS</span>
+        <button onclick="fecharView()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:4px; font-weight:900; cursor:pointer;">FECHAR</button>
+    </div>
+    <div class="paper-render" id="area-folha-master"></div>
+</div>
+
 <nav class="bottom-nav">
-    <a href="#" class="nav-btn active"><i class="fas fa-file-invoice"></i>PEÇAS</a>
-    <a href="#" class="nav-btn"><i class="fas fa-gavel"></i>TESES</a>
-    <a href="#" class="nav-btn"><i class="fas fa-brain"></i>N.C</a>
+    <button class="nav-btn active" onclick="carregarHistorico()"><i class="fas fa-history"></i>Histórico</button>
+    <button class="nav-btn" onclick="alert('Módulo 50 Questões Ativo')"><i class="fas fa-list-check"></i>50 Questões</button>
+    <button class="nav-btn" onclick="alert('Módulo Não Confunda Ativo')"><i class="fas fa-brain"></i>Não Confunda</button>
+    <button class="nav-btn" onclick="alert('Módulo Qual a Peça Ativo')"><i class="fas fa-search"></i>Qual a Peça</button>
+    <button class="nav-btn" onclick="alert('Módulo Teses Ativo')"><i class="fas fa-gavel"></i>Teses</button>
 </nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
         authDomain: "masteroab-db5e1.firebaseapp.com", 
@@ -82,70 +68,51 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let dbCache = {};
+    let dadosCache = {};
 
-    onValue(ref(db, 'producao_v13'), snap => {
-        dbCache = snap.val() || {};
-        render();
-    });
-
-    function render() {
-        const feed = document.getElementById('feed-conteudo');
-        feed.innerHTML = "";
-        
-        const chaves = Object.keys(dbCache).filter(k => !k.includes("_RASCUNHO_ATUAL")).reverse();
-
-        if (chaves.length === 0) {
-            feed.innerHTML = "<p style='text-align:center; opacity:0.5; margin-top:50px;'>Histórico vazio.</p>";
-            return;
-        }
-
-        chaves.forEach(id => {
-            const p = dbCache[id];
-            feed.innerHTML += `
-                <div class="card-elite">
-                    <small>EXAME ${p.exame || '--'}</small>
-                    <h3>${p.nome_peca || 'PEÇA FINALIZADA'}</h3>
-                    <div class="acoes">
-                        <button class="btn-acao-lite" onclick="abrirVisualizador('${id}')" style="color:var(--destaque)"><i class="fas fa-eye"></i> VISUALIZAR</button>
-                        <button class="btn-acao-lite" onclick="apagar('${id}')" style="color:#ef4444"><i class="fas fa-trash"></i> APAGAR</button>
-                    </div>
-                </div>`;
+    window.carregarHistorico = () => {
+        onValue(ref(db, 'producao_v13'), snap => {
+            dadosCache = snap.val() || {};
+            const lista = document.getElementById('conteudo-dinamico');
+            lista.innerHTML = "";
+            Object.keys(dadosCache).filter(k => !k.includes("RASCUNHO")).reverse().forEach(id => {
+                const p = dadosCache[id];
+                lista.innerHTML += `
+                    <div class="card-elite">
+                        <div><small>EXAME ${p.exame || '--'}</small><h3>${p.nome_peca || 'Peça Finalizada'}</h3></div>
+                        <button onclick="abrirPeca('${id}')" style="background:#000; color:#fff; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:bold;">VER FOLHA</button>
+                    </div>`;
+            });
         });
-    }
+    };
 
-    window.abrirVisualizador = (id) => {
-        const p = dbCache[id];
-        if (!p) return;
-        
-        // CORREÇÃO DA FOLHA EM BRANCO: 
-        // O FolhaEngine salva no campo 'conteudo'
+    window.abrirPeca = (id) => {
+        const p = dadosCache[id];
+        const area = document.getElementById('area-folha-master');
         let texto = p.conteudo || "";
         let linhas = texto.split('\n');
-        let html = "";
-
-        for (let i = 0; i < 150; i++) {
-            let textoLinha = linhas[i] || "";
-            html += `
-                <div class="linha-oab">
-                    <div class="num-L">${i+1}</div>
-                    <div class="txt-L">${textoLinha}</div>
-                </div>`;
+        
+        // MOTOR DE RENDERIZAÇÃO 150 LINHAS (CLONE DO INDEX)
+        let htmlFolha = `<div style="display: grid; grid-template-columns: 50px 1fr; border: 2px solid #000; background:#fff;">`;
+        htmlFolha += `<div style="background:#f1f5f9; border-right:2px solid #000;">`;
+        for(let i=1; i<=150; i++) {
+            htmlFolha += `<div style="height:35px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:900; border-bottom:1px solid #cbd5e1; color:#1e293b;">${i}</div>`;
         }
-
-        document.getElementById('folha-render').innerHTML = html;
-        document.getElementById('modal-visualizar').style.display = 'block';
-    };
-
-    window.fecharPeca = () => {
-        document.getElementById('modal-visualizar').style.display = 'none';
-    };
-
-    window.apagar = (id) => {
-        if (confirm("Apagar permanentemente?")) {
-            remove(ref(db, `producao_v13/${id}`));
+        htmlFolha += `</div><div style="padding:0; background-image: linear-gradient(to bottom, transparent 34px, #e2e8f0 34px); background-size: 100% 35px;">`;
+        for(let i=0; i<150; i++) {
+            let txt = linhas[i] || "";
+            htmlFolha += `<div style="height:35px; line-height:35px; padding:0 20px; font-family:'Courier New', monospace; font-size:19px; font-weight:700; color:#000; text-transform:uppercase;">${txt}</div>`;
         }
+        htmlFolha += `</div></div>`;
+
+        area.innerHTML = htmlFolha;
+        document.getElementById('visualizador-full').style.display = 'flex';
     };
+
+    window.fecharView = () => document.getElementById('visualizador-full').style.display = 'none';
+
+    // Inicia carregando o histórico
+    carregarHistorico();
 </script>
 </body>
 </html>

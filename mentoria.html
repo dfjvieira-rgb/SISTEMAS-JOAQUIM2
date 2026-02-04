@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE V13 | FULL INTEGRATION</title>
+    <title>ELITE V13 | GESTÃO TOTAL</title>
     <style>
         :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -12,35 +12,36 @@
         header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* PAINEL DE INCLUSÃO (SÓ APARECE EM INTELIGÊNCIAS) */
+        /* PAINEL DE GESTÃO */
         .admin-panel { background: var(--card); border: 2px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none; }
         .admin-panel input, .admin-panel textarea { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; margin-bottom: 10px; padding: 12px; border-radius: 6px; font-size: 16px; }
         .btn-save { width: 100%; background: var(--gold); color: black; border: none; padding: 14px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
 
-        /* LINHAS DO FEED */
+        /* ITENS DO FEED */
         .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; }
         .item-content { flex: 1; }
-        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 10px; text-transform: uppercase; margin-bottom: 5px; }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 10px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
         .item-desc { font-size: 16px; font-weight: 600; color: #e6edf3; }
         
-        /* BOTÕES DE AÇÃO VISÍVEIS */
         .row-actions { display: flex; gap: 10px; }
         .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
         .btn-view { background: var(--gold); color: black; border: none; }
-        .btn-edit { background: #238636; border: none; }
         .btn-delete { background: #da3633; border: none; }
 
-        /* NAVEGAÇÃO */
+        /* NAVEGAÇÃO INFERIOR */
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 30px 0; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .nav-item.active { color: var(--gold); border-top: 2px solid var(--gold); }
 
-        /* MODAL FOLHA */
+        /* MODAL DA PEÇA COM BOTÃO VOLTAR */
         #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
-        .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; }
+        .view-header { width: 100%; background: #0f172a; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
+        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        
+        .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; box-shadow: 0 0 40px rgba(0,0,0,0.2); }
         .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
         .num-linha { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #000; }
-        .texto-linha { flex: 1; padding: 0 15px; font-family: 'Courier New', Courier, monospace; font-size: 18px; font-weight: 700; color: #000; line-height: 35px; text-transform: uppercase; text-align: justify; white-space: nowrap; overflow: hidden; }
+        .texto-linha { flex: 1; padding: 0 20px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #000; line-height: 35px; text-transform: uppercase; text-align: justify; white-space: nowrap; overflow: hidden; }
     </style>
 </head>
 <body>
@@ -52,28 +53,29 @@
 
 <div class="container">
     <div id="editor-container" class="admin-panel">
-        <h3 style="margin:0 0 10px 0; font-size:12px; color:var(--gold)">GESTÃO DE INTELIGÊNCIA</h3>
-        <input id="tit-input" placeholder="Título (ex: Q01 ou Tese X)...">
+        <input id="tit-input" placeholder="Título...">
         <textarea id="cont-input" placeholder="Conteúdo técnico..." rows="4"></textarea>
-        <button class="btn-save" onclick="window.salvarInteligencia()">💾 SALVAR AGORA</button>
+        <button class="btn-save" onclick="window.salvarInteligencia()">💾 SALVAR NO BANCO</button>
     </div>
-    
     <div id="main-feed"></div>
 </div>
 
 <div id="view-modal">
-    <div style="width:100%; background:#0f172a; padding:15px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;">
-        <span style="color:white; font-weight:900;" id="peca-titulo">REVISÃO DE PEÇA</span>
-        <button onclick="window.closeView()" style="background:var(--gold); border:none; padding:10px 20px; border-radius:6px; font-weight:900; cursor:pointer;">FECHAR</button>
+    <div class="view-header">
+        <div style="display: flex; flex-direction: column;">
+            <span style="color:white; font-weight:900; font-size: 14px;" id="peca-titulo">REVISÃO DE PEÇA</span>
+            <span style="color:var(--gold); font-size: 10px; font-weight: bold;" id="peca-exame">EXAME: --</span>
+        </div>
+        <button class="btn-voltar" onclick="window.closeView()">← VOLTAR AO INÍCIO</button>
     </div>
     <div id="area-folha" class="paper"></div>
 </div>
 
 <nav class="nav-bar">
     <button class="nav-item active" id="btn-producao" onclick="tab('producao')">📁 PEÇAS</button>
-    <button class="nav-item" id="btn-questoes" onclick="tab('questoes')">🎓 50 QUESTÕES</button>
+    <button class="nav-item" id="btn-questoes" onclick="tab('questoes')">🎓 QUESTÕES</button>
     <button class="nav-item" id="btn-tese" onclick="tab('tese')">⚖️ TESES</button>
-    <button class="nav-item" id="btn-nc" onclick="tab('nc')">⚠️ NÃO CONFUNDA</button>
+    <button class="nav-item" id="btn-nc" onclick="tab('nc')">⚠️ NC</button>
 </nav>
 
 <script type="module">
@@ -91,15 +93,11 @@
 
     let activeTab = 'producao';
     let cache = {};
-    let editId = null;
 
     window.tab = (t) => {
-        activeTab = t; editId = null;
+        activeTab = t;
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        const tabKey = (t === 'questoes') ? 'questoes' : t;
-        document.getElementById('btn-' + tabKey).classList.add('active');
-        
-        // MOSTRA O PAINEL DE INCLUIR PARA AS ABAS DE INTELIGÊNCIA
+        document.getElementById('btn-' + (t==='questoes'?'questoes':t)).classList.add('active');
         document.getElementById('editor-container').style.display = (t === 'producao') ? 'none' : 'block';
         render();
     };
@@ -114,17 +112,20 @@
             const pecas = cache.producao_v13 || {};
             Object.keys(pecas).reverse().forEach(id => {
                 const p = pecas[id];
-                feed.innerHTML += `
-                    <div class="item-row">
-                        <div class="item-content">
-                            <span class="item-title">PEÇA SALVA</span>
-                            <span class="item-desc">${p.nome_peca || 'SEM TÍTULO'}</span>
-                        </div>
-                        <div class="row-actions">
-                            <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
-                            <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
-                        </div>
-                    </div>`;
+                if (p.nome_peca || p.linhas) {
+                    const labelExame = p.activeEx || p.exame || "OFF";
+                    feed.innerHTML += `
+                        <div class="item-row">
+                            <div class="item-content">
+                                <span class="item-title">EXAME: ${labelExame}</span>
+                                <span class="item-desc">${p.nome_peca || 'PEÇA FINALIZADA'}</span>
+                            </div>
+                            <div class="row-actions">
+                                <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
+                                <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
+                            </div>
+                        </div>`;
+                }
             });
         } else {
             const itens = cache.v13_master || {};
@@ -138,7 +139,7 @@
                                 <span class="item-desc" style="font-size:14px; font-weight:400;">${it.c}</span>
                             </div>
                             <div class="row-actions">
-                                <button class="btn-action btn-edit" onclick="window.editarInteligencia('${id}','${it.t}','${it.c}')">📝</button>
+                                <button class="btn-action" onclick="window.editarInteligencia('${id}','${it.t}','${it.c}')">📝</button>
                                 <button class="btn-action btn-delete" onclick="window.apagarInteligencia('${id}')">🗑️</button>
                             </div>
                         </div>`;
@@ -147,10 +148,9 @@
         }
     }
 
-    // BOTÃO OLHO (VISUALIZAR PEÇA)
     window.verPeca = (id) => {
         const p = cache.producao_v13[id];
-        let raw = p.linhas ? p.linhas.join('\n') : (p.conteudo || p.texto || "");
+        let raw = p.linhas ? (Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas) : (p.texto || "");
         const lines = raw.split('\n');
         let html = "";
         for(let i=1; i<=150; i++) {
@@ -158,32 +158,24 @@
         }
         document.getElementById('area-folha').innerHTML = html;
         document.getElementById('peca-titulo').innerText = p.nome_peca;
+        document.getElementById('peca-exame').innerText = "EXAME: " + (p.activeEx || p.exame || "--");
         document.getElementById('view-modal').style.display = 'flex';
-    };
-
-    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
-
-    // BOTÃO SALVAR / EDITAR / LIXEIRA
-    window.salvarInteligencia = () => {
-        const t = document.getElementById('tit-input').value;
-        const c = document.getElementById('cont-input').value;
-        if(!t || !c) return alert("Preencha título e conteúdo!");
-        const data = { t, c, cat: activeTab, ts: serverTimestamp() };
-        if(editId) set(ref(db, `v13_master/${editId}`), data);
-        else push(ref(db, 'v13_master'), data);
-        document.getElementById('tit-input').value = ""; document.getElementById('cont-input').value = ""; editId = null;
-    };
-
-    window.editarInteligencia = (id, t, c) => {
-        editId = id;
-        document.getElementById('tit-input').value = t;
-        document.getElementById('cont-input').value = c;
         window.scrollTo(0,0);
     };
 
-    window.apagarInteligencia = (id) => { if(confirm("Apagar card?")) remove(ref(db, `v13_master/${id}`)); };
-    window.apagarPeca = (id) => { if(confirm("Excluir peça da produção?")) remove(ref(db, `producao_v13/${id}`)); };
+    window.closeView = () => {
+        document.getElementById('view-modal').style.display = 'none';
+    };
 
+    window.salvarInteligencia = () => {
+        const t = document.getElementById('tit-input').value, c = document.getElementById('cont-input').value;
+        if(!t || !c) return;
+        push(ref(db, 'v13_master'), { t, c, cat: activeTab, ts: serverTimestamp() });
+        document.getElementById('tit-input').value = ""; document.getElementById('cont-input').value = "";
+    };
+
+    window.apagarPeca = (id) => { if(confirm("Excluir definitivamente?")) remove(ref(db, `producao_v13/${id}`)); };
+    window.apagarInteligencia = (id) => { if(confirm("Remover item?")) remove(ref(db, `v13_master/${id}`)); };
 </script>
 </body>
 </html>

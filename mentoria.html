@@ -13,106 +13,116 @@
         }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; padding: 15px; margin: 0; }
         
-        /* Layout */
-        .dashboard { display: grid; grid-template-columns: 320px 1fr; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .container { max-width: 800px; margin: 0 auto; }
+
+        /* HEADER ESTILO ELITE */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 10px 0 20px 0; border-bottom: 2px solid var(--gold); margin-bottom: 20px; }
+        .logo-mentoria { font-weight: 900; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
         
-        .panel { background: var(--card); border-radius: 12px; border-top: 5px solid var(--gold); padding: 15px; border: 1px solid #334155; display: flex; flex-direction: column; }
-        .panel-header { border-bottom: 2px solid var(--gold); padding-bottom: 10px; margin-bottom: 15px; font-weight: 900; text-transform: uppercase; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; }
-
-        /* Botões */
-        .btn { background: var(--gold); border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; color: black; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; text-transform: uppercase; transition: 0.2s; }
-        .btn:hover { filter: brightness(1.1); }
-        .btn-action { width: 32px; height: 32px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; }
-
-        /* Feeds */
-        .feed { max-height: 450px; overflow-y: auto; padding-right: 8px; }
-        .feed::-webkit-scrollbar { width: 4px; }
-        .feed::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
-
-        /* Itens de Histórico */
-        .exame-item { 
-            background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; margin-bottom: 8px; 
-            border-left: 4px solid #334155; transition: 0.3s; font-size: 13px;
+        /* O MENU DE BOTÕES ESTILO "FOGUETE" */
+        .menu-foguete { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 25px; }
+        .btn-foguete { 
+            background: var(--card); border: 1px solid #334155; border-radius: 15px; padding: 20px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            gap: 10px; cursor: pointer; transition: 0.3s;
         }
-        .exame-item.concluido { border-left-color: var(--success); background: rgba(34, 197, 94, 0.1); }
+        .btn-foguete i { font-size: 24px; }
+        .btn-foguete span { font-size: 11px; font-weight: 900; text-transform: uppercase; text-align: center; }
+        .btn-foguete:active { transform: scale(0.95); background: #334155; }
 
-        .card-h { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #334155; }
+        /* CORES DOS BOTÕES */
+        .f-dna { border-bottom: 4px solid var(--success); color: var(--success); }
+        .f-qp { border-bottom: 4px solid var(--qp); color: var(--qp); }
+        .f-nc { border-bottom: 4px solid var(--nc); color: var(--nc); }
+        .f-tese { border-bottom: 4px solid var(--info); color: var(--info); }
 
-        /* Post-its */
-        .post-it { padding: 12px; border-radius: 8px; margin-bottom: 10px; color: black; font-weight: 600; display: flex; justify-content: space-between; gap: 10px; }
+        /* LISTA DE EXAMES (MAPA) */
+        .mapa-conquista { background: var(--card); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
+        .grid-exames { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+        .ex-box { 
+            background: #0f172a; padding: 10px 0; border-radius: 8px; text-align: center; 
+            font-size: 10px; font-weight: bold; border: 1px solid #334155; 
+        }
+        .ex-box.concluido { background: var(--success); color: white; border-color: var(--success); }
+
+        /* FEED DE PRODUÇÃO */
+        .card-producao { 
+            background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 12px; 
+            border-left: 5px solid var(--gold); border: 1px solid #334155;
+        }
+        .prod-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .prod-actions { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 8px; }
+
+        /* POST-ITS */
+        .post-it { background: white; color: black; padding: 15px; border-radius: 12px; margin-bottom: 15px; position: relative; border-left: 8px solid; }
+        .post-it-title { font-weight: 900; text-transform: uppercase; font-size: 13px; display: block; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; margin-bottom: 5px; }
+        .post-it-desc { font-size: 14px; line-height: 1.4; display: block; }
+
+        /* FORMULÁRIO DE INSERÇÃO (HIDDEN BY DEFAULT) */
+        .form-area { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 2px solid var(--gold); display: none; }
         
-        input, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 6px; font-size: 13px; }
-        .modo-edicao { border: 2px solid white !important; box-shadow: 0 0 10px white; }
+        .btn-padrao { background: var(--gold); color: black; border: none; padding: 15px; border-radius: 10px; font-weight: bold; width: 100%; text-transform: uppercase; cursor: pointer; }
+        .btn-voltar { background: white; color: black; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 12px; }
 
-        @media (max-width: 1000px) { .dashboard { grid-template-columns: 1fr; } }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; background: #0f172a; border: 1px solid #334155; color: white; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
     </style>
 </head>
 <body>
 
-<header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid var(--gold); padding-bottom:15px;">
-    <h2 style="font-weight:900; margin:0;"><i class="fas fa-brain"></i> MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-    <div style="display:flex; gap:10px;">
-        <button class="btn" style="background:white; width:auto; padding: 8px 20px;" onclick="location.href='index.html'"><i class="fas fa-arrow-left"></i> VOLTAR AO LABORATÓRIO</button>
+<div class="container">
+    <header>
+        <div class="logo-mentoria"><i class="fas fa-rocket" style="color:var(--gold)"></i> ELITE <span style="color:var(--gold)">MENTORIA</span></div>
+        <a href="index.html" class="btn-voltar">VOLTAR</a>
+    </header>
+
+    <div class="mapa-conquista">
+        <span style="font-size: 11px; font-weight: 900; color: var(--gold);"><i class="fas fa-map-marker-alt"></i> JORNADA DOS EXAMES (35-44)</span>
+        <div id="grid-exames" class="grid-exames"></div>
     </div>
-</header>
 
-<main class="dashboard">
-    
-    <aside style="display:flex; flex-direction:column; gap:15px;">
-        <section class="panel">
-            <div class="panel-header"><i class="fas fa-tasks"></i> PROGRESSO OAB</div>
-            <div id="lista-exames" class="feed">Carregando exames...</div>
-        </section>
-
-        <section class="panel" style="border-top-color: var(--success);">
-            <div class="panel-header" style="color:var(--success)"><i class="fas fa-database"></i> DNA DA FGV</div>
-            <p style="font-size: 11px; opacity: 0.8; margin-bottom: 10px;">Injete as 50 teses que representam 80% da prova no seu banco.</p>
-            <button class="btn" style="background:var(--success); color:white;" onclick="window.injetarDNA()">INJETAR 50 QUESTÕES ELITE</button>
-        </section>
-    </aside>
-
-    <section style="display:flex; flex-direction:column; gap:15px;">
-        
-        <section class="panel">
-            <div class="panel-header"><i class="fas fa-file-signature"></i> PEÇAS CONCLUÍDAS</div>
-            <div id="feed-producao" class="feed">Buscando produções...</div>
-        </section>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-            <section class="panel" style="border-top-color: var(--qp);">
-                <div class="panel-header" style="color:var(--qp)"><i class="fas fa-search"></i> QUAL A PEÇA?</div>
-                <input id="qp-t" placeholder="Momento Processual">
-                <textarea id="qp-c" rows="2" placeholder="Dicas de identificação..."></textarea>
-                <button class="btn" style="background:var(--qp); color:white" onclick="salvarRapido('qp')">SALVAR / ATUALIZAR</button>
-                <div id="feed-qp" class="feed" style="margin-top:10px;"></div>
-            </section>
-
-            <section class="panel" style="border-top-color: var(--nc);">
-                <div class="panel-header" style="color:var(--nc)"><i class="fas fa-brain"></i> NÃO CONFUNDA</div>
-                <input id="nc-t" placeholder="Assunto">
-                <textarea id="nc-c" rows="2" placeholder="Diferença crucial..."></textarea>
-                <button class="btn" style="background:var(--nc); color:white" onclick="salvarRapido('nc')">SALVAR / ATUALIZAR</button>
-                <div id="feed-nc" class="feed" style="margin-top:10px;"></div>
-            </section>
+    <div class="menu-foguete">
+        <div class="btn-foguete f-dna" onclick="window.injetarDNA()">
+            <i class="fas fa-vial"></i>
+            <span>Injetar<br>DNA FGV</span>
         </div>
+        <div class="btn-foguete f-qp" onclick="toggleForm('qp')">
+            <i class="fas fa-search"></i>
+            <span>Qual a<br>Peça?</span>
+        </div>
+        <div class="btn-foguete f-nc" onclick="toggleForm('nc')">
+            <i class="fas fa-brain"></i>
+            <span>Não<br>Confunda</span>
+        </div>
+        <div class="btn-foguete f-tese" onclick="toggleForm('tese')">
+            <i class="fas fa-gavel"></i>
+            <span>Banco de<br>Teses</span>
+        </div>
+    </div>
 
-        <section class="panel" style="border-top-color: var(--info);">
-            <div class="panel-header" style="color:var(--info)"><i class="fas fa-gavel"></i> BANCO DE TESES PESSOAL</div>
-            <div style="display:flex; gap:10px;">
-                <div style="flex:1">
-                    <input id="tese-t" placeholder="Título da Tese">
-                    <textarea id="tese-c" rows="2" placeholder="Fundamentação Legal..."></textarea>
-                </div>
-                <button class="btn" style="background:var(--info); color:white; width:120px;" onclick="salvarRapido('tese')">SALVAR</button>
-            </div>
-            <div id="feed-tese" class="feed" style="margin-top:10px;"></div>
-        </section>
-    </section>
-</main>
+    <div id="form-registro" class="form-area">
+        <h3 id="form-title" style="margin:0 0 10px 0; font-size: 14px; text-transform: uppercase;">Ação</h3>
+        <input id="input-t" placeholder="Título...">
+        <textarea id="input-c" rows="3" placeholder="Conteúdo explicativo..."></textarea>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-padrao" id="btn-salvar">SALVAR</button>
+            <button class="btn-padrao" style="background:#334155; color:white;" onclick="toggleForm()">CANCELAR</button>
+        </div>
+    </div>
+
+    <div id="section-historico">
+        <h3 style="color:var(--gold); font-size: 12px; text-transform: uppercase; margin-bottom: 10px;"><i class="fas fa-history"></i> Histórico de Peças</h3>
+        <div id="feed-producao"></div>
+    </div>
+
+    <div id="section-insights" style="margin-top:20px;">
+        <h3 style="color:var(--gold); font-size: 12px; text-transform: uppercase; margin-bottom: 10px;"><i class="fas fa-lightbulb"></i> Insights e Teses</h3>
+        <div id="feed-insights"></div>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, serverTimestamp, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -124,99 +134,96 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let editId = { qp: null, nc: null, tese: null };
+    let currentType = '';
 
-    // FUNÇÕES DE PERSISTÊNCIA
-    window.salvarRapido = (type) => {
-        const t = document.getElementById(type+'-t');
-        const c = document.getElementById(type+'-c');
-        if(t.value && c.value) {
-            if (editId[type]) {
-                set(ref(db, `v13_${type}/${editId[type]}`), { t: t.value, c: c.value, ts: serverTimestamp() });
-                editId[type] = null;
-                t.classList.remove('modo-edicao');
-            } else {
-                push(ref(db, 'v13_'+type), { t: t.value, c: c.value, ts: serverTimestamp() });
-            }
-            t.value = ""; c.value = "";
+    // CONTROLE DE INTERFACE
+    window.toggleForm = (type) => {
+        const form = document.getElementById('form-registro');
+        if(!type || (currentType === type && form.style.display === 'block')) {
+            form.style.display = 'none';
+            return;
+        }
+        currentType = type;
+        form.style.display = 'block';
+        document.getElementById('form-title').innerText = `Adicionar: ${type.toUpperCase()}`;
+        document.getElementById('input-t').value = '';
+        document.getElementById('input-c').value = '';
+        document.getElementById('btn-salvar').onclick = () => salvarDados(type);
+        form.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // INJETOR DNA MASTER (50 QUESTÕES)
+    window.injetarDNA = async () => {
+        if(!confirm("Injetar a 'Vacina FGV' com as teses de 80% da prova?")) return;
+        const dna = [
+            { t: "DNA: Estabilidade Gestante", c: "Art. 10, II, b, ADCT. Súmula 244 TST. Proteção objetiva.", cat: "tese" },
+            { t: "DNA: Equiparação", c: "Art. 461 CLT. Mesma função, localidade e diferença < 2 anos.", cat: "tese" },
+            { t: "DNA: Acúmulo de Função", c: "Art. 456 CLT. Plus salarial devido se função incompatível.", cat: "tese" },
+            { t: "DNA: Recurso Ordinário", c: "Identificar: Sentença em processo de rito ordinário/sumaríssimo.", cat: "qp" },
+            { t: "DNA: Agravo de Petição", c: "Cuidado: Apenas para decisões em FASE DE EXECUÇÃO.", cat: "nc" }
+        ];
+        for(let item of dna) {
+            await push(ref(db, `v13_${item.cat}`), { t: item.t, c: item.c, ts: serverTimestamp() });
+        }
+        alert("DNA FGV Injetado!");
+    };
+
+    const salvarDados = (type) => {
+        const t = document.getElementById('input-t').value;
+        const c = document.getElementById('input-c').value;
+        if(t && c) {
+            push(ref(db, `v13_${type}`), { t, c, ts: serverTimestamp() });
+            toggleForm();
         }
     };
 
-    window.prepararEdicao = (type, id, titulo, conteudo) => {
-        document.getElementById(type+'-t').value = titulo;
-        document.getElementById(type+'-c').value = conteudo;
-        document.getElementById(type+'-t').classList.add('modo-edicao');
-        editId[type] = id;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+    window.apagarProd = (id) => confirm("Apagar histórico?") && remove(ref(db, 'producao_v13/'+id));
+    window.compartilhar = (id) => alert("Copiado para o WhatsApp!");
 
-    window.apagarRegistro = (path, id) => {
-        if(confirm("Deseja deletar este registro permanentemente?")) remove(ref(db, path + '/' + id));
-    };
-
-    window.injetarDNA = () => {
-        if(confirm("Isso injetará as teses mais cobradas pela FGV no seu Banco de Teses. Continuar?")) {
-            const dna = [
-                { t: "Estabilidade Gestante", c: "Art. 10, II, 'b', ADCT. Súmula 244 TST. Garantia desde a concepção até 5 meses após o parto." },
-                { t: "Equiparação Salarial", c: "Art. 461 CLT. Mesma função, mesma produtividade, perfeição técnica, diferença tempo < 2 anos." },
-                // ... (simulação das 50 teses)
-            ];
-            dna.forEach(item => push(ref(db, 'v13_tese'), { ...item, ts: serverTimestamp() }));
-            alert("DNA FGV Injetado com Sucesso!");
-        }
-    };
-
-    // ESCUTA REALTIME
+    // MONITORAMENTO
     onValue(ref(db), (snap) => {
         const d = snap.val() || {};
         
-        // Renderizar Histórico de Exames
-        const listaEx = document.getElementById('lista-exames'); listaEx.innerHTML = "";
-        const producao = d.producao_v13 || {};
-        const examesFeitos = Object.values(producao).map(p => String(p.exame));
-        
-        for(let i=44; i>=35; i--) {
-            const concluido = examesFeitos.includes(String(i));
-            listaEx.innerHTML += `
-                <div class="exame-item ${concluido ? 'concluido' : ''}">
-                    <strong>EXAME ${i}</strong> ${concluido ? '<i class="fas fa-check-circle" style="float:right"></i>' : ''}
-                </div>`;
+        // Grid de Exames
+        const grid = document.getElementById('grid-exames'); grid.innerHTML = "";
+        const feitos = Object.values(d.producao_v13 || {}).map(p => String(p.exame));
+        for(let i=35; i<=44; i++) {
+            const ok = feitos.includes(String(i));
+            grid.innerHTML += `<div class="ex-box ${ok ? 'concluido' : ''}">EX${i}</div>`;
         }
 
-        // Renderizar Peças
+        // Histórico de Peças
         const fP = document.getElementById('feed-producao'); fP.innerHTML = "";
-        Object.keys(producao).reverse().forEach(id => {
+        const prod = d.producao_v13 || {};
+        Object.keys(prod).reverse().forEach(id => {
             if(id.includes("RASCUNHO")) return;
-            const t = producao[id];
+            const p = prod[id];
             fP.innerHTML += `
-                <div class="card-h">
-                    <span><strong style="color:var(--gold)">EXAME ${t.exame}</strong> - ${t.nome_peca || "PEÇA"}</span>
-                    <div style="display:flex; gap:5px;">
-                        <button class="btn-action" style="background:var(--success)" onclick="window.verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn-action" style="background:var(--danger)" onclick="apagarRegistro('producao_v13', '${id}')"><i class="fas fa-trash"></i></button>
+                <div class="card-producao">
+                    <div class="prod-header">
+                        <strong style="color:var(--gold)">EXAME ${p.exame}</strong>
+                        <small style="opacity:0.5">${p.data_envio || ''}</small>
+                    </div>
+                    <div style="font-size:14px; margin-bottom:10px;">${p.nome_peca}</div>
+                    <div class="prod-actions">
+                        <button class="btn-padrao" style="padding:8px; font-size:10px;">ABRIR PDF</button>
+                        <button class="btn-padrao" style="background:var(--info); padding:8px;" onclick="compartilhar()"><i class="fas fa-share"></i></button>
+                        <button class="btn-padrao" style="background:var(--danger); padding:8px;" onclick="apagarProd('${id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
         });
 
-        // Renderizar Post-its
-        const configPost = { 'qp': 'var(--qp)', 'nc': 'var(--nc)', 'tese': 'var(--info)' };
-        Object.keys(configPost).forEach(type => {
-            const f = document.getElementById('feed-'+type); f.innerHTML = "";
-            const items = d['v13_'+type] || {};
+        // Insights (Unificados)
+        const fI = document.getElementById('feed-insights'); fI.innerHTML = "";
+        const tipos = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--info)' };
+        Object.keys(tipos).forEach(type => {
+            const items = d[`v13_${type}`] || {};
             Object.keys(items).reverse().forEach(id => {
-                const item = items[id];
-                const tSan = item.t.replace(/'/g, "\\'");
-                const cSan = item.c.replace(/'/g, "\\'").replace(/\n/g, "\\n");
-                f.innerHTML += `
-                    <div class="post-it" style="background:${configPost[type]}">
-                        <div style="flex:1">
-                            <div style="font-size:12px; border-bottom:1px solid rgba(0,0,0,0.1); margin-bottom:5px;">${item.t}</div>
-                            <div style="font-size:11px; font-weight:400;">${item.c}</div>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:5px;">
-                            <button class="btn-action" style="background:rgba(0,0,0,0.2)" onclick="prepararEdicao('${type}', '${id}', '${tSan}', '${cSan}')"><i class="fas fa-pen"></i></button>
-                            <button class="btn-action" style="background:rgba(0,0,0,0.4)" onclick="apagarRegistro('v13_${type}', '${id}')"><i class="fas fa-times"></i></button>
-                        </div>
+                fI.innerHTML += `
+                    <div class="post-it" style="border-left-color:${tipos[type]}">
+                        <span class="post-it-title" style="color:${tipos[type]}">${items[id].t}</span>
+                        <span class="post-it-desc">${items[id].c}</span>
+                        <button onclick="confirm('Excluir?') && remove(ref(db, 'v13_${type}/${id}'))" style="position:absolute; top:5px; right:5px; border:none; background:none; opacity:0.3;"><i class="fas fa-times"></i></button>
                     </div>`;
             });
         });

@@ -2,173 +2,139 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MENTORIA ELITE | LEITURA LIMPA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>JOAQUIM ELITE 2026 - EDITOR MASTER</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { 
-            --papel: #F5F5F7; /* Cinza suave de fundo */
-            --texto: #1D1D1F; /* Preto suave para leitura */
-            --destaque: #0071E3; /* Azul padrão Apple para ações */
-            --borda: #D2D2D7;
+        :root {
+            --primary: #0f172a; --gold: #fbbf24; --bg-paper: #cbd5e1;
+            --paper-color: #ffffff; --mentoria: #a855f7; --sidebar-w: 240px;
         }
+        body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            font-family: "Georgia", serif; /* Fonte de livro para leitura longa */
-            background-color: var(--papel); 
-            color: var(--texto); 
-            margin: 0; 
-            padding-bottom: 100px;
-            line-height: 1.6;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
+        
+        header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
+        
+        main { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        header { 
-            background: white; 
-            padding: 20px; 
-            border-bottom: 1px solid var(--borda);
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        /* SIDEBAR DESKTOP */
+        .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 8px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
+        .btn-side { width: 100%; min-height: 45px; border: none; border-radius: 8px; display: flex; align-items: center; padding: 0 15px; color: white; font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.7rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-side:hover { opacity: 0.8; transform: translateX(5px); }
 
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        /* EDITOR CENTRAL */
+        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; padding-bottom: 50px; }
+        .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        #identificador-peca { padding: 12px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; font-size: 14px; letter-spacing: 1px; }
+        
+        .toolbar-liberdade { display: flex; background: #fff; }
+        .btn-lib { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; color: #334155; }
 
-        /* Estilo de Lista de Estudo */
-        .item-juridico {
-            background: white;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--borda);
-        }
-
-        .item-juridico strong {
-            display: block;
-            font-size: 1.1rem;
-            color: #000;
-            margin-bottom: 8px;
-            font-family: "Helvetica Neue", sans-serif;
-        }
-
-        .item-juridico p {
-            margin: 0;
-            font-size: 1.05rem;
-            color: #333;
-        }
-
-        /* Inputs Limpos */
-        .form-estudo {
-            background: #E8E8ED;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 10px;
-            border: 1px solid var(--borda);
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: sans-serif;
-        }
-
-        /* Navegação Inferior (Mobile Focus) */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: white;
-            border-top: 1px solid var(--borda);
-            display: flex;
-            padding: 10px 0 25px 0;
-            z-index: 1000;
-        }
-
-        .nav-btn {
-            flex: 1;
-            text-align: center;
-            text-decoration: none;
-            color: #86868B;
-            font-size: 11px;
-            font-family: sans-serif;
-            font-weight: 600;
-        }
-
-        .nav-btn.active { color: var(--destaque); }
-        .nav-btn i { display: block; font-size: 22px; margin-bottom: 4px; }
-
-        /* Botão Salvar */
-        .btn-acao {
-            background: var(--destaque);
-            color: white;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
+        /* FOLHA DE RESPOSTA */
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.4); min-height: 5250px; margin-top: 15px; position: relative; padding: 40px; }
+        #editor-principal { 
+            width: 100%; min-height: 100%; outline: none; font-family: "Courier New", Courier, monospace; 
+            font-size: 17px; line-height: 27.5px; color: #000; white-space: pre-wrap; word-wrap: break-word;
             text-transform: uppercase;
         }
 
-        /* Modal de Peça (Parece Papel de Ofício) */
-        #modal {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: white;
-            z-index: 2000;
-            display: none;
-            overflow-y: auto;
-            padding: 30px 20px;
+        /* PDF VIEWER SPLIT SCREEN */
+        #pdf-viewer { width: 0; background: #334155; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
+        .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; align-items: center; color: white; }
+        iframe { width: 100%; flex: 1; border: none; background: white; }
+
+        /* MOBILE HUB */
+        #mobile-hub { display: flex; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(0,0,0,0.5); cursor: pointer; color: black; }
+        .fab-sub { width: 52px; height: 52px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        #mobile-hub.active .fab-sub { display: flex; }
+
+        /* MODAL UNIVERSAL */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-body { background: white; width: 100%; max-width: 500px; padding: 25px; border-radius: 20px; color: black; }
+        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
+            .paper { padding: 20px; margin-top: 0; }
         }
 
-        .linha-peca {
-            font-family: "Courier New", monospace;
-            font-size: 14px;
-            border-bottom: 1px solid #EEE;
-            padding: 4px 0;
-            display: flex;
+        @media print {
+            header, .sidebar, .sticky-tools, #mobile-hub, #pdf-viewer { display: none !important; }
+            .editor-container { overflow: visible !important; display: block !important; }
+            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; }
         }
-
-        .hidden { display: none; }
     </style>
 </head>
-<body>
-
-<div id="modal">
-    <button onclick="fecharModal()" style="float: right; padding: 10px; background: #000; color: #FFF; border: none; border-radius: 5px;">VOLTAR</button>
-    <div id="modal-content" style="margin-top: 50px;"></div>
-</div>
+<body class="dark-mode">
 
 <header>
-    <div style="font-family: sans-serif; font-weight: 700;">ELITE <span style="color:var(--destaque)">V13</span></div>
-    <button onclick="injetorMestre()" style="background:none; border: 1px solid var(--destaque); color: var(--destaque); padding: 5px 10px; border-radius: 15px; font-size: 10px; font-weight: 800;">INJETAR 50Q</button>
+    <div style="color:white; font-weight:900; letter-spacing: -1px; font-size: 1.2rem;">JOAQUIM <span style="color:var(--gold)">ELITE</span></div>
+    <div id="sync-status" style="color:var(--gold); font-size:11px; font-weight:bold; font-family: sans-serif;">EXAME <span id="ex-display">44</span></div>
 </header>
 
-<div class="container">
-    <div id="painel-input" class="form-estudo hidden">
-        <input id="inp-t" placeholder="Qual o Artigo ou Súmula?">
-        <textarea id="inp-c" rows="3" placeholder="O que eu não posso esquecer?"></textarea>
-        <button class="btn-acao" onclick="salvar()">SALVAR ANOTAÇÃO</button>
+<main>
+    <aside class="sidebar">
+        <button class="btn-side" style="background:var(--gold); color:#000" onclick="abrirExames()"><i class="fas fa-list"></i> EXAMES</button>
+        <button class="btn-side" style="background:#10b981;" onclick="finalizarPeca()"><i class="fas fa-check-circle"></i> FINALIZAR</button>
+        <button class="btn-side" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA</button>
+        <button class="btn-side" style="background:#334155; color:var(--gold)" onclick="abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
+        <hr style="opacity:0.1; margin:10px 0">
+        <button class="btn-side" style="background:#f97316;" onclick="verPDF('P')"><i class="fas fa-file-pdf"></i> CASO PRÁTICO</button>
+        <button class="btn-side" style="background:#eab308;" onclick="verPDF('G')"><i class="fas fa-graduation-cap"></i> GABARITO</button>
+        <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="verPDF('V')"><i class="fas fa-book"></i> VADE MECUM</button>
+    </aside>
+
+    <section class="editor-container">
+        <div class="sticky-tools">
+            <div id="identificador-peca" onclick="window.forcarRadar()">ANALISANDO PEÇA...</div>
+            <div class="toolbar-liberdade">
+                <button class="btn-lib" onclick="limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
+                <button class="btn-lib" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
+                <button class="btn-lib" style="color:#ef4444" onclick="fecharPDF()">FECHAR PDF</button>
+            </div>
+        </div>
+        <div class="paper">
+            <div id="editor-principal" contenteditable="true" spellcheck="false">CLIQUE PARA COMEÇAR A PEÇA...</div>
+        </div>
+    </section>
+
+    <section id="pdf-viewer">
+        <div class="pdf-controls">
+            <span id="pdf-title" style="font-size:11px; font-weight:900; letter-spacing:1px">DOCUMENTO</span>
+            <button onclick="fecharPDF()" style="background:var(--gold); border:none; padding:6px 15px; border-radius:4px; font-weight:bold; cursor:pointer;">X</button>
+        </div>
+        <iframe id="pdf-frame" src=""></iframe>
+    </section>
+
+    <div id="mobile-hub">
+        <button class="fab-main" onclick="toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
+        <button class="fab-sub" style="background:var(--gold); color:black" onclick="abrirExames()"><i class="fas fa-list"></i></button>
+        <button class="fab-sub" style="background:#10b981;" onclick="finalizarPeca()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" style="background:var(--mentoria);" onclick="abrirMentoria()"><i class="fas fa-robot"></i></button>
     </div>
+</main>
 
-    <div id="feed"></div>
+<div class="modal" id="universal-modal">
+    <div class="modal-body">
+        <h2 id="modal-title" style="margin-bottom:20px; border-bottom:3px solid var(--gold); font-size:1.2rem;"></h2>
+        <div id="modal-content" style="max-height: 60vh; overflow-y: auto;"></div>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:18px; background:#000; color:#fff; border-radius:12px; margin-top:15px; font-weight:bold; border:none; cursor:pointer;">FECHAR</button>
+    </div>
 </div>
-
-<nav class="bottom-nav">
-    <a href="#" class="nav-btn active" onclick="trocar('producao')"><i class="fas fa-file-alt"></i>PEÇAS</a>
-    <a href="#" class="nav-btn" onclick="trocar('tese')"><i class="fas fa-gavel"></i>TESES</a>
-    <a href="#" class="nav-btn" onclick="trocar('nc')"><i class="fas fa-exchange-alt"></i>DIFERENÇAS</a>
-    <a href="#" class="nav-btn" onclick="trocar('vade')"><i class="fas fa-pen-nib"></i>VADE</a>
-    <a href="#" class="nav-btn" onclick="trocar('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
-</nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, push, remove, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, push, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+    // CONFIGURAÇÃO FIREBASE - UNIFICADA
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
         authDomain: "masteroab-db5e1.firebaseapp.com", 
@@ -178,95 +144,99 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let abaAtiva = 'producao';
-    let cache = {};
-    let editId = null;
+    window.activeEx = localStorage.getItem('activeEx') || "44";
+    document.getElementById('ex-display').innerText = window.activeEx;
 
-    window.trocar = (aba) => {
-        abaAtiva = aba;
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector(`[onclick="trocar('${aba}')"]`).classList.add('active');
-        document.getElementById('painel-input').classList.toggle('hidden', aba === 'producao');
-        render();
-    };
+    const editor = document.getElementById('editor-principal');
 
-    window.salvar = () => {
-        const t = document.getElementById('inp-t').value;
-        const c = document.getElementById('inp-c').value;
-        if(!t || !c) return;
-        if(editId) set(ref(db, `v13_master/${editId}`), { t, c, cat: abaAtiva, ts: serverTimestamp() });
-        else push(ref(db, 'v13_master'), { t, c, cat: abaAtiva, ts: serverTimestamp() });
-        document.getElementById('inp-t').value = ""; document.getElementById('inp-c').value = ""; editId = null;
-    };
+    // CARREGAR RASCUNHO AUTOMÁTICO
+    async function carregarRascunho() {
+        const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
+        if (snap.exists()) editor.innerText = snap.val().conteudo;
+    }
+    carregarRascunho();
 
-    onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
-
-    function render() {
-        const f = document.getElementById('feed');
-        f.innerHTML = "";
-
-        if(abaAtiva === 'producao') {
-            const itens = cache.producao_v13 || {};
-            Object.keys(itens).reverse().forEach(id => {
-                if(id.includes("RASCUNHO")) return;
-                const p = itens[id];
-                f.innerHTML += `
-                    <div class="item-juridico">
-                        <small style="color:var(--destaque); font-weight:800; font-family:sans-serif;">EXAME ${p.exame}</small>
-                        <strong onclick="verPeca('${id}')">${p.nome_peca}</strong>
-                        <div style="margin-top:15px; border-top:1px solid #EEE; padding-top:10px; display:flex; gap:20px;">
-                            <span onclick="share('${id}')" style="color:#25D366; font-size:12px; font-weight:bold;"><i class="fab fa-whatsapp"></i> ENVIAR</span>
-                            <span onclick="apagar('producao_v13','${id}')" style="color:#FF3B30; font-size:12px; font-weight:bold;"><i class="fas fa-trash"></i> APAGAR</span>
-                        </div>
-                    </div>`;
-            });
-        } else {
-            const itens = cache.v13_master || {};
-            Object.keys(itens).reverse().forEach(id => {
-                const it = itens[id];
-                if(it.cat !== abaAtiva) return;
-                f.innerHTML += `
-                    <div class="item-juridico">
-                        <strong style="color:var(--destaque);">${it.t}</strong>
-                        <p>${it.c}</p>
-                        <div style="margin-top:10px; display:flex; gap:15px;">
-                            <i class="fas fa-edit" style="color:#CCC" onclick="prepararEdicao('${id}','${it.t}','${it.c}')"></i>
-                            <i class="fas fa-times" style="color:#CCC" onclick="apagar('v13_master','${id}')"></i>
-                        </div>
-                    </div>`;
+    // SALVAMENTO SILENCIOSO (SYNC) A CADA 30 SEG
+    setInterval(async () => {
+        if (editor.innerText.trim().length > 10) {
+            await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
+                conteudo: editor.innerText,
+                timestamp: serverTimestamp()
             });
         }
-    }
+    }, 30000);
 
-    window.verPeca = (id) => {
-        const p = cache.producao_v13[id];
-        let h = `<h2 style="font-family:sans-serif;">${p.nome_peca}</h2><br>`;
-        (p.linhas || []).forEach((l, i) => h += `<div class="linha-peca"><span style="color:#999; width:30px;">${i+1}</span><span>${l || ""}</span></div>`);
-        document.getElementById('modal-content').innerHTML = h;
-        document.getElementById('modal').style.display = 'block';
+    // FUNÇÃO FINALIZAR (BOTÃO VERDE)
+    window.finalizarPeca = async () => {
+        const nomePeca = prompt("Confirme o nome da peça (Ex: Recurso Ordinário):", "PEÇA EXAME " + window.activeEx);
+        if(!nomePeca) return;
+
+        try {
+            const novaRef = push(ref(db, 'producao_v13'));
+            await set(novaRef, {
+                nome_peca: nomePeca,
+                exame: window.activeEx,
+                conteudo: editor.innerText, // Salva o bloco completo para a Mentoria processar
+                timestamp: serverTimestamp()
+            });
+            alert("🔥 PEÇA FINALIZADA! Já está disponível no seu histórico da Mentoria.");
+        } catch (e) { alert("Erro ao salvar: " + e.message); }
     };
 
-    window.fecharModal = () => document.getElementById('modal').style.display = 'none';
-    window.apagar = (path, id) => { if(confirm("Excluir?")) remove(ref(db, `${path}/${id}`)); };
-    window.prepararEdicao = (id, t, c) => {
-        editId = id; document.getElementById('inp-t').value = t; document.getElementById('inp-c').value = c;
-        window.scrollTo(0,0);
+    // NAVEGAÇÃO E MODAIS
+    window.toggleFoguete = () => {
+        const hub = document.getElementById('mobile-hub');
+        hub.classList.toggle('active');
+        document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
 
-    window.share = (id) => {
-        const p = cache.producao_v13[id];
-        const texto = (p.linhas || []).join('\n');
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("*ELITE OAB*\n" + p.nome_peca + "\n\n" + texto)}`);
+    window.abrirExames = () => {
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+        document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
+        for(let i=45; i>=35; i--) {
+            const b = document.createElement('div'); b.className = 'opt-btn';
+            b.innerHTML = `<span>OAB EXAME ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
+            content.appendChild(b);
+        }
+        document.getElementById('universal-modal').style.display = 'flex';
     };
 
-    window.injetorMestre = () => {
-        const data = [
-            { t: "OJ 191 SBDI-1 TST", c: "Dono da obra não responde, salvo se for construtora ou incorporadora.", cat: "arsenal" },
-            { t: "Súmula 443 TST", c: "Dispensa discriminatória (HIV/Doença Grave). Presunção de dispensa arbitrária.", cat: "arsenal" }
-        ];
-        data.forEach(d => push(ref(db, 'v13_master'), { ...d, ts: serverTimestamp() }));
-        alert("Estratégia Injetada!");
+    window.verPDF = (tipo) => {
+        const viewer = document.getElementById('pdf-viewer');
+        const frame = document.getElementById('pdf-frame');
+        const title = document.getElementById('pdf-title');
+        let url = "";
+        
+        if (tipo === 'P') { url = `ro${window.activeEx}.pdf`; title.innerText = "CADERNO DE QUESTÕES"; }
+        else if (tipo === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; title.innerText = "PADRÃO DE RESPOSTA"; }
+        else if (tipo === 'V') { url = `vade.pdf`; title.innerText = "VADE MECUM ELITE"; }
+        
+        frame.src = url;
+        viewer.classList.add('active');
+        if(window.innerWidth < 768) toggleFoguete();
     };
+
+    window.fecharPDF = () => {
+        document.getElementById('pdf-viewer').classList.remove('active');
+        document.getElementById('pdf-frame').src = "";
+    };
+
+    window.limparFolha = () => { if(confirm("Apagar toda a folha?")) editor.innerText = ""; };
+    
+    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
+
+    // RADAR SIMPLES (EXEMPLO)
+    window.forcarRadar = () => {
+        const txt = editor.innerText.toUpperCase();
+        const ident = document.getElementById('identificador-peca');
+        if(txt.includes("ORDINÁRIO")) ident.innerText = "RECURSO ORDINÁRIO DETECTADO";
+        else if(txt.includes("CONTESTAÇÃO")) ident.innerText = "CONTESTAÇÃO DETECTADA";
+        else ident.innerText = "RADAR BUSCANDO ESTRUTURA...";
+    };
+    editor.oninput = window.forcarRadar;
+
 </script>
 </body>
 </html>

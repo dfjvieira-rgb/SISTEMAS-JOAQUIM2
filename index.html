@@ -43,6 +43,7 @@
         /* SIDEBAR ESQUERDA */
         .sidebar { width: var(--sidebar-w); background: #1e293b; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); overflow-y: auto; }
         .btn-side { width: 100%; min-height: 40px; border: none; border-radius: 6px; display: flex; align-items: center; padding: 0 12px; color: white; font-weight: 700; cursor: pointer; gap: 10px; font-size: 0.75rem; text-transform: uppercase; transition: 0.2s; }
+        .btn-side:hover { filter: brightness(1.2); }
 
         /* CHECKLIST MODERNO (DIREITA) */
         .checklist-panel {
@@ -62,13 +63,13 @@
         .checklist-item.checked { background: rgba(34, 197, 94, 0.1); border-color: var(--success); color: var(--success); }
 
         /* EDITOR E FOLHA */
-        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
+        .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; scroll-behavior: smooth; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); }
+        #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); letter-spacing: 1px; }
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
 
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; }
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin: 10px 0 100px 0; }
 
         /* PDF VIEWER */
         #pdf-viewer { width: 0; background: #334155; transition: width 0.4s ease; display: flex; flex-direction: column; overflow: hidden; }
@@ -76,15 +77,20 @@
         .pdf-controls { background: #1e293b; padding: 10px; display: flex; justify-content: space-between; align-items: center; color: white; }
         iframe { width: 100%; flex: 1; border: none; }
 
-        /* MOBILE HUB */
-        #mobile-hub { display: flex; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 10px; align-items: center; }
-        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); color: black; }
-        .fab-sub { width: 45px; height: 45px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; transition: 0.3s; }
+        /* MOBILE HUB (FOGUETE) */
+        #mobile-hub { display: none; position: fixed; bottom: 25px; right: 20px; z-index: 99999; flex-direction: column-reverse; gap: 10px; align-items: center; }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.4); color: black; cursor: pointer; }
+        .fab-sub { width: 45px; height: 45px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1rem; font-weight: 900; transition: 0.3s; cursor: pointer; box-shadow: 0 3px 10px rgba(0,0,0,0.3); }
         #mobile-hub.active .fab-sub { display: flex; animation: slideUp 0.3s ease forwards; }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        @media (max-width: 1100px) { .checklist-panel { display: none; } }
+        /* RESPONSIVIDADE */
+        @media (max-width: 1100px) { 
+            .checklist-panel, .sidebar { display: none; } 
+            #mobile-hub { display: flex; }
+            #pdf-viewer.active { width: 100%; position: absolute; inset: 0; z-index: 6000; }
+        }
     </style>
 </head>
 <body class="dark-mode">
@@ -115,7 +121,7 @@
 
     <section class="editor-container">
         <div class="sticky-tools">
-            <div id="identificador-peca">SCANNER...</div>
+            <div id="identificador-peca">ESCANEANDO PEÇA...</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Ver</button>
@@ -149,7 +155,7 @@
 
     <section id="pdf-viewer">
         <div class="pdf-controls">
-            <span id="pdf-title" style="font-size:10px; font-weight:900;">DOC</span>
+            <span id="pdf-title" style="font-size:10px; font-weight:900;">DOCUMENTO ELITE</span>
             <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">X</button>
         </div>
         <iframe id="pdf-frame" src=""></iframe>
@@ -157,19 +163,20 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
-        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
-        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
-        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" title="Vade Mecum" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
+        <button class="fab-sub" title="Gabarito" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
+        <button class="fab-sub" title="Peça PDF" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
+        <button class="fab-sub" title="Injetar Teses" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" title="Mentoria" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-sub" title="Finalizar" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
+        <button class="fab-sub" title="Exames" style="background:var(--gold); color:black;" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
     </div>
 </main>
 
 <div class="modal" id="universal-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:100000; align-items:center; justify-content:center;">
-    <div style="background:white; width:90%; max-width:450px; padding:20px; border-radius:15px;">
-        <h2 id="modal-title" style="color:black; border-bottom:2px solid var(--gold); padding-bottom:10px;"></h2>
-        <div id="modal-content" style="max-height:60vh; overflow-y:auto; margin:15px 0;"></div>
+    <div style="background:white; width:95%; max-width:450px; padding:20px; border-radius:15px; box-shadow: 0 0 30px var(--gold);">
+        <h2 id="modal-title" style="color:black; border-bottom:2px solid var(--gold); padding-bottom:10px; font-size:1.2rem;"></h2>
+        <div id="modal-content" style="max-height:60vh; overflow-y:auto; margin:15px 0; color: #333;"></div>
         <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:black; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">FECHAR</button>
     </div>
 </div>
@@ -187,7 +194,7 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
 
-    // Lógica do Cronômetro Blindada
+    // Lógica do Cronômetro
     let segundos = 0; let timerAtivo = true;
     window.toggleTimer = () => {
         timerAtivo = !timerAtivo;
@@ -203,12 +210,12 @@
         document.getElementById('cronometro').innerText = `${h}:${m}:${s}`;
     }}, 1000);
 
-    // Lógica do Checklist Elite
+    // Checklist Progressivo
     window.updateCheck = (el) => {
         el.parentElement.classList.toggle('checked', el.checked);
-        const total = document.querySelectorAll('#checklist-elite input[type="checkbox"]').length;
+        const checkboxes = document.querySelectorAll('#checklist-elite input[type="checkbox"]');
         const marcados = document.querySelectorAll('#checklist-elite input[type="checkbox"]:checked').length;
-        document.getElementById('progress-bar').style.width = (marcados / total * 100) + '%';
+        document.getElementById('progress-bar').style.width = (marcados / checkboxes.length * 100) + '%';
     };
 
     window.limparChecklist = () => {
@@ -219,39 +226,66 @@
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
+        
+        // Carrega rascunho anterior se existir
         setTimeout(async () => {
             const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
             if(snap.exists()) document.getElementById('editor-principal').innerText = snap.val().conteudo;
             window.forcarRadar();
-        }, 500);
+        }, 800);
     };
 
     window.verPDF = (t) => {
-        const url = t === 'P' ? `./ro${window.activeEx}.pdf` : t === 'G' ? `./ro${window.activeEx}-gabarito.pdf` : `./vade.pdf`;
+        let url = "";
+        if(t === 'P') url = `./ro${window.activeEx}.pdf`;
+        else if(t === 'G') url = `./ro${window.activeEx}-gabarito.pdf`;
+        else url = `./vade.pdf`;
+        
+        document.getElementById('pdf-title').innerText = t === 'V' ? "VADE MECUM" : `EXAME ${window.activeEx}`;
         document.getElementById('pdf-frame').src = url;
         document.getElementById('pdf-viewer').classList.add('active');
     };
 
-    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active'); document.getElementById('pdf-frame').src = ""; };
+    window.fecharPDF = () => { 
+        document.getElementById('pdf-viewer').classList.remove('active'); 
+        document.getElementById('pdf-frame').src = ""; 
+    };
 
     window.finalizarPeca = async () => {
         const marcados = document.querySelectorAll('#checklist-elite input[type="checkbox"]:checked').length;
-        if(marcados < 12 && !confirm("Seu checklist não está 100%. Deseja salvar assim mesmo?")) return;
+        if(marcados < 12 && !confirm("Atenção: Checklist incompleto. Deseja finalizar mesmo assim?")) return;
+        
         const texto = document.getElementById('editor-principal').innerText;
         await engineSaveElite(db, window.activeEx, true, texto);
-        alert("PEÇA SALVA NO HISTÓRICO ELITE!");
+        alert("MISSIÃO CUMPRIDA! Peça salva no histórico.");
     };
 
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.injetarTeses = () => { const dna = BANCO_ESPELHOS[window.activeEx]; if(dna) FolhaEngine.injetarTextoMultilinhas(dna); };
+
+    window.injetarTeses = () => { 
+        const dna = BANCO_ESPELHOS[window.activeEx]; 
+        if(dna) {
+            if(confirm("Injetar teses oficiais do Exame " + window.activeEx + "?")) {
+                FolhaEngine.injetarTextoMultilinhas(dna); 
+            }
+        } else {
+            alert("Espelho não encontrado para este exame.");
+        }
+    };
 
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "ESTRUTURAS";
+        document.getElementById('modal-title').innerText = "ESTRUTURAS DE PEÇAS";
         const content = document.getElementById('modal-content'); content.innerHTML = "";
+        
         Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div'); b.style.padding="12px"; b.style.borderBottom="1px solid #eee"; b.innerText=k; b.style.cursor="pointer";
-            b.onclick = () => { FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; };
+            const b = document.createElement('div'); 
+            b.style.padding="15px"; b.style.borderBottom="1px solid #eee"; b.innerText=k; b.style.cursor="pointer";
+            b.style.fontWeight="bold";
+            b.onclick = () => { 
+                FolhaEngine.injetarTextoMultilinhas(pecas[k]); 
+                modal.style.display='none'; 
+            };
             content.appendChild(b);
         });
         modal.style.display = 'flex';
@@ -259,16 +293,23 @@
 
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if (dna) document.getElementById('identificador-peca').innerText = RadarEngine.analisar(dna).id.toUpperCase();
+        if (dna) {
+            const analise = RadarEngine.analisar(dna);
+            document.getElementById('identificador-peca').innerText = "PEÇA IDENTIFICADA: " + analise.id.toUpperCase();
+        }
     };
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "EXAMES";
+        document.getElementById('modal-title').innerText = "SELECIONAR EXAME";
         const content = document.getElementById('modal-content'); content.innerHTML = "";
         for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.style.padding="12px"; b.style.borderBottom="1px solid #eee"; b.innerText=`EXAME ${i}`; b.style.cursor="pointer";
-            b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
+            const b = document.createElement('div'); 
+            b.style.padding="15px"; b.style.borderBottom="1px solid #eee"; b.innerText=`EXAME ${i} - TRABALHO`; b.style.cursor="pointer";
+            b.onclick = () => { 
+                localStorage.setItem('activeEx', i.toString()); 
+                window.location.reload(); 
+            };
             content.appendChild(b);
         }
         modal.style.display = 'flex';
@@ -279,7 +320,11 @@
         document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
     
-    window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
+    window.limparFolha = () => { 
+        if(confirm("Isso apagará todo o texto da folha atual. Confirmar?")) {
+            document.getElementById('editor-principal').innerText = ""; 
+        }
+    };
 </script>
 </body>
 </html>

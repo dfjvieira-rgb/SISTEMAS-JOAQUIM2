@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELITE V13 | FOCO NO EXAME</title>
+    <title>ELITE V13 | COMANDOS P-G-V</title>
     <style>
         :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -18,15 +18,20 @@
         .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1.2px; }
         .item-desc { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; }
         
-        .row-actions { display: flex; gap: 10px; margin-left: 10px; }
-        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .row-actions { display: flex; gap: 10px; }
+        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; }
         .btn-view { background: var(--gold); color: black; border: none; }
         .btn-delete { background: #da3633; border: none; }
 
-        /* MODAL E FOLHA */
+        /* MODAL E COMANDOS P G V */
         #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
-        .view-header { width: 100%; background: #0f172a; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
-        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        .view-header { width: 100%; background: #0f172a; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
+        
+        .pgv-group { display: flex; gap: 8px; }
+        .btn-pgv { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; color: var(--gold); font-weight: 900; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .btn-pgv:active { background: var(--gold); color: black; }
+        
+        .btn-voltar { background: var(--gold); color: black; border: none; padding: 8px 15px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 11px; }
         
         .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; }
         .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
@@ -43,18 +48,19 @@
 
 <header>
     <div style="font-weight: 900; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
-    <div style="font-size: 10px; color: #4ade80; font-weight: bold;">● PRODUÇÃO INTEGRADA</div>
+    <div style="font-size: 10px; color: #4ade80;">● MODO ESTUDO</div>
 </header>
 
 <div class="container" id="main-feed"></div>
 
 <div id="view-modal">
     <div class="view-header">
-        <div style="display: flex; flex-direction: column;">
-            <span style="color:white; font-weight:900; font-size: 14px;" id="peca-titulo">REVISÃO</span>
-            <span style="color:var(--gold); font-size: 10px; font-weight: bold;" id="peca-exame">DETALHES DA PRODUÇÃO</span>
+        <div class="pgv-group">
+            <button class="btn-pgv" onclick="window.cmd('P')">P</button>
+            <button class="btn-pgv" onclick="window.cmd('G')">G</button>
+            <button class="btn-pgv" onclick="window.cmd('V')">V</button>
         </div>
-        <button class="btn-voltar" onclick="window.closeView()">← VOLTAR</button>
+        <button class="btn-voltar" onclick="window.closeView()">SAIR</button>
     </div>
     <div id="area-folha" class="paper"></div>
 </div>
@@ -97,64 +103,46 @@
         
         if(activeTab === 'producao') {
             const pecas = cache.producao_v13 || {};
-            const chaves = Object.keys(pecas).reverse();
-
-            if(chaves.length === 0) {
-                feed.innerHTML = "<div style='text-align:center; padding:50px; color:var(--dim)'>Nenhuma peça finalizada.</div>";
-                return;
-            }
-
-            chaves.forEach(id => {
+            Object.keys(pecas).reverse().forEach(id => {
                 const p = pecas[id];
-                const nomePeca = p.nome_peca || "PEÇA FINALIZADA";
-                const numExame = p.activeEx || p.exame || "OFF";
-                
-                feed.innerHTML += `
-                    <div class="item-row">
-                        <div class="item-content">
-                            <span class="item-title">OAB EXAME: ${numExame}</span>
-                            <span class="item-desc">${nomePeca}</span>
-                        </div>
-                        <div class="row-actions">
-                            <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
-                            <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
-                        </div>
-                    </div>`;
+                if (p.nome_peca || p.linhas) {
+                    feed.innerHTML += `
+                        <div class="item-row">
+                            <div class="item-content">
+                                <span class="item-title">EXAME: ${p.activeEx || p.exame || "OFF"}</span>
+                                <span class="item-desc">${p.nome_peca || 'PEÇA'}</span>
+                            </div>
+                            <div class="row-actions">
+                                <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
+                                <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
+                            </div>
+                        </div>`;
+                }
             });
         }
-        // As outras abas seguem a mesma lógica de listagem...
     }
 
     window.verPeca = (id) => {
         const p = cache.producao_v13[id];
-        if(!p) return;
-
-        let raw = "";
-        // Scanner Prioritário
-        if(p.linhas) raw = Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas;
-        else if (p.texto) raw = p.texto;
-        else if (p.conteudo) raw = p.conteudo;
-        else {
-            let backup = "";
-            for(let k in p) if(typeof p[k] === 'string' && p[k].length > backup.length) backup = p[k];
-            raw = backup;
-        }
-
+        let raw = p.linhas ? (Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas) : (p.texto || "");
         const lines = raw.split('\n');
         let html = "";
         for(let i=1; i<=150; i++) {
             html += `<div class="linha-folha"><div class="num-linha">${i}</div><div class="texto-linha">${lines[i-1] || ""}</div></div>`;
         }
         document.getElementById('area-folha').innerHTML = html;
-        document.getElementById('peca-titulo').innerText = p.nome_peca || "REVISÃO";
-        document.getElementById('peca-exame').innerText = "EXAME: " + (p.activeEx || p.exame || "SIMULADO");
         document.getElementById('view-modal').style.display = 'flex';
         window.scrollTo(0,0);
     };
 
-    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
-    window.apagarPeca = (id) => { if(confirm("Deseja apagar esta produção do banco?")) remove(ref(db, `producao_v13/${id}`)); };
+    // FUNÇÃO DOS BOTÕES P G V
+    window.cmd = (tipo) => {
+        alert("Comando " + tipo + " acionado. Aqui abriremos a estrutura de: " + tipo);
+        // Aqui você pode integrar para abrir os PDFs de enunciado ou gabarito futuramente.
+    };
 
+    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
+    window.apagarPeca = (id) => { if(confirm("Apagar produção?")) remove(ref(db, `producao_v13/${id}`)); };
 </script>
 </body>
 </html>

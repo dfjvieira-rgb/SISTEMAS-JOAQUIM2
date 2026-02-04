@@ -3,97 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SISTEMA ELITE - HISTÓRICO & INTELIGÊNCIA</title>
+    <title>SISTEMA ELITE - ARSENAL 50Q</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
-            --nc: #f472b6; /* Rosa: Não Confunda */
-            --qp: #a855f7; /* Roxo: Qual a Peça */
-            --tese: #3b82f6; /* Azul: Teses */
-            --arsenal: #22c55e; /* Verde: Arsenal 50Q */
+            --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding: 0; }
 
-        header { background: var(--card); padding: 15px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        
+        header { 
+            background: var(--card); padding: 15px 20px; border-bottom: 3px solid var(--gold); 
+            display: flex; justify-content: space-between; align-items: center; 
+            position: sticky; top: 0; z-index: 1000; 
+        }
+        .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
         .dashboard { padding: 15px; max-width: 1200px; margin: 0 auto; }
 
-        /* SEÇÃO HISTÓRICO (PRESERVADA) */
-        .secao-titulo { color: var(--gold); font-size: 13px; font-weight: 900; text-transform: uppercase; margin: 25px 0 10px 0; display: flex; align-items: center; gap: 8px; }
+        .secao-titulo { color: var(--gold); font-size: 13px; font-weight: 900; text-transform: uppercase; margin: 25px 0 10px 0; display: flex; align-items: center; gap: 8px; border-left: 4px solid var(--gold); padding-left: 10px; }
         
-        .card-peca { 
-            background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 10px; 
-            border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;
-        }
-        .peca-info b { display: block; color: var(--gold); font-size: 10px; }
-        .peca-info span { font-size: 1rem; font-weight: 700; }
-
-        /* HUB DE INTELIGÊNCIAS (BOTÃO FOGUETE) */
-        .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .btn-hub { 
-            background: var(--card); border-radius: 12px; padding: 15px; text-align: center;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            cursor: pointer; border: 1px solid #334155;
-        }
-        .btn-hub i { font-size: 1.4rem; }
+        .card-peca { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 12px; border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        
+        .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .btn-hub { background: var(--card); border-radius: 15px; padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; border: 1px solid #475569; }
+        .btn-hub i { font-size: 1.8rem; }
         .btn-hub span { font-size: 10px; font-weight: 900; text-transform: uppercase; }
         
-        /* CORES POR CATEGORIA */
-        .h-nc { border-bottom: 4px solid var(--nc); color: var(--nc); }
-        .h-qp { border-bottom: 4px solid var(--qp); color: var(--qp); }
-        .h-tese { border-bottom: 4px solid var(--tese); color: var(--tese); }
-        .h-arsenal { border-bottom: 4px solid var(--arsenal); color: var(--arsenal); }
+        .h-nc { border-bottom: 5px solid var(--nc); color: var(--nc); }
+        .h-qp { border-bottom: 5px solid var(--qp); color: var(--qp); }
+        .h-tese { border-bottom: 5px solid var(--tese); color: var(--tese); }
+        .h-arsenal { border-bottom: 5px solid var(--arsenal); color: var(--arsenal); }
 
-        /* POST-ITS COM CATEGORIA */
-        .post-it { 
-            background: white; color: #020617; padding: 20px; border-radius: 15px; 
-            margin-bottom: 15px; border-left: 10px solid; position: relative;
-        }
-        .label-cat { position: absolute; top: -10px; right: 10px; padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 900; color: white; }
+        .post-it { background: white; color: #020617; padding: 22px; border-radius: 18px; margin-bottom: 15px; border-left: 12px solid; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .pi-title { font-size: 1.1rem; font-weight: 900; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        .pi-desc { font-size: 1.05rem; line-height: 1.4; color: #1e293b; font-weight: 500; }
+        .pi-tag { background: #020617; color: var(--gold); padding: 5px 12px; border-radius: 6px; font-size: 12px; margin-top: 10px; display: inline-block; font-weight: 700; }
 
-        .pi-title { font-size: 1.1rem; font-weight: 900; display: block; margin-bottom: 5px; }
-        .pi-desc { font-size: 1rem; line-height: 1.4; color: #1e293b; }
-        .pi-tag { background: #020617; color: var(--gold); padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-top: 10px; display: inline-block; }
-
-        .btn-del { background: none; border: none; color: #ef4444; font-size: 1.2rem; cursor: pointer; }
-        .fab-foguete { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 100; color: black; }
+        .btn-del { background: none; border: none; color: #ef4444; font-size: 1.4rem; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <header>
-    <h2 style="margin:0; font-size: 1.1rem;">MENTORIA <span style="color:var(--gold)">ELITE 2026</span></h2>
-    <div style="font-size: 10px; font-weight: 900; color: var(--arsenal);"><i class="fas fa-check-circle"></i> SISTEMA ATIVO</div>
+    <button onclick="window.history.back()" class="btn-voltar"><i class="fas fa-arrow-left"></i> VOLTAR</button>
+    <h2 style="margin:0; font-size: 1.1rem;">ARSENAL <span style="color:var(--gold)">50Q</span></h2>
 </header>
 
 <div class="dashboard">
-    <div class="secao-titulo"><i class="fas fa-history"></i> MEU HISTÓRICO DE PEÇAS</div>
+    <div class="secao-titulo"><i class="fas fa-history"></i> HISTÓRICO DE PEÇAS</div>
     <div id="feed-historico"></div>
 
-    <div class="secao-titulo" id="hub-ancora"><i class="fas fa-rocket"></i> HUB DE INTELIGÊNCIA</div>
+    <div class="secao-titulo" id="hub-ancora"><i class="fas fa-rocket"></i> DISPARAR INTELIGÊNCIA</div>
     <div class="hub-grid">
-        <div class="btn-hub h-nc" onclick="filtrar('nc')">
-            <i class="fas fa-brain"></i><span>Não Confunda</span>
-        </div>
-        <div class="btn-hub h-qp" onclick="filtrar('qp')">
-            <i class="fas fa-search"></i><span>Qual a Peça?</span>
-        </div>
-        <div class="btn-hub h-tese" onclick="filtrar('tese')">
-            <i class="fas fa-gavel"></i><span>Teses Ouro</span>
-        </div>
-        <div class="btn-hub h-arsenal" onclick="window.injetarTudo()">
-            <i class="fas fa-bolt"></i><span>Arsenal 50Q</span>
-        </div>
+        <div class="btn-hub h-nc" onclick="window.injetar('nc')"><i class="fas fa-brain"></i><span>Não Confunda</span></div>
+        <div class="btn-hub h-qp" onclick="window.injetar('qp')"><i class="fas fa-search"></i><span>Qual a Peça?</span></div>
+        <div class="btn-hub h-tese" onclick="window.injetar('tese')"><i class="fas fa-gavel"></i><span>Teses Ouro</span></div>
+        <div class="btn-hub h-arsenal" onclick="window.injetar('arsenal')"><i class="fas fa-bolt"></i><span>Arsenal 50Q</span></div>
     </div>
 
     <div id="feed-inteligencia"></div>
 </div>
-
-<button class="fab-foguete" onclick="document.getElementById('hub-ancora').scrollIntoView({behavior:'smooth'})">
-    <i class="fas fa-rocket"></i>
-</button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -109,60 +80,88 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let filtro = 'all';
-    window.filtrar = (tipo) => { filtro = tipo; alert("Modo: " + tipo.toUpperCase()); };
+    window.injetar = (tipo) => {
+        let conteudo = [];
+        if(tipo === 'arsenal') {
+            conteudo = [
+                { t: "Q1: Honorários Periciais", c: "Sucumbente na pretensão objeto da perícia paga, salvo se beneficiário de JG.", kw: "Art. 790-B CLT" },
+                { t: "Q2: Horas In Itinere", c: "Tempo de trajeto não integra a jornada, mesmo com transporte da empresa.", kw: "Art. 58, §2º CLT" },
+                { t: "Q3: Estabilidade Gestante", c: "Direito garantido em contratos de experiência e tempo determinado.", kw: "Súmula 244, III TST" },
+                { t: "Q4: Equiparação Salarial", c: "Exige trabalho no mesmo estabelecimento e mesma função.", kw: "Art. 461 CLT" },
+                { t: "Q5: Intervalo Intrajornada", c: "Supressão gera pagamento apenas do período suprimido (+50%) indenizatório.", kw: "Art. 71, §4º CLT" },
+                { t: "Q6: Gorjetas", c: "Não integram base de HE, adicional noturno e aviso prévio.", kw: "Súmula 354 TST" },
+                { t: "Q7: Sócio Retirante", c: "Responde subsidiariamente até 2 anos após a averbação da saída.", kw: "Art. 10-A CLT" },
+                { t: "Q8: Teletrabalho", c: "Em regra, excluído do controle de jornada (Art. 62, III).", kw: "Art. 75-A CLT" },
+                { t: "Q9: Preposto", c: "O preposto não precisa mais ser empregado da reclamada.", kw: "Art. 843, §3º CLT" },
+                { t: "Q10: Rito Sumaríssimo", c: "Pedidos devem ser líquidos. Não cabe citação por edital.", kw: "Art. 852-B CLT" },
+                { t: "Q11: Testemunhas Sumaríssimo", c: "Limite máximo de 2 testemunhas para cada parte.", kw: "Art. 852-H, §2º CLT" },
+                { t: "Q12: Embargos de Declaração", c: "Prazo de 5 dias e interrompem o prazo para outros recursos.", kw: "Art. 897-A CLT" },
+                { t: "Q13: Depósito Recursal", c: "Isenção total para entidades filantrópicas e beneficiários de JG.", kw: "Art. 899, §10 CLT" },
+                { t: "Q14: Agravo de Instrumento", c: "Serve para destrancar recurso negado. Preparo de 50% do valor do recurso.", kw: "Art. 897, §7º CLT" },
+                { t: "Q15: Férias Proporcionais", c: "Indevidas apenas na dispensa por justa causa.", kw: "Súmula 171 TST" },
+                { t: "Q16: FGTS Gestante", c: "Depósito obrigatório durante toda a licença-maternidade.", kw: "Lei 8.036/90" },
+                { t: "Q17: Contribuição Sindical", c: "Necessita de autorização prévia, voluntária e por escrito.", kw: "Art. 579 CLT" },
+                { t: "Q18: Acordo Extrajudicial", c: "Petição conjunta suspende prescrição e exige advogados distintos.", kw: "Art. 855-B CLT" },
+                { t: "Q19: Prescrição Intercorrente", c: "2 anos na execução por inércia do exequente.", kw: "Art. 11-A CLT" },
+                { t: "Q20: Recurso de Revista", c: "Sumaríssimo: só por violação da CF ou Súmula TST/Vinculante.", kw: "Art. 896, §9º CLT" },
+                { t: "Q21: Danos Morais", c: "Teto baseado no último salário (Leve 3x, Média 5x, Grave 20x, Gravíssima 50x).", kw: "Art. 223-G CLT" },
+                { t: "Q22: Estabilidade CIPA", c: "Titular e Suplente. Do registro até 1 ano após o mandato.", kw: "Súmula 339 TST" },
+                { t: "Q23: Horas Extras Pré-Contratadas", c: "Nulas. O valor pago apenas remunera a jornada normal.", kw: "Súmula 199 TST" },
+                { t: "Q24: Adicional de Periculosidade", c: "12,5% para tripulantes/abastecimento de aeronaves (Súmula 447).", kw: "Art. 193 CLT" },
+                { t: "Q25: Turno Revezamento", c: "Jornada de 6h, salvo negociação coletiva (limite 8h).", kw: "Súmula 423 TST" },
+                { t: "Q26: Sobreaviso", c: "Uso de celular não caracteriza, salvo se houver restrição de locomoção.", kw: "Súmula 428 TST" },
+                { t: "Q27: Prontidão", c: "Permanência na empresa aguardando ordens (limite 12h). Paga-se 2/3 da hora.", kw: "Art. 244 CLT" },
+                { t: "Q28: Multa Art. 467", c: "Pagamento de 50% das verbas incontroversas na 1ª audiência.", kw: "Art. 467 CLT" },
+                { t: "Q29: Multa Art. 477", c: "Paga-se 1 salário por atraso na quitação das verbas rescisórias (10 dias).", kw: "Art. 477 CLT" },
+                { t: "Q30: Integração de Diárias", c: "Independentemente do valor, não integram o salário.", kw: "Art. 457, §2º CLT" },
+                { t: "Q31: Gratificação de Função", c: "Pode ser suprimida a qualquer tempo, sem direito a reversão financeira.", kw: "Art. 468, §2º CLT" },
+                { t: "Q32: Seguro Desemprego", c: "Indenização substitutiva se o empregador não entregar guias.", kw: "Súmula 389 TST" },
+                { t: "Q33: Estabilidade Acidentária", c: "12 meses após a cessação do auxílio-doença acidentário.", kw: "Súmula 378 TST" },
+                { t: "Q34: Doença Profissional", c: "Equipada a acidente do trabalho. Estabilidade garantida.", kw: "Art. 118 Lei 8.213" },
+                { t: "Q35: Justa Causa: Improbidade", c: "Conduta desonesta, furto, fraude ou falsificação.", kw: "Art. 482, a, CLT" },
+                { t: "Q36: Desídia", c: "Faltas repetidas, atrasos frequentes, preguiça ou má vontade.", kw: "Art. 482, e, CLT" },
+                { t: "Q37: Perda da Habilitação Profissional", c: "Motivo para justa causa se decorrente de conduta dolosa.", kw: "Art. 482, m, CLT" },
+                { t: "Q38: Rescisão Indireta", c: "Falta grave do empregador. Empregado recebe todas as verbas.", kw: "Art. 483 CLT" },
+                { t: "Q39: Culpa Recíproca", c: "Verbas pagas pela metade (Aviso, 13º, Férias). FGTS 20%.", kw: "Súmula 14 TST" },
+                { t: "Q40: Distrato (Acordo)", c: "Metade do Aviso e Multa FGTS (20%). Demais verbas 100%.", kw: "Art. 484-A CLT" },
+                { t: "Q41: Honorários Sucumbenciais", c: "Entre 5% e 15% sobre o valor da liquidação.", kw: "Art. 791-A CLT" },
+                { t: "Q42: Jus Postulandi", c: "Não alcança Ação Rescisória, Mandado de Segurança e Recursos ao TST.", kw: "Súmula 425 TST" },
+                { t: "Q43: Litigância de Má-Fé", c: "Multa de 1% a 10% do valor da causa.", kw: "Art. 793-C CLT" },
+                { t: "Q44: Responsabilidade Solidária", c: "Grupo Econômico: empresas sob mesma direção ou controle.", kw: "Art. 2º, §2º CLT" },
+                { t: "Q45: Terceirização", c: "Responsabilidade subsidiária do tomador pelos encargos trabalhistas.", kw: "Súmula 331 TST" },
+                { t: "Q46: Dono da Obra", c: "Inexistência de responsabilidade, salvo se empresa construtora.", kw: "OJ 191 SBDI-1" },
+                { t: "Q47: Transferência Definitiva", c: "Não gera direito ao adicional de 25%.", kw: "Art. 469 CLT" },
+                { t: "Q48: Equipamentos (EPI)", c: "Empregador deve fornecer gratuitamente e exigir o uso.", kw: "Art. 166 CLT" },
+                { t: "Q49: Jornada 12x36", c: "Pode ser pactuada por acordo individual escrito.", kw: "Art. 59-A CLT" },
+                { t: "Q50: Banco de Horas", c: "Semestral (acordo individual) ou Anual (acordo coletivo).", kw: "Art. 59 CLT" }
+            ];
+        } else if(tipo === 'nc') {
+            conteudo = [{ t: "Aviso Prévio Proporcional", c: "Só para o empregado. O empregador não pode exigir mais de 30 dias de trabalho.", kw: "Lei 12.506" }];
+        } else if(tipo === 'qp') {
+            conteudo = [{ t: "Ação de Consignação", c: "Quando o patrão quer pagar e o empregado sumiu.", kw: "Art. 539 CPC" }];
+        } else if(tipo === 'tese') {
+            conteudo = [{ t: "Dano Extrapatrimonial", c: "Cumulação de dano moral e estético é possível.", kw: "Súmula 387 STJ" }];
+        }
 
-    window.injetarTudo = () => {
-        if(!confirm("Injetar Inteligências e Arsenal de 50 Questões?")) return;
-        const dados = [
-            // NÃO CONFUNDA
-            { t: "Massa Falida x Recup. Judicial", c: "Massa Falida: Isenta de Multas (467/477) e Depósito. Recup. Judicial: Paga TUDO, só é isenta de Depósito.", cat: "nc", kw: "Súmula 388 TST" },
-            // QUAL A PEÇA
-            { t: "Fase de Execução", c: "Decisão interlocutória que fere direito líquido e certo = MANDADO DE SEGURANÇA. Decisão definitiva = AGRAVO DE PETIÇÃO.", cat: "qp", kw: "Art. 897 CLT" },
-            // TESES
-            { t: "Estabilidade Gestante", c: "Direito garantido mesmo em contrato de experiência ou determinado.", cat: "tese", kw: "Súmula 244 TST" }
-            // O sistema carrega as 50 seguindo este padrão...
-        ];
-        dados.forEach(d => push(ref(db, 'v13_master'), { ...d, ts: serverTimestamp() }));
+        conteudo.forEach(item => {
+            push(ref(db, 'v13_master'), { ...item, cat: tipo, ts: serverTimestamp() });
+        });
+        alert("ARSENAL ELITE CARREGADO!");
     };
 
     onValue(ref(db), (snap) => {
         const data = snap.val() || {};
-        
-        // Render Histórico
         const hFeed = document.getElementById('feed-historico'); hFeed.innerHTML = "";
         const pecas = data.producao_v13 || {};
         Object.keys(pecas).reverse().forEach(id => {
-            hFeed.innerHTML += `
-                <div class="card-peca">
-                    <div class="peca-info"><b>EXAME ${pecas[id].exame || '--'}</b><span>${pecas[id].nome_peca}</span></div>
-                    <button class="btn-del" onclick="remove(ref(db,'producao_v13/${id}'))"><i class="fas fa-trash"></i></button>
-                </div>`;
+            hFeed.innerHTML += `<div class="card-peca"><div><b>EXAME ${pecas[id].exame || '--'}</b><span>${pecas[id].nome_peca}</span></div><button class="btn-del" onclick="remove(ref(db,'producao_v13/${id}'))"><i class="fas fa-trash"></i></button></div>`;
         });
-
-        // Render Inteligência
         const iFeed = document.getElementById('feed-inteligencia'); iFeed.innerHTML = "";
         const itens = data.v13_master || {};
-        const configCat = { 
-            nc: { cor: 'var(--nc)', txt: 'NÃO CONFUNDA' },
-            qp: { cor: 'var(--qp)', txt: 'QUAL A PEÇA?' },
-            tese: { cor: 'var(--tese)', txt: 'TESE DE OURO' },
-            arsenal: { cor: 'var(--arsenal)', txt: 'QUESTÃO ARSENAL' }
-        };
-
+        const cores = { nc: 'var(--nc)', qp: 'var(--qp)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
         Object.keys(itens).reverse().forEach(id => {
             const it = itens[id];
-            if(filtro !== 'all' && it.cat !== filtro) return;
-            const style = configCat[it.cat] || { cor: 'gray', txt: 'DICA' };
-
-            iFeed.innerHTML += `
-                <div class="post-it" style="border-left-color:${style.cor}">
-                    <div class="label-cat" style="background:${style.cor}">${style.txt}</div>
-                    <button class="btn-del" style="float:right;" onclick="remove(ref(db,'v13_master/${id}'))">&times;</button>
-                    <span class="pi-title" style="color:${style.cor}">${it.t}</span>
-                    <div class="pi-desc">${it.c}</div>
-                    <div class="pi-tag">${it.kw}</div>
-                </div>`;
+            iFeed.innerHTML += `<div class="post-it" style="border-left-color:${cores[it.cat] || 'var(--gold)'}"><button class="btn-del" style="float:right;" onclick="remove(ref(db,'v13_master/${id}'))">&times;</button><span class="pi-title" style="color:${cores[it.cat]}">${it.t}</span><div class="pi-desc">${it.c}</div><div class="pi-tag">${it.kw}</div></div>`;
         });
     });
 </script>

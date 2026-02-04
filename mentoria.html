@@ -3,74 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELITE V13 | SCANNER BLINDADO</title>
+    <title>SISTEMA ELITE | MENTORIA V13</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
+        :root {
+            --primary: #020617; --gold: #fbbf24; --card: #1e293b;
+            --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
+        }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 110px; }
-       
-        header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 100px; }
+
+        header {
+            background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
+
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* CARDS DO FEED */
-        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; }
-        .item-content { flex: 1; }
-        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 10px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
-        .item-desc { font-size: 16px; font-weight: 600; color: #e6edf3; }
-       
-        .row-actions { display: flex; gap: 10px; }
-        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
-        .btn-view { background: var(--gold); color: black; border: none; }
-        .btn-delete { background: #da3633; border: none; }
+        /* FORMULÁRIO DE INCLUSÃO */
+        .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
 
-        /* MODAL E FOLHA */
-        #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
-        .view-header { width: 100%; background: #0f172a; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
-        .btn-voltar { background: var(--gold); color: black; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 900; cursor: pointer; text-transform: uppercase; font-size: 12px; }
-       
-        .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; }
-        .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
-        .num-linha { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; color: #000; }
-        .texto-linha { flex: 1; padding: 0 20px; font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700; color: #000; line-height: 35px; text-transform: uppercase; text-align: justify; white-space: nowrap; overflow: hidden; }
+        /* CARDS HISTÓRICO */
+        .card-h {
+            background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            border: 1px solid #334155; border-left: 5px solid var(--gold);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .info-h b { display: block; color: var(--gold); font-size: 10px; text-transform: uppercase; }
+        .info-h span { font-size: 14px; font-weight: 700; }
 
-        /* NAV */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 30px 0; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 10px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .nav-item.active { color: var(--gold); border-top: 2px solid var(--gold); }
+        /* POST-ITS */
+        .post-it {
+            padding: 18px; border-radius: 15px; margin-bottom: 15px; color: #020617;
+            position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .post-it strong { display: block; font-size: 1rem; text-transform: uppercase; }
+        .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
+
+        .actions { display: flex; gap: 8px; }
+        .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-circle:active { transform: scale(0.9); }
+
+        /* MENU INFERIOR */
+        .nav-tabs {
+            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+            display: flex; justify-content: space-around; padding: 10px;
+            border-top: 2px solid #334155; z-index: 2000;
+        }
+        .tab { color: #94a3b8; text-align: center; font-size: 10px; text-decoration: none; font-weight: 700; flex: 1; }
+        .tab.active { color: var(--gold); }
+        .tab i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+
+        #fab-injetor { position: fixed; bottom: 85px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1001; color: black; }
+
+        .hidden { display: none; }
+       
+        /* MODAL DE VISUALIZAÇÃO */
+        #modal-view { position: fixed; top:0; left:0; width:100%; height:100%; background:white; color:black; z-index: 3000; display:none; overflow-y:auto; padding: 20px; }
     </style>
 </head>
 <body>
 
+<div id="modal-view">
+    <button onclick="fecharModal()" style="background:var(--primary); color:white; padding:10px; border:none; border-radius:5px; margin-bottom:20px;">FECHAR VISUALIZAÇÃO</button>
+    <div id="modal-content"></div>
+</div>
+
 <header>
-    <div style="font-weight: 900; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
-    <div style="font-size: 10px; color: #4ade80;">● SCANNER ATIVO</div>
+    <button class="btn-voltar" onclick="window.close()"><i class="fas fa-arrow-left"></i> VOLTAR</button>
+    <h2 style="font-size: 1rem; margin:0;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
 </header>
 
 <div class="container">
-    <div id="main-feed"></div>
-</div>
-
-<div id="view-modal">
-    <div class="view-header">
-        <div style="display: flex; flex-direction: column;">
-            <span style="color:white; font-weight:900; font-size: 14px;" id="peca-titulo">REVISÃO</span>
-            <span style="color:var(--gold); font-size: 10px; font-weight: bold;" id="peca-exame">SINCRO TOTAL</span>
-        </div>
-        <button class="btn-voltar" onclick="window.closeView()">← VOLTAR</button>
+    <div id="panel-editor" class="panel-input hidden">
+        <h4 id="editor-title" style="margin-top:0;">Incluir Novo</h4>
+        <input id="inp-t" placeholder="Título / Assunto">
+        <textarea id="inp-c" rows="3" placeholder="Conteúdo detalhado..."></textarea>
+        <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px;">SALVAR NA INTELIGÊNCIA</button>
     </div>
-    <div id="area-folha" class="paper"></div>
+
+    <div id="sec-producao">
+        <h3 style="color:var(--gold); font-size: 0.9rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
+        <div id="feed-producao"></div>
+    </div>
+
+    <div id="sec-inteligencia" class="hidden">
+        <h3 id="intel-head" style="font-size: 0.9rem;">INTELIGÊNCIA</h3>
+        <div id="feed-v13"></div>
+    </div>
 </div>
 
-<nav class="nav-bar">
-    <button class="nav-item active" id="btn-producao" onclick="tab('producao')">📁 PEÇAS</button>
-    <button class="nav-item" id="btn-questoes" onclick="tab('questoes')">🎓 QUESTÕES</button>
-    <button class="nav-item" id="btn-tese" onclick="tab('tese')">⚖️ TESES</button>
-    <button class="nav-item" id="btn-nc" onclick="tab('nc')">⚠️ NC</button>
+<nav class="nav-tabs">
+    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-file-signature"></i>PEÇAS</a>
+    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-search"></i>PEÇA?</a>
+    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
+    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
+    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
 </nav>
+
+<button id="fab-injetor" onclick="injetorMestre()"><i class="fas fa-rocket"></i></button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push, remove, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = {
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ",
@@ -81,88 +119,127 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    let activeTab = 'producao';
-    let cache = {};
+    let currentTab = 'producao';
+    let editId = null;
 
-    window.tab = (t) => {
-        activeTab = t;
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('btn-' + (t==='questoes'?'questoes':t)).classList.add('active');
+    // NAVEGAÇÃO
+    window.showTab = (tab) => {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`.tab[onclick*='${tab}']`).classList.add('active');
+       
+        const isProd = tab === 'producao';
+        document.getElementById('sec-producao').classList.toggle('hidden', !isProd);
+        document.getElementById('sec-inteligencia').classList.toggle('hidden', isProd);
+        document.getElementById('panel-editor').classList.toggle('hidden', isProd);
+       
+        if(!isProd) {
+            const titulos = { qp: 'Qual a Peça?', nc: 'Não Confunda', tese: 'Banco de Teses', arsenal: 'Arsenal 50Q' };
+            document.getElementById('intel-head').innerText = titulos[tab].toUpperCase();
+            document.getElementById('intel-head').style.color = `var(--${tab})`;
+            document.getElementById('btn-salvar').style.background = `var(--${tab})`;
+        }
         render();
     };
 
-    onValue(ref(db), snap => { cache = snap.val() || {}; render(); });
+    // SALVAR INTELIGÊNCIA
+    document.getElementById('btn-salvar').onclick = () => {
+        const t = document.getElementById('inp-t').value;
+        const c = document.getElementById('inp-c').value;
+        if(!t || !c) return alert("Preencha tudo!");
 
-    function render() {
-        const feed = document.getElementById('main-feed');
-        feed.innerHTML = "";
-       
-        if(activeTab === 'producao') {
-            const pecas = cache.producao_v13 || {};
-            Object.keys(pecas).reverse().forEach(id => {
-                const p = pecas[id];
-                // Verifica se tem QUALQUER conteúdo antes de renderizar
-                const temTexto = (p.linhas || p.texto || p.conteudo || p.corpo || p.nome_peca);
-                if (temTexto) {
-                    const labelExame = p.activeEx || p.exame || "OFF";
-                    feed.innerHTML += `
-                        <div class="item-row">
-                            <div class="item-content">
-                                <span class="item-title">EXAME: ${labelExame}</span>
-                                <span class="item-desc">${p.nome_peca || 'ARQUIVO DE TEXTO SALVO'}</span>
-                            </div>
-                            <div class="row-actions">
-                                <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
-                                <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
-                            </div>
-                        </div>`;
-                }
-            });
-        }
-        // ... (lógica das outras abas se mantém)
-    }
-
-    // MOTOR DE BUSCA AGRESSIVO (SCANNER V13)
-    window.verPeca = (id) => {
-        const p = cache.producao_v13[id];
-        if(!p) return;
-
-        let raw = "";
-        // Tenta capturar o texto de todas as formas possíveis
-        if(p.linhas) {
-            raw = Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas;
-        } else if (p.texto) {
-            raw = p.texto;
-        } else if (p.conteudo) {
-            raw = p.conteudo;
-        } else if (p.corpo) {
-            raw = p.corpo;
+        if(editId) {
+            set(ref(db, `v13_master/${editId}`), { t, c, cat: currentTab, ts: serverTimestamp() });
+            editId = null;
         } else {
-            // Se não achou nos campos óbvios, procura a maior string dentro do objeto
-            let maiorTexto = "";
-            for(let key in p) {
-                if(typeof p[key] === 'string' && p[key].length > maiorTexto.length) {
-                    maiorTexto = p[key];
-                }
-            }
-            raw = maiorTexto;
+            push(ref(db, 'v13_master'), { t, c, cat: currentTab, ts: serverTimestamp() });
         }
-
-        const lines = raw.split('\n');
-        let html = "";
-        for(let i=1; i<=150; i++) {
-            html += `<div class="linha-folha"><div class="num-linha">${i}</div><div class="texto-linha">${lines[i-1] || ""}</div></div>`;
-        }
-        document.getElementById('area-folha').innerHTML = html;
-        document.getElementById('peca-titulo').innerText = p.nome_peca || "PEÇA RECUPERADA";
-        document.getElementById('peca-exame').innerText = "EXAME: " + (p.activeEx || p.exame || "--");
-        document.getElementById('view-modal').style.display = 'flex';
-        window.scrollTo(0,0);
+        document.getElementById('inp-t').value = "";
+        document.getElementById('inp-c').value = "";
     };
 
-    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
-    window.apagarPeca = (id) => { if(confirm("Excluir definitivamente?")) remove(ref(db, `producao_v13/${id}`)); };
+    // COMPARTILHAR WHATSAPP
+    window.compartilhar = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        if(!s.exists()) return;
+        const p = s.val();
+        const texto = Array.isArray(p.linhas) ? p.linhas.join('\n') : (p.conteudo || "");
+        const msg = encodeURIComponent(`*MENTORIA ELITE - PEÇA PARA CORREÇÃO*\n\n*Exame:* ${p.exame}\n*Peça:* ${p.nome_peca}\n\n${texto}`);
+        window.open(`https://api.whatsapp.com/send?text=${msg}`);
+    };
+
+    // VISUALIZAR PEÇA (MODAL)
+    window.verTreino = async (id) => {
+        const s = await get(ref(db, 'producao_v13/' + id));
+        if(!s.exists()) return;
+        const p = s.val();
+        const linhas = Array.isArray(p.linhas) ? p.linhas : [];
+        let html = `<h2>${p.nome_peca} - Exame ${p.exame}</h2><hr>`;
+        linhas.forEach((l, i) => {
+            html += `<div style="display:flex; border-bottom:1px solid #eee; padding:5px 0;"><span style="width:30px; color:#999;">${i+1}</span><span>${l || ""}</span></div>`;
+        });
+        document.getElementById('modal-content').innerHTML = html;
+        document.getElementById('modal-view').style.display = 'block';
+    };
+
+    window.fecharModal = () => document.getElementById('modal-view').style.display = 'none';
+
+    // RENDERIZAÇÃO
+    let cache = {};
+    onValue(ref(db), (snap) => { cache = snap.val() || {}; render(); });
+
+    function render() {
+        if(currentTab === 'producao') {
+            const f = document.getElementById('feed-producao'); f.innerHTML = "";
+            const itens = cache.producao_v13 || {};
+            Object.keys(itens).reverse().forEach(id => {
+                if(id.includes("RASCUNHO")) return;
+                const p = itens[id];
+                f.innerHTML += `
+                    <div class="card-h">
+                        <div class="info-h"><b>Exame ${p.exame}</b><span>${p.nome_peca}</span></div>
+                        <div class="actions">
+                            <button class="btn-circle" style="background:#25d366" onclick="compartilhar('${id}')"><i class="fab fa-whatsapp"></i></button>
+                            <button class="btn-circle" style="background:var(--info)" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-circle" style="background:var(--danger)" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        } else {
+            const f = document.getElementById('feed-v13'); f.innerHTML = "";
+            const itens = cache.v13_master || {};
+            const cores = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
+            Object.keys(itens).reverse().forEach(id => {
+                const it = itens[id];
+                if(it.cat !== currentTab) return;
+                f.innerHTML += `
+                    <div class="post-it" style="background:${cores[it.cat]}">
+                        <strong>${it.t}</strong><p>${it.c}</p>
+                        <div class="actions">
+                            <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    window.apagar = (path, id) => { if(confirm("Excluir?")) remove(ref(db, `${path}/${id}`)); };
+    window.editar = (id, t, c) => {
+        editId = id;
+        document.getElementById('inp-t').value = t;
+        document.getElementById('inp-c').value = c;
+        window.scrollTo({top:0, behavior:'smooth'});
+    };
+
+    window.injetorMestre = () => {
+        if(!confirm("Injetar Teses 50Q?")) return;
+        const q = [
+            { t: "Q1: Honorários Periciais", c: "Sucumbente na perícia paga. JG isenta.", cat: "arsenal" },
+            { t: "Q2: Horas In Itinere", c: "Não computa na jornada.", cat: "arsenal" }
+        ];
+        q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
+    };
 </script>
 </body>
-</html>
- 
+</html> 

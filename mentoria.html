@@ -15,7 +15,7 @@
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
         /* PAINEL DE GESTÃO (CRUD) */
-        .admin-panel { background: var(--card); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .admin-panel { background: var(--card); border: 2px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         .admin-panel input, .admin-panel textarea { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; margin-bottom: 10px; padding: 12px; border-radius: 6px; outline: none; font-size: 16px; }
         .btn-save { width: 100%; background: var(--gold); color: black; border: none; padding: 14px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
         .btn-save:active { transform: scale(0.98); }
@@ -113,6 +113,8 @@
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         const tabKey = (t === 'questoes') ? 'questoes' : t;
         document.getElementById('btn-' + tabKey).classList.add('active');
+        
+        // Exibe o painel de criação apenas para inteligências (NC, Questões, Teses)
         document.getElementById('editor-container').style.display = (t === 'producao') ? 'none' : 'block';
         render();
     };
@@ -134,8 +136,8 @@
                 feed.innerHTML += `
                     <div class="item-row">
                         <div class="item-content" onclick="window.verPeca('${id}')">
-                            <span class="item-title">${p.exame ? 'EXAME ' + p.exame : 'PRODUÇÃO PRÓPRIA'}</span>
-                            <span class="item-desc">${p.nome_peca || 'PEÇA SEM IDENTIFICAÇÃO'}</span>
+                            <span class="item-title">${p.exame ? 'EXAME ' + p.exame : 'PRODUÇÃO SALVA'}</span>
+                            <span class="item-desc">${p.nome_peca || 'PEÇA SEM TÍTULO'}</span>
                         </div>
                         <div class="row-actions">
                             <button class="btn-row" onclick="window.apagarPeca('${id}')"><i class="fas fa-trash-alt"></i></button>
@@ -163,57 +165,4 @@
         }
     }
 
-    // MOTOR DE BUSCA & VISUALIZAÇÃO
-    window.verPeca = (id) => {
-        const p = cache.producao_v13[id];
-        if(!p) return;
-
-        let raw = "";
-        if(p.linhas && Array.isArray(p.linhas)) raw = p.linhas.join('\n');
-        else raw = p.conteudo || p.texto || p.corpo || "";
-        
-        if(!raw) {
-            for(let k in p) if(typeof p[k] === 'string' && p[k].length > 40) raw = p[k];
-        }
-
-        const lines = raw.split('\n');
-        let html = "";
-        for(let i=1; i<=150; i++) {
-            html += `
-                <div class="linha-folha">
-                    <div class="num-linha">${i}</div>
-                    <div class="texto-linha">${lines[i-1] || ""}</div>
-                </div>`;
-        }
-        
-        document.getElementById('area-folha').innerHTML = html;
-        document.getElementById('peca-titulo').innerText = p.nome_peca || "PEÇA SALVA";
-        document.getElementById('view-modal').style.display = 'flex';
-    };
-
-    window.closeView = () => document.getElementById('view-modal').style.display = 'none';
-
-    // CRUD LOGIC
-    window.salvarInteligencia = () => {
-        const t = document.getElementById('tit-input').value;
-        const c = document.getElementById('cont-input').value;
-        if(!t || !c) return alert("Preencha os campos!");
-        const data = { t, c, cat: activeTab, ts: serverTimestamp() };
-        if(editId) set(ref(db, `v13_master/${editId}`), data);
-        else push(ref(db, 'v13_master'), data);
-        document.getElementById('tit-input').value = ""; document.getElementById('cont-input').value = ""; editId = null;
-    };
-
-    window.editarInteligencia = (id, t, c) => {
-        editId = id;
-        document.getElementById('tit-input').value = t;
-        document.getElementById('cont-input').value = c;
-        window.scrollTo({top: 0, behavior: 'smooth'});
-    };
-
-    window.apagarInteligencia = (id) => { if(confirm("Deseja excluir este card?")) remove(ref(db, `v13_master/${id}`)); };
-    window.apagarPeca = (id) => { if(confirm("Excluir peça do histórico de produção?")) remove(ref(db, `producao_v13/${id}`)); };
-
-</script>
-</body>
-</html>
+    // MOTOR DE BUSCA & VISUAL

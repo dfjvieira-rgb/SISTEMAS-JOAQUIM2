@@ -3,62 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELITE V13 | RECUPERAÇÃO MASTER</title>
+    <title>MENTORIA ELITE V13 | FULL INTEGRATION</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; }
+        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 100px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 110px; overflow-x: hidden; }
+        
         header { padding: 15px 20px; border-bottom: 1px solid var(--border); background: var(--bg); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
-        .container { padding: 15px; max-width: 700px; margin: 0 auto; }
         
-        /* ESTILO DOS CARDS DE INTELIGÊNCIA */
-        .item-row { padding: 16px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 8px; border-radius: 8px; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
-        .item-desc { font-size: 15px; line-height: 1.4; color: var(--text); display: block; }
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* NAVEGAÇÃO */
-        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 10px 0 25px 0; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; background: none; border: none; color: #8b949e; font-size: 9px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
+        /* PAINEL DE GESTÃO (CRUD) */
+        .admin-panel { background: var(--card); border: 1px solid var(--gold); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: none; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .admin-panel input, .admin-panel textarea { width: 100%; background: #0d1117; border: 1px solid var(--border); color: white; margin-bottom: 10px; padding: 12px; border-radius: 6px; outline: none; font-size: 16px; }
+        .btn-save { width: 100%; background: var(--gold); color: black; border: none; padding: 14px; border-radius: 8px; font-weight: 900; cursor: pointer; text-transform: uppercase; transition: 0.2s; }
+        .btn-save:active { transform: scale(0.98); }
+
+        /* LISTAGEM ESTILIZADA */
+        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; transition: 0.2s; border-left: 4px solid transparent; }
+        .item-row:hover { border-left-color: var(--gold); background: #1c2128; }
+        .item-content { flex: 1; cursor: pointer; }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 10px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .item-desc { font-size: 16px; font-weight: 600; line-height: 1.4; color: #e6edf3; }
+        
+        .row-actions { display: flex; gap: 15px; margin-left: 15px; }
+        .btn-row { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--dim); transition: 0.2s; }
+        .btn-row:hover { color: #ff4444; }
+        .btn-edit:hover { color: var(--gold); }
+
+        /* NAVEGAÇÃO MOBILE/DESKTOP */
+        .nav-bar { position: fixed; bottom: 0; width: 100%; background: var(--card); border-top: 1px solid var(--border); display: flex; padding: 12px 0 30px 0; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; background: none; border: none; color: var(--dim); font-size: 9px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .nav-item.active { color: var(--gold); }
-        .nav-item i { display: block; font-size: 18px; margin-bottom: 4px; }
+        .nav-item i { display: block; font-size: 22px; margin-bottom: 6px; }
 
-        /* MODAL FGV */
+        /* VISUALIZADOR DE FOLHA (BLINDADO & JUSTIFICADO) */
         #view-modal { position: fixed; inset: 0; background: #cbd5e1; z-index: 5000; display: none; flex-direction: column; overflow-y: auto; }
-        .paper { width: 100%; max-width: 850px; background: white; margin: 10px auto; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .paper { width: 100%; max-width: 850px; background: white; margin: 0 auto; border: 1px solid #000; box-shadow: 0 0 50px rgba(0,0,0,0.4); }
+        .linha-folha { display: flex; min-height: 35px; border-bottom: 1px solid #e2e8f0; }
+        .num-linha { width: 50px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: #1e293b; }
+        .texto-linha { 
+            flex: 1; 
+            padding: 0 20px; 
+            font-family: 'Courier New', Courier, monospace; 
+            font-size: 19px; 
+            font-weight: 700; 
+            color: #000; 
+            line-height: 35px; 
+            text-transform: uppercase; 
+            text-align: justify; 
+            text-justify: inter-word;
+            white-space: nowrap; 
+            overflow: hidden; 
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900;">ELITE <span style="color:var(--gold)">MASTER</span></div>
-    <button onclick="window.injetorMestre()" style="background:var(--gold); border:none; padding:6px 12px; border-radius:4px; font-weight:900; font-size:10px; color:black;">INJETAR INTELIGÊNCIAS</button>
+    <div style="font-weight: 900; letter-spacing: 1.5px; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
+    <div id="status-sync" style="font-size: 10px; color: #4ade80; font-weight: 800;"><i class="fas fa-circle"></i> SYNC ACTIVE</div>
 </header>
 
-<div class="container" id="main-feed">
-    <p style="text-align:center; color:var(--gold)">Carregando Inteligências...</p>
+<div class="container">
+    <div id="editor-container" class="admin-panel">
+        <input id="tit-input" placeholder="Título do Card...">
+        <textarea id="cont-input" placeholder="Conteúdo técnico ou jurídico..." rows="4"></textarea>
+        <button class="btn-save" onclick="window.salvarInteligencia()">SALVAR NA INTELIGÊNCIA</button>
+    </div>
+    
+    <div id="main-feed"></div>
 </div>
 
 <div id="view-modal">
-    <div style="width:100%; background:#0f172a; padding:15px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100;">
-        <span style="color:white; font-weight:bold;" id="peca-titulo">VISUALIZADOR FGV</span>
-        <button onclick="window.closeView()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:4px; font-weight:900;">FECHAR</button>
+    <div style="width:100%; background:#0f172a; padding:15px 25px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:100; border-bottom: 3px solid var(--gold);">
+        <span style="color:white; font-weight:900; font-size: 14px; text-transform: uppercase;" id="peca-titulo">VISUALIZANDO PRODUÇÃO</span>
+        <button onclick="window.closeView()" style="background:var(--gold); border:none; padding:10px 25px; border-radius:6px; font-weight:900; color: black; cursor:pointer;">VOLTAR</button>
     </div>
     <div id="area-folha" class="paper"></div>
 </div>
 
 <nav class="nav-bar">
-    <button class="nav-item active" id="btn-producao" onclick="tab('producao')"><i class="fas fa-pen-nib"></i>Peças</button>
-    <button class="nav-item" id="btn-questoes" onclick="tab('questoes')"><i class="fas fa-list-check"></i>50 Questões</button>
+    <button class="nav-item active" id="btn-producao" onclick="tab('producao')"><i class="fas fa-briefcase"></i>Peças</button>
+    <button class="nav-item" id="btn-questoes" onclick="tab('questoes')"><i class="fas fa-tasks"></i>50 Questões</button>
     <button class="nav-item" id="btn-tese" onclick="tab('tese')"><i class="fas fa-gavel"></i>Teses</button>
-    <button class="nav-item" id="btn-nc" onclick="tab('nc')"><i class="fas fa-clone"></i>Diferenças</button>
+    <button class="nav-item" id="btn-nc" onclick="tab('nc')"><i class="fas fa-layer-group"></i>Não Confunda</button>
 </nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push, set, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -71,17 +106,20 @@
 
     let activeTab = 'producao';
     let cache = {};
+    let editId = null;
 
     window.tab = (t) => {
-        activeTab = t;
+        activeTab = t; editId = null;
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById('btn-' + (t === 'questoes' ? 'questoes' : t)).classList.add('active');
+        const tabKey = (t === 'questoes') ? 'questoes' : t;
+        document.getElementById('btn-' + tabKey).classList.add('active');
+        document.getElementById('editor-container').style.display = (t === 'producao') ? 'none' : 'block';
         render();
     };
 
-    onValue(ref(db), snap => {
-        cache = snap.val() || {};
-        render();
+    onValue(ref(db), snap => { 
+        cache = snap.val() || {}; 
+        render(); 
     });
 
     function render() {
@@ -89,13 +127,19 @@
         feed.innerHTML = "";
         
         if(activeTab === 'producao') {
-            const itens = cache.producao_v13 || {};
-            Object.keys(itens).reverse().forEach(id => {
-                const p = itens[id];
+            const peças = cache.producao_v13 || {};
+            const keys = Object.keys(peças).reverse();
+            keys.forEach(id => {
+                const p = peças[id];
                 feed.innerHTML += `
-                    <div class="item-row" onclick="window.verPeca('${id}')">
-                        <span class="item-title">${id.includes("RASCUNHO") ? "EM ANDAMENTO" : "PEÇA FINALIZADA"}</span>
-                        <span class="item-desc" style="font-weight:bold;">${p.nome_peca || 'Sem Título'}</span>
+                    <div class="item-row">
+                        <div class="item-content" onclick="window.verPeca('${id}')">
+                            <span class="item-title">${p.exame ? 'EXAME ' + p.exame : 'PRODUÇÃO PRÓPRIA'}</span>
+                            <span class="item-desc">${p.nome_peca || 'PEÇA SEM IDENTIFICAÇÃO'}</span>
+                        </div>
+                        <div class="row-actions">
+                            <button class="btn-row" onclick="window.apagarPeca('${id}')"><i class="fas fa-trash-alt"></i></button>
+                        </div>
                     </div>`;
             });
         } else {
@@ -105,103 +149,71 @@
                 if(it.cat === activeTab) {
                     feed.innerHTML += `
                         <div class="item-row">
-                            <span class="item-title">${it.t}</span>
-                            <span class="item-desc">${it.c}</span>
+                            <div class="item-content">
+                                <span class="item-title">${it.t}</span>
+                                <span class="item-desc" style="font-size:14px; font-weight:400;">${it.c}</span>
+                            </div>
+                            <div class="row-actions">
+                                <button class="btn-row btn-edit" onclick="window.editarInteligencia('${id}','${it.t}','${it.c}')"><i class="fas fa-pen-to-square"></i></button>
+                                <button class="btn-row" onclick="window.apagarInteligencia('${id}')"><i class="fas fa-times-circle"></i></button>
+                            </div>
                         </div>`;
                 }
             });
         }
     }
 
+    // MOTOR DE BUSCA & VISUALIZAÇÃO
     window.verPeca = (id) => {
         const p = cache.producao_v13[id];
         if(!p) return;
+
+        let raw = "";
+        if(p.linhas && Array.isArray(p.linhas)) raw = p.linhas.join('\n');
+        else raw = p.conteudo || p.texto || p.corpo || "";
         
-        // SCANNER DE DADOS (Não deixa a folha em branco)
-        let textoFinal = "";
-        if(Array.isArray(p.linhas)) textoFinal = p.linhas.join('\n');
-        else textoFinal = p.conteudo || p.texto || p.corpo || "";
-        
-        // Se ainda estiver vazio, busca qualquer string longa no objeto
-        if(!textoFinal) {
-            for(let key in p) { if(typeof p[key] === 'string' && p[key].length > 20) textoFinal = p[key]; }
+        if(!raw) {
+            for(let k in p) if(typeof p[k] === 'string' && p[k].length > 40) raw = p[k];
         }
 
-        const lns = textoFinal.split('\n');
-        let h = `<div style="display: grid; grid-template-columns: 45px 1fr; background:#fff; border:1px solid #000;">`;
-        h += `<div style="background:#f0f0f0; border-right:2px solid #000; text-align:center; font-size:10px; color:#666;">`;
-        for(let i=1; i<=150; i++) h += `<div style="height:32px; line-height:32px; border-bottom:1px solid #ddd;">${i}</div>`;
-        h += `</div><div style="background-image: linear-gradient(#eee 1px, transparent 1px); background-size: 100% 32px; padding:0 15px;">`;
-        for(let i=0; i<150; i++) {
-            h += `<div style="height:32px; line-height:32px; font-family:Courier, monospace; font-size:19px; font-weight:bold; color:#000; text-transform:uppercase; overflow:hidden; white-space:nowrap;">${lns[i] || ""}</div>`;
+        const lines = raw.split('\n');
+        let html = "";
+        for(let i=1; i<=150; i++) {
+            html += `
+                <div class="linha-folha">
+                    <div class="num-linha">${i}</div>
+                    <div class="texto-linha">${lines[i-1] || ""}</div>
+                </div>`;
         }
-        h += `</div></div>`;
         
-        document.getElementById('area-folha').innerHTML = h;
-        document.getElementById('peca-titulo').innerText = p.nome_peca || "PEÇA";
+        document.getElementById('area-folha').innerHTML = html;
+        document.getElementById('peca-titulo').innerText = p.nome_peca || "PEÇA SALVA";
         document.getElementById('view-modal').style.display = 'flex';
     };
 
     window.closeView = () => document.getElementById('view-modal').style.display = 'none';
 
-    window.injetorMestre = () => {
-        if(!confirm("Deseja restaurar as 50 Questões e Teses?")) return;
-        const d = [
-           { t: "Q01: ADICIONAL TRANSFERÊNCIA", c: "Art. 469, §3º CLT. Provisoriedade. 25%.", cat: "questoes" },
-            { t: "Q02: HORAS IN ITINERE", c: "Art. 58, §2º CLT. Não computáveis pós-Reforma.", cat: "questoes" },
-            { t: "Q03: SOBREAVISO", c: "Art. 244, §2º CLT. 1/3 do salário. Limite 24h.", cat: "questoes" },
-            { t: "Q04: EQUIPAÇÃO SALARIAL", c: "Art. 461 CLT. Mesmo estabelecimento. Tempo < 2 anos.", cat: "questoes" },
-            { t: "Q05: ESTABILIDADE GESTANTE", c: "Súmula 244 TST. Mesmo em contrato fixo.", cat: "questoes" },
-            { t: "Q06: JUSTIÇA GRATUITA", c: "Art. 790, §3º CLT. Até 40% do teto RGPS.", cat: "questoes" },
-            { t: "Q07: FÉRIAS FRACIONADAS", c: "Art. 134, §1º CLT. 3 períodos (14/5/5 dias).", cat: "questoes" },
-            { t: "Q08: MULTA 477 CLT", c: "10 dias para pagar verbas e guias.", cat: "questoes" },
-            { t: "Q09: HONORÁRIOS SUCUMBENCIAIS", c: "Art. 791-A CLT. 5% a 15%.", cat: "questoes" },
-            { t: "Q10: PRESCRIÇÃO", c: "Art. 11 CLT. Bienal e Quinquenal.", cat: "questoes" },
-            { t: "Q11: SALÁRIO SUBSTITUIÇÃO", c: "Súmula 159 TST. Direito ao salário do substituído.", cat: "questoes" },
-            { t: "Q12: PERICULOSIDADE", c: "Art. 193 CLT. 30% sobre base.", cat: "questoes" },
-            { t: "Q13: INSALUBRIDADE", c: "Art. 192 CLT. 10/20/40% salário mínimo.", cat: "questoes" },
-            { t: "Q14: INTERVALO INTRAJORNADA", c: "Art. 71 CLT. Paga apenas tempo suprimido + 50%.", cat: "questoes" },
-            { t: "Q15: ESTABILIDADE ACIDENTÁRIA", c: "Art. 118 Lei 8.213/91. 12 meses após retorno.", cat: "questoes" },
-            { t: "Q16: GRUPO ECONÔMICO", c: "Art. 2, §2º CLT. Coordenação entre empresas.", cat: "questoes" },
-            { t: "Q17: INTERMITENTE", c: "Art. 452-A CLT. Convocação 3 dias antes.", cat: "questoes" },
-            { t: "Q18: RESCISÃO ACORDO", c: "Art. 484-A CLT. Metade do aviso e 20% multa FGTS.", cat: "questoes" },
-            { t: "Q19: CONTRIBUIÇÃO SINDICAL", c: "Art. 578 CLT. Requer autorização expressa.", cat: "questoes" },
-            { t: "Q20: TELETRABALHO", c: "Art. 75-A CLT. Contrato escrito obrigatório.", cat: "questoes" },
-            { t: "Q21: DESVIO FUNÇÃO", c: "Diferença salarial p/ função idêntica.", cat: "questoes" },
-            { t: "Q22: MULTA 467 CLT", c: "Incontroverso na 1ª audiência ou +50%.", cat: "questoes" },
-            { t: "Q23: DOMINGOS/FERIADOS", c: "Lei 605/49. Dobro sem folga compensatória.", cat: "questoes" },
-            { t: "Q24: ESTABILIDADE CIPA", c: "Art. 10 ADCT. Suplente também tem.", cat: "questoes" },
-            { t: "Q25: DANO EXTRA-PATRIMONIAL", c: "Art. 223-G CLT. Tabelamento por gravidade.", cat: "questoes" },
-            { t: "Q26: CARGO CONFIANÇA", c: "Art. 62, II CLT. Sem horas extras.", cat: "questoes" },
-            { t: "Q27: SOBREAVISO ANALOGIA", c: "Súmula 428 TST. Plantão à distância.", cat: "questoes" },
-            { t: "Q28: QUITAÇÃO ANUAL", c: "Art. 507-B CLT. Eficácia liberatória parcelas.", cat: "questoes" },
-            { t: "Q29: HOMOLOGAÇÃO ACORDO", c: "Art. 855-B CLT. Jurisdição voluntária.", cat: "questoes" },
-            { t: "Q30: MÁ-FÉ", c: "Art. 793-B CLT. Multa 1% a 10%.", cat: "questoes" },
-            { t: "Q31: TESTEMUNHAS", c: "Ord (3), Sum (2), Inq (6).", cat: "questoes" },
-            { t: "Q32: ÔNUS PROVA", c: "Art. 818 CLT. Autor (fato) / Réu (impedimento).", cat: "questoes" },
-            { t: "Q33: RECURSO ORDINÁRIO", c: "Art. 895 CLT. Prazo 8 dias.", cat: "questoes" },
-            { t: "Q34: AGRAVO INSTRUMENTO", c: "Art. 897, 'b' CLT. Destrancar recurso.", cat: "questoes" },
-            { t: "Q35: AGRAVO PETIÇÃO", c: "Art. 897, 'a' CLT. Na execução.", cat: "questoes" },
-            { t: "Q36: EMBARGOS DECLARAÇÃO", c: "Art. 897-A CLT. Omissão/Erro. 5 dias.", cat: "questoes" },
-            { t: "Q37: DEPÓSITO RECURSAL", c: "Garantia juízo. Teto limite TST.", cat: "questoes" },
-            { t: "Q38: RECURSO REVISTA", c: "Art. 896 CLT. Divergência ou CF.", cat: "questoes" },
-            { t: "Q39: AGRAVO INTERNO", c: "Art. 1021 CPC. Decisão monocrática.", cat: "questoes" },
-            { t: "Q40: CONTESTAÇÃO", c: "Art. 847 CLT. Defesa escrita ou oral.", cat: "questoes" },
-            { t: "Q41: RECONVENÇÃO", c: "Art. 343 CPC. Contra-atacar autor.", cat: "questoes" },
-            { t: "Q42: EXCEÇÃO INCOMPETÊNCIA", c: "Art. 800 CLT. 5 dias da notificação.", cat: "questoes" },
-            { t: "Q43: PREPOSTO", c: "Art. 843, §3º CLT. Não precisa ser empregado.", cat: "questoes" },
-            { t: "Q44: ARQUIVAMENTO", c: "Ausência Reclamante. Custas p/ nova ação.", cat: "questoes" },
-            { t: "Q45: REVELIA", c: "Ausência Reclamada. Confissão matéria fato.", cat: "questoes" },
-            { t: "Q46: JORNADA 12X36", c: "Art. 59-A CLT. Acordo individual escrito.", cat: "questoes" },
-            { t: "Q47: PRONTIDÃO", c: "Art. 244, §3º. 2/3 salário. Max 12h.", cat: "questoes" },
-            { t: "Q48: SUCESSÃO", c: "Art. 10 e 448 CLT. Sucessor responde.", cat: "questoes" },
-            { t: "Q49: PRESCRIÇÃO INTERCORRENTE", c: "Art. 11-A CLT. 2 anos na inércia.", cat: "questoes" },
-            { t: "Q50: HONORÁRIOS PERICIAIS", c: "Art. 790-B CLT. Parte sucumbente paga.", cat: "questoes" }
-        ];
-        d.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        alert("Inteligências Restauradas!");
+    // CRUD LOGIC
+    window.salvarInteligencia = () => {
+        const t = document.getElementById('tit-input').value;
+        const c = document.getElementById('cont-input').value;
+        if(!t || !c) return alert("Preencha os campos!");
+        const data = { t, c, cat: activeTab, ts: serverTimestamp() };
+        if(editId) set(ref(db, `v13_master/${editId}`), data);
+        else push(ref(db, 'v13_master'), data);
+        document.getElementById('tit-input').value = ""; document.getElementById('cont-input').value = ""; editId = null;
     };
+
+    window.editarInteligencia = (id, t, c) => {
+        editId = id;
+        document.getElementById('tit-input').value = t;
+        document.getElementById('cont-input').value = c;
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    };
+
+    window.apagarInteligencia = (id) => { if(confirm("Deseja excluir este card?")) remove(ref(db, `v13_master/${id}`)); };
+    window.apagarPeca = (id) => { if(confirm("Excluir peça do histórico de produção?")) remove(ref(db, `producao_v13/${id}`)); };
+
 </script>
 </body>
 </html>
-

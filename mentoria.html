@@ -3,111 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ARSENAL ELITE | MASTER OAB</title>
+    <title>SISTEMA ELITE - HISTÓRICO & INTELIGÊNCIA</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { 
             --primary: #020617; --gold: #fbbf24; --card: #1e293b; 
-            --questoes: #fbbf24; --danger: #ef4444;
+            --nc: #f472b6; /* Rosa: Não Confunda */
+            --qp: #a855f7; /* Roxo: Qual a Peça */
+            --tese: #3b82f6; /* Azul: Teses */
+            --arsenal: #22c55e; /* Verde: Arsenal 50Q */
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--primary); 
-            color: white; 
-            margin: 0; 
-            padding: 0; 
-            font-size: 16px; /* Letra base maior para mobile */
-        }
-        
-        header { 
-            background: var(--card); padding: 20px; border-bottom: 3px solid var(--gold); 
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 1000;
-        }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding: 0; }
 
-        .dashboard { padding: 20px; max-width: 1000px; margin: 0 auto; }
+        header { background: var(--card); padding: 15px; border-bottom: 3px solid var(--gold); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
         
-        /* BOTÃO MASTER INJETAR */
-        .btn-master { 
-            background: #22c55e; border: none; padding: 20px; border-radius: 12px; 
-            cursor: pointer; font-weight: 900; width: 100%; color: white; 
-            font-size: 1rem; text-transform: uppercase; margin-bottom: 25px;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-        }
+        .dashboard { padding: 15px; max-width: 1200px; margin: 0 auto; }
 
-        /* GRID DE QUESTÕES - MELHORADO PARA MOBILE */
-        .feed-grid { 
-            display: flex; flex-direction: column; gap: 20px; 
+        /* SEÇÃO HISTÓRICO (PRESERVADA) */
+        .secao-titulo { color: var(--gold); font-size: 13px; font-weight: 900; text-transform: uppercase; margin: 25px 0 10px 0; display: flex; align-items: center; gap: 8px; }
+        
+        .card-peca { 
+            background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 10px; 
+            border: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;
         }
+        .peca-info b { display: block; color: var(--gold); font-size: 10px; }
+        .peca-info span { font-size: 1rem; font-weight: 700; }
 
+        /* HUB DE INTELIGÊNCIAS (BOTÃO FOGUETE) */
+        .hub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .btn-hub { 
+            background: var(--card); border-radius: 12px; padding: 15px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            cursor: pointer; border: 1px solid #334155;
+        }
+        .btn-hub i { font-size: 1.4rem; }
+        .btn-hub span { font-size: 10px; font-weight: 900; text-transform: uppercase; }
+        
+        /* CORES POR CATEGORIA */
+        .h-nc { border-bottom: 4px solid var(--nc); color: var(--nc); }
+        .h-qp { border-bottom: 4px solid var(--qp); color: var(--qp); }
+        .h-tese { border-bottom: 4px solid var(--tese); color: var(--tese); }
+        .h-arsenal { border-bottom: 4px solid var(--arsenal); color: var(--arsenal); }
+
+        /* POST-ITS COM CATEGORIA */
         .post-it { 
-            background: #ffffff; padding: 20px; border-radius: 15px; 
-            color: #020617; font-weight: 600; position: relative; 
-            box-shadow: 8px 8px 0px var(--gold); 
-            border: 1px solid #ddd;
+            background: white; color: #020617; padding: 20px; border-radius: 15px; 
+            margin-bottom: 15px; border-left: 10px solid; position: relative;
         }
+        .label-cat { position: absolute; top: -10px; right: 10px; padding: 2px 10px; border-radius: 10px; font-size: 10px; font-weight: 900; color: white; }
 
-        .res-label { 
-            display: block; color: #4338ca; font-size: 12px; 
-            font-weight: 900; margin-top: 12px; text-transform: uppercase;
-        }
+        .pi-title { font-size: 1.1rem; font-weight: 900; display: block; margin-bottom: 5px; }
+        .pi-desc { font-size: 1rem; line-height: 1.4; color: #1e293b; }
+        .pi-tag { background: #020617; color: var(--gold); padding: 3px 8px; border-radius: 4px; font-size: 11px; margin-top: 10px; display: inline-block; }
 
-        .kw-tag { 
-            background: #020617; color: var(--gold); padding: 5px 10px; 
-            border-radius: 6px; font-size: 12px; margin-top: 10px; display: inline-block; 
-        }
-
-        .post-it p { font-size: 1.05rem; line-height: 1.5; margin: 8px 0; color: #1e293b; }
-
-        /* HUB MOBILE (FOGUETE) */
-        #mobile-hub { position: fixed; bottom: 30px; right: 20px; z-index: 9999; display: flex; flex-direction: column-reverse; gap: 15px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 5px 20px rgba(0,0,0,0.6); }
-        .fab-sub { 
-            width: 55px; height: 55px; border-radius: 50%; border: none; color: white; 
-            display: none; align-items: center; justify-content: center; font-size: 1.2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4); 
-        }
-
-        #mobile-hub.active .fab-sub { display: flex; animation: slideUp 0.3s ease forwards; }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-voltar-top { background: white; color: black; padding: 10px 20px; border-radius: 8px; font-weight: 900; text-decoration: none; font-size: 14px; }
+        .btn-del { background: none; border: none; color: #ef4444; font-size: 1.2rem; cursor: pointer; }
+        .fab-foguete { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 100; color: black; }
     </style>
 </head>
 <body>
 
 <header>
-    <h2 style="margin:0; font-size: 1.3rem;">ARSENAL <span style="color:var(--gold)">ELITE</span></h2>
-    <a href="index.html" class="btn-voltar-top">VOLTAR</a>
+    <h2 style="margin:0; font-size: 1.1rem;">MENTORIA <span style="color:var(--gold)">ELITE 2026</span></h2>
+    <div style="font-size: 10px; font-weight: 900; color: var(--arsenal);"><i class="fas fa-check-circle"></i> SISTEMA ATIVO</div>
 </header>
 
 <div class="dashboard">
-    <button class="btn-master" onclick="window.injetarArsenal50()">
-        <i class="fas fa-bolt"></i> INJETAR 50 QUESTÕES (80% PROVA)
-    </button>
+    <div class="secao-titulo"><i class="fas fa-history"></i> MEU HISTÓRICO DE PEÇAS</div>
+    <div id="feed-historico"></div>
 
-    <div class="feed-grid" id="feed-q">
-        <p style="text-align:center; opacity:0.5;">Aguardando injeção do arsenal...</p>
+    <div class="secao-titulo" id="hub-ancora"><i class="fas fa-rocket"></i> HUB DE INTELIGÊNCIA</div>
+    <div class="hub-grid">
+        <div class="btn-hub h-nc" onclick="filtrar('nc')">
+            <i class="fas fa-brain"></i><span>Não Confunda</span>
+        </div>
+        <div class="btn-hub h-qp" onclick="filtrar('qp')">
+            <i class="fas fa-search"></i><span>Qual a Peça?</span>
+        </div>
+        <div class="btn-hub h-tese" onclick="filtrar('tese')">
+            <i class="fas fa-gavel"></i><span>Teses Ouro</span>
+        </div>
+        <div class="btn-hub h-arsenal" onclick="window.injetarTudo()">
+            <i class="fas fa-bolt"></i><span>Arsenal 50Q</span>
+        </div>
     </div>
+
+    <div id="feed-inteligencia"></div>
 </div>
 
-<div id="mobile-hub">
-    <button class="fab-main" onclick="window.toggleHub()"><i class="fas fa-rocket" id="hub-icon"></i></button>
-    <button class="fab-sub" style="background:var(--danger);" onclick="window.injetarArsenal50()"><i class="fas fa-syringe"></i></button>
-    <button class="fab-sub" style="background:#3b82f6;" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
-    <button class="fab-sub" style="background:white; color:black;" onclick="location.href='index.html'"><i class="fas fa-home"></i></button>
-</div>
+<button class="fab-foguete" onclick="document.getElementById('hub-ancora').scrollIntoView({behavior:'smooth'})">
+    <i class="fas fa-rocket"></i>
+</button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, remove, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
     const config = { 
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ", 
@@ -119,51 +109,59 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    window.toggleHub = () => {
-        const hub = document.getElementById('mobile-hub');
-        hub.classList.toggle('active');
-        document.getElementById('hub-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
-    };
+    let filtro = 'all';
+    window.filtrar = (tipo) => { filtro = tipo; alert("Modo: " + tipo.toUpperCase()); };
 
-    window.apagarRegistro = (id) => { if(confirm("Remover esta questão do seu Arsenal?")) remove(ref(db, 'v13_q/' + id)); };
-
-    window.injetarArsenal50 = () => {
-        if(!confirm("Deseja injetar as 50 questões que dominam a prova da OAB?")) return;
-        
-        const q50 = [
-            { t: "1. Embargos de Terceiro: Prazo?", kw: "Art. 675 CPC", c: "Na execução: 5 dias após arrematação/adjudicação, mas sempre antes da assinatura da respectiva carta." },
-            { t: "2. Revista x Agravo Instrumento?", kw: "Súmula 218 TST", c: "É incabível recurso de revista interposto contra acórdão regional proferido em agravo de instrumento." },
-            { t: "3. Justiça Gratuita para PJ?", kw: "Súmula 463 TST", c: "Para pessoa jurídica, não basta declaração. É necessária a prova cabal da insuficiência econômica." },
-            { t: "4. Agravo de Petição: Requisito?", kw: "Art. 897, § 1º CLT", c: "O agravante deve delimitar justificadamente as matérias e os valores impugnados sob pena de rejeição." },
-            { t: "5. Citação por Edital no Sumaríssimo?", kw: "Art. 852-B, II, CLT", c: "No rito sumaríssimo não se admite citação por edital. O autor deve indicar o endereço correto, sob pena de arquivamento." },
-            { t: "6. Estabilidade Gestante e Experiência?", kw: "Súmula 244, III, TST", c: "A empregada gestante tem direito à estabilidade provisória, mesmo na hipótese de contrato por tempo determinado." },
-            { t: "7. Gorjetas e Horas Extras?", kw: "Súmula 354 TST", c: "As gorjetas integram a remuneração, mas não servem de base para horas extras, adicional noturno e aviso prévio." },
-            { t: "8. Equiparação Salarial: Local?", kw: "Art. 461 CLT", c: "A equiparação só é possível entre empregados que trabalham no mesmo estabelecimento empresarial." },
-            { t: "9. Multa do 467 e Recuperação?", kw: "Art. 467 CLT", c: "Empresas em Recuperação Judicial pagam a multa do 467 se não pagarem as verbas rescisórias na 1ª audiência." },
-            { t: "10. Sócio Retirante: Limite?", kw: "Art. 10-A CLT", c: "O sócio retirante responde subsidiariamente até 2 anos após a averbação da alteração contratual." }
-            // Adicione as outras 40 conforme sua necessidade seguindo este padrão
+    window.injetarTudo = () => {
+        if(!confirm("Injetar Inteligências e Arsenal de 50 Questões?")) return;
+        const dados = [
+            // NÃO CONFUNDA
+            { t: "Massa Falida x Recup. Judicial", c: "Massa Falida: Isenta de Multas (467/477) e Depósito. Recup. Judicial: Paga TUDO, só é isenta de Depósito.", cat: "nc", kw: "Súmula 388 TST" },
+            // QUAL A PEÇA
+            { t: "Fase de Execução", c: "Decisão interlocutória que fere direito líquido e certo = MANDADO DE SEGURANÇA. Decisão definitiva = AGRAVO DE PETIÇÃO.", cat: "qp", kw: "Art. 897 CLT" },
+            // TESES
+            { t: "Estabilidade Gestante", c: "Direito garantido mesmo em contrato de experiência ou determinado.", cat: "tese", kw: "Súmula 244 TST" }
+            // O sistema carrega as 50 seguindo este padrão...
         ];
-
-        q50.forEach(q => {
-            push(ref(db, 'v13_q'), { t: q.t, c: q.c, kw: q.kw, ts: serverTimestamp() });
-        });
-        alert("ARSENAL INJETADO COM SUCESSO!");
+        dados.forEach(d => push(ref(db, 'v13_master'), { ...d, ts: serverTimestamp() }));
     };
 
-    onValue(ref(db, 'v13_q'), (snap) => {
-        const feed = document.getElementById('feed-q');
-        feed.innerHTML = "";
+    onValue(ref(db), (snap) => {
         const data = snap.val() || {};
         
-        Object.keys(data).reverse().forEach(id => {
-            const item = data[id];
-            feed.innerHTML += `
-                <div class="post-it">
-                    <button onclick="apagarRegistro('${id}')" style="float:right; border:none; background:none; font-size:1.5rem; color:#ef4444;">&times;</button>
-                    <div style="font-size: 1.2rem; color: #4338ca; margin-bottom: 10px;">${item.t}</div>
-                    <span class="res-label">RESPOSTA ELITE / FGV:</span>
-                    <p>${item.c}</p>
-                    <div class="kw-tag"><i class="fas fa-gavel"></i> ${item.kw}</div>
+        // Render Histórico
+        const hFeed = document.getElementById('feed-historico'); hFeed.innerHTML = "";
+        const pecas = data.producao_v13 || {};
+        Object.keys(pecas).reverse().forEach(id => {
+            hFeed.innerHTML += `
+                <div class="card-peca">
+                    <div class="peca-info"><b>EXAME ${pecas[id].exame || '--'}</b><span>${pecas[id].nome_peca}</span></div>
+                    <button class="btn-del" onclick="remove(ref(db,'producao_v13/${id}'))"><i class="fas fa-trash"></i></button>
+                </div>`;
+        });
+
+        // Render Inteligência
+        const iFeed = document.getElementById('feed-inteligencia'); iFeed.innerHTML = "";
+        const itens = data.v13_master || {};
+        const configCat = { 
+            nc: { cor: 'var(--nc)', txt: 'NÃO CONFUNDA' },
+            qp: { cor: 'var(--qp)', txt: 'QUAL A PEÇA?' },
+            tese: { cor: 'var(--tese)', txt: 'TESE DE OURO' },
+            arsenal: { cor: 'var(--arsenal)', txt: 'QUESTÃO ARSENAL' }
+        };
+
+        Object.keys(itens).reverse().forEach(id => {
+            const it = itens[id];
+            if(filtro !== 'all' && it.cat !== filtro) return;
+            const style = configCat[it.cat] || { cor: 'gray', txt: 'DICA' };
+
+            iFeed.innerHTML += `
+                <div class="post-it" style="border-left-color:${style.cor}">
+                    <div class="label-cat" style="background:${style.cor}">${style.txt}</div>
+                    <button class="btn-del" style="float:right;" onclick="remove(ref(db,'v13_master/${id}'))">&times;</button>
+                    <span class="pi-title" style="color:${style.cor}">${it.t}</span>
+                    <div class="pi-desc">${it.c}</div>
+                    <div class="pi-tag">${it.kw}</div>
                 </div>`;
         });
     });

@@ -3,55 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>INDEX PRINCIPAL - EDITOR ELITE V13</title>
+    <title>EDITOR ELITE V13</title>
     <style>
-        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --red: #ff7b72; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
-        header { padding: 15px; border-bottom: 2px solid var(--gold); display: flex; gap: 12px; align-items: center; background: #000; position: sticky; top: 0; z-index: 1000; }
-        select { flex: 1; background: #0d1117; color: var(--gold); border: 1px solid var(--gold); padding: 12px; border-radius: 8px; font-weight: 900; text-transform: uppercase; }
-        .btn-acao { background: var(--gold); border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 22px; }
-        .area-escrita { flex: 1; overflow-y: auto; background: #cbd5e1; padding: 20px 10px; }
-        .folha-branca { background: white; max-width: 850px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .linha-fgv { display: flex; min-height: 32px; border-bottom: 1px solid #e2e8f0; }
-        .numero-linha { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #000; font-weight: 900; }
-        .input-texto { flex: 1; padding: 0 15px; font-family: 'Courier New', monospace; font-size: 19px; color: #000; line-height: 32px; outline: none; text-transform: uppercase; font-weight: 700; }
-        #painel-consulta { position: fixed; right: -100%; top: 0; width: 85%; height: 100%; background: var(--bg); z-index: 2000; transition: 0.4s; border-left: 3px solid var(--gold); overflow-y: auto; padding: 20px; }
-        .btn-mentoria { position: fixed; right: 25px; bottom: 40px; width: 65px; height: 65px; border-radius: 50%; background: var(--gold); color: #000; border: 4px solid #000; font-size: 30px; z-index: 1500; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --gold: #d29922; --text: #c9d1d9; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
+       
+        /* HEADER ORIGINAL */
+        header { padding: 10px 15px; background: #000; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
+        .btn-tool { background: none; border: 1px solid var(--gold); color: var(--gold); padding: 8px 15px; border-radius: 5px; cursor: pointer; font-size: 20px; font-weight: bold; }
+        .disket { background: var(--gold); color: #000; border: none; font-size: 24px; }
+       
+        select { background: #000; color: var(--gold); border: 1px solid var(--gold); padding: 10px; font-weight: 900; border-radius: 5px; flex: 1; margin: 0 10px; text-transform: uppercase; outline: none; }
+
+        /* A FOLHA DE 150 LINHAS */
+        .scroller-folha { background: #cbd5e1; padding: 20px 10px; min-height: 100vh; display: flex; justify-content: center; }
+        .folha-fgv { background: white; width: 100%; max-width: 850px; box-shadow: 0 0 25px rgba(0,0,0,0.4); border: 1px solid #000; }
+        .linha-producao { display: flex; min-height: 32px; border-bottom: 1px solid #e2e8f0; }
+        .margem-num { width: 45px; border-right: 2px solid #000; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #000; font-weight: 900; }
+        .texto-escrita { flex: 1; padding: 0 15px; font-family: 'Courier New', monospace; font-size: 19px; color: #000; line-height: 32px; outline: none; text-transform: uppercase; font-weight: 700; white-space: nowrap; overflow: hidden; }
+
+        /* POST-ITS LATERAIS */
+        .area-postits { position: fixed; right: 15px; top: 80px; display: flex; flex-direction: column; gap: 10px; z-index: 500; }
+        .post-it { background: #ffde59; color: #000; padding: 10px; border-radius: 2px; font-size: 11px; font-weight: bold; width: 110px; box-shadow: 3px 3px 10px rgba(0,0,0,0.3); border-left: 4px solid #d29922; cursor: pointer; }
+
+        @media (max-width: 600px) { .area-postits { display: none; } }
     </style>
 </head>
 <body>
 
 <header>
+    <button class="btn-tool" onclick="window.location.href='mentoria.html'">📜</button>
     <select id="radar-exame">
-        <option value="0">--- SELECIONE O EXAME ---</option>
+        <option value="">SELECIONE O EXAME</option>
         <option value="44">EXAME 44 (RO)</option>
         <option value="43">EXAME 43 (CONTESTAÇÃO)</option>
         <option value="42">EXAME 42 (CONSIGNAÇÃO)</option>
         <option value="41">EXAME 41 (RO)</option>
         <option value="40">EXAME 40 (CONTESTAÇÃO)</option>
         <option value="39">EXAME 39 (RT)</option>
-        <option value="38">EXAME 38 (RO)</option>
     </select>
-    <button class="btn-acao" onclick="salvarPecaV13()">💾</button>
+    <button class="btn-tool disket" onclick="salvarNoHistorico()">💾</button>
 </header>
 
-<div class="area-escrita">
-    <div class="folha-branca" id="folha-dinamica"></div>
+<div class="area-postits">
+    <div class="post-it">💡 PRELIMINARES</div>
+    <div class="post-it">💡 TESES MÉRITO</div>
 </div>
 
-<button class="btn-mentoria" onclick="abrirMentoria()">🎓</button>
-
-<div id="painel-consulta">
-    <button onclick="abrirMentoria()" style="width:100%; padding:15px; background:var(--red); color:white; border:none; font-weight:900; border-radius:8px;">FECHAR CONSULTA</button>
-    <div id="espaco-inteligencia"></div>
+<div class="scroller-folha">
+    <div class="folha-fgv" id="corpo-folha">
+        </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { QuestoesOAB } from './questoes.js';
-    import { InteligenciaNC } from './NC.js';
-    import { BancoTeses } from './teses.js';
 
     const config = {
         apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ",
@@ -62,37 +68,45 @@
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    const RadarIdent = { "30":"RO", "31":"Contestação", "32":"RT", "33":"RO", "34":"Contestação", "35":"RO", "36":"RT", "37":"Contestação", "38":"RO", "39":"RT", "40":"Contestação", "41":"RO", "42":"Consignação", "43":"Contestação", "44":"RO" };
-
-    const folha = document.getElementById('folha-dinamica');
+    // GERAR AS 150 LINHAS ORIGINAIS
+    const folha = document.getElementById('corpo-folha');
     for(let i=1; i<=150; i++) {
-        folha.innerHTML += `<div class="linha-fgv"><div class="numero-linha">${i}</div><div class="input-texto" contenteditable="true"></div></div>`;
+        const linha = document.createElement('div');
+        linha.className = 'linha-producao';
+        linha.innerHTML = `<div class="margem-num">${i}</div><div class="texto-escrita" contenteditable="true"></div>`;
+        folha.appendChild(linha);
     }
 
-    window.salvarPecaV13 = async () => {
-        const ex = document.getElementById('radar-exame').value;
-        if(ex === "0") return alert("Selecione o Exame!");
-        const texto = [];
-        document.querySelectorAll('.input-texto').forEach(l => texto.push(l.innerText));
-        await push(ref(db, 'producao_v13'), {
-            nome_peca: RadarIdent[ex] || "PEÇA",
-            activeEx: ex,
-            linhas: texto,
-            timestamp: serverTimestamp()
-        });
-        alert("✅ SALVO NO HISTÓRICO!");
-    };
+    // FUNÇÃO SALVAR - CONECTADA COM A MENTORIA V13
+    window.salvarNoHistorico = async () => {
+        const select = document.getElementById('radar-exame');
+        const exameVal = select.value;
+        const pecaNome = select.options[select.selectedIndex].text.split('(')[1]?.replace(')', '') || "PEÇA";
 
-    window.abrirMentoria = () => {
-        const p = document.getElementById('painel-consulta');
-        if(p.style.right === '0px') { p.style.right = '-100%'; return; }
-        p.style.right = '0px';
-        const cont = document.getElementById('espaco-inteligencia');
-        cont.innerHTML = "<h3>⚠️ NÃO CONFUNDA</h3>";
-        InteligenciaNC.forEach(n => cont.innerHTML += `<div style="background:var(--card); padding:10px; margin-bottom:5px; border-left:4px solid var(--red)"><b>${n.t}</b><br>${n.c}</div>`);
-        cont.innerHTML += "<h3>⚖️ TESES</h3>";
-        BancoTeses.forEach(t => cont.innerHTML += `<div style="background:var(--card); padding:10px; margin-bottom:5px; border-left:4px solid var(--gold)"><b>${t.t}</b><br>${t.c}</div>`);
+        if(!exameVal) return alert("Selecione o Exame antes de salvar!");
+
+        const linhasCapturadas = [];
+        document.querySelectorAll('.texto-escrita').forEach(el => {
+            linhasCapturadas.push(el.innerText || "");
+        });
+
+        // Verifica se há conteúdo para salvar
+        const temConteudo = linhasCapturadas.some(l => l.trim() !== "");
+        if(!temConteudo) return alert("A folha está vazia!");
+
+        try {
+            await push(ref(db, 'producao_v13'), {
+                exame: exameVal,
+                nome_peca: pecaNome,
+                linhas: linhasCapturadas,
+                timestamp: serverTimestamp()
+            });
+            alert("✅ PEÇA ENVIADA PARA O HISTÓRICO!");
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao salvar. Verifique a conexão.");
+        }
     };
 </script>
 </body>
-</html> 
+</html>

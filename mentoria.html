@@ -147,12 +147,56 @@
     window.injetorMestre = () => {
         if(!confirm("Deseja restaurar as 50 Questões e Teses?")) return;
         const d = [
-            { t: "Q01: ADICIONAL TRANSFERÊNCIA", c: "Art. 469, §3º CLT. Provisoriedade. 25%.", cat: "questoes" },
+           { t: "Q01: ADICIONAL TRANSFERÊNCIA", c: "Art. 469, §3º CLT. Provisoriedade. 25%.", cat: "questoes" },
             { t: "Q02: HORAS IN ITINERE", c: "Art. 58, §2º CLT. Não computáveis pós-Reforma.", cat: "questoes" },
-            { t: "Q10: PRESCRIÇÃO", c: "Art. 11 CLT. Bienal (2 anos) e Quinquenal (5 anos).", cat: "questoes" },
-            { t: "TESE: GRUPO ECONÔMICO", c: "Art. 2, §2º CLT. Exige coordenação e interesse comum.", cat: "tese" },
-            { t: "DIF: RO vs APELAÇÃO", c: "RO é para decisões em MS ou Sentenças do Trabalho.", cat: "nc" }
-            // Adicione as outras conforme a lista que te enviei antes
+            { t: "Q03: SOBREAVISO", c: "Art. 244, §2º CLT. 1/3 do salário. Limite 24h.", cat: "questoes" },
+            { t: "Q04: EQUIPAÇÃO SALARIAL", c: "Art. 461 CLT. Mesmo estabelecimento. Tempo < 2 anos.", cat: "questoes" },
+            { t: "Q05: ESTABILIDADE GESTANTE", c: "Súmula 244 TST. Mesmo em contrato fixo.", cat: "questoes" },
+            { t: "Q06: JUSTIÇA GRATUITA", c: "Art. 790, §3º CLT. Até 40% do teto RGPS.", cat: "questoes" },
+            { t: "Q07: FÉRIAS FRACIONADAS", c: "Art. 134, §1º CLT. 3 períodos (14/5/5 dias).", cat: "questoes" },
+            { t: "Q08: MULTA 477 CLT", c: "10 dias para pagar verbas e guias.", cat: "questoes" },
+            { t: "Q09: HONORÁRIOS SUCUMBENCIAIS", c: "Art. 791-A CLT. 5% a 15%.", cat: "questoes" },
+            { t: "Q10: PRESCRIÇÃO", c: "Art. 11 CLT. Bienal e Quinquenal.", cat: "questoes" },
+            { t: "Q11: SALÁRIO SUBSTITUIÇÃO", c: "Súmula 159 TST. Direito ao salário do substituído.", cat: "questoes" },
+            { t: "Q12: PERICULOSIDADE", c: "Art. 193 CLT. 30% sobre base.", cat: "questoes" },
+            { t: "Q13: INSALUBRIDADE", c: "Art. 192 CLT. 10/20/40% salário mínimo.", cat: "questoes" },
+            { t: "Q14: INTERVALO INTRAJORNADA", c: "Art. 71 CLT. Paga apenas tempo suprimido + 50%.", cat: "questoes" },
+            { t: "Q15: ESTABILIDADE ACIDENTÁRIA", c: "Art. 118 Lei 8.213/91. 12 meses após retorno.", cat: "questoes" },
+            { t: "Q16: GRUPO ECONÔMICO", c: "Art. 2, §2º CLT. Coordenação entre empresas.", cat: "questoes" },
+            { t: "Q17: INTERMITENTE", c: "Art. 452-A CLT. Convocação 3 dias antes.", cat: "questoes" },
+            { t: "Q18: RESCISÃO ACORDO", c: "Art. 484-A CLT. Metade do aviso e 20% multa FGTS.", cat: "questoes" },
+            { t: "Q19: CONTRIBUIÇÃO SINDICAL", c: "Art. 578 CLT. Requer autorização expressa.", cat: "questoes" },
+            { t: "Q20: TELETRABALHO", c: "Art. 75-A CLT. Contrato escrito obrigatório.", cat: "questoes" },
+            { t: "Q21: DESVIO FUNÇÃO", c: "Diferença salarial p/ função idêntica.", cat: "questoes" },
+            { t: "Q22: MULTA 467 CLT", c: "Incontroverso na 1ª audiência ou +50%.", cat: "questoes" },
+            { t: "Q23: DOMINGOS/FERIADOS", c: "Lei 605/49. Dobro sem folga compensatória.", cat: "questoes" },
+            { t: "Q24: ESTABILIDADE CIPA", c: "Art. 10 ADCT. Suplente também tem.", cat: "questoes" },
+            { t: "Q25: DANO EXTRA-PATRIMONIAL", c: "Art. 223-G CLT. Tabelamento por gravidade.", cat: "questoes" },
+            { t: "Q26: CARGO CONFIANÇA", c: "Art. 62, II CLT. Sem horas extras.", cat: "questoes" },
+            { t: "Q27: SOBREAVISO ANALOGIA", c: "Súmula 428 TST. Plantão à distância.", cat: "questoes" },
+            { t: "Q28: QUITAÇÃO ANUAL", c: "Art. 507-B CLT. Eficácia liberatória parcelas.", cat: "questoes" },
+            { t: "Q29: HOMOLOGAÇÃO ACORDO", c: "Art. 855-B CLT. Jurisdição voluntária.", cat: "questoes" },
+            { t: "Q30: MÁ-FÉ", c: "Art. 793-B CLT. Multa 1% a 10%.", cat: "questoes" },
+            { t: "Q31: TESTEMUNHAS", c: "Ord (3), Sum (2), Inq (6).", cat: "questoes" },
+            { t: "Q32: ÔNUS PROVA", c: "Art. 818 CLT. Autor (fato) / Réu (impedimento).", cat: "questoes" },
+            { t: "Q33: RECURSO ORDINÁRIO", c: "Art. 895 CLT. Prazo 8 dias.", cat: "questoes" },
+            { t: "Q34: AGRAVO INSTRUMENTO", c: "Art. 897, 'b' CLT. Destrancar recurso.", cat: "questoes" },
+            { t: "Q35: AGRAVO PETIÇÃO", c: "Art. 897, 'a' CLT. Na execução.", cat: "questoes" },
+            { t: "Q36: EMBARGOS DECLARAÇÃO", c: "Art. 897-A CLT. Omissão/Erro. 5 dias.", cat: "questoes" },
+            { t: "Q37: DEPÓSITO RECURSAL", c: "Garantia juízo. Teto limite TST.", cat: "questoes" },
+            { t: "Q38: RECURSO REVISTA", c: "Art. 896 CLT. Divergência ou CF.", cat: "questoes" },
+            { t: "Q39: AGRAVO INTERNO", c: "Art. 1021 CPC. Decisão monocrática.", cat: "questoes" },
+            { t: "Q40: CONTESTAÇÃO", c: "Art. 847 CLT. Defesa escrita ou oral.", cat: "questoes" },
+            { t: "Q41: RECONVENÇÃO", c: "Art. 343 CPC. Contra-atacar autor.", cat: "questoes" },
+            { t: "Q42: EXCEÇÃO INCOMPETÊNCIA", c: "Art. 800 CLT. 5 dias da notificação.", cat: "questoes" },
+            { t: "Q43: PREPOSTO", c: "Art. 843, §3º CLT. Não precisa ser empregado.", cat: "questoes" },
+            { t: "Q44: ARQUIVAMENTO", c: "Ausência Reclamante. Custas p/ nova ação.", cat: "questoes" },
+            { t: "Q45: REVELIA", c: "Ausência Reclamada. Confissão matéria fato.", cat: "questoes" },
+            { t: "Q46: JORNADA 12X36", c: "Art. 59-A CLT. Acordo individual escrito.", cat: "questoes" },
+            { t: "Q47: PRONTIDÃO", c: "Art. 244, §3º. 2/3 salário. Max 12h.", cat: "questoes" },
+            { t: "Q48: SUCESSÃO", c: "Art. 10 e 448 CLT. Sucessor responde.", cat: "questoes" },
+            { t: "Q49: PRESCRIÇÃO INTERCORRENTE", c: "Art. 11-A CLT. 2 anos na inércia.", cat: "questoes" },
+            { t: "Q50: HONORÁRIOS PERICIAIS", c: "Art. 790-B CLT. Parte sucumbente paga.", cat: "questoes" }
         ];
         d.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
         alert("Inteligências Restauradas!");
@@ -160,3 +204,4 @@
 </script>
 </body>
 </html>
+

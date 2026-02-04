@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ELITE V13 | SCANNER BLINDADO</title>
+    <title>ELITE V13 | FOCO NO EXAME</title>
     <style>
         :root { --bg: #0a0c10; --card: #161b22; --border: #30363d; --text: #c9d1d9; --gold: #d29922; --dim: #8b949e; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -13,13 +13,13 @@
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
         /* CARDS DO FEED */
-        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; }
+        .item-row { padding: 18px; border-bottom: 1px solid var(--border); background: var(--card); margin-bottom: 10px; border-radius: 10px; display: flex; align-items: center; justify-content: space-between; border-left: 4px solid var(--gold); }
         .item-content { flex: 1; }
-        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 10px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
-        .item-desc { font-size: 16px; font-weight: 600; color: #e6edf3; }
+        .item-title { display: block; font-weight: 800; color: var(--gold); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1.2px; }
+        .item-desc { font-size: 16px; font-weight: 700; color: #ffffff; text-transform: uppercase; }
         
-        .row-actions { display: flex; gap: 10px; }
-        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .row-actions { display: flex; gap: 10px; margin-left: 10px; }
+        .btn-action { background: #30363d; border: 1px solid #444; color: white; padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
         .btn-view { background: var(--gold); color: black; border: none; }
         .btn-delete { background: #da3633; border: none; }
 
@@ -43,18 +43,16 @@
 
 <header>
     <div style="font-weight: 900; font-size: 18px;">ELITE <span style="color:var(--gold)">V13</span></div>
-    <div style="font-size: 10px; color: #4ade80;">● SCANNER ATIVO</div>
+    <div style="font-size: 10px; color: #4ade80; font-weight: bold;">● PRODUÇÃO INTEGRADA</div>
 </header>
 
-<div class="container">
-    <div id="main-feed"></div>
-</div>
+<div class="container" id="main-feed"></div>
 
 <div id="view-modal">
     <div class="view-header">
         <div style="display: flex; flex-direction: column;">
             <span style="color:white; font-weight:900; font-size: 14px;" id="peca-titulo">REVISÃO</span>
-            <span style="color:var(--gold); font-size: 10px; font-weight: bold;" id="peca-exame">SINCRO TOTAL</span>
+            <span style="color:var(--gold); font-size: 10px; font-weight: bold;" id="peca-exame">DETALHES DA PRODUÇÃO</span>
         </div>
         <button class="btn-voltar" onclick="window.closeView()">← VOLTAR</button>
     </div>
@@ -99,53 +97,47 @@
         
         if(activeTab === 'producao') {
             const pecas = cache.producao_v13 || {};
-            Object.keys(pecas).reverse().forEach(id => {
+            const chaves = Object.keys(pecas).reverse();
+
+            if(chaves.length === 0) {
+                feed.innerHTML = "<div style='text-align:center; padding:50px; color:var(--dim)'>Nenhuma peça finalizada.</div>";
+                return;
+            }
+
+            chaves.forEach(id => {
                 const p = pecas[id];
-                // Verifica se tem QUALQUER conteúdo antes de renderizar
-                const temTexto = (p.linhas || p.texto || p.conteudo || p.corpo || p.nome_peca);
-                if (temTexto) {
-                    const labelExame = p.activeEx || p.exame || "OFF";
-                    feed.innerHTML += `
-                        <div class="item-row">
-                            <div class="item-content">
-                                <span class="item-title">EXAME: ${labelExame}</span>
-                                <span class="item-desc">${p.nome_peca || 'ARQUIVO DE TEXTO SALVO'}</span>
-                            </div>
-                            <div class="row-actions">
-                                <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
-                                <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
-                            </div>
-                        </div>`;
-                }
+                const nomePeca = p.nome_peca || "PEÇA FINALIZADA";
+                const numExame = p.activeEx || p.exame || "OFF";
+                
+                feed.innerHTML += `
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-title">OAB EXAME: ${numExame}</span>
+                            <span class="item-desc">${nomePeca}</span>
+                        </div>
+                        <div class="row-actions">
+                            <button class="btn-action btn-view" onclick="window.verPeca('${id}')">👁️ VER</button>
+                            <button class="btn-action btn-delete" onclick="window.apagarPeca('${id}')">🗑️</button>
+                        </div>
+                    </div>`;
             });
         }
-        // ... (lógica das outras abas se mantém)
+        // As outras abas seguem a mesma lógica de listagem...
     }
 
-    // MOTOR DE BUSCA AGRESSIVO (SCANNER V13)
     window.verPeca = (id) => {
         const p = cache.producao_v13[id];
         if(!p) return;
 
         let raw = "";
-        // Tenta capturar o texto de todas as formas possíveis
-        if(p.linhas) {
-            raw = Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas;
-        } else if (p.texto) {
-            raw = p.texto;
-        } else if (p.conteudo) {
-            raw = p.conteudo;
-        } else if (p.corpo) {
-            raw = p.corpo;
-        } else {
-            // Se não achou nos campos óbvios, procura a maior string dentro do objeto
-            let maiorTexto = "";
-            for(let key in p) {
-                if(typeof p[key] === 'string' && p[key].length > maiorTexto.length) {
-                    maiorTexto = p[key];
-                }
-            }
-            raw = maiorTexto;
+        // Scanner Prioritário
+        if(p.linhas) raw = Array.isArray(p.linhas) ? p.linhas.join('\n') : p.linhas;
+        else if (p.texto) raw = p.texto;
+        else if (p.conteudo) raw = p.conteudo;
+        else {
+            let backup = "";
+            for(let k in p) if(typeof p[k] === 'string' && p[k].length > backup.length) backup = p[k];
+            raw = backup;
         }
 
         const lines = raw.split('\n');
@@ -154,14 +146,15 @@
             html += `<div class="linha-folha"><div class="num-linha">${i}</div><div class="texto-linha">${lines[i-1] || ""}</div></div>`;
         }
         document.getElementById('area-folha').innerHTML = html;
-        document.getElementById('peca-titulo').innerText = p.nome_peca || "PEÇA RECUPERADA";
-        document.getElementById('peca-exame').innerText = "EXAME: " + (p.activeEx || p.exame || "--");
+        document.getElementById('peca-titulo').innerText = p.nome_peca || "REVISÃO";
+        document.getElementById('peca-exame').innerText = "EXAME: " + (p.activeEx || p.exame || "SIMULADO");
         document.getElementById('view-modal').style.display = 'flex';
         window.scrollTo(0,0);
     };
 
     window.closeView = () => document.getElementById('view-modal').style.display = 'none';
-    window.apagarPeca = (id) => { if(confirm("Excluir definitivamente?")) remove(ref(db, `producao_v13/${id}`)); };
+    window.apagarPeca = (id) => { if(confirm("Deseja apagar esta produção do banco?")) remove(ref(db, `producao_v13/${id}`)); };
+
 </script>
 </body>
 </html>

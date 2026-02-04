@@ -7,24 +7,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #0f172a; --gold: #fbbf24; --bg: #F5F5F7; --card: #FFFFFF; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 110px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 110px; overflow-x: hidden; }
         
         header { background: var(--primary); height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); position: sticky; top: 0; z-index: 1000; }
         .btn-voltar { background: var(--gold); color: #000; border: none; padding: 10px 15px; border-radius: 6px; font-weight: 900; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; }
 
-        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
-        .card-elite { background: var(--card); padding: 20px; border-radius: 12px; border-left: 5px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .container { padding: 15px; max-width: 800px; margin: 0 auto; min-height: 80vh; }
+        .card-elite { background: var(--card); padding: 15px; border-radius: 12px; border-left: 5px solid var(--gold); box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; animation: slideIn 0.3s ease-out; }
         
-        /* VISUALIZAÇÃO IGUAL AO SEU INDEX */
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* VISUALIZAÇÃO IGUAL AO SEU INDEX MASTER */
         #visualizador-full { position: fixed; inset: 0; background: #cbd5e1; z-index: 99999; display: none; overflow-y: auto; flex-direction: column; align-items: center; }
         .toolbar-view { width: 100%; background: var(--primary); padding: 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; border-bottom: 2px solid var(--gold); }
         .paper-render { width: 100%; max-width: 850px; background: white; margin: 20px 0; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
 
-        /* MENU INFERIOR - AS INTELIGÊNCIAS */
+        /* MENU INFERIOR - INTELIGÊNCIAS */
         .bottom-nav { position: fixed; bottom: 0; width: 100%; background: var(--primary); display: flex; padding: 10px 0 30px 0; border-top: 2px solid var(--gold); z-index: 1000; }
-        .nav-btn { flex: 1; text-align: center; background: none; border: none; color: white; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .nav-btn { flex: 1; text-align: center; background: none; border: none; color: white; font-size: 9px; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
         .nav-btn i { display: block; font-size: 18px; margin-bottom: 4px; color: var(--gold); }
-        .nav-btn.active { color: var(--gold); }
+        .nav-btn.active { color: var(--gold); transform: scale(1.1); }
+
+        .titulo-secao { font-weight: 900; color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid var(--gold); display: inline-block; }
     </style>
 </head>
 <body>
@@ -32,7 +36,7 @@
 <header>
     <div style="color:white; font-weight:900;">JOAQUIM <span style="color:var(--gold)">MENTORIA</span></div>
     <button class="btn-voltar" onclick="window.close()">
-        <i class="fas fa-arrow-left"></i> VOLTAR PARA PRODUÇÃO
+        <i class="fas fa-arrow-left"></i> PRODUÇÃO
     </button>
 </header>
 
@@ -41,18 +45,18 @@
 
 <div id="visualizador-full">
     <div class="toolbar-view">
-        <span id="nome-peca-view" style="color:white; font-weight:bold; font-size:12px;">CADERNO DE RESPOSTAS</span>
-        <button onclick="fecharView()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:4px; font-weight:900; cursor:pointer;">FECHAR</button>
+        <span id="nome-peca-view" style="color:white; font-weight:bold; font-size:12px;">FOLHA DE RESPOSTA</span>
+        <button onclick="window.fecharView()" style="background:var(--gold); border:none; padding:8px 15px; border-radius:4px; font-weight:900; cursor:pointer;">FECHAR</button>
     </div>
     <div class="paper-render" id="area-folha-master"></div>
 </div>
 
 <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="carregarHistorico()"><i class="fas fa-history"></i>Histórico</button>
-    <button class="nav-btn" onclick="alert('Módulo 50 Questões Ativo')"><i class="fas fa-list-check"></i>50 Questões</button>
-    <button class="nav-btn" onclick="alert('Módulo Não Confunda Ativo')"><i class="fas fa-brain"></i>Não Confunda</button>
-    <button class="nav-btn" onclick="alert('Módulo Qual a Peça Ativo')"><i class="fas fa-search"></i>Qual a Peça</button>
-    <button class="nav-btn" onclick="alert('Módulo Teses Ativo')"><i class="fas fa-gavel"></i>Teses</button>
+    <button class="nav-btn" onclick="window.carregarHistorico(this)"><i class="fas fa-history"></i>Histórico</button>
+    <button class="nav-btn" onclick="window.carregarInteligencia('50 QUESTÕES', this)"><i class="fas fa-list-check"></i>50 Questões</button>
+    <button class="nav-btn" onclick="window.carregarInteligencia('NÃO CONFUNDA', this)"><i class="fas fa-brain"></i>N.C</button>
+    <button class="nav-btn" onclick="window.carregarInteligencia('QUAL A PEÇA', this)"><i class="fas fa-search"></i>Qual a Peça</button>
+    <button class="nav-btn" onclick="window.carregarInteligencia('TESES', this)"><i class="fas fa-gavel"></i>Teses</button>
 </nav>
 
 <script type="module">
@@ -70,29 +74,56 @@
 
     let dadosCache = {};
 
-    window.carregarHistorico = () => {
+    // --- FUNÇÕES EXPOSTAS AO WINDOW (PARA O HTML ENXERGAR) ---
+
+    window.carregarHistorico = (btn) => {
+        atualizarMenu(btn);
         onValue(ref(db, 'producao_v13'), snap => {
             dadosCache = snap.val() || {};
             const lista = document.getElementById('conteudo-dinamico');
-            lista.innerHTML = "";
-            Object.keys(dadosCache).filter(k => !k.includes("RASCUNHO")).reverse().forEach(id => {
+            lista.innerHTML = "<h2 class='titulo-secao'>PEÇAS PRODUZIDAS</h2>";
+            
+            const chaves = Object.keys(dadosCache).filter(k => !k.includes("RASCUNHO")).reverse();
+            
+            if(chaves.length === 0) {
+                lista.innerHTML += "<p>Nenhuma peça finalizada encontrada.</p>";
+                return;
+            }
+
+            chaves.forEach(id => {
                 const p = dadosCache[id];
                 lista.innerHTML += `
                     <div class="card-elite">
-                        <div><small>EXAME ${p.exame || '--'}</small><h3>${p.nome_peca || 'Peça Finalizada'}</h3></div>
-                        <button onclick="abrirPeca('${id}')" style="background:#000; color:#fff; border:none; padding:10px; border-radius:6px; cursor:pointer; font-weight:bold;">VER FOLHA</button>
+                        <div>
+                            <small style="font-weight:bold; color:var(--primary)">OAB EXAME ${p.exame || '--'}</small>
+                            <h3 style="margin:5px 0; font-size:1rem;">${p.nome_peca || 'Peça Finalizada'}</h3>
+                        </div>
+                        <button onclick="window.abrirPeca('${id}')" style="background:var(--primary); color:#fff; border:none; padding:10px 15px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:10px;">VER FOLHA</button>
                     </div>`;
             });
         });
     };
 
+    window.carregarInteligencia = (tipo, btn) => {
+        atualizarMenu(btn);
+        const lista = document.getElementById('conteudo-dinamico');
+        lista.innerHTML = `
+            <h2 class='titulo-secao'>${tipo}</h2>
+            <div class="card-elite" style="flex-direction:column; align-items:flex-start;">
+                <p>Módulo de Inteligência <b>${tipo}</b> carregando dados do Exame Ativo...</p>
+                <small>Sincronizando com Banco de Dados Master 2026...</small>
+            </div>
+        `;
+    };
+
     window.abrirPeca = (id) => {
         const p = dadosCache[id];
         const area = document.getElementById('area-folha-master');
+        document.getElementById('nome-peca-view').innerText = `VISUALIZANDO: ${p.nome_peca || 'PEÇA'}`;
+        
         let texto = p.conteudo || "";
         let linhas = texto.split('\n');
         
-        // MOTOR DE RENDERIZAÇÃO 150 LINHAS (CLONE DO INDEX)
         let htmlFolha = `<div style="display: grid; grid-template-columns: 50px 1fr; border: 2px solid #000; background:#fff;">`;
         htmlFolha += `<div style="background:#f1f5f9; border-right:2px solid #000;">`;
         for(let i=1; i<=150; i++) {
@@ -101,7 +132,7 @@
         htmlFolha += `</div><div style="padding:0; background-image: linear-gradient(to bottom, transparent 34px, #e2e8f0 34px); background-size: 100% 35px;">`;
         for(let i=0; i<150; i++) {
             let txt = linhas[i] || "";
-            htmlFolha += `<div style="height:35px; line-height:35px; padding:0 20px; font-family:'Courier New', monospace; font-size:19px; font-weight:700; color:#000; text-transform:uppercase;">${txt}</div>`;
+            htmlFolha += `<div style="height:35px; line-height:35px; padding:0 20px; font-family:'Courier New', monospace; font-size:19px; font-weight:700; color:#000; text-transform:uppercase; overflow:hidden;">${txt}</div>`;
         }
         htmlFolha += `</div></div>`;
 
@@ -111,8 +142,14 @@
 
     window.fecharView = () => document.getElementById('visualizador-full').style.display = 'none';
 
-    // Inicia carregando o histórico
-    carregarHistorico();
+    function atualizarMenu(btn) {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        if(btn) btn.classList.add('active');
+    }
+
+    // Inicialização
+    window.carregarHistorico(document.querySelector('.nav-btn'));
+
 </script>
 </body>
 </html>

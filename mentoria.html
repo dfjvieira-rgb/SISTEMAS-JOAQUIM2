@@ -9,96 +9,83 @@
         body { font-family: 'Courier New', Courier, monospace; background-color: #f4f4f4; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
         .header-fgv { border: 2px solid var(--fgv-blue); padding: 10px; text-align: center; margin-bottom: 20px; background-color: var(--fgv-yellow); }
-        .folha-respostas { background-color: var(--fgv-yellow); border: 1px solid #999; min-height: 400px; padding: 40px; background-image: linear-gradient(#e1e1e1 1px, transparent 1px); background-size: 100% 2em; line-height: 2em; outline: none; }
+        .folha-respostas { background-color: var(--fgv-yellow); border: 1px solid #999; min-height: 500px; padding: 40px; background-image: linear-gradient(#e1e1e1 1px, transparent 1px); background-size: 100% 2em; line-height: 2em; outline: none; white-space: pre-wrap; }
         .toolbar { display: flex; justify-content: space-around; background: var(--fgv-blue); padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-        .btn-tool { color: white; cursor: pointer; font-size: 20px; background: none; border: none; padding: 10px; transition: 0.2s; }
-        .btn-tool:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+        .btn-tool { color: white; cursor: pointer; font-size: 24px; background: none; border: none; padding: 10px; transition: 0.2s; }
         
-        /* POST-ITS */
         .post-it-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .post-it { background: #fffa82; padding: 15px; border: 1px solid #e1db55; box-shadow: 5px 5px 7px rgba(0,0,0,0.1); font-size: 0.9em; }
 
-        /* SEÇÃO DE HISTÓRICO - FORÇADA */
-        #historico-mentoria { 
-            display: none; 
-            margin-top: 20px; 
-            border: 3px double var(--fgv-blue); 
-            padding: 20px; 
-            background: #fff;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .item-exame { background: #f9f9f9; margin-bottom: 15px; padding: 15px; border-left: 8px solid var(--fgv-blue); border-bottom: 1px solid #ddd; }
-        .btn-limpar-hist { background: #ef4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 0.7rem; }
+        #historico-mentoria { display: none; margin-top: 20px; border: 3px double var(--fgv-blue); padding: 20px; background: #fff; }
+        .item-exame { background: #f9f9f9; margin-bottom: 15px; padding: 15px; border-left: 8px solid var(--fgv-blue); display: flex; justify-content: space-between; align-items: center; }
+        .btn-reabrir { background: var(--fgv-blue); color: white; border: none; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
+        .btn-limpar-hist { background: #ef4444; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-fgv">
-        <h2>EXAME DE ORDEM UNIFICADO - CADERNO DE RESPOSTAS</h2>
+        <h2>EXAME DE ORDEM - CADERNO DE RESPOSTAS</h2>
         <small>Mente Blindada - Plano de Voo</small>
     </div>
 
     <div class="toolbar">
-        <button class="btn-tool" onclick="mostrarEstruturas()" title="Estruturas">📜</button>
-        <button class="btn-tool" onclick="salvarPeca()" title="Finalizar Peça">💾</button>
-        <button class="btn-tool" onclick="toggleHistorico()" title="Ver Histórico">📂</button>
+        <button class="btn-tool" onclick="mostrarEstruturas()">📜</button>
+        <button class="btn-tool" onclick="salvarPeca()">💾</button>
+        <button class="btn-tool" onclick="toggleHistorico()">📂</button>
     </div>
 
-    <div class="folha-respostas" contenteditable="true" id="area-edicao">
-        AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...
-    </div>
+    <div class="folha-respostas" contenteditable="true" id="area-edicao">AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...</div>
 
     <div class="post-it-container">
-        <div class="post-it">
-            <strong>📌 Teses & Preliminares:</strong>
-            <ul id="lista-teses"><li>Aguardando análise...</li></ul>
-        </div>
-        <div class="post-it">
-            <strong>💡 Inteligência Não Confunda:</strong>
-            <p id="dica-inteligencia">Identifique se é fase de Conhecimento ou Execução.</p>
-        </div>
+        <div class="post-it"><strong>📌 Teses & Preliminares:</strong><ul id="lista-teses"><li>Aguardando análise...</li></ul></div>
+        <div class="post-it"><strong>💡 Inteligência Não Confunda:</strong><p>Diferencie rito Sumaríssimo de Ordinário.</p></div>
     </div>
 
     <div id="historico-mentoria">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 style="margin:0;">📂 Peças Finalizadas</h3>
-            <button class="btn-limpar-hist" onclick="limparTudo()">Apagar Histórico</button>
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3>📂 Peças Salvas</h3>
+            <button class="btn-limpar-hist" onclick="limparTudo()">APAGAR TUDO</button>
         </div>
         <div id="lista-historico"></div>
     </div>
 </div>
 
 <script>
-    // Função do Disquete: Salva a peça no histórico
     function salvarPeca() {
-        const conteudo = document.getElementById('area-edicao').innerText;
-        if(conteudo.trim().length < 50) return alert("Escreva a peça antes de finalizar!");
+        const conteudoCompleto = document.getElementById('area-edicao').innerText;
+        if(conteudoCompleto.trim().length < 10) return alert("Peça vazia!");
 
         const exame = {
+            id: Date.now(),
             data: new Date().toLocaleString('pt-BR'),
-            conteudo: conteudo.substring(0, 500) + "..." // Salva um resumo para visualização
+            texto: conteudoCompleto
         };
 
         let historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
         historico.push(exame);
         localStorage.setItem('historico_oab', JSON.stringify(historico));
 
-        alert("PEÇA FINALIZADA! O PDF foi organizado no Histórico (📂).");
+        alert("PEÇA SALVA INTEGRALMENTE NO HISTÓRICO!");
         atualizarVisualizacaoHistorico();
     }
 
-    // Função da Pasta: Abre e fecha o histórico
     function toggleHistorico() {
         const histDiv = document.getElementById('historico-mentoria');
-        atualizarVisualizacaoHistorico(); // Garante que a lista está atualizada antes de mostrar
-        
-        if (histDiv.style.display === "none" || histDiv.style.display === "") {
-            histDiv.style.display = "block";
-            histDiv.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            histDiv.style.display = "none";
+        atualizarVisualizacaoHistorico();
+        histDiv.style.display = histDiv.style.display === "none" ? "block" : "none";
+        if(histDiv.style.display === "block") histDiv.scrollIntoView({behavior: 'smooth'});
+    }
+
+    function carregarPeça(id) {
+        const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
+        const peca = historico.find(p => p.id === id);
+        if(peca) {
+            document.getElementById('area-edicao').innerText = peca.texto;
+            document.getElementById('historico-mentoria').style.display = "none";
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            alert("Peça carregada na folha!");
         }
     }
 
@@ -107,32 +94,31 @@
         const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
         
         if (historico.length === 0) {
-            lista.innerHTML = "<p style='color:red;'>Nenhuma peça salva ainda. Use o Disquete (💾) para finalizar.</p>";
+            lista.innerHTML = "<p>Nenhuma peça no arquivo.</p>";
             return;
         }
 
-        lista.innerHTML = historico.reverse().map((item, index) => `
+        lista.innerHTML = historico.reverse().map(item => `
             <div class="item-exame">
-                <strong>🗓 Data: ${item.data}</strong><br>
-                <p style="font-size:0.8rem; color:#444; margin-top:5px;">${item.conteudo}</p>
-                <small style="color:var(--fgv-blue); font-weight:bold;">[STATUS: PEÇA BLINDADA]</small>
+                <div>
+                    <strong>Data: ${item.data}</strong><br>
+                    <small>${item.texto.substring(0, 40)}...</small>
+                </div>
+                <button class="btn-reabrir" onclick="carregarPeça(${item.id})">REABRIR PEÇA</button>
             </div>
         `).join('');
     }
 
-    function mostrarEstruturas() {
-        alert("ESTRUTURA RT:\n- Endereçamento\n- Qualificação\n- Preliminares\n- Mérito\n- Pedidos\n- Fechamento");
-    }
-
     function limparTudo() {
-        if(confirm("Deseja apagar todas as peças salvas?")) {
+        if(confirm("Apagar histórico permanente?")) {
             localStorage.removeItem('historico_oab');
             atualizarVisualizacaoHistorico();
         }
     }
 
-    window.onload = atualizarVisualizacaoHistorico;
+    function mostrarEstruturas() {
+        alert("ESTRUTURA RT:\n1. Endereçamento\n2. Qualificação\n3. Preliminares\n4. Mérito\n5. Pedidos\n6. Fechamento");
+    }
 </script>
-
 </body>
 </html>

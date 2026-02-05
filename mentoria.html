@@ -3,100 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentoria OAB - Voo Blindado</title>
+    <title>MENTORIA OAB - MODO BLINDADO</title>
     <style>
-        :root { --fgv-yellow: #fffdf0; --fgv-blue: #003366; --border-color: #ccc; }
-        body { font-family: 'Courier New', Courier, monospace; background-color: #f4f4f4; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
-        .header-fgv { border: 2px solid var(--fgv-blue); padding: 10px; text-align: center; margin-bottom: 20px; background-color: var(--fgv-yellow); }
-        .folha-respostas { background-color: var(--fgv-yellow); border: 1px solid #999; min-height: 500px; padding: 40px; background-image: linear-gradient(#e1e1e1 1px, transparent 1px); background-size: 100% 2em; line-height: 2em; outline: none; white-space: pre-wrap; text-align: left; }
-        .toolbar { display: flex; justify-content: space-around; background: var(--fgv-blue); padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-        .btn-tool { color: white; cursor: pointer; font-size: 30px; background: none; border: none; padding: 10px; width: 33%; }
-        .btn-tool:hover { background: rgba(255,255,255,0.1); }
-        .post-it-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .post-it { background: #fffa82; padding: 15px; border: 1px solid #e1db55; box-shadow: 5px 5px 7px rgba(0,0,0,0.1); font-size: 0.9em; }
-        #historico-mentoria { display: none; margin-top: 20px; border: 5px double var(--fgv-blue); padding: 20px; background: #fff; }
-        .item-exame { background: #f1f5f9; margin-bottom: 15px; padding: 15px; border-left: 10px solid #10b981; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
-        .btn-reabrir { background: #10b981; color: white; border: none; padding: 15px; cursor: pointer; font-weight: 900; border-radius: 6px; }
+        :root { --azul: #003366; --amarelo: #fffdf0; }
+        body { font-family: sans-serif; background: #ddd; padding: 10px; }
+        .caixa { max-width: 800px; margin: auto; background: white; padding: 15px; border: 2px solid var(--azul); }
+        .topo { text-align: center; border-bottom: 2px solid var(--azul); margin-bottom: 10px; }
+        
+        /* BOTÕES GIGANTES PARA NÃO ERRAR */
+        .controles { display: flex; gap: 10px; margin-bottom: 15px; }
+        .btn { flex: 1; padding: 15px; font-size: 20px; cursor: pointer; border: none; color: white; font-weight: bold; border-radius: 5px; }
+        .btn-salvar { background: #10b981; }
+        .btn-pasta { background: var(--azul); }
+        .btn-limpar { background: #666; }
+
+        /* A FOLHA */
+        #editor { 
+            background: var(--amarelo); 
+            border: 1px solid #ccc; 
+            min-height: 400px; 
+            padding: 20px; 
+            outline: none; 
+            font-family: 'Courier New', monospace; 
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* LISTA DE PEÇAS */
+        #lista-arquivos { display: none; background: #f9f9f9; padding: 15px; border: 1px solid var(--azul); margin-top: 10px; }
+        .item-peca { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px; 
+            border-bottom: 1px solid #ccc; 
+            background: white;
+            margin-bottom: 5px;
+        }
+        .btn-abrir { background: #f59e0b; border: none; padding: 10px; color: white; font-weight: bold; cursor: pointer; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header-fgv">
-        <h2 style="margin:0;">EXAME DE ORDEM - SISTEMA MESTRE</h2>
-        <small>Mente Blindada - Plano de Voo</small>
+<div class="caixa">
+    <div class="topo">
+        <h2>CENTRAL DE PEÇAS - MENTORIA</h2>
     </div>
 
-    <div class="toolbar">
-        <button class="btn-tool" onclick="alert('ESTRUTURA:\n1. Endereçamento\n2. Qualificação\n3. Fatos\n4. Teses\n5. Pedidos\n6. Fechamento')">📜</button>
-        <button class="btn-tool" onclick="salvarPeca()">💾</button>
-        <button class="btn-tool" onclick="toggleHistorico()">📂</button>
+    <div class="controles">
+        <button class="btn btn-salvar" onclick="salvarAgora()">💾 SALVAR</button>
+        <button class="btn btn-pasta" onclick="verArquivos()">📂 PASTA</button>
+        <button class="btn btn-limpar" onclick="limparFolha()">🧹 LIMPAR</button>
     </div>
 
-    <div class="folha-respostas" contenteditable="true" id="area-edicao">AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...</div>
+    <div id="editor" contenteditable="true">AO DOUTO JUÍZO DA...</div>
 
-    <div id="historico-mentoria">
-        <h3 style="margin-top:0; border-bottom:2px solid var(--fgv-blue);">📂 PEÇAS ARQUIVADAS</h3>
-        <div id="lista-historico"></div>
-        <button onclick="localStorage.removeItem('historico_oab'); atualizarLista();" style="margin-top:10px; color:red; border:none; background:none; cursor:pointer;">Apagar Tudo</button>
+    <div id="lista-arquivos">
+        <h3 style="margin-top:0">Minhas Peças Salvas:</h3>
+        <div id="corpo-lista"></div>
     </div>
 </div>
 
 <script>
-    function salvarPeca() {
-        const ed = document.getElementById('area-edicao');
-        const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
-        
-        const novaPeca = {
+    // SALVAR
+    function salvarAgora() {
+        const texto = document.getElementById('editor').innerText;
+        if(texto.length < 10) return alert("Escreva algo antes!");
+
+        const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
+        const nova = {
             data: new Date().toLocaleString('pt-BR'),
-            texto: ed.innerHTML
+            conteudo: texto
         };
 
-        historico.push(novaPeca);
-        localStorage.setItem('historico_oab', JSON.stringify(historico));
-        alert("SALVO COM SUCESSO!");
-        atualizarLista();
+        banco.push(nova);
+        localStorage.setItem('pecas_mentoria', JSON.stringify(banco));
+        alert("PEÇA GUARDADA NA PASTA!");
+        document.getElementById('lista-arquivos').style.display = "none";
     }
 
-    function toggleHistorico() {
-        const div = document.getElementById('historico-mentoria');
-        atualizarLista();
-        div.style.display = (div.style.display === "block") ? "none" : "block";
-        if(div.style.display === "block") div.scrollIntoView();
-    }
+    // MOSTRAR LISTA
+    function verArquivos() {
+        const painel = document.getElementById('lista-arquivos');
+        const lista = document.getElementById('corpo-lista');
+        const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
 
-    function carregarPeca(idx) {
-        const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
-        if(historico[idx]) {
-            document.getElementById('area-edicao').innerHTML = historico[idx].texto;
-            document.getElementById('historico-mentoria').style.display = "none";
-            window.scrollTo(0,0);
-        }
-    }
-
-    function atualizarLista() {
-        const container = document.getElementById('lista-historico');
-        const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
-        
-        if(historico.length === 0) {
-            container.innerHTML = "<p>Nenhuma peça salva.</p>";
+        if(banco.length === 0) {
+            alert("Sua pasta está vazia!");
             return;
         }
 
-        let html = "";
-        // Loop simples para evitar erros de renderização
-        for(let i = 0; i < historico.length; i++) {
-            html += '<div class="item-exame">' +
-                    '<div><strong>DATA: ' + historico[i].data + '</strong></div>' +
-                    '<button class="btn-reabrir" onclick="carregarPeca(' + i + ')">ABRIR</button>' +
-                    '</div>';
-        }
-        container.innerHTML = html;
+        lista.innerHTML = "";
+        banco.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'item-peca';
+            div.innerHTML = `
+                <span><strong>${item.data}</strong></span>
+                <button class="btn-abrir" onclick="abrirPeca(${index})">ABRIR PEÇA</button>
+            `;
+            lista.appendChild(div);
+        });
+
+        painel.style.display = "block";
+        painel.scrollIntoView();
     }
 
-    // Garante que a lista carregue ao abrir a página
-    window.onload = atualizarLista;
+    // ABRIR
+    function abrirPeca(index) {
+        const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
+        const peca = banco[index];
+        
+        if(peca) {
+            document.getElementById('editor').innerText = peca.conteudo;
+            document.getElementById('lista-arquivos').style.display = "none";
+            window.scrollTo(0,0);
+            alert("Peça recuperada!");
+        }
+    }
+
+    function limparFolha() {
+        if(confirm("Apagar o que está escrito na folha agora?")) {
+            document.getElementById('editor').innerText = "";
+        }
+    }
 </script>
 
 </body>

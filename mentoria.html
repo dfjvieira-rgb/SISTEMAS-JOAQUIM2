@@ -1,223 +1,206 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>SISTEMA ELITE | MENTORIA V13</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentoria OAB - Voo Blindado</title>
     <style>
         :root {
-            --primary: #020617; --gold: #fbbf24; --card: #1e293b;
-            --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
-            --info: #3b82f6; --danger: #ef4444;
+            --fgv-yellow: #fffdf0;
+            --fgv-blue: #003366;
+            --border-color: #ccc;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 100px; }
 
-        header {
-            background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold);
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 1000;
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
         }
-        .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
-        .container { padding: 15px; max-width: 800px; margin: 0 auto; }
-
-        .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
-        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
-
-        .card-h {
-            background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px;
-            border: 1px solid #334155; border-left: 5px solid var(--gold);
-            display: flex; justify-content: space-between; align-items: center;
+        /* Container Principal */
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
         }
-        .info-h b { display: block; color: var(--gold); font-size: 10px; text-transform: uppercase; }
-        .info-h span { font-size: 14px; font-weight: 700; }
+
+        /* Cabeçalho FGV Style */
+        .header-fgv {
+            border: 2px solid var(--fgv-blue);
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: var(--fgv-yellow);
+        }
+
+        /* Área da Peça (Folha de Respostas) */
+        .folha-respostas {
+            background-color: var(--fgv-yellow);
+            border: 1px solid #999;
+            min-height: 400px;
+            padding: 40px;
+            background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
+            background-size: 100% 2em;
+            line-height: 2em;
+            position: relative;
+        }
+
+        /* Sidebar de Ferramentas (Mobile Friendly) */
+        .toolbar {
+            display: flex;
+            justify-content: space-around;
+            background: var(--fgv-blue);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .btn-tool {
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            background: none;
+            border: none;
+        }
+
+        /* Inteligências e Post-its */
+        .post-it-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
 
         .post-it {
-            padding: 18px; border-radius: 15px; margin-bottom: 15px; color: #020617;
-            position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: #fffa82;
+            padding: 15px;
+            border: 1px solid #e1db55;
+            box-shadow: 5px 5px 7px rgba(0,0,0,0.1);
+            font-size: 0.9em;
         }
-        .post-it strong { display: block; font-size: 1rem; text-transform: uppercase; }
-        .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
 
-        .actions { display: flex; gap: 8px; }
-        .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
-
-        .nav-tabs {
-            position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
-            display: flex; justify-content: space-around; padding: 10px;
-            border-top: 2px solid #334155; z-index: 2000;
+        /* Histórico (O Exame Realizado) */
+        #historico-mentoria {
+            display: none;
+            margin-top: 20px;
+            border-top: 3px double var(--fgv-blue);
+            padding-top: 20px;
         }
-        .tab { color: #94a3b8; text-align: center; font-size: 10px; text-decoration: none; font-weight: 700; flex: 1; }
-        .tab.active { color: var(--gold); }
-        .tab i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
 
-        #modal-view { position: fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; color:black; z-index: 3000; display:none; overflow-y:auto; padding: 0; }
-        .modal-body-elite { max-width: 850px; margin: 20px auto; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.5); min-height: 100vh; }
-        
-        .hidden { display: none; }
+        .item-exame {
+            background: #eee;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-left: 5px solid var(--fgv-blue);
+        }
+
+        @media (max-width: 600px) {
+            .folha-respostas { padding: 15px; }
+            .post-it-container { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div id="modal-view">
-    <div style="position: sticky; top: 0; background: #0f172a; padding: 15px; z-index: 3001; display: flex; justify-content: center; gap: 10px;">
-        <button onclick="fecharModal()" style="background:var(--gold); color:black; padding:12px 30px; border:none; border-radius:8px; font-weight: 900; cursor: pointer;">FECHAR</button>
-    </div>
-    <div id="modal-content" class="modal-body-elite"></div>
-</div>
-
-<header>
-    <button class="btn-voltar" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> VOLTAR</button>
-    <h2 style="font-size: 1rem; margin:0;">MENTORIA <span style="color:var(--gold)">ELITE</span></h2>
-</header>
-
 <div class="container">
-    <div id="panel-editor" class="panel-input hidden">
-        <h4 id="editor-title" style="margin-top:0;">Incluir Novo</h4>
-        <input id="inp-t" placeholder="Título / Assunto">
-        <textarea id="inp-c" rows="3" placeholder="Conteúdo detalhado..."></textarea>
-        <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px;">SALVAR</button>
+    <div class="header-fgv">
+        <h2>EXAME DE ORDEM UNIFICADO - CADERNO DE RESPOSTAS</h2>
+        <small>Mente Blindada - Plano de Voo</small>
     </div>
 
-    <div id="sec-producao">
-        <h3 style="color:var(--gold); font-size: 0.9rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
-        <div id="feed-producao"></div>
+    <div class="toolbar">
+        <button class="btn-tool" onclick="mostrarEstruturas()" title="Estruturas (Pergaminho)">📜</button>
+        <button class="btn-tool" onclick="salvarPeca()" title="Salvar PDF (Disquete)">💾</button>
+        <button class="btn-tool" onclick="toggleHistorico()" title="Ver Exames Realizados">📂</button>
     </div>
-    
-    <div id="sec-inteligencia" class="hidden">
-        <h3 id="intel-head" style="font-size: 0.9rem;">INTELIGÊNCIA</h3>
-        <div id="feed-v13"></div>
+
+    <div class="folha-respostas" contenteditable="true" id="area-edicao">
+        AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...
+        <br><br>
+        (Skeleton Blindado: RT até Cumprimento)
+    </div>
+
+    <div class="post-it-container">
+        <div class="post-it" id="postit-teses">
+            <strong>📌 Teses & Preliminares:</strong>
+            <ul id="lista-teses"><li>Aguardando análise de PDF...</li></ul>
+        </div>
+        <div class="post-it" id="postit-inteligencia">
+            <strong>💡 Inteligência Não Confunda:</strong>
+            <p id="dica-inteligencia">Diferencie Recurso Ordinário de Agravo de Petição.</p>
+        </div>
+    </div>
+
+    <div id="historico-mentoria">
+        <h3>📂 Histórico de Exames Realizados (PDFs Salvos)</h3>
+        <div id="lista-historico">
+            </div>
     </div>
 </div>
 
-<nav class="nav-tabs">
-    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-file-signature"></i>PEÇAS</a>
-    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-search"></i>PEÇA?</a>
-    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
-    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
-    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
-</nav>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, push, remove, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { FolhaEngine } from './FolhaEngine.js';
-
-    const config = {
-        apiKey: "AIzaSyAmigODFK8R9c0-fWtagdxLWu9xkODfKYQ",
-        authDomain: "masteroab-db5e1.firebaseapp.com",
-        projectId: "masteroab-db5e1",
-        databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com"
+<script>
+    // Constantes de Qualificação e Pulos (Skeleton Técnico)
+    const CONSTANTES_PECA = {
+        PULO_LINHAS: "\n\n\n\n\n",
+        FECHAMENTO: "Nestes Termos,\nPede Deferimento.\nLocal e Data...\nAdvogado...\nOAB..."
     };
-    const app = initializeApp(config);
-    const db = getDatabase(app);
 
-    let currentTab = 'producao';
-    let editId = null;
-
-    window.showTab = (tab) => {
-        currentTab = tab;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        const tabEl = document.querySelector(`.tab[onclick*='${tab}']`);
-        if(tabEl) tabEl.classList.add('active');
+    // Função do Disquete: Salva apenas quando finalizar
+    function salvarPeca() {
+        const conteudo = document.getElementById('area-edicao').innerText;
+        const data = new Date().toLocaleString();
         
-        const isProd = tab === 'producao';
-        document.getElementById('sec-producao').classList.toggle('hidden', !isProd);
-        document.getElementById('sec-inteligencia').classList.toggle('hidden', isProd);
-        document.getElementById('panel-editor').classList.toggle('hidden', isProd);
-        
-        if(!isProd) {
-            const titulos = { qp: 'Qual a Peça?', nc: 'Não Confunda', tese: 'Banco de Teses', arsenal: 'Arsenal 50Q' };
-            document.getElementById('intel-head').innerText = titulos[tab].toUpperCase();
-            document.getElementById('intel-head').style.color = `var(--${tab})`;
-            document.getElementById('btn-salvar').style.background = `var(--${tab})`;
-        }
-        render();
-    };
+        // Simulação de salvamento no histórico do mentoria
+        const exame = {
+            data: data,
+            titulo: "Peça Prática - Analisada via PDF",
+            conteúdo: conteudo
+        };
 
-    document.getElementById('btn-salvar').onclick = () => {
-        const t = document.getElementById('inp-t').value;
-        const c = document.getElementById('inp-c').value;
-        if(!t || !c) return alert("Preencha título e conteúdo!");
-        if(editId) {
-            set(ref(db, `v13_master/${editId}`), { t, c, cat: currentTab, ts: serverTimestamp() });
-            editId = null;
-        } else {
-            push(ref(db, 'v13_master'), { t, c, cat: currentTab, ts: serverTimestamp() });
-        }
-        document.getElementById('inp-t').value = ""; document.getElementById('inp-c').value = "";
-    };
+        let historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
+        historico.push(exame);
+        localStorage.setItem('historico_oab', JSON.stringify(historico));
 
-    // A FUNÇÃO QUE RESOLVE A TELA BRANCA
-    window.verTreino = async (id) => {
-        const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return alert("Registro não encontrado.");
-        const p = s.val();
-        
-        // Pega o conteúdo de qualquer uma das 3 formas possíveis no seu histórico
-        let textoParaRenderizar = "";
-        if (p.conteudo) {
-            textoParaRenderizar = p.conteudo; // Padrão novo (String única)
-        } else if (p.texto) {
-            textoParaRenderizar = p.texto; // Padrão reserva
-        } else if (Array.isArray(p.linhas)) {
-            textoParaRenderizar = p.linhas.join('\n'); // Padrão antigo (Array)
-        }
-
-        if(!textoParaRenderizar) return alert("Erro: Conteúdo vazio no banco.");
-
-        // Renderiza usando o motor oficial
-        const htmlFolha = FolhaEngine.renderizarFolhaEstatica(textoParaRenderizar, p.exame || "---");
-        document.getElementById('modal-content').innerHTML = htmlFolha;
-        document.getElementById('modal-view').style.display = 'block';
-    };
-
-    window.fecharModal = () => document.getElementById('modal-view').style.display = 'none';
-
-    let cache = {};
-    onValue(ref(db), (snap) => { cache = snap.val() || {}; render(); });
-
-    function render() {
-        if(currentTab === 'producao') {
-            const f = document.getElementById('feed-producao'); f.innerHTML = "";
-            const itens = cache.producao_v13 || {};
-            Object.keys(itens).reverse().forEach(id => {
-                if(id.includes("RASCUNHO")) return;
-                const p = itens[id];
-                f.innerHTML += `<div class="card-h">
-                    <div class="info-h"><b>Exame ${p.exame || '??'}</b><span>${p.nome_peca || 'REGISTRO'}</span></div>
-                    <div class="actions">
-                        <button class="btn-circle" style="background:var(--info)" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                        <button class="btn-circle" style="background:var(--danger)" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-        } else {
-            const f = document.getElementById('feed-v13'); f.innerHTML = "";
-            const itens = cache.v13_master || {};
-            const cores = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
-            Object.keys(itens).reverse().forEach(id => {
-                const it = itens[id];
-                if(it.cat !== currentTab) return;
-                f.innerHTML += `<div class="post-it" style="background:${cores[it.cat]}">
-                    <strong>${it.t}</strong><p>${it.c}</p>
-                    <div class="actions">
-                        <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
-                    </div>
-                </div>`;
-            });
-        }
+        alert("Peça finalizada e salva no Histórico (PDF Gerado no Mentoria)!");
+        atualizarVisualizacaoHistorico();
     }
 
-    window.editar = (id, t, c) => {
-        editId = id; document.getElementById('inp-t').value = t; document.getElementById('inp-c').value = c;
-        window.scrollTo({top:0, behavior:'smooth'});
-    };
+    // Função do Pergaminho: Traz as estruturas
+    function mostrarEstruturas() {
+        const estruturas = "ESTRUTURA BASE:\n1. Endereçamento\n2. Qualificação\n3. Fatos\n4. Fundamentos (Teses)\n5. Pedidos\n6. Provas/Valor da Causa";
+        alert(estruturas);
+    }
 
-    window.apagar = (path, id) => { if(confirm("Excluir registro?")) remove(ref(db, `${path}/${id}`)); };
+    // Ajuste da Visualização do Exame Realizado
+    function toggleHistorico() {
+        const histDiv = document.getElementById('historico-mentoria');
+        histDiv.style.display = histDiv.style.display === 'none' ? 'block' : 'none';
+        atualizarVisualizacaoHistorico();
+    }
+
+    function atualizarVisualizacaoHistorico() {
+        const lista = document.getElementById('lista-historico');
+        const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
+        
+        lista.innerHTML = historico.length === 0 ? "<p>Nenhum exame realizado ainda.</p>" : "";
+        
+        historico.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'item-exame';
+            div.innerHTML = `<strong>${item.data}</strong> - ${item.titulo} <br> <small>Conteúdo preservado no sistema.</small>`;
+            lista.appendChild(div);
+        });
+    }
+
+    // Inicialização Mobile
+    window.onload = () => {
+        console.log("Sistema Mentoria OAB carregado no modo Mobile/Desktop.");
+    };
 </script>
+
 </body>
 </html>

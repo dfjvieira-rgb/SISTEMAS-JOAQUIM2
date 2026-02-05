@@ -9,43 +9,41 @@
         body { font-family: 'Courier New', Courier, monospace; background-color: #f4f4f4; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
         .header-fgv { border: 2px solid var(--fgv-blue); padding: 10px; text-align: center; margin-bottom: 20px; background-color: var(--fgv-yellow); }
-        .folha-respostas { background-color: var(--fgv-yellow); border: 1px solid #999; min-height: 500px; padding: 40px; background-image: linear-gradient(#e1e1e1 1px, transparent 1px); background-size: 100% 2em; line-height: 2em; outline: none; white-space: pre-wrap; }
+        .folha-respostas { background-color: var(--fgv-yellow); border: 1px solid #999; min-height: 500px; padding: 40px; background-image: linear-gradient(#e1e1e1 1px, transparent 1px); background-size: 100% 2em; line-height: 2em; outline: none; white-space: pre-wrap; text-align: left; }
         .toolbar { display: flex; justify-content: space-around; background: var(--fgv-blue); padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-        .btn-tool { color: white; cursor: pointer; font-size: 24px; background: none; border: none; padding: 10px; transition: 0.2s; }
-        
+        .btn-tool { color: white; cursor: pointer; font-size: 28px; background: none; border: none; padding: 10px; }
         .post-it-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .post-it { background: #fffa82; padding: 15px; border: 1px solid #e1db55; box-shadow: 5px 5px 7px rgba(0,0,0,0.1); font-size: 0.9em; }
-
-        #historico-mentoria { display: none; margin-top: 20px; border: 3px double var(--fgv-blue); padding: 20px; background: #fff; }
-        .item-exame { background: #f9f9f9; margin-bottom: 15px; padding: 15px; border-left: 8px solid var(--fgv-blue); display: flex; justify-content: space-between; align-items: center; }
-        .btn-reabrir { background: var(--fgv-blue); color: white; border: none; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .btn-limpar-hist { background: #ef4444; color: white; border: none; padding: 8px; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .post-it { background: #fffa82; padding: 15px; border: 1px solid #e1db55; box-shadow: 5px 5px 7px rgba(0,0,0,0.1); font-size: 0.9em; color: #333; }
+        #historico-mentoria { display: none; margin-top: 20px; border: 4px double var(--fgv-blue); padding: 20px; background: #fff; }
+        .item-exame { background: #f1f5f9; margin-bottom: 10px; padding: 15px; border-left: 10px solid var(--fgv-blue); display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .btn-reabrir { background: #10b981; color: white; border: none; padding: 12px 15px; cursor: pointer; font-weight: 900; border-radius: 6px; text-transform: uppercase; }
+        .btn-limpar-hist { background: #ef4444; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header-fgv">
-        <h2>EXAME DE ORDEM - CADERNO DE RESPOSTAS</h2>
-        <small>Mente Blindada - Plano de Voo</small>
+        <h2 style="margin:0;">EXAME DE ORDEM - CADERNO DE RESPOSTAS</h2>
+        <small>Mente Blindada - Plano de Voo 2026</small>
     </div>
 
     <div class="toolbar">
-        <button class="btn-tool" onclick="mostrarEstruturas()">📜</button>
-        <button class="btn-tool" onclick="salvarPeca()">💾</button>
-        <button class="btn-tool" onclick="toggleHistorico()">📂</button>
+        <button class="btn-tool" onclick="mostrarEstruturas()" title="Estruturas">📜</button>
+        <button class="btn-tool" onclick="salvarPeca()" title="Salvar Peça">💾</button>
+        <button class="btn-tool" onclick="toggleHistorico()" title="Ver Histórico">📂</button>
     </div>
 
     <div class="folha-respostas" contenteditable="true" id="area-edicao">AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...</div>
 
     <div class="post-it-container">
-        <div class="post-it"><strong>📌 Teses & Preliminares:</strong><ul id="lista-teses"><li>Aguardando análise...</li></ul></div>
-        <div class="post-it"><strong>💡 Inteligência Não Confunda:</strong><p>Diferencie rito Sumaríssimo de Ordinário.</p></div>
+        <div class="post-it"><strong>📌 Teses & Preliminares:</strong><ul id="lista-teses"><li>Pronto para injetar conteúdo oficial.</li></ul></div>
+        <div class="post-it"><strong>💡 Inteligência Não Confunda:</strong><p id="dica-inteligencia">Diferencie Recurso Ordinário de Agravo de Petição.</p></div>
     </div>
 
     <div id="historico-mentoria">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <h3>📂 Peças Salvas</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom: 2px solid var(--fgv-blue); padding-bottom:10px;">
+            <h3 style="margin:0;">📂 ARQUIVO DE PEÇAS</h3>
             <button class="btn-limpar-hist" onclick="limparTudo()">APAGAR TUDO</button>
         </div>
         <div id="lista-historico"></div>
@@ -53,72 +51,83 @@
 </div>
 
 <script>
+    // SALVAR INTEGRALMENTE
     function salvarPeca() {
-        const conteudoCompleto = document.getElementById('area-edicao').innerText;
-        if(conteudoCompleto.trim().length < 10) return alert("Peça vazia!");
+        const texto = document.getElementById('area-edicao').innerText;
+        if(texto.trim().length < 20) return alert("Escreva algo antes de salvar!");
 
-        const exame = {
-            id: Date.now(),
+        const novaPeca = {
             data: new Date().toLocaleString('pt-BR'),
-            texto: conteudoCompleto
+            conteudo: texto
         };
 
         let historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
-        historico.push(exame);
+        historico.push(novaPeca);
         localStorage.setItem('historico_oab', JSON.stringify(historico));
 
-        alert("PEÇA SALVA INTEGRALMENTE NO HISTÓRICO!");
-        atualizarVisualizacaoHistorico();
+        alert("PEÇA SALVA NO HISTÓRICO!");
+        atualizarLista();
     }
 
+    // ABRIR/FECHAR PASTA
     function toggleHistorico() {
-        const histDiv = document.getElementById('historico-mentoria');
-        atualizarVisualizacaoHistorico();
-        histDiv.style.display = histDiv.style.display === "none" ? "block" : "none";
-        if(histDiv.style.display === "block") histDiv.scrollIntoView({behavior: 'smooth'});
+        const div = document.getElementById('historico-mentoria');
+        atualizarLista();
+        div.style.display = (div.style.display === "none" || div.style.display === "") ? "block" : "none";
+        if(div.style.display === "block") div.scrollIntoView({behavior: 'smooth'});
     }
 
-    function carregarPeça(id) {
-        const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
-        const peca = historico.find(p => p.id === id);
+    // CARREGAR PEÇA DE VOLTA PRA FOLHA
+    function carregar(index) {
+        let historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
+        const peca = historico[index];
         if(peca) {
-            document.getElementById('area-edicao').innerText = peca.texto;
+            document.getElementById('area-edicao').innerText = peca.conteudo;
             document.getElementById('historico-mentoria').style.display = "none";
             window.scrollTo({top: 0, behavior: 'smooth'});
-            alert("Peça carregada na folha!");
+            alert("Peça recuperada com sucesso!");
         }
     }
 
-    function atualizarVisualizacaoHistorico() {
-        const lista = document.getElementById('lista-historico');
+    // RENDERIZAR LISTA
+    function atualizarLista() {
+        const container = document.getElementById('lista-historico');
         const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
         
-        if (historico.length === 0) {
-            lista.innerHTML = "<p>Nenhuma peça no arquivo.</p>";
+        if(historico.length === 0) {
+            container.innerHTML = "<p style='text-align:center; color:gray;'>Pasta vazia.</p>";
             return;
         }
 
-        lista.innerHTML = historico.reverse().map(item => `
-            <div class="item-exame">
-                <div>
-                    <strong>Data: ${item.data}</strong><br>
-                    <small>${item.texto.substring(0, 40)}...</small>
+        // Criar a lista sem inverter o array original para não perder o index
+        let html = "";
+        for(let i = historico.length - 1; i >= 0; i--) {
+            html += `
+                <div class="item-exame">
+                    <div>
+                        <strong style="color:var(--fgv-blue)">DATA: ${historico[i].data}</strong><br>
+                        <small style="color:#666">${historico[i].conteudo.substring(0, 60)}...</small>
+                    </div>
+                    <button class="btn-reabrir" onclick="carregar(${i})">ABRIR</button>
                 </div>
-                <button class="btn-reabrir" onclick="carregarPeça(${item.id})">REABRIR PEÇA</button>
-            </div>
-        `).join('');
+            `;
+        }
+        container.innerHTML = html;
     }
 
     function limparTudo() {
-        if(confirm("Apagar histórico permanente?")) {
+        if(confirm("Limpar todas as peças salvas?")) {
             localStorage.removeItem('historico_oab');
-            atualizarVisualizacaoHistorico();
+            atualizarLista();
         }
     }
 
     function mostrarEstruturas() {
-        alert("ESTRUTURA RT:\n1. Endereçamento\n2. Qualificação\n3. Preliminares\n4. Mérito\n5. Pedidos\n6. Fechamento");
+        alert("ESTRUTURA BLINDADA:\n1. Endereçamento\n2. Qualificação\n3. Preliminares\n4. Mérito\n5. Pedidos\n6. Fechamento");
     }
+
+    window.onload = atualizarLista;
 </script>
+
 </body>
 </html>

@@ -35,13 +35,6 @@
         .actions { display: flex; gap: 8px; }
         .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
 
-        /* MODAL DE VISUALIZAÇÃO */
-        #modal-view { position: fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; color:black; z-index: 3000; display:none; overflow-y:auto; padding: 0; }
-        .modal-header-sticky { position: sticky; top: 0; background: #0f172a; padding: 15px; z-index: 3001; display: flex; justify-content: center; border-bottom: 1px solid #334155; }
-        .modal-body-elite { max-width: 850px; margin: 20px auto; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.5); min-height: 100vh; }
-
-        .hidden { display: none; }
-        
         /* MENU INFERIOR */
         .nav-tabs {
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
@@ -51,12 +44,18 @@
         .tab { color: #94a3b8; text-align: center; font-size: 10px; text-decoration: none; font-weight: 700; flex: 1; }
         .tab.active { color: var(--gold); }
         .tab i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+
+        /* MODAL DE VISUALIZAÇÃO */
+        #modal-view { position: fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; color:black; z-index: 3000; display:none; overflow-y:auto; padding: 0; }
+        .modal-body-elite { max-width: 850px; margin: 20px auto; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.5); min-height: 100vh; }
+        
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div id="modal-view">
-    <div class="modal-header-sticky">
+    <div style="position: sticky; top: 0; background: #0f172a; padding: 15px; z-index: 3001; display: flex; justify-content: center;">
         <button onclick="fecharModal()" style="background:var(--gold); color:black; padding:12px 30px; border:none; border-radius:8px; font-weight: 900; cursor: pointer;">FECHAR VISUALIZAÇÃO</button>
     </div>
     <div id="modal-content" class="modal-body-elite"></div>
@@ -70,13 +69,22 @@
 <div class="container">
     <div id="sec-producao">
         <h3 style="color:var(--gold); font-size: 0.9rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
-        <div id="feed-producao">Carregando registros...</div>
+        <div id="feed-producao"></div>
+    </div>
+    
+    <div id="sec-inteligencia" class="hidden">
+        <h3 id="intel-head" style="font-size: 0.9rem;">INTELIGÊNCIA</h3>
+        <div id="feed-v13"></div>
     </div>
 </div>
 
 <nav class="nav-tabs">
-    <a href="#" class="tab active"><i class="fas fa-file-signature"></i>PEÇAS</a>
-    </nav>
+    <a href="#" class="tab active" onclick="showTab('producao')"><i class="fas fa-file-signature"></i>PEÇAS</a>
+    <a href="#" class="tab" onclick="showTab('qp')"><i class="fas fa-search"></i>PEÇA?</a>
+    <a href="#" class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
+    <a href="#" class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
+    <a href="#" class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
+</nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -89,67 +97,67 @@
         projectId: "masteroab-db5e1",
         databaseURL: "https://masteroab-db5e1-default-rtdb.firebaseio.com"
     };
-    
     const app = initializeApp(config);
     const db = getDatabase(app);
 
-    // Renderizar Histórico
-    onValue(ref(db, 'producao_v13'), (snapshot) => {
-        const feed = document.getElementById('feed-producao');
-        feed.innerHTML = "";
-        
-        if (snapshot.exists()) {
-            const dados = snapshot.val();
-            Object.keys(dados).reverse().forEach(id => {
-                if(id.includes("RASCUNHO")) return;
-                const p = dados[id];
-                feed.innerHTML += `
-                    <div class="card-h">
-                        <div class="info-h"><b>Exame ${p.exame || '??'}</b><span>${p.nome_peca || p.peca || 'PEÇA'}</span></div>
-                        <div class="actions">
-                            <button class="btn-circle" style="background:var(--info)" onclick="window.verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn-circle" style="background:var(--danger)" onclick="window.apagar('${id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`;
-            });
-        } else {
-            feed.innerHTML = "Nenhum registro encontrado.";
-        }
-    });
+    let currentTab = 'producao';
 
-    // --- FUNÇÃO VER TREINO AJUSTADA (RESILIENTE) ---
+    window.showTab = (tab) => {
+        currentTab = tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        const tabEl = document.querySelector(`.tab[onclick*='${tab}']`);
+        if(tabEl) tabEl.classList.add('active');
+        
+        const isProd = tab === 'producao';
+        document.getElementById('sec-producao').classList.toggle('hidden', !isProd);
+        document.getElementById('sec-inteligencia').classList.toggle('hidden', isProd);
+        render();
+    };
+
+    // --- AJUSTE CIRÚRGICO BLINDADO ---
     window.verTreino = async (id) => {
         const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return alert("Dados não encontrados.");
-        
+        if(!s.exists()) return alert("Treino não localizado.");
         const p = s.val();
         
-        // Tenta capturar o texto de todas as chaves possíveis
-        let textoFinal = "";
+        // Tenta capturar o texto de qualquer lugar (resiliência total)
+        let textoFinal = p.conteudo || p.texto || (Array.isArray(p.linhas) ? p.linhas.join('\n') : "");
         
-        if (p.conteudo && typeof p.conteudo === 'string') {
-            textoFinal = p.conteudo;
-        } else if (p.linhas && Array.isArray(p.linhas)) {
-            textoFinal = p.linhas.join('\n');
-        } else if (p.texto) {
-            textoFinal = p.texto;
+        if(!textoFinal || textoFinal.trim() === "") {
+            return alert("Erro: O conteúdo deste arquivo está vazio no banco.");
         }
 
-        if (!textoFinal || textoFinal.trim() === "") {
-            console.log("Dados brutos do Firebase para este ID:", p);
-            return alert("Erro: O conteúdo deste arquivo está vazio no banco de dados.");
-        }
-
-        // Renderização
-        const container = document.getElementById('modal-content');
-        container.innerHTML = FolhaEngine.renderizarFolhaEstatica(textoFinal, p.exame || "---");
+        const modalCont = document.getElementById('modal-content');
+        // Usa o motor FolhaEngine para garantir a estrutura FGV
+        modalCont.innerHTML = FolhaEngine.renderizarFolhaEstatica(textoFinal, p.exame || "---");
         document.getElementById('modal-view').style.display = 'block';
-        window.scrollTo(0,0);
     };
 
     window.fecharModal = () => document.getElementById('modal-view').style.display = 'none';
-    window.apagar = (id) => { if(confirm("Excluir?")) remove(ref(db, 'producao_v13/' + id)); };
 
+    let cache = {};
+    onValue(ref(db), (snap) => { cache = snap.val() || {}; render(); });
+
+    function render() {
+        if(currentTab === 'producao') {
+            const f = document.getElementById('feed-producao'); f.innerHTML = "";
+            const itens = cache.producao_v13 || {};
+            Object.keys(itens).reverse().forEach(id => {
+                if(id.includes("RASCUNHO")) return;
+                const p = itens[id];
+                f.innerHTML += `
+                    <div class="card-h">
+                        <div class="info-h"><b>Exame ${p.exame || '??'}</b><span>${p.nome_peca || p.peca || 'REGISTRO'}</span></div>
+                        <div class="actions">
+                            <button class="btn-circle" style="background:var(--info)" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-circle" style="background:var(--danger)" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        }
+    }
+
+    window.apagar = (path, id) => { if(confirm("Excluir registro?")) remove(ref(db, `${path}/${id}`)); };
 </script>
 </body>
 </html>

@@ -23,11 +23,9 @@
 
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* PAINEL DE INPUT (INTELIGÊNCIAS) */
         .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
 
-        /* CARDS HISTÓRICO */
         .card-h {
             background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px;
             border: 1px solid #334155; border-left: 5px solid var(--gold);
@@ -36,7 +34,6 @@
         .info-h b { display: block; color: var(--gold); font-size: 10px; text-transform: uppercase; }
         .info-h span { font-size: 14px; font-weight: 700; }
 
-        /* POST-ITS */
         .post-it {
             padding: 18px; border-radius: 15px; margin-bottom: 15px; color: #020617;
             position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
@@ -47,7 +44,6 @@
         .actions { display: flex; gap: 8px; }
         .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
 
-        /* MENU INFERIOR */
         .nav-tabs {
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
             display: flex; justify-content: space-around; padding: 10px;
@@ -57,7 +53,6 @@
         .tab.active { color: var(--gold); }
         .tab i { display: block; font-size: 1.2rem; margin-bottom: 3px; }
 
-        /* MODAL DE VISUALIZAÇÃO */
         #modal-view { position: fixed; top:0; left:0; width:100%; height:100%; background:#0f172a; color:black; z-index: 3000; display:none; overflow-y:auto; padding: 0; }
         .modal-body-elite { max-width: 850px; margin: 20px auto; background: white; box-shadow: 0 0 50px rgba(0,0,0,0.5); min-height: 100vh; }
         
@@ -142,31 +137,32 @@
         render();
     };
 
-    // Salvar nas abas de inteligência
     document.getElementById('btn-salvar').onclick = () => {
         const t = document.getElementById('inp-t').value;
         const c = document.getElementById('inp-c').value;
         if(!t || !c) return alert("Preencha título e conteúdo!");
-
         if(editId) {
             set(ref(db, `v13_master/${editId}`), { t, c, cat: currentTab, ts: serverTimestamp() });
             editId = null;
         } else {
             push(ref(db, 'v13_master'), { t, c, cat: currentTab, ts: serverTimestamp() });
         }
-        document.getElementById('inp-t').value = "";
-        document.getElementById('inp-c').value = "";
+        document.getElementById('inp-t').value = ""; document.getElementById('inp-c').value = "";
     };
 
-    // VISUALIZAÇÃO BLINDADA
+    // VISUALIZAÇÃO TOTALMENTE RECONSTRUÍDA
     window.verTreino = async (id) => {
         const s = await get(ref(db, 'producao_v13/' + id));
-        if(!s.exists()) return alert("Treino não localizado.");
+        if(!s.exists()) return alert("Treino não localizado no banco.");
         const p = s.val();
         
+        // RESOLUÇÃO DO PROBLEMA DE PÁGINA EM BRANCO:
+        // Pega o texto se for string OU une as linhas se for array.
         let textoFinal = p.conteudo || p.texto || (Array.isArray(p.linhas) ? p.linhas.join('\n') : "");
         
-        if(!textoFinal || textoFinal.trim() === "") return alert("Erro: O conteúdo está vazio no banco.");
+        if(!textoFinal || textoFinal.trim() === "") {
+            return alert("Este treino está vazio no banco de dados.");
+        }
 
         document.getElementById('modal-content').innerHTML = FolhaEngine.renderizarFolhaEstatica(textoFinal, p.exame || "---");
         document.getElementById('modal-view').style.display = 'block';
@@ -175,10 +171,7 @@
     window.fecharModal = () => document.getElementById('modal-view').style.display = 'none';
 
     let cache = {};
-    onValue(ref(db), (snap) => { 
-        cache = snap.val() || {}; 
-        render(); 
-    });
+    onValue(ref(db), (snap) => { cache = snap.val() || {}; render(); });
 
     function render() {
         if(currentTab === 'producao') {
@@ -187,14 +180,13 @@
             Object.keys(itens).reverse().forEach(id => {
                 if(id.includes("RASCUNHO")) return;
                 const p = itens[id];
-                f.innerHTML += `
-                    <div class="card-h">
-                        <div class="info-h"><b>Exame ${p.exame || '??'}</b><span>${p.nome_peca || p.peca || 'REGISTRO'}</span></div>
-                        <div class="actions">
-                            <button class="btn-circle" style="background:var(--info)" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
-                            <button class="btn-circle" style="background:var(--danger)" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`;
+                f.innerHTML += `<div class="card-h">
+                    <div class="info-h"><b>Exame ${p.exame || '??'}</b><span>${p.nome_peca || p.peca || 'REGISTRO'}</span></div>
+                    <div class="actions">
+                        <button class="btn-circle" style="background:var(--info)" onclick="verTreino('${id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn-circle" style="background:var(--danger)" onclick="apagar('producao_v13','${id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
             });
         } else {
             const f = document.getElementById('feed-v13'); f.innerHTML = "";
@@ -203,22 +195,19 @@
             Object.keys(itens).reverse().forEach(id => {
                 const it = itens[id];
                 if(it.cat !== currentTab) return;
-                f.innerHTML += `
-                    <div class="post-it" style="background:${cores[it.cat]}">
-                        <strong>${it.t}</strong><p>${it.c}</p>
-                        <div class="actions">
-                            <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
-                            <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
-                        </div>
-                    </div>`;
+                f.innerHTML += `<div class="post-it" style="background:${cores[it.cat]}">
+                    <strong>${it.t}</strong><p>${it.c}</p>
+                    <div class="actions">
+                        <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>`;
             });
         }
     }
 
     window.editar = (id, t, c) => {
-        editId = id;
-        document.getElementById('inp-t').value = t;
-        document.getElementById('inp-c').value = c;
+        editId = id; document.getElementById('inp-t').value = t; document.getElementById('inp-c').value = c;
         window.scrollTo({top:0, behavior:'smooth'});
     };
 

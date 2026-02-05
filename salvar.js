@@ -42,13 +42,13 @@ export const engineSaveElite = async (db, exame, isFinal = false) => {
     try {
         // 4. Execução do Salvamento
         if (isFinal) {
-            // Salva no histórico de produção para a Mentoria ler
+            // Salva no histórico de produção para a Mentoria ler [cite: 2026-01-30]
             const historicoRef = ref(db, `producao_v13`);
             const novaPecaRef = push(historicoRef); 
             await set(novaPecaRef, payload);
             alert("✅ PEÇA SALVA NO HISTÓRICO COM SUCESSO!");
         } else {
-            // Salva apenas o rascunho temporário
+            // Salva apenas o rascunho temporário [cite: 2026-01-30]
             const rascunhoPath = `producao_v13/${exameOficial}_RASCUNHO_ATUAL`;
             await set(ref(db, rascunhoPath), payload);
         }

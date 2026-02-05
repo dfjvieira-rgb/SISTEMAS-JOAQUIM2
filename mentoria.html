@@ -5,103 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mentoria OAB - Voo Blindado</title>
     <style>
-        :root {
-            --fgv-yellow: #fffdf0;
-            --fgv-blue: #003366;
-            --border-color: #ccc;
-        }
+        :root { --fgv-yellow: #fffdf0; --fgv-blue: #003366; --border-color: #ccc; }
+        body { font-family: 'Courier New', Courier, monospace; background-color: #f4f4f4; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border: 1px solid var(--border-color); }
+        .header-fgv { border: 2px solid var(--fgv-blue); padding: 10px; text-align: center; margin-bottom: 20px; background-color: var(--fgv-yellow); }
+        .folha-respostas { background-color: var(--fgv-yellow); border: 1px solid #999; min-height: 400px; padding: 40px; background-image: linear-gradient(#e1e1e1 1px, transparent 1px); background-size: 100% 2em; line-height: 2em; outline: none; }
+        .toolbar { display: flex; justify-content: space-around; background: var(--fgv-blue); padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        .btn-tool { color: white; cursor: pointer; font-size: 20px; background: none; border: none; padding: 10px; transition: 0.2s; }
+        .btn-tool:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+        
+        /* POST-ITS */
+        .post-it-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .post-it { background: #fffa82; padding: 15px; border: 1px solid #e1db55; box-shadow: 5px 5px 7px rgba(0,0,0,0.1); font-size: 0.9em; }
 
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
+        /* SEÇÃO DE HISTÓRICO - FORÇADA */
+        #historico-mentoria { 
+            display: none; 
+            margin-top: 20px; 
+            border: 3px double var(--fgv-blue); 
+            padding: 20px; 
+            background: #fff;
+            max-height: 400px;
+            overflow-y: auto;
         }
-
-        /* Container Principal */
-        .container {
-            max-width: 900px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Cabeçalho FGV Style */
-        .header-fgv {
-            border: 2px solid var(--fgv-blue);
-            padding: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-            background-color: var(--fgv-yellow);
-        }
-
-        /* Área da Peça (Folha de Respostas) */
-        .folha-respostas {
-            background-color: var(--fgv-yellow);
-            border: 1px solid #999;
-            min-height: 400px;
-            padding: 40px;
-            background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
-            background-size: 100% 2em;
-            line-height: 2em;
-            position: relative;
-        }
-
-        /* Sidebar de Ferramentas (Mobile Friendly) */
-        .toolbar {
-            display: flex;
-            justify-content: space-around;
-            background: var(--fgv-blue);
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .btn-tool {
-            color: white;
-            cursor: pointer;
-            font-size: 20px;
-            background: none;
-            border: none;
-        }
-
-        /* Inteligências e Post-its */
-        .post-it-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .post-it {
-            background: #fffa82;
-            padding: 15px;
-            border: 1px solid #e1db55;
-            box-shadow: 5px 5px 7px rgba(0,0,0,0.1);
-            font-size: 0.9em;
-        }
-
-        /* Histórico (O Exame Realizado) */
-        #historico-mentoria {
-            display: none;
-            margin-top: 20px;
-            border-top: 3px double var(--fgv-blue);
-            padding-top: 20px;
-        }
-
-        .item-exame {
-            background: #eee;
-            margin-bottom: 10px;
-            padding: 10px;
-            border-left: 5px solid var(--fgv-blue);
-        }
-
-        @media (max-width: 600px) {
-            .folha-respostas { padding: 15px; }
-            .post-it-container { grid-template-columns: 1fr; }
-        }
+        .item-exame { background: #f9f9f9; margin-bottom: 15px; padding: 15px; border-left: 8px solid var(--fgv-blue); border-bottom: 1px solid #ddd; }
+        .btn-limpar-hist { background: #ef4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; font-size: 0.7rem; }
     </style>
 </head>
 <body>
@@ -113,95 +41,98 @@
     </div>
 
     <div class="toolbar">
-        <button class="btn-tool" onclick="mostrarEstruturas()" title="Estruturas (Pergaminho)">📜</button>
-        <button class="btn-tool" onclick="salvarPeca()" title="Salvar PDF (Disquete)">💾</button>
-        <button class="btn-tool" onclick="toggleHistorico()" title="Ver Exames Realizados">📂</button>
+        <button class="btn-tool" onclick="mostrarEstruturas()" title="Estruturas">📜</button>
+        <button class="btn-tool" onclick="salvarPeca()" title="Finalizar Peça">💾</button>
+        <button class="btn-tool" onclick="toggleHistorico()" title="Ver Histórico">📂</button>
     </div>
 
     <div class="folha-respostas" contenteditable="true" id="area-edicao">
         AO DOUTO JUÍZO DA ... VARA DO TRABALHO DE ...
-        <br><br>
-        (Skeleton Blindado: RT até Cumprimento)
     </div>
 
     <div class="post-it-container">
-        <div class="post-it" id="postit-teses">
+        <div class="post-it">
             <strong>📌 Teses & Preliminares:</strong>
-            <ul id="lista-teses"><li>Aguardando análise de PDF...</li></ul>
+            <ul id="lista-teses"><li>Aguardando análise...</li></ul>
         </div>
-        <div class="post-it" id="postit-inteligencia">
+        <div class="post-it">
             <strong>💡 Inteligência Não Confunda:</strong>
-            <p id="dica-inteligencia">Diferencie Recurso Ordinário de Agravo de Petição.</p>
+            <p id="dica-inteligencia">Identifique se é fase de Conhecimento ou Execução.</p>
         </div>
     </div>
 
     <div id="historico-mentoria">
-        <h3>📂 Histórico de Exames Realizados (PDFs Salvos)</h3>
-        <div id="lista-historico">
-            </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0;">📂 Peças Finalizadas</h3>
+            <button class="btn-limpar-hist" onclick="limparTudo()">Apagar Histórico</button>
+        </div>
+        <div id="lista-historico"></div>
     </div>
 </div>
 
 <script>
-    // Constantes de Qualificação e Pulos (Skeleton Técnico)
-    const CONSTANTES_PECA = {
-        PULO_LINHAS: "\n\n\n\n\n",
-        FECHAMENTO: "Nestes Termos,\nPede Deferimento.\nLocal e Data...\nAdvogado...\nOAB..."
-    };
-
-    // Função do Disquete: Salva apenas quando finalizar
+    // Função do Disquete: Salva a peça no histórico
     function salvarPeca() {
         const conteudo = document.getElementById('area-edicao').innerText;
-        const data = new Date().toLocaleString();
-        
-        // Simulação de salvamento no histórico do mentoria
+        if(conteudo.trim().length < 50) return alert("Escreva a peça antes de finalizar!");
+
         const exame = {
-            data: data,
-            titulo: "Peça Prática - Analisada via PDF",
-            conteúdo: conteudo
+            data: new Date().toLocaleString('pt-BR'),
+            conteudo: conteudo.substring(0, 500) + "..." // Salva um resumo para visualização
         };
 
         let historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
         historico.push(exame);
         localStorage.setItem('historico_oab', JSON.stringify(historico));
 
-        alert("Peça finalizada e salva no Histórico (PDF Gerado no Mentoria)!");
+        alert("PEÇA FINALIZADA! O PDF foi organizado no Histórico (📂).");
         atualizarVisualizacaoHistorico();
     }
 
-    // Função do Pergaminho: Traz as estruturas
-    function mostrarEstruturas() {
-        const estruturas = "ESTRUTURA BASE:\n1. Endereçamento\n2. Qualificação\n3. Fatos\n4. Fundamentos (Teses)\n5. Pedidos\n6. Provas/Valor da Causa";
-        alert(estruturas);
-    }
-
-    // Ajuste da Visualização do Exame Realizado
+    // Função da Pasta: Abre e fecha o histórico
     function toggleHistorico() {
         const histDiv = document.getElementById('historico-mentoria');
-        histDiv.style.display = histDiv.style.display === 'none' ? 'block' : 'none';
-        atualizarVisualizacaoHistorico();
+        atualizarVisualizacaoHistorico(); // Garante que a lista está atualizada antes de mostrar
+        
+        if (histDiv.style.display === "none" || histDiv.style.display === "") {
+            histDiv.style.display = "block";
+            histDiv.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            histDiv.style.display = "none";
+        }
     }
 
     function atualizarVisualizacaoHistorico() {
         const lista = document.getElementById('lista-historico');
         const historico = JSON.parse(localStorage.getItem('historico_oab') || "[]");
         
-        lista.innerHTML = historico.length === 0 ? "<p>Nenhum exame realizado ainda.</p>" : "";
-        
-        historico.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'item-exame';
-            div.innerHTML = `<strong>${item.data}</strong> - ${item.titulo} <br> <small>Conteúdo preservado no sistema.</small>`;
-            lista.appendChild(div);
-        });
+        if (historico.length === 0) {
+            lista.innerHTML = "<p style='color:red;'>Nenhuma peça salva ainda. Use o Disquete (💾) para finalizar.</p>";
+            return;
+        }
+
+        lista.innerHTML = historico.reverse().map((item, index) => `
+            <div class="item-exame">
+                <strong>🗓 Data: ${item.data}</strong><br>
+                <p style="font-size:0.8rem; color:#444; margin-top:5px;">${item.conteudo}</p>
+                <small style="color:var(--fgv-blue); font-weight:bold;">[STATUS: PEÇA BLINDADA]</small>
+            </div>
+        `).join('');
     }
 
-    // Inicialização Mobile
-    window.onload = () => {
-        console.log("Sistema Mentoria OAB carregado no modo Mobile/Desktop.");
-    };
+    function mostrarEstruturas() {
+        alert("ESTRUTURA RT:\n- Endereçamento\n- Qualificação\n- Preliminares\n- Mérito\n- Pedidos\n- Fechamento");
+    }
+
+    function limparTudo() {
+        if(confirm("Deseja apagar todas as peças salvas?")) {
+            localStorage.removeItem('historico_oab');
+            atualizarVisualizacaoHistorico();
+        }
+    }
+
+    window.onload = atualizarVisualizacaoHistorico;
 </script>
 
 </body>
 </html>
-

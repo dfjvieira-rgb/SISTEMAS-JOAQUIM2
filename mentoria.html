@@ -23,6 +23,10 @@
 
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
+        /* PAINEL DE INPUT (INTELIGÊNCIAS) */
+        .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
+        input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
+
         /* CARDS HISTÓRICO */
         .card-h {
             background: var(--card); border-radius: 12px; padding: 15px; margin-bottom: 10px;
@@ -31,6 +35,14 @@
         }
         .info-h b { display: block; color: var(--gold); font-size: 10px; text-transform: uppercase; }
         .info-h span { font-size: 14px; font-weight: 700; }
+
+        /* POST-ITS */
+        .post-it {
+            padding: 18px; border-radius: 15px; margin-bottom: 15px; color: #020617;
+            position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .post-it strong { display: block; font-size: 1rem; text-transform: uppercase; }
+        .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 500; }
 
         .actions { display: flex; gap: 8px; }
         .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
@@ -67,6 +79,13 @@
 </header>
 
 <div class="container">
+    <div id="panel-editor" class="panel-input hidden">
+        <h4 id="editor-title" style="margin-top:0;">Incluir Novo</h4>
+        <input id="inp-t" placeholder="Título / Assunto">
+        <textarea id="inp-c" rows="3" placeholder="Conteúdo detalhado..."></textarea>
+        <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px;">SALVAR</button>
+    </div>
+
     <div id="sec-producao">
         <h3 style="color:var(--gold); font-size: 0.9rem;"><i class="fas fa-history"></i> HISTÓRICO DE PRODUÇÃO</h3>
         <div id="feed-producao"></div>
@@ -88,7 +107,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, onValue, push, remove, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
 
     const config = {
@@ -101,6 +120,7 @@
     const db = getDatabase(app);
 
     let currentTab = 'producao';
+    let editId = null;
 
     window.showTab = (tab) => {
         currentTab = tab;
@@ -111,32 +131,54 @@
         const isProd = tab === 'producao';
         document.getElementById('sec-producao').classList.toggle('hidden', !isProd);
         document.getElementById('sec-inteligencia').classList.toggle('hidden', isProd);
+        document.getElementById('panel-editor').classList.toggle('hidden', isProd);
+        
+        if(!isProd) {
+            const titulos = { qp: 'Qual a Peça?', nc: 'Não Confunda', tese: 'Banco de Teses', arsenal: 'Arsenal 50Q' };
+            document.getElementById('intel-head').innerText = titulos[tab].toUpperCase();
+            document.getElementById('intel-head').style.color = `var(--${tab})`;
+            document.getElementById('btn-salvar').style.background = `var(--${tab})`;
+        }
         render();
     };
 
-    // --- AJUSTE CIRÚRGICO BLINDADO ---
+    // Salvar nas abas de inteligência
+    document.getElementById('btn-salvar').onclick = () => {
+        const t = document.getElementById('inp-t').value;
+        const c = document.getElementById('inp-c').value;
+        if(!t || !c) return alert("Preencha título e conteúdo!");
+
+        if(editId) {
+            set(ref(db, `v13_master/${editId}`), { t, c, cat: currentTab, ts: serverTimestamp() });
+            editId = null;
+        } else {
+            push(ref(db, 'v13_master'), { t, c, cat: currentTab, ts: serverTimestamp() });
+        }
+        document.getElementById('inp-t').value = "";
+        document.getElementById('inp-c').value = "";
+    };
+
+    // VISUALIZAÇÃO BLINDADA
     window.verTreino = async (id) => {
         const s = await get(ref(db, 'producao_v13/' + id));
         if(!s.exists()) return alert("Treino não localizado.");
         const p = s.val();
         
-        // Tenta capturar o texto de qualquer lugar (resiliência total)
         let textoFinal = p.conteudo || p.texto || (Array.isArray(p.linhas) ? p.linhas.join('\n') : "");
         
-        if(!textoFinal || textoFinal.trim() === "") {
-            return alert("Erro: O conteúdo deste arquivo está vazio no banco.");
-        }
+        if(!textoFinal || textoFinal.trim() === "") return alert("Erro: O conteúdo está vazio no banco.");
 
-        const modalCont = document.getElementById('modal-content');
-        // Usa o motor FolhaEngine para garantir a estrutura FGV
-        modalCont.innerHTML = FolhaEngine.renderizarFolhaEstatica(textoFinal, p.exame || "---");
+        document.getElementById('modal-content').innerHTML = FolhaEngine.renderizarFolhaEstatica(textoFinal, p.exame || "---");
         document.getElementById('modal-view').style.display = 'block';
     };
 
     window.fecharModal = () => document.getElementById('modal-view').style.display = 'none';
 
     let cache = {};
-    onValue(ref(db), (snap) => { cache = snap.val() || {}; render(); });
+    onValue(ref(db), (snap) => { 
+        cache = snap.val() || {}; 
+        render(); 
+    });
 
     function render() {
         if(currentTab === 'producao') {
@@ -154,8 +196,31 @@
                         </div>
                     </div>`;
             });
+        } else {
+            const f = document.getElementById('feed-v13'); f.innerHTML = "";
+            const itens = cache.v13_master || {};
+            const cores = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--tese)', arsenal: 'var(--arsenal)' };
+            Object.keys(itens).reverse().forEach(id => {
+                const it = itens[id];
+                if(it.cat !== currentTab) return;
+                f.innerHTML += `
+                    <div class="post-it" style="background:${cores[it.cat]}">
+                        <strong>${it.t}</strong><p>${it.c}</p>
+                        <div class="actions">
+                            <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}','${it.t}','${it.c}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('v13_master','${id}')"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>`;
+            });
         }
     }
+
+    window.editar = (id, t, c) => {
+        editId = id;
+        document.getElementById('inp-t').value = t;
+        document.getElementById('inp-c').value = c;
+        window.scrollTo({top:0, behavior:'smooth'});
+    };
 
     window.apagar = (path, id) => { if(confirm("Excluir registro?")) remove(ref(db, `${path}/${id}`)); };
 </script>

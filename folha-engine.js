@@ -163,5 +163,26 @@ export const FolhaEngine = {
         overlay.appendChild(btn);
         overlay.appendChild(papel);
         document.body.appendChild(overlay);
+    },
+
+    // AJUSTE PONTUAL PARA VISUALIZAÇÃO NA MENTORIA
+    renderizarFolhaEstatica: (textoBruto, exame) => {
+        const linhas = textoBruto.split('\n');
+        let html = `
+            <div style="text-align:center; border-bottom:3px solid #000; padding:20px; font-family:Arial,sans-serif; background:#f8fafc; color:black;">
+                <h2 style="margin:0; font-size:18px;">CADERNO DE RESPOSTAS - EXAME ${exame}</h2>
+                <p style="margin:5px 0 0 0; font-size:12px; color:#444;">REPRODUÇÃO DO HISTÓRICO ELITE</p>
+            </div>
+        `;
+
+        for(let i=1; i<=150; i++) {
+            const txt = linhas[i-1] || "";
+            html += `
+                <div style="display:flex; min-height:35px; border-bottom:1px solid #eee; align-items:stretch; background:white;">
+                    <span style="width:40px; min-width:40px; border-right:2px solid #000; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:bold; background:#f1f5f9; color:#000;">${i}</span>
+                    <span style="flex:1; padding:5px 15px; font-family:'Courier New', monospace; font-size:18px; font-weight:bold; line-height:25px; white-space:pre-wrap; word-break:break-word; color:#000; text-align:justify;">${txt}</span>
+                </div>`;
+        }
+        return html;
     }
 };

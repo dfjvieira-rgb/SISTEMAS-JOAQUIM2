@@ -88,16 +88,15 @@
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
-        /* --- PDF VIEWER LATERAL --- */
         #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; }
         iframe { width: 100%; flex: 1; border: none; }
 
-        /* --- MOBILE --- */
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 15px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; }
-        .fab-sub { width: 55px; height: 55px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; }
+        /* --- MOBILE HUB --- */
+        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
+        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
         #mobile-hub.active .fab-sub { display: flex; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
@@ -108,6 +107,13 @@
             .sidebar { display: none; }
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
+        }
+
+        @media print {
+            body, main, .editor-container { overflow: visible !important; height: auto !important; display: block !important; background: white !important; }
+            .sidebar, header, .sticky-tools, #mobile-hub, #pdf-viewer, .modal { display: none !important; }
+            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; }
+            .editor-container { padding: 0 !important; }
         }
     </style>
 </head>
@@ -158,8 +164,11 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
+        
+        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder"></i></button>
+        <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
         <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
@@ -191,7 +200,6 @@
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
         
-        // Ativar TAB no editor
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
@@ -217,7 +225,6 @@
         setInterval(window.forcarRadar, 5000);
     };
 
-    // --- PASTA E HISTÓRICO ---
     window.abrirPastaHistorico = async () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS";
@@ -259,7 +266,6 @@
         }
     };
 
-    // --- PERGAMINHO (ESTRUTURAS) ---
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "📜 PERGAMINHO";
@@ -268,21 +274,24 @@
         Object.keys(pecas).forEach(k => {
             const b = document.createElement('div'); b.className = 'opt-btn';
             b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`;
-            b.onclick = () => { FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; };
+            b.onclick = () => { 
+                FolhaEngine.injetarTextoMultilinhas(pecas[k]); 
+                modal.style.display='none';
+                if(window.innerWidth < 768) window.toggleFoguete();
+            };
             content.appendChild(b);
         });
         modal.style.display = 'flex';
     };
 
-    // --- MARTELO (TESES) ---
     window.injetarTeses = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) {
             FolhaEngine.injetarTextoMultilinhas(dna);
+            if(window.innerWidth < 768) window.toggleFoguete();
         } else { alert("Sem espelho para este exame."); }
     };
 
-    // --- PDFS (P, G, V) ---
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
@@ -299,7 +308,6 @@
         document.getElementById('pdf-frame').src = "";
     };
 
-    // --- AUXILIARES ---
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         const ed = document.getElementById('editor-principal');

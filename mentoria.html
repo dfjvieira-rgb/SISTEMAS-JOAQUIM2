@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MENTORIA OAB - MODO ELITE</title>
+    <title>MENTORIA OAB - MODO ELITE MASTER</title>
     <style>
         :root { --azul: #003366; --amarelo: #fffdf0; --cinza-num: #f1f5f9; }
         body { font-family: sans-serif; background: #ddd; padding: 10px; margin: 0; }
         .caixa { max-width: 900px; margin: auto; background: white; padding: 15px; border: 2px solid var(--azul); box-sizing: border-box; }
         
-        /* CABEÇALHO E CONTROLES */
         .topo { text-align: center; border-bottom: 2px solid var(--azul); margin-bottom: 10px; padding-bottom: 10px; }
-        .campo-titulo { width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid var(--azul); font-weight: bold; box-sizing: border-box; }
+        .campo-titulo { width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid var(--azul); font-weight: bold; box-sizing: border-box; text-transform: uppercase; }
+        
         .controles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .btn { padding: 15px 5px; cursor: pointer; border: none; color: white; font-weight: bold; border-radius: 5px; text-transform: uppercase; font-size: 12px; }
+        .btn { padding: 15px 5px; cursor: pointer; border: none; color: white; font-weight: bold; border-radius: 5px; text-transform: uppercase; font-size: 11px; }
         .btn-salvar { background: #10b981; }
         .btn-pasta { background: var(--azul); }
         .btn-print { background: #3b82f6; }
-        .btn-limpar { background: #ef4444; }
+        .btn-limpar { background: #666; }
 
-        /* ENGINE DA FOLHA (DNA FOLHAENGINE + JUSTIFICADO) */
+        /* ENGINE DA FOLHA */
         .folha-container {
             display: grid;
             grid-template-columns: 45px 1fr;
@@ -31,7 +31,6 @@
             background: var(--cinza-num);
             border-right: 2px solid #000;
             user-select: none;
-            text-align: center;
         }
         .num-linha {
             height: 35px;
@@ -39,7 +38,6 @@
             font-weight: bold;
             border-bottom: 1px solid #cbd5e1;
             display: flex; align-items: center; justify-content: center;
-            box-sizing: border-box;
         }
         #editor { 
             outline: none; 
@@ -52,59 +50,67 @@
             background-image: linear-gradient(to bottom, transparent 34px, #e2e8f0 34px);
             background-size: 100% 35px;
             min-height: 1050px;
-            /* JUSTIFICAÇÃO DO TEXTO */
             text-align: justify;
-            text-justify: inter-word;
         }
 
-        /* HISTÓRICO */
-        #lista-arquivos { display: none; background: #f9f9f9; padding: 15px; border: 3px double var(--azul); margin-top: 10px; }
-        .item-peca { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #ccc; background: white; margin-bottom: 5px; }
+        /* PASTA DE ARQUIVOS - CORREÇÃO CRÍTICA */
+        #painel-historico { 
+            display: none; 
+            position: fixed; 
+            top: 50%; left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 90%; max-width: 500px; 
+            background: white; 
+            z-index: 9999; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); 
+            border: 4px solid var(--azul);
+            padding: 20px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index: 9998; }
+        .item-peca { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 10px; border-bottom: 1px solid #eee; margin-bottom: 5px; 
+        }
+        .btn-abrir { background: #fbbf24; border: none; padding: 10px; cursor: pointer; font-weight: bold; border-radius: 4px; }
 
-        /* BLINDAGEM ANTI-CORTE NA IMPRESSÃO */
         @media print {
-            @page {
-                margin: 1cm;
-                size: A4;
-            }
-            body { background: white !important; padding: 0 !important; }
-            .controles, .topo, .campo-titulo, #lista-arquivos, .btn-limpar { display: none !important; }
-            .caixa { border: none !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
-            .folha-container { border: none !important; }
-            #editor { 
-                overflow: visible !important; 
-                height: auto !important;
-                background-image: none !important; /* Remove as linhas cinzas pra não carregar o toner */
-                border-left: 1px solid #000; /* Mantém a margem da esquerda */
-            }
-            /* Força a quebra de página correta */
-            .num-linha { border-bottom: 1px solid #eee !important; }
+            .controles, .topo, .campo-titulo, #painel-historico, .overlay { display: none !important; }
+            .caixa { border: none !important; width: 100% !important; max-width: none !important; }
+            #editor { background-image: none !important; }
         }
     </style>
 </head>
 <body>
 
-<div class="caixa">
-    <div class="topo"><h2>CADERNO DE RESPOSTAS ELITE</h2></div>
+<div class="overlay" id="overlay" onclick="fecharPasta()"></div>
 
-    <input type="text" id="titulo-peca" class="campo-titulo" placeholder="NOME DA PEÇA...">
+<div class="caixa">
+    <div class="topo"><h2>CADERNO ELITE MASTER</h2></div>
+
+    <input type="text" id="titulo-peca" class="campo-titulo" placeholder="NOME DA PEÇA (EX: RECURSO ORDINÁRIO)">
 
     <div class="controles">
-        <button class="btn btn-salvar" onclick="salvarAgora()">💾 SALVAR</button>
-        <button class="btn btn-pasta" onclick="verArquivos()">📂 PASTA</button>
+        <button class="btn btn-salvar" onclick="salvarPeca()">💾 SALVAR</button>
+        <button class="btn btn-pasta" onclick="abrirPasta()">📂 PASTA</button>
         <button class="btn btn-print" onclick="window.print()">🖨️ PRINT</button>
-        <button class="btn btn-limpar" onclick="limparFolha()">🧹 LIMPAR</button>
+        <button class="btn btn-limpar" onclick="limparTudo()">🧹 LIMPAR</button>
     </div>
 
     <div class="folha-container">
         <div class="numeracao" id="col-num"></div>
         <div id="editor" contenteditable="true" spellcheck="false">AO DOUTO JUÍZO DA...</div>
     </div>
+</div>
 
-    <div id="lista-arquivos">
-        <h3>📂 ARQUIVO DE PEÇAS</h3>
-        <div id="corpo-lista"></div>
+<div id="painel-historico">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--azul);">
+        <h3 style="margin:0;">📂 PEÇAS SALVAS</h3>
+        <button onclick="fecharPasta()" style="cursor:pointer; font-weight:bold; background:red; color:white; border:none; padding:5px 10px;">X</button>
     </div>
+    <div id="lista-corpo"></div>
+    <button onclick="apagarTudo()" style="margin-top:20px; color:red; background:none; border:none; cursor:pointer; font-size:10px;">[Apagar Todo Histórico]</button>
 </div>
 
 <script>
@@ -119,70 +125,85 @@
 
     const editor = document.getElementById('editor');
 
-    // TAB e PASTE Blindados
-    editor.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab') {
-            e.preventDefault();
-            const sel = window.getSelection();
-            const range = sel.getRangeAt(0);
-            const tabNode = document.createTextNode("    ");
-            range.insertNode(tabNode);
-            range.setStartAfter(tabNode);
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-    });
-
-    editor.addEventListener('paste', (e) => {
-        e.preventDefault();
-        const text = e.clipboardData.getData('text/plain');
-        document.execCommand('insertText', false, text);
-    });
-
-    function salvarAgora() {
+    // Salvar
+    function salvarPeca() {
+        const titulo = document.getElementById('titulo-peca').value || "PEÇA SEM TÍTULO";
         const texto = editor.innerText;
-        const titulo = document.getElementById('titulo-peca').value || "Peça sem título";
-        const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
+        
+        if(texto.length < 10) return alert("Peça vazia!");
+
+        const banco = JSON.parse(localStorage.getItem('pecas_mentoria_v2') || "[]");
         banco.push({
             data: new Date().toLocaleString('pt-BR'),
             titulo: titulo.toUpperCase(),
             conteudo: texto
         });
-        localStorage.setItem('pecas_mentoria', JSON.stringify(banco));
+        
+        localStorage.setItem('pecas_mentoria_v2', JSON.stringify(banco));
         alert("SALVO COM SUCESSO!");
     }
 
-    function verArquivos() {
-        const painel = document.getElementById('lista-arquivos');
-        const lista = document.getElementById('corpo-lista');
-        const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
-        if(banco.length === 0) return alert("Vazio!");
+    // Abrir Pasta (Agora como Modal para não falhar)
+    function abrirPasta() {
+        const modal = document.getElementById('painel-historico');
+        const overlay = document.getElementById('overlay');
+        const lista = document.getElementById('lista-corpo');
+        const banco = JSON.parse(localStorage.getItem('pecas_mentoria_v2') || "[]");
+
+        if(banco.length === 0) return alert("A pasta está vazia!");
+
         lista.innerHTML = "";
         banco.forEach((item, index) => {
-            lista.innerHTML += `
-                <div class="item-peca">
-                    <span><strong>${item.titulo}</strong></span>
-                    <button onclick="abrirPeca(${index})" style="background:#fbbf24; border:none; padding:10px; cursor:pointer; border-radius:4px;">ABRIR</button>
-                </div>`;
+            const div = document.createElement('div');
+            div.className = 'item-peca';
+            div.innerHTML = `
+                <span><strong>${item.titulo}</strong><br><small>${item.data}</small></span>
+                <button class="btn-abrir" onclick="carregarPeca(${index})">ABRIR</button>
+            `;
+            lista.appendChild(div);
         });
-        painel.style.display = "block";
-        painel.scrollIntoView({behavior: 'smooth'});
+
+        modal.style.display = "block";
+        overlay.style.display = "block";
     }
 
-    function abrirPeca(index) {
-        const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
-        editor.innerText = banco[index].conteudo;
-        document.getElementById('titulo-peca').value = banco[index].titulo;
-        document.getElementById('lista-arquivos').style.display = "none";
-        window.scrollTo(0,0);
+    function fecharPasta() {
+        document.getElementById('painel-historico').style.display = "none";
+        document.getElementById('overlay').style.display = "none";
     }
 
-    function limparFolha() {
-        if(confirm("Limpar folha?")) {
-            editor.innerText = "";
+    function carregarPeca(index) {
+        const banco = JSON.parse(localStorage.getItem('pecas_mentoria_v2') || "[]");
+        if(banco[index]) {
+            editor.innerText = banco[index].conteudo;
+            document.getElementById('titulo-peca').value = banco[index].titulo;
+            fecharPasta();
+            window.scrollTo(0,0);
+        }
+    }
+
+    function limparTudo() {
+        if(confirm("Deseja limpar a folha atual?")) {
+            editor.innerText = "AO DOUTO JUÍZO DA...";
             document.getElementById('titulo-peca').value = "";
         }
     }
+
+    function apagarTudo() {
+        if(confirm("AVISO: Isso apagará TODAS as peças salvas permanentemente. Confirmar?")) {
+            localStorage.removeItem('pecas_mentoria_v2');
+            fecharPasta();
+            alert("Histórico limpo.");
+        }
+    }
+
+    // Tabulação (DNA Elite)
+    editor.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            document.execCommand('insertText', false, "    ");
+        }
+    });
 </script>
 </body>
 </html>

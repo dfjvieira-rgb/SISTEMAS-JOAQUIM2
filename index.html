@@ -173,7 +173,7 @@
 <header>
     <div class="logo">JOAQUIM <span>ELITE</span></div>
     <div id="sync-status" style="color:var(--gold); font-size:10px; font-weight:bold; background: rgba(251,191,36,0.1); padding: 5px 10px; border-radius: 20px;">
-        <i class="fas fa-circle" style="font-size:7px; vertical-align:middle; margin-right:5px; animation: pulse 2s infinite;"></i> 
+        <i class="fas fa-circle" style="font-size:7px; vertical-align:middle; margin-right:5px;"></i> 
         EXAME <span id="ex-display">--</span>
     </div>
 </header>
@@ -237,38 +237,78 @@
 
 <script type="module">
     import { db } from './firebase-config.js';
-    import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
     import { RadarEngine } from './radar-engine.js';
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
+    import { pecas } from './estruturas.js'; // Certifique-se que o export está correto no estruturas.js
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
+    let ultimaLinhaFocada = 1;
 
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
+        
+        // Listener para capturar qual linha está ativa para injeção
+        document.addEventListener('focusin', (e) => {
+            if(e.target.classList.contains('linha-folha')) {
+                ultimaLinhaFocada = parseInt(e.target.id.replace('L', ''));
+            }
+        });
+
         await carregarRascunho();
         window.forcarRadar();
         setInterval(salvarAutomatico, 30000);
-        setInterval(window.forcarRadar, 5000);
     };
 
-    // --- LÓGICA DE PDFS P, G, V ---
-    window.verPDF = (tipo) => {
-        let url = "";
-        if (tipo === 'P') url = `ro${window.activeEx}.pdf`;
-        if (tipo === 'G') url = `ro${window.activeEx}-gabarito.pdf`;
-        if (tipo === 'V') url = `vade.pdf`;
+    // --- MARTELO (TESES) ---
+    window.injetarTeses = () => {
+        const dna = BANCO_ESPELHOS[window.activeEx] || "";
+        if(!dna) return alert("Espelho não disponível para este exame.");
+        
+        const frases = dna.replace(/<[^>]*>/g, '').split('\n').filter(f => f.trim().length > 5);
+        frases.forEach((f, i) => {
+            const el = document.getElementById(`L${ultimaLinhaFocada + i}`);
+            if(el) el.value = "➤ " + f.trim().substring(0, 82);
+        });
+    };
 
+    // --- PERGAMINHO (ESTRUTURAS) ---
+    window.abrirPergaminho = () => {
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "📜 ESTRUTURAS ELITE";
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+
+        Object.keys(pecas).forEach(key => {
+            const b = document.createElement('div');
+            b.className = 'opt-btn';
+            b.innerHTML = `<span>${key}</span> <i class="fas fa-plus-circle"></i>`;
+            b.onclick = () => {
+                const linhasTexto = pecas[key].split('\n');
+                linhasTexto.forEach((txt, idx) => {
+                    const el = document.getElementById(`L${ultimaLinhaFocada + idx}`);
+                    if(el) el.value = txt.substring(0, 85);
+                });
+                modal.style.display = 'none';
+            };
+            content.appendChild(b);
+        });
+        modal.style.display = 'flex';
+    };
+
+    // --- LÓGICA DE PDFS ---
+    window.verPDF = (tipo) => {
+        let url = tipo === 'V' ? 'vade.pdf' : `ro${window.activeEx}${tipo === 'G' ? '-gabarito' : ''}.pdf`;
         if (window.innerWidth < 768) {
             window.open(url, '_blank');
-            window.toggleFoguete();
+            if(document.getElementById('mobile-hub').classList.contains('active')) window.toggleFoguete();
         } else {
-            const viewer = document.getElementById('pdf-side-viewer');
             document.getElementById('pdf-frame').src = url;
-            viewer.style.display = 'block';
+            document.getElementById('pdf-side-viewer').style.display = 'block';
         }
     };
 
@@ -279,10 +319,10 @@
 
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
-        const ed = document.getElementById('editor-principal');
-        if (dna && RadarEngine && ed) {
-            const analise = RadarEngine.analisar(dna, ed.innerText);
-            RadarEngine.renderizar(analise);
+        // Nota: Adaptado para ler os valores dos inputs da FolhaEngine
+        const textoEscrito = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value).join(' ');
+        if (dna && RadarEngine) {
+            const analise = RadarEngine.analisar(dna, textoEscrito);
             document.getElementById('identificador-peca').innerText = "PEÇA: " + analise.id.toUpperCase();
         }
     };
@@ -301,72 +341,45 @@
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div');
             b.className = 'opt-btn';
-            b.innerHTML = `<span>OAB EXAME ${i}</span> <i class="fas fa-chevron-right" style="opacity:0.3"></i>`;
+            b.innerHTML = `<span>OAB EXAME ${i}</span> <i class="fas fa-chevron-right"></i>`;
             b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
             content.appendChild(b);
         }
         modal.style.display = 'flex';
     };
 
-    window.abrirPastaHistorico = async () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "📂 MEUS ARQUIVOS";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "<p style='text-align:center; padding:20px;'>Acessando...</p>";
-        modal.style.display = 'flex';
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-            content.innerHTML = "";
-            if (snap.exists()) {
-                Object.keys(snap.val()).reverse().forEach(key => {
-                    const item = snap.val()[key];
-                    const div = document.createElement('div');
-                    div.style.padding = "15px"; div.style.borderBottom = "1px solid #eee"; div.style.display="flex"; div.style.justifyContent="space-between";
-                    div.innerHTML = `<div><strong>${item.exame} - ${item.peca}</strong></div><button onclick="window.carregarPecaPasta('${key}')" style="background:var(--gold); border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">ABRIR</button>`;
-                    content.appendChild(div);
-                });
-            }
-        } catch (e) { content.innerHTML = "Erro."; }
-    };
-
-    window.carregarPecaPasta = async (key) => {
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
-        if(snap.exists()) {
-            document.getElementById('editor-principal').innerText = snap.val().conteudo;
-            document.getElementById('universal-modal').style.display = 'none';
-            window.forcarRadar();
-        }
-    };
-
     window.finalizarPeca = async () => {
-        const ed = document.getElementById('editor-principal');
-        const iden = document.getElementById('identificador-peca').innerText.replace("PEÇA: ", "");
-        if(confirm("Salvar na Pasta?")) {
+        const dados = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
+        const iden = document.getElementById('identificador-peca').innerText;
+        if(confirm("Deseja salvar esta peça no Histórico Oficial?")) {
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
-                exame: window.activeEx, peca: iden, conteudo: ed.innerText, timestamp: Date.now()
+                exame: window.activeEx, peca: iden, conteudo: dados, timestamp: Date.now()
             });
-            alert("Salvo!");
+            alert("Peça Blindada no Histórico!");
         }
     };
 
     async function salvarAutomatico() {
-        const ed = document.getElementById('editor-principal');
-        if (ed && ed.innerText.trim()) {
+        const dados = Array.from(document.querySelectorAll('.linha-folha')).map(i => i.value);
+        if (dados.some(d => d.trim() !== "")) {
             await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
-                conteudo: ed.innerText, timestamp: Date.now()
+                linhas: dados, timestamp: Date.now()
             });
         }
     }
 
     async function carregarRascunho() {
         const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-        if (snap.exists()) document.getElementById('editor-principal').innerText = snap.val().conteudo;
+        if (snap.exists() && snap.val().linhas) {
+            snap.val().linhas.forEach((txt, idx) => {
+                const el = document.getElementById(`L${idx + 1}`);
+                if (el) el.value = txt;
+            });
+        }
     }
 
-    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.getElementById('editor-principal').innerText = ""; };
+    window.limparFolha = () => { if(confirm("Apagar tudo?")) document.querySelectorAll('.linha-folha').forEach(i => i.value = ""); };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.abrirPergaminho = () => alert("Estruturas carregadas!");
-    window.injetarTeses = () => alert("Martelo de teses ativo!");
 
 </script>
 </body>

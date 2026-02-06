@@ -14,7 +14,7 @@
             --perigo: #ef4444;
         }
         body.dark-mode { --primary: #020617; --gold: #f59e0b; --bg-paper: #0f172a; }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         
         body { font-family: 'Inter', sans-serif; background: var(--primary); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         header { background: var(--primary); height: 50px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); z-index: 5000; }
@@ -25,30 +25,21 @@
         
         .editor-container { flex: 1; display: flex; flex-direction: column; background: var(--bg-paper); overflow-y: auto; align-items: center; }
         .sticky-tools { position: sticky; top: 0; z-index: 1000; background: white; width: 100%; max-width: 850px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); cursor: pointer; }
+        #identificador-peca { padding: 10px; background: #f1f5f9; text-align: center; font-weight: 900; color: #1e293b; border-bottom: 2px solid var(--gold); }
         
         .toolbar-liberdade { display: flex; border-bottom: 1px solid #ddd; }
         .btn-lib { flex: 1; padding: 10px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.65rem; text-transform: uppercase; border-right: 1px solid #eee; }
         
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.3); min-height: 5250px; margin-top: 10px; position: relative; }
 
-        /* Inteligência da Linha 150 */
-        .num-linha.limite-oab { background: var(--perigo) !important; color: white !important; font-weight: bold; }
+        /* Estilo da Lixeira e Pasta */
+        .item-historico { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #f8fafc; margin-bottom: 5px; border-radius: 6px; color: #000; }
+        .btn-trash-item { color: var(--perigo); cursor: pointer; font-size: 1.2rem; border: none; background: none; }
 
-        /* Itens da Pasta/Histórico */
-        .item-historico { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #f8fafc; margin-bottom: 5px; border-radius: 6px; color: black; }
-        .btn-trash { color: var(--perigo); cursor: pointer; padding: 8px; font-size: 1.1rem; }
-
-        /* Estilos de Modais */
+        /* Modal */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 92%; max-width: 500px; padding: 20px; border-radius: 15px; color: black; }
-        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; color: black; }
-
-        @media print {
-            header, .sidebar, .sticky-tools, #mobile-hub, #pdf-viewer, .modal { display: none !important; }
-            body, html { background: white !important; overflow: visible !important; height: auto !important; }
-            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; max-width: none !important; }
-        }
+        .modal-body { background: white; width: 92%; max-width: 500px; padding: 20px; border-radius: 15px; color: #000; }
+        .opt-btn { width: 100%; padding: 15px; margin-bottom: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; color: #000; }
     </style>
 </head>
 <body class="dark-mode">
@@ -60,7 +51,7 @@
 
 <main>
     <aside class="sidebar">
-        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirSeletorExames()"><i class="fas fa-list"></i> EXAMES</button>
+        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES</button>
         
         <button class="btn-side" style="background:#475569; color:white" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i> PASTA</button>
 
@@ -68,76 +59,58 @@
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA</button>
         <button class="btn-side" style="background:#334155; color:var(--gold)" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
-        <hr style="opacity:0.1; margin:10px 0">
-        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
-        <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')">GABARITO</button>
-        <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
     </aside>
 
     <section class="editor-container">
         <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.forcarRadar()">SCANNER INATIVO</div>
+            <div id="identificador-peca">SCANNER INATIVO</div>
             <div class="toolbar-liberdade">
-                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-eraser"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()"><i class="fas fa-eye"></i> Ver</button>
-                <button class="btn-lib" style="background:#ef4444; color:white" onclick="window.fecharPDF()">FECHAR PDF</button>
+                <button class="btn-lib" onclick="window.limparFolha()">Limpar</button>
+                <button class="btn-lib" onclick="window.FolhaEngine.visualizarImpressao()">Ver/Imprimir</button>
             </div>
         </div>
         <div class="paper">
             <div id="folha-total"></div>
         </div>
     </section>
-
-    <section id="pdf-viewer" style="display:none; width:50%; background:#334155; border-left:4px solid var(--gold);">
-        </section>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:2px solid var(--gold);">
-            <h2 id="modal-title" style="font-size:1.1rem; color: black;"></h2>
-            <button onclick="document.getElementById('universal-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-        </div>
+        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold); font-size:1.1rem;"></h2>
         <div id="modal-content" style="max-height: 60vh; overflow-y: auto;"></div>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:8px; margin-top:10px; font-weight:bold; cursor:pointer;">FECHAR</button>
     </div>
 </div>
 
 <script type="module">
     import { db } from './firebase-config.js';
     import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { FolhaEngine } from './folha-engine.js';
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
-    import { FolhaEngine } from './folha-engine.js';
-    import { RadarEngine } from './radar-engine.js';
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
 
-    window.onload = async () => {
+    window.onload = () => {
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
-        
-        // Alerta na linha 150
-        setTimeout(() => {
-            const l150 = document.querySelector('.num-linha:nth-child(150)');
-            if(l150) l150.classList.add('limite-oab');
-        }, 1000);
-
         carregarRascunho();
     };
 
-    // --- RESTABELECENDO O SELETOR DE EXAMES (35 ao 44) ---
-    window.abrirSeletorExames = () => {
+    // --- FUNÇÃO EXAMES (RESTABELECIDA) ---
+    window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "SELECIONAR EXAME OAB";
         const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "MUDAR EXAME OAB";
         content.innerHTML = "";
         
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div');
             b.className = 'opt-btn';
-            b.innerHTML = `<span>EXAME OAB ${i}</span> <i class="fas fa-chevron-right"></i>`;
+            b.innerHTML = `<span>OAB EXAME ${i}</span> <i class="fas fa-chevron-right"></i>`;
             b.onclick = () => { 
                 localStorage.setItem('activeEx', i.toString()); 
                 window.location.reload(); 
@@ -147,12 +120,12 @@
         modal.style.display = 'flex';
     };
 
-    // --- PASTA DE HISTÓRICO (ARQUIVOS FINALIZADOS) ---
+    // --- FUNÇÃO PASTA (COM LIXEIRA) ---
     window.abrirPastaHistorico = async () => {
         const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "📂 MINHA PASTA (SALVOS)";
         const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 MEUS ARQUIVOS SALVOS";
-        content.innerHTML = "<p>Carregando...</p>";
+        content.innerHTML = "Carregando...";
         modal.style.display = 'flex';
 
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
@@ -163,18 +136,18 @@
                 const div = document.createElement('div');
                 div.className = 'item-historico';
                 div.innerHTML = `
-                    <div style="cursor:pointer; flex:1" onclick="window.carregarPeca('${key}')">
+                    <div style="cursor:pointer; flex:1" onclick="window.carregarPecaHistorico('${key}')">
                         <strong>${item.exame} - ${item.peca || 'PEÇA'}</strong><br>
                         <small>${new Date(item.timestamp).toLocaleString()}</small>
                     </div>
-                    <i class="fas fa-trash-alt btn-trash" onclick="window.deletarPeca('${key}')"></i>
+                    <button class="btn-trash-item" onclick="window.deletarPecaHistorico('${key}')"><i class="fas fa-trash"></i></button>
                 `;
                 content.appendChild(div);
             });
-        } else { content.innerHTML = "<p>Nenhum arquivo na pasta.</p>"; }
+        } else { content.innerHTML = "<p>Pasta vazia.</p>"; }
     };
 
-    window.carregarPeca = async (key) => {
+    window.carregarPecaHistorico = async (key) => {
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
         if(snap.exists()) {
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
@@ -182,8 +155,8 @@
         }
     };
 
-    window.deletarPeca = async (key) => {
-        if(confirm("Excluir definitivamente?")) {
+    window.deletarPecaHistorico = async (key) => {
+        if(confirm("Excluir este exame da sua pasta?")) {
             await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
             window.abrirPastaHistorico();
         }
@@ -192,7 +165,7 @@
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
         const iden = document.getElementById('identificador-peca').innerText;
-        if(confirm("Deseja salvar esta versão na sua PASTA?")) {
+        if(confirm("Deseja salvar esta peça na sua PASTA oficial?")) {
             const refHist = ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`);
             await set(refHist, {
                 exame: window.activeEx,
@@ -200,7 +173,7 @@
                 conteudo: ed.innerText,
                 timestamp: Date.now()
             });
-            alert("ARQUIVO GUARDADO NA PASTA!");
+            alert("SALVO NA PASTA!");
         }
     };
 
@@ -211,6 +184,8 @@
 
     window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerText = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
+    window.abrirPergaminho = () => { /* lógica de estruturas */ };
+    window.injetarTeses = () => { /* lógica martelo */ };
 </script>
 </body>
 </html>

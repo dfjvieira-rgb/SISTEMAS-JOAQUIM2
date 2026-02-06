@@ -5,28 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MENTORIA OAB - MODO BLINDADO</title>
     <style>
-        :root { --azul: #003366; --amarelo: #fffdf0; }
+        :root { --azul: #003366; --amarelo: #fffdf0; --gold: #fbbf24; }
         body { font-family: sans-serif; background: #ddd; padding: 10px; }
         .caixa { max-width: 800px; margin: auto; background: white; padding: 15px; border: 2px solid var(--azul); }
-        .topo { text-align: center; border-bottom: 2px solid var(--azul); margin-bottom: 10px; }
+        .topo { text-align: center; border-bottom: 2px solid var(--azul); margin-bottom: 10px; padding-bottom: 10px; }
         
-        /* BOTÕES GIGANTES PARA NÃO ERRAR */
-        .controles { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn { flex: 1; padding: 15px; font-size: 20px; cursor: pointer; border: none; color: white; font-weight: bold; border-radius: 5px; }
+        /* INPUT DE TÍTULO */
+        .campo-titulo { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid var(--azul); border-radius: 5px; font-weight: bold; font-size: 1rem; box-sizing: border-box; background: var(--amarelo); }
+
+        /* CONTROLES */
+        .controles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .btn { padding: 12px 5px; font-size: 0.8rem; cursor: pointer; border: none; color: white; font-weight: bold; border-radius: 5px; text-transform: uppercase; }
         .btn-salvar { background: #10b981; }
         .btn-pasta { background: var(--azul); }
-        .btn-limpar { background: #666; }
+        .btn-print { background: #3b82f6; } /* Botão Azul Claro para Print */
+        .btn-limpar { background: #ef4444; }
 
         /* A FOLHA */
         #editor { 
             background: var(--amarelo); 
             border: 1px solid #ccc; 
-            min-height: 400px; 
-            padding: 20px; 
+            min-height: 500px; 
+            padding: 40px; 
             outline: none; 
             font-family: 'Courier New', monospace; 
-            line-height: 1.5;
+            line-height: 2em;
             white-space: pre-wrap;
+            background-image: linear-gradient(#e1e1e1 1px, transparent 1px);
+            background-size: 100% 2em;
         }
 
         /* LISTA DE PEÇAS */
@@ -40,49 +46,63 @@
             background: white;
             margin-bottom: 5px;
         }
-        .btn-abrir { background: #f59e0b; border: none; padding: 10px; color: white; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-abrir { background: var(--gold); border: none; padding: 8px; color: black; font-weight: bold; cursor: pointer; border-radius: 4px; }
+
+        /* REGRA DE IMPRESSÃO - BLINDAGEM TOTAL */
+        @media print {
+            body { background: white !important; padding: 0 !important; }
+            .controles, .topo, .campo-titulo, #lista-arquivos, .btn-limpar { display: none !important; }
+            .caixa { border: none !important; width: 100% !important; max-width: none !important; }
+            #editor { border: none !important; padding: 0 !important; min-height: auto !important; background: white !important; }
+        }
     </style>
 </head>
 <body>
 
 <div class="caixa">
     <div class="topo">
-        <h2>CENTRAL DE PEÇAS - MENTORIA</h2>
+        <h2 style="margin:0">MENTORIA ELITE - CADERNO DE RESPOSTAS</h2>
     </div>
+
+    <input type="text" id="titulo-peca" class="campo-titulo" placeholder="NOME DA PEÇA (EX: RECURSO ORDINÁRIO - EXAME 44)">
 
     <div class="controles">
         <button class="btn btn-salvar" onclick="salvarAgora()">💾 SALVAR</button>
         <button class="btn btn-pasta" onclick="verArquivos()">📂 PASTA</button>
+        <button class="btn btn-print" onclick="window.print()">🖨️ PRINT</button>
         <button class="btn btn-limpar" onclick="limparFolha()">🧹 LIMPAR</button>
     </div>
 
     <div id="editor" contenteditable="true">AO DOUTO JUÍZO DA...</div>
 
     <div id="lista-arquivos">
-        <h3 style="margin-top:0">Minhas Peças Salvas:</h3>
+        <h3 style="margin-top:0; border-bottom: 2px solid var(--azul)">📂 ARQUIVO DE PEÇAS SALVAS:</h3>
         <div id="corpo-lista"></div>
     </div>
 </div>
 
 <script>
-    // SALVAR
+    // SALVAR COM TÍTULO
     function salvarAgora() {
         const texto = document.getElementById('editor').innerText;
-        if(texto.length < 10) return alert("Escreva algo antes!");
+        const titulo = document.getElementById('titulo-peca').value || "Peça sem título";
+        
+        if(texto.length < 10) return alert("Escreva a peça antes de salvar!");
 
         const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
         const nova = {
             data: new Date().toLocaleString('pt-BR'),
+            titulo: titulo.toUpperCase(),
             conteudo: texto
         };
 
         banco.push(nova);
         localStorage.setItem('pecas_mentoria', JSON.stringify(banco));
-        alert("PEÇA GUARDADA NA PASTA!");
+        alert("PEÇA '" + nova.titulo + "' SALVA NA PASTA!");
         document.getElementById('lista-arquivos').style.display = "none";
     }
 
-    // MOSTRAR LISTA
+    // VER ARQUIVOS COM TÍTULO EXPOSTO
     function verArquivos() {
         const painel = document.getElementById('lista-arquivos');
         const lista = document.getElementById('corpo-lista');
@@ -98,32 +118,37 @@
             const div = document.createElement('div');
             div.className = 'item-peca';
             div.innerHTML = `
-                <span><strong>${item.data}</strong></span>
-                <button class="btn-abrir" onclick="abrirPeca(${index})">ABRIR PEÇA</button>
+                <div style="display:flex; flex-direction:column">
+                    <span style="font-size:0.7rem; color:#666">${item.data}</span>
+                    <strong style="color:var(--azul)">${item.titulo}</strong>
+                </div>
+                <button class="btn-abrir" onclick="abrirPeca(${index})">ABRIR</button>
             `;
             lista.appendChild(div);
         });
 
         painel.style.display = "block";
-        painel.scrollIntoView();
+        painel.scrollIntoView({behavior: 'smooth'});
     }
 
-    // ABRIR
+    // ABRIR E RECOUPERAR TÍTULO
     function abrirPeca(index) {
         const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
         const peca = banco[index];
         
         if(peca) {
             document.getElementById('editor').innerText = peca.conteudo;
+            document.getElementById('titulo-peca').value = peca.titulo;
             document.getElementById('lista-arquivos').style.display = "none";
             window.scrollTo(0,0);
-            alert("Peça recuperada!");
+            alert("Peça '" + peca.titulo + "' carregada!");
         }
     }
 
     function limparFolha() {
-        if(confirm("Apagar o que está escrito na folha agora?")) {
-            document.getElementById('editor').innerText = "";
+        if(confirm("Apagar tudo para começar uma nova?")) {
+            document.getElementById('editor').innerText = "AO DOUTO JUÍZO DA...";
+            document.getElementById('titulo-peca').value = "";
         }
     }
 </script>

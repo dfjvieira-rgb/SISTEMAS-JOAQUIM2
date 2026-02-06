@@ -19,13 +19,13 @@
         .btn-print { background: #3b82f6; }
         .btn-limpar { background: #ef4444; }
 
-        /* ENGINE DA FOLHA (DNA FOLHAENGINE) */
+        /* ENGINE DA FOLHA (DNA FOLHAENGINE + JUSTIFICADO) */
         .folha-container {
             display: grid;
             grid-template-columns: 45px 1fr;
             background: #fff;
             border: 1px solid #000;
-            line-height: 35px; /* Altura exata da linha */
+            line-height: 35px;
         }
         .numeracao {
             background: var(--cinza-num);
@@ -39,27 +39,46 @@
             font-weight: bold;
             border-bottom: 1px solid #cbd5e1;
             display: flex; align-items: center; justify-content: center;
+            box-sizing: border-box;
         }
         #editor { 
             outline: none; 
-            padding: 0 15px; 
+            padding: 0 20px; 
             font-family: 'Courier New', monospace; 
-            font-size: 18px; 
+            font-size: 19px; 
             font-weight: bold;
+            color: #000;
             white-space: pre-wrap;
             background-image: linear-gradient(to bottom, transparent 34px, #e2e8f0 34px);
             background-size: 100% 35px;
-            min-height: 1050px; /* 30 linhas iniciais */
+            min-height: 1050px;
+            /* JUSTIFICAÇÃO DO TEXTO */
+            text-align: justify;
+            text-justify: inter-word;
         }
 
         /* HISTÓRICO */
         #lista-arquivos { display: none; background: #f9f9f9; padding: 15px; border: 3px double var(--azul); margin-top: 10px; }
         .item-peca { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #ccc; background: white; margin-bottom: 5px; }
 
+        /* BLINDAGEM ANTI-CORTE NA IMPRESSÃO */
         @media print {
+            @page {
+                margin: 1cm;
+                size: A4;
+            }
+            body { background: white !important; padding: 0 !important; }
             .controles, .topo, .campo-titulo, #lista-arquivos, .btn-limpar { display: none !important; }
-            body { background: white; }
-            .caixa { border: none; width: 100%; }
+            .caixa { border: none !important; width: 100% !important; max-width: none !important; margin: 0 !important; }
+            .folha-container { border: none !important; }
+            #editor { 
+                overflow: visible !important; 
+                height: auto !important;
+                background-image: none !important; /* Remove as linhas cinzas pra não carregar o toner */
+                border-left: 1px solid #000; /* Mantém a margem da esquerda */
+            }
+            /* Força a quebra de página correta */
+            .num-linha { border-bottom: 1px solid #eee !important; }
         }
     </style>
 </head>
@@ -79,7 +98,7 @@
 
     <div class="folha-container">
         <div class="numeracao" id="col-num"></div>
-        <div id="editor" contenteditable="true" spellcheck="false"></div>
+        <div id="editor" contenteditable="true" spellcheck="false">AO DOUTO JUÍZO DA...</div>
     </div>
 
     <div id="lista-arquivos">
@@ -89,7 +108,7 @@
 </div>
 
 <script>
-    // Gerar números das linhas (DNA FolhaEngine)
+    // Gerar números das linhas
     const colNum = document.getElementById('col-num');
     for(let i=1; i<=150; i++) {
         const n = document.createElement('div');
@@ -100,7 +119,7 @@
 
     const editor = document.getElementById('editor');
 
-    // Interceptar TAB e Paste (DNA FolhaEngine)
+    // TAB e PASTE Blindados
     editor.addEventListener('keydown', (e) => {
         if (e.key === 'Tab') {
             e.preventDefault();
@@ -120,12 +139,9 @@
         document.execCommand('insertText', false, text);
     });
 
-    // Funções de Persistência
     function salvarAgora() {
         const texto = editor.innerText;
         const titulo = document.getElementById('titulo-peca').value || "Peça sem título";
-        if(texto.length < 5) return alert("Vazio!");
-
         const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
         banco.push({
             data: new Date().toLocaleString('pt-BR'),
@@ -133,25 +149,24 @@
             conteudo: texto
         });
         localStorage.setItem('pecas_mentoria', JSON.stringify(banco));
-        alert("SALVO NA PASTA!");
+        alert("SALVO COM SUCESSO!");
     }
 
     function verArquivos() {
         const painel = document.getElementById('lista-arquivos');
         const lista = document.getElementById('corpo-lista');
         const banco = JSON.parse(localStorage.getItem('pecas_mentoria') || "[]");
-        
         if(banco.length === 0) return alert("Vazio!");
-        
         lista.innerHTML = "";
         banco.forEach((item, index) => {
             lista.innerHTML += `
                 <div class="item-peca">
-                    <span><strong>${item.titulo}</strong><br><small>${item.data}</small></span>
-                    <button onclick="abrirPeca(${index})" style="background:#fbbf24; border:none; padding:10px; cursor:pointer;">ABRIR</button>
+                    <span><strong>${item.titulo}</strong></span>
+                    <button onclick="abrirPeca(${index})" style="background:#fbbf24; border:none; padding:10px; cursor:pointer; border-radius:4px;">ABRIR</button>
                 </div>`;
         });
         painel.style.display = "block";
+        painel.scrollIntoView({behavior: 'smooth'});
     }
 
     function abrirPeca(index) {

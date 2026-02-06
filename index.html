@@ -15,7 +15,6 @@
         }
 
         body.dark-mode { --bg-paper: #0f172a; }
-        
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -28,7 +27,6 @@
             color: white;
         }
 
-        /* --- HEADER PROFISSIONAL --- */
         header { 
             background: var(--primary); 
             height: 60px; 
@@ -38,7 +36,6 @@
             align-items: center; 
             border-bottom: 2px solid var(--gold); 
             z-index: 5000;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
 
         .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: -1px; }
@@ -46,7 +43,6 @@
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
         
-        /* --- SIDEBAR DESKTOP --- */
         .sidebar { 
             width: var(--sidebar-w); 
             background: #1e293b; 
@@ -59,58 +55,28 @@
         }
 
         .btn-side { 
-            width: 100%; 
-            min-height: 45px; 
-            border: none; 
-            border-radius: 8px; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 15px; 
-            color: white; 
-            font-weight: 700; 
-            cursor: pointer; 
-            gap: 12px; 
-            font-size: 0.8rem; 
-            text-transform: uppercase; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255,255,255,0.05);
+            width: 100%; min-height: 45px; border: none; border-radius: 8px; 
+            display: flex; align-items: center; padding: 0 15px; color: white; 
+            font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; 
+            text-transform: uppercase; transition: 0.3s; background: rgba(255,255,255,0.05);
         }
-        .btn-side:hover { background: rgba(255,255,255,0.15); transform: translateX(5px); }
+        .btn-side:hover { background: rgba(255,255,255,0.15); }
         .btn-side i { width: 20px; font-size: 1rem; color: var(--gold); }
 
-        /* --- CONTAINER DA FOLHA --- */
         .editor-container { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            background: var(--bg-paper); 
-            overflow-y: auto; 
-            align-items: center; 
-            padding: 20px 10px;
-            scroll-behavior: smooth;
+            flex: 1; display: flex; flex-direction: column; 
+            background: var(--bg-paper); overflow-y: auto; align-items: center; padding: 20px 10px;
         }
 
         .sticky-tools { 
-            position: sticky; 
-            top: -20px; 
-            z-index: 1000; 
-            background: white; 
-            width: 100%; 
-            max-width: 850px; 
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            margin-bottom: 10px;
+            position: sticky; top: -20px; z-index: 1000; background: white; 
+            width: 100%; max-width: 850px; border-radius: 0 0 12px 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); margin-bottom: 10px;
         }
 
         #identificador-peca { 
-            padding: 12px; 
-            background: #f8fafc; 
-            text-align: center; 
-            font-weight: 900; 
-            color: #0f172a; 
-            border-bottom: 3px solid var(--gold); 
-            font-size: 0.85rem;
-            letter-spacing: 1px;
+            padding: 12px; background: #f8fafc; text-align: center; 
+            font-weight: 900; color: #0f172a; border-bottom: 3px solid var(--gold); 
         }
         
         .toolbar-liberdade { display: flex; background: #fff; }
@@ -119,60 +85,29 @@
             cursor: pointer; font-weight: 800; font-size: 0.7rem; 
             text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
         }
-        .btn-lib:hover { background: #f8fafc; color: var(--primary); }
 
-        /* FOLHA FGV STYLE */
-        .paper { 
-            width: 100%; 
-            max-width: 850px; 
-            background: white; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
-            min-height: 5250px; 
-            position: relative; 
-            margin-bottom: 100px;
-        }
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
-        /* --- HUB FOGUETE MOBILE --- */
-        #mobile-hub { 
-            display: none; position: fixed; bottom: 30px; right: 25px; 
-            z-index: 99999; flex-direction: column-reverse; gap: 15px; align-items: center; 
-        }
-        .fab-main { 
-            width: 65px; height: 65px; border-radius: 50%; background: var(--gold); 
-            border: none; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; 
-            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4); cursor: pointer; color: black; 
-        }
-        .fab-sub { 
-            width: 55px; height: 55px; border-radius: 50%; border: none; color: white; 
-            display: none; align-items: center; justify-content: center; font-size: 1.2rem; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3); animation: pop 0.3s ease forwards;
-        }
-        @keyframes pop { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+        /* --- PDF VIEWER LATERAL --- */
+        #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); }
+        #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
+        .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; }
+        iframe { width: 100%; flex: 1; border: none; }
+
+        /* --- MOBILE --- */
+        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 15px; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; }
+        .fab-sub { width: 55px; height: 55px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.2rem; }
         #mobile-hub.active .fab-sub { display: flex; }
 
-        /* --- MODAIS MODERNOS --- */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: 110000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; display: flex; flex-direction: column; }
-        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #e2e8f0; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; color: #0f172a; }
-        
-        .item-historico { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #f1f5f9; background: #fff; margin-bottom: 8px; border-radius: 10px; border: 1px solid #eee; }
-
-        /* --- IMPRESSÃO RADICAL --- */
-        @media print {
-            header, .sidebar, .sticky-tools, #mobile-hub, .modal { display: none !important; }
-            body, html { background: white !important; overflow: visible !important; height: auto !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
-            .editor-container { padding: 0 !important; display: block !important; overflow: visible !important; }
-            .paper { box-shadow: none !important; width: 100% !important; margin: 0 !important; min-height: auto !important; }
-            #editor-principal { line-height: 35px !important; }
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
+        .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
+        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #mobile-hub { display: flex; }
-            header { height: 50px; padding: 0 15px; }
-            .logo { font-size: 1rem; }
-            .editor-container { padding: 10px 5px; }
-            .paper { width: 100%; border-radius: 4px; }
+            #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
         }
     </style>
 </head>
@@ -180,55 +115,63 @@
 
 <header>
     <div class="logo">JOAQUIM <span>ELITE</span></div>
-    <div id="sync-status" style="color:var(--gold); font-size:10px; font-weight:bold; background: rgba(251,191,36,0.1); padding: 5px 10px; border-radius: 20px;">
-        <i class="fas fa-circle" style="font-size:7px; vertical-align:middle; margin-right:5px;"></i> 
-        EXAME <span id="ex-display">--</span>
-    </div>
+    <div style="color:var(--gold); font-size:10px; font-weight:bold;">EXAME <span id="ex-display">--</span></div>
 </header>
 
 <main>
     <aside class="sidebar">
-        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-layer-group"></i> EXAMES OAB</button>
+        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES</button>
         <button class="btn-side" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i> MINHA PASTA</button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-cloud-upload-alt"></i> FINALIZAR PEÇA</button>
-        <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.1);"></div>
-        <button class="btn-side" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA IA</button>
-        <button class="btn-side" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> ESTRUTURAS</button>
-        <button class="btn-side" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO (TESES)</button>
+        <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> FINALIZAR</button>
+        <hr style="opacity:0.1; margin:10px 0">
+        <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA IA</button>
+        <button class="btn-side" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
+        <hr style="opacity:0.1; margin:10px 0">
+        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
+        <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')">GABARITO</button>
+        <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
     </aside>
 
     <section class="editor-container">
         <div class="sticky-tools">
-            <div id="identificador-peca">INICIANDO SCANNER ELITE...</div>
+            <div id="identificador-peca">SCANNER ELITE...</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.visualizarModoFoco()"><i class="fas fa-eye"></i> Visualizar</button>
-                <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> Imprimir PDF</button>
-                <button class="btn-lib" style="background:#0f172a; color:var(--gold)" onclick="window.location.reload()"><i class="fas fa-sync"></i> Reset</button>
+                <button class="btn-lib" onclick="window.visualizarModoFoco()"><i class="fas fa-eye"></i> Foco</button>
+                <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
+                <button class="btn-lib" style="background:#ef4444; color:white" onclick="window.fecharPDF()">Fechar PDF</button>
             </div>
         </div>
-        
         <div class="paper">
             <div id="folha-total"></div>
         </div>
+    </section>
+
+    <section id="pdf-viewer">
+        <div class="pdf-controls">
+            <span id="pdf-title">DOCUMENTO</span>
+            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer">X</button>
+        </div>
+        <iframe id="pdf-frame"></iframe>
     </section>
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
-        <button class="fab-sub" style="background:#22c55e;" onclick="window.print()"><i class="fas fa-print"></i></button>
+        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
+        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
+        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
     </div>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 id="modal-title" style="font-size:1.2rem; font-weight:900;"></h2>
-            <button onclick="document.getElementById('universal-modal').style.display='none'" style="background:#f1f5f9; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer;"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="modal-content" style="overflow-y: auto; flex:1"></div>
+        <h2 id="modal-title" style="margin-bottom:20px; border-bottom:2px solid var(--gold)"></h2>
+        <div id="modal-content"></div>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">FECHAR</button>
     </div>
 </div>
 
@@ -248,7 +191,7 @@
         document.getElementById('ex-display').innerText = window.activeEx;
         FolhaEngine.montar('folha-total');
         
-        // Inteligência de TAB recriada no editor
+        // Ativar TAB no editor
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
@@ -271,87 +214,117 @@
         await carregarRascunho();
         window.forcarRadar();
         setInterval(salvarAutomatico, 30000);
+        setInterval(window.forcarRadar, 5000);
     };
 
-    // --- LÓGICA DA PASTA (HISTÓRICO) ---
+    // --- PASTA E HISTÓRICO ---
     window.abrirPastaHistorico = async () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "📂 MINHA PASTA";
+        document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS";
         const content = document.getElementById('modal-content');
-        content.innerHTML = "<p style='text-align:center;'>Abrindo arquivos...</p>";
+        content.innerHTML = "Carregando...";
         modal.style.display = 'flex';
-
         try {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
             content.innerHTML = "";
             if (snap.exists()) {
-                const dados = snap.val();
-                Object.keys(dados).reverse().forEach(key => {
-                    const item = dados[key];
+                Object.keys(snap.val()).reverse().forEach(key => {
+                    const item = snap.val()[key];
                     const div = document.createElement('div');
-                    div.className = 'item-historico';
+                    div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center";
                     div.innerHTML = `
-                        <div style="flex:1; cursor:pointer" onclick="window.carregarPecaPasta('${key}')">
-                            <strong style="color:#0f172a">OAB ${item.exame} - ${item.peca}</strong><br>
-                            <small style="color:#64748b">${new Date(item.timestamp).toLocaleDateString()}</small>
+                        <div onclick="window.carregarPecaPasta('${key}')" style="cursor:pointer">
+                            <strong>OAB ${item.exame} - ${item.peca}</strong><br><small>${new Date(item.timestamp).toLocaleDateString()}</small>
                         </div>
-                        <button onclick="window.deletarPecaPasta('${key}')" style="border:none; background:none; color:var(--perigo); cursor:pointer;"><i class="fas fa-trash"></i></button>
+                        <i class="fas fa-trash" style="color:red; cursor:pointer" onclick="window.deletarPecaPasta('${key}')"></i>
                     `;
                     content.appendChild(div);
                 });
-            } else { content.innerHTML = "<p style='text-align:center; opacity:0.5'>Pasta vazia.</p>"; }
-        } catch (e) { content.innerHTML = "Erro ao carregar."; }
+            } else { content.innerHTML = "Vazio."; }
+        } catch (e) { content.innerHTML = "Erro."; }
     };
 
-    window.carregarPecaPasta = async (key) => {
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
+    window.carregarPecaPasta = async (k) => {
+        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
         if(snap.exists()){
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
-            document.getElementById('universal-modal').style.display = 'none';
+            document.getElementById('universal-modal').style.display='none';
         }
     };
 
-    window.deletarPecaPasta = async (key) => {
-        if(confirm("Excluir da pasta?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
+    window.deletarPecaPasta = async (k) => {
+        if(confirm("Excluir?")) {
+            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
             window.abrirPastaHistorico();
         }
     };
 
-    // --- VISUALIZAR E IMPRIMIR ---
-    window.visualizarModoFoco = () => {
-        const sb = document.querySelector('.sidebar');
-        sb.style.display = (sb.style.display === 'none') ? 'flex' : 'none';
+    // --- PERGAMINHO (ESTRUTURAS) ---
+    window.abrirPergaminho = () => {
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "📜 PERGAMINHO";
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+        Object.keys(pecas).forEach(k => {
+            const b = document.createElement('div'); b.className = 'opt-btn';
+            b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`;
+            b.onclick = () => { FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; };
+            content.appendChild(b);
+        });
+        modal.style.display = 'flex';
+    };
+
+    // --- MARTELO (TESES) ---
+    window.injetarTeses = () => {
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        if(dna) {
+            FolhaEngine.injetarTextoMultilinhas(dna);
+        } else { alert("Sem espelho para este exame."); }
+    };
+
+    // --- PDFS (P, G, V) ---
+    window.verPDF = (t) => {
+        const v = document.getElementById('pdf-viewer');
+        const f = document.getElementById('pdf-frame');
+        const tit = document.getElementById('pdf-title');
+        let url = (t==='P') ? `ro${window.activeEx}.pdf` : (t==='G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
+        tit.innerText = (t==='P') ? "ENUNCIADO" : (t==='G') ? "GABARITO" : "VADE MECUM";
+        f.src = url;
+        v.classList.add('active');
+        if(window.innerWidth < 768) window.toggleFoguete();
+    };
+
+    window.fecharPDF = () => {
+        document.getElementById('pdf-viewer').classList.remove('active');
+        document.getElementById('pdf-frame').src = "";
+    };
+
+    // --- AUXILIARES ---
+    window.forcarRadar = () => {
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        const ed = document.getElementById('editor-principal');
+        if (dna && RadarEngine && ed) {
+            const an = RadarEngine.analisar(dna, ed.innerText);
+            RadarEngine.renderizar(an);
+            document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase();
+        }
     };
 
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
         const iden = document.getElementById('identificador-peca').innerText;
-        if(confirm("Salvar esta peça oficialmente na Pasta?")) {
-            const novoRef = ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`);
-            await set(novoRef, {
-                exame: window.activeEx,
-                peca: iden.replace("PEÇA: ", ""),
-                conteudo: ed.innerText,
-                timestamp: Date.now()
+        if(confirm("Salvar na Pasta Oficial?")) {
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
+                exame: window.activeEx, peca: iden.replace("PEÇA: ", ""),
+                conteudo: ed.innerText, timestamp: Date.now()
             });
-            alert("Peça arquivada com sucesso!");
-        }
-    };
-
-    window.forcarRadar = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        const ed = document.getElementById('editor-principal');
-        if (dna && RadarEngine && ed) {
-            const analise = RadarEngine.analisar(dna, ed.innerText);
-            RadarEngine.renderizar(analise);
-            document.getElementById('identificador-peca').innerText = "PEÇA: " + analise.id.toUpperCase();
+            alert("Salvo!");
         }
     };
 
     async function salvarAutomatico() {
         const ed = document.getElementById('editor-principal');
-        if (ed && ed.innerText.trim()) {
+        if(ed && ed.innerText.trim()) {
             await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
                 conteudo: ed.innerText, timestamp: Date.now()
             });
@@ -360,33 +333,32 @@
 
     async function carregarRascunho() {
         const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-        if (snap.exists()) document.getElementById('editor-principal').innerText = snap.val().conteudo;
+        if(snap.exists()) document.getElementById('editor-principal').innerText = snap.val().conteudo;
     }
 
     window.toggleFoguete = () => {
-        const hub = document.getElementById('mobile-hub');
-        hub.classList.toggle('active');
-        document.getElementById('rocket-icon').className = hub.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
+        const h = document.getElementById('mobile-hub');
+        h.classList.toggle('active');
+        document.getElementById('rocket-icon').className = h.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
 
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "TROCAR EXAME";
+        document.getElementById('modal-title').innerText = "EXAMES OAB";
         const content = document.getElementById('modal-content');
         content.innerHTML = "";
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className = 'opt-btn';
-            b.innerHTML = `<span>OAB EXAME ${i}</span> <i class="fas fa-chevron-right"></i>`;
-            b.onclick = () => { localStorage.setItem('activeEx', i.toString()); window.location.reload(); };
+            b.innerHTML = `<span>EXAME ${i}</span>`;
+            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
             content.appendChild(b);
         }
         modal.style.display = 'flex';
     };
 
-    window.limparFolha = () => { if(confirm("Apagar tudo?")) { document.getElementById('editor-principal').innerText = ""; } };
+    window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
+    window.visualizarModoFoco = () => { const s = document.querySelector('.sidebar'); s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.abrirPergaminho = () => { /* Estrutura no pergaminho.js */ };
-    window.injetarTeses = () => { /* Martelo no banco-espelhos.js */ };
 </script>
 </body>
 </html>

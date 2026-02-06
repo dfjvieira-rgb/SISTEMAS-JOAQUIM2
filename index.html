@@ -164,7 +164,6 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder"></i></button>
@@ -241,7 +240,7 @@
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center";
                     div.innerHTML = `
                         <div onclick="window.carregarPecaPasta('${key}')" style="cursor:pointer">
-                            <strong>OAB ${item.exame} - ${item.peca}</strong><br><small>${new Date(item.timestamp).toLocaleDateString()}</small>
+                            <strong>${item.peca}</strong><br><small>OAB ${item.exame}</small>
                         </div>
                         <i class="fas fa-trash" style="color:red; cursor:pointer" onclick="window.deletarPecaPasta('${key}')"></i>
                     `;
@@ -321,12 +320,17 @@
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
         const iden = document.getElementById('identificador-peca').innerText;
-        if(confirm("Salvar na Pasta Oficial?")) {
+        if(confirm("Deseja finalizar e salvar esta peça na Pasta Oficial?")) {
+            const agora = new Date();
+            const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
-                exame: window.activeEx, peca: iden.replace("PEÇA: ", ""),
-                conteudo: ed.innerText, timestamp: Date.now()
+                exame: window.activeEx, 
+                peca: `OAB ${window.activeEx} - ${iden.replace("PEÇA: ", "")} (${dataFormatada})`,
+                conteudo: ed.innerText, 
+                timestamp: Date.now()
             });
-            alert("Salvo!");
+            alert("Peça blindada e salva com sucesso!");
         }
     };
 

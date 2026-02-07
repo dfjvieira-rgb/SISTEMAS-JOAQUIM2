@@ -58,6 +58,19 @@ export const BANCO_ESPELHOS = {
         <div class="espelho-item"><input type="checkbox" value="1.10" onchange="window.calcNota()"><div class="espelho-txt">8. Pedidos (Renovação/Improcedência/Honorários) e Fechamento</div><div class="espelho-pt">1.10</div></div>
     `,
 
+    "36": `
+        <div class="nota-floating">ESPELHO OFICIAL - EXAME 36 (MANDADO DE SEGURANÇA)</div>
+        <div class="espelho-item"><input type="checkbox" value="0.20" onchange="window.calcNota()"><div class="espelho-txt">1. Endereçamento: Presidente do TRT da 12ª Região (SC)</div><div class="espelho-pt">0.20</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.30" onchange="window.calcNota()"><div class="espelho-txt">2. Partes: Impetrante, Coatora (Juízo 80ª VT) e Litisconsorte</div><div class="espelho-pt">0.30</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.40" onchange="window.calcNota()"><div class="espelho-txt">3. Fundamento: Lei 12.016/09 ou Art. 5º, LXIX CF</div><div class="espelho-pt">0.40</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.60" onchange="window.calcNota()"><div class="espelho-txt">4. Cabimento: Inexistência de recurso imediato (S. 214 TST ou OJ 92)</div><div class="espelho-pt">0.60</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.70" onchange="window.calcNota()"><div class="espelho-txt">5. Tese: Direito à quesitação e assistente (Art. 465, §1º CPC)</div><div class="espelho-pt">0.70</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.70" onchange="window.calcNota()"><div class="espelho-txt">6. Tese: Vedação de depósito prévio de honorários (OJ 98 SDI-2)</div><div class="espelho-pt">0.70</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.80" onchange="window.calcNota()"><div class="espelho-txt">7. Liminar: Fumus Boni Iuris e Periculum in Mora</div><div class="espelho-pt">0.80</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.40" onchange="window.calcNota()"><div class="espelho-txt">8. Prova Pré-constituída: Indicação de prova documental</div><div class="espelho-pt">0.40</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.90" onchange="window.calcNota()"><div class="espelho-txt">9. Pedidos (Liminar, Notificação e Segurança) e Fechamento</div><div class="espelho-pt">0.90</div></div>
+    `,
+
     "35": `
         <div class="nota-floating">ESPELHO OFICIAL - EXAME 35 (RECURSO ORDINÁRIO)</div>
         <div class="espelho-item"><input type="checkbox" value="0.30" onchange="window.calcNota()"><div class="espelho-txt">1. Endereçamento 89ª VT Floriano/PI, TRT e Art. 895, I CLT</div><div class="espelho-pt">0.30</div></div>
@@ -70,7 +83,7 @@ export const BANCO_ESPELHOS = {
         <div class="espelho-item"><input type="checkbox" value="0.50" onchange="window.calcNota()"><div class="espelho-txt">8. Mérito: Ajuda Custo Indenizatória (Art. 457, §2 CLT)</div><div class="espelho-pt">0.50</div></div>
         <div class="espelho-item"><input type="checkbox" value="0.50" onchange="window.calcNota()"><div class="espelho-txt">9. Mérito: Equiparação Salarial (Art. 461 CLT)</div><div class="espelho-pt">0.50</div></div>
         <div class="espelho-item"><input type="checkbox" value="0.50" onchange="window.calcNota()"><div class="espelho-txt">10. Mérito: Insalubridade Reclassificação (Art. 194 CLT)</div><div class="espelho-pt">0.50</div></div>
-        <div class="espelho-item"><input type="checkbox" value="0.80" onchange="window.calcNota()"><div class="espelho-pt">0.80</div><div class="espelho-txt">11. Honorários (791-A), Pedidos e Fechamento</div></div>
+        <div class="espelho-item"><input type="checkbox" value="0.80" onchange="window.calcNota()"><div class="espelho-txt">11. Honorários (791-A), Pedidos e Fechamento</div><div class="espelho-pt">0.80</div></div>
     `
 };
 

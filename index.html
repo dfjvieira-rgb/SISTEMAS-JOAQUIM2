@@ -79,7 +79,7 @@
             font-weight: 900; color: #0f172a; border-bottom: 3px solid var(--gold); 
         }
         
-        .toolbar-liberdade { display: flex; background: #fff; }
+        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; }
         .btn-lib { 
             flex: 1; padding: 12px; border: none; background: transparent; 
             cursor: pointer; font-weight: 800; font-size: 0.7rem; 
@@ -143,6 +143,7 @@
         <div class="sticky-tools">
             <div id="identificador-peca">SCANNER ELITE...</div>
             <div class="toolbar-liberdade">
+                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.visualizarModoFoco()"><i class="fas fa-eye"></i> Foco</button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
@@ -164,9 +165,9 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
+        <button class="fab-sub" style="background:#64748b;" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
-        <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder"></i></button>
         <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
@@ -194,6 +195,9 @@
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
+    
+    // CIRURGIA: Pilha de histórico para o Desfazer
+    window.historicoUndo = [];
 
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
@@ -214,6 +218,11 @@
                         sel.removeAllRanges();
                         sel.addRange(range);
                     }
+                    // CIRURGIA: Suporte ao CTRL+Z físico
+                    if (e.ctrlKey && e.key === 'z') {
+                        e.preventDefault();
+                        window.desfazer();
+                    }
                 });
             }
         }, 1000);
@@ -222,6 +231,26 @@
         window.forcarRadar();
         setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
+    };
+
+    // CIRURGIA: Função para salvar estado antes de mudanças
+    window.salvarEstado = () => {
+        const ed = document.getElementById('editor-principal');
+        if(ed) {
+            window.historicoUndo.push(ed.innerText);
+            if(window.historicoUndo.length > 20) window.historicoUndo.shift(); // Mantém 20 níveis
+        }
+    };
+
+    // CIRURGIA: Função Desfazer
+    window.desfazer = () => {
+        if(window.historicoUndo.length > 0) {
+            const estadoAnterior = window.historicoUndo.pop();
+            document.getElementById('editor-principal').innerText = estadoAnterior;
+            window.forcarRadar();
+        } else {
+            console.log("Nada no histórico para desfazer.");
+        }
     };
 
     window.abrirPastaHistorico = async () => {
@@ -253,6 +282,7 @@
     window.carregarPecaPasta = async (k) => {
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
         if(snap.exists()){
+            window.salvarEstado(); // Salva antes de carregar nova peça
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             document.getElementById('universal-modal').style.display='none';
         }
@@ -274,6 +304,7 @@
             const b = document.createElement('div'); b.className = 'opt-btn';
             b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`;
             b.onclick = () => { 
+                window.salvarEstado(); // CIRURGIA: Protege o texto antes de injetar coringa
                 FolhaEngine.injetarTextoMultilinhas(pecas[k]); 
                 modal.style.display='none';
                 if(window.innerWidth < 768) window.toggleFoguete();
@@ -284,6 +315,7 @@
     };
 
     window.injetarTeses = () => {
+        window.salvarEstado(); // CIRURGIA: Protege o texto antes do Martelo
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) {
             FolhaEngine.injetarTextoMultilinhas(dna);
@@ -368,7 +400,12 @@
         modal.style.display = 'flex';
     };
 
-    window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerText = ""; };
+    window.limparFolha = () => { 
+        if(confirm("Limpar tudo?")) {
+            window.salvarEstado();
+            document.getElementById('editor-principal').innerText = ""; 
+        }
+    };
     window.visualizarModoFoco = () => { const s = document.querySelector('.sidebar'); s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>

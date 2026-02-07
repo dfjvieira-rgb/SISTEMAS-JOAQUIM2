@@ -93,7 +93,6 @@
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; }
         iframe { width: 100%; flex: 1; border: none; }
 
-        /* --- MOBILE HUB --- */
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
         .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
         .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
@@ -196,8 +195,9 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
     
-    // CIRURGIA: Pilha de histórico para o Desfazer
+    // INTELIGÊNCIA DE DESFAZER: Pilha de histórico
     window.historicoUndo = [];
+    let debounceTimer = null;
 
     window.onload = async () => {
         document.getElementById('ex-display').innerText = window.activeEx;
@@ -206,6 +206,21 @@
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
+                // INTELIGÊNCIA: Salva estado ao digitar (com delay para performance)
+                ed.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const texto = ed.innerText;
+                        if(window.historicoUndo[window.historicoUndo.length -1] !== texto) {
+                            window.historicoUndo.push(texto);
+                            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
+                        }
+                    }, 800);
+                });
+
+                // INTELIGÊNCIA: Salva estado imediatamente ao colar (Paste)
+                ed.addEventListener('paste', () => window.salvarEstado());
+
                 ed.addEventListener('keydown', (e) => {
                     if (e.key === 'Tab') {
                         e.preventDefault();
@@ -218,7 +233,6 @@
                         sel.removeAllRanges();
                         sel.addRange(range);
                     }
-                    // CIRURGIA: Suporte ao CTRL+Z físico
                     if (e.ctrlKey && e.key === 'z') {
                         e.preventDefault();
                         window.desfazer();
@@ -233,23 +247,27 @@
         setInterval(window.forcarRadar, 5000);
     };
 
-    // CIRURGIA: Função para salvar estado antes de mudanças
     window.salvarEstado = () => {
         const ed = document.getElementById('editor-principal');
         if(ed) {
             window.historicoUndo.push(ed.innerText);
-            if(window.historicoUndo.length > 20) window.historicoUndo.shift(); // Mantém 20 níveis
+            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
         }
     };
 
-    // CIRURGIA: Função Desfazer
     window.desfazer = () => {
+        const ed = document.getElementById('editor-principal');
         if(window.historicoUndo.length > 0) {
+            // Se o texto atual é igual ao último do histórico, remove ele primeiro
+            if(ed.innerText === window.historicoUndo[window.historicoUndo.length-1]) {
+                window.historicoUndo.pop();
+            }
+            
             const estadoAnterior = window.historicoUndo.pop();
-            document.getElementById('editor-principal').innerText = estadoAnterior;
-            window.forcarRadar();
-        } else {
-            console.log("Nada no histórico para desfazer.");
+            if(estadoAnterior !== undefined) {
+                ed.innerText = estadoAnterior;
+                window.forcarRadar();
+            }
         }
     };
 
@@ -282,7 +300,7 @@
     window.carregarPecaPasta = async (k) => {
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
         if(snap.exists()){
-            window.salvarEstado(); // Salva antes de carregar nova peça
+            window.salvarEstado(); 
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             document.getElementById('universal-modal').style.display='none';
         }
@@ -304,7 +322,7 @@
             const b = document.createElement('div'); b.className = 'opt-btn';
             b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`;
             b.onclick = () => { 
-                window.salvarEstado(); // CIRURGIA: Protege o texto antes de injetar coringa
+                window.salvarEstado(); 
                 FolhaEngine.injetarTextoMultilinhas(pecas[k]); 
                 modal.style.display='none';
                 if(window.innerWidth < 768) window.toggleFoguete();
@@ -315,7 +333,7 @@
     };
 
     window.injetarTeses = () => {
-        window.salvarEstado(); // CIRURGIA: Protege o texto antes do Martelo
+        window.salvarEstado(); 
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) {
             FolhaEngine.injetarTextoMultilinhas(dna);
@@ -355,7 +373,6 @@
         if(confirm("Deseja finalizar e salvar esta peça na Pasta Oficial?")) {
             const agora = new Date();
             const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
                 exame: window.activeEx, 
                 peca: `OAB ${window.activeEx} - ${iden.replace("PEÇA: ", "")} (${dataFormatada})`,
@@ -377,7 +394,10 @@
 
     async function carregarRascunho() {
         const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
-        if(snap.exists()) document.getElementById('editor-principal').innerText = snap.val().conteudo;
+        if(snap.exists()) {
+            document.getElementById('editor-principal').innerText = snap.val().conteudo;
+            window.salvarEstado();
+        }
     }
 
     window.toggleFoguete = () => {

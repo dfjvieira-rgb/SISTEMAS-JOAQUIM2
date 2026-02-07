@@ -167,6 +167,9 @@
         <button class="fab-sub" style="background:#64748b;" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        
+        <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i></button>
+        
         <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
@@ -195,7 +198,6 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.FolhaEngine = FolhaEngine;
     
-    // INTELIGÊNCIA DE DESFAZER: Pilha de histórico
     window.historicoUndo = [];
     let debounceTimer = null;
 
@@ -206,7 +208,6 @@
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
-                // INTELIGÊNCIA: Salva estado ao digitar (com delay para performance)
                 ed.addEventListener('input', () => {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
@@ -218,7 +219,6 @@
                     }, 800);
                 });
 
-                // INTELIGÊNCIA: Salva estado imediatamente ao colar (Paste)
                 ed.addEventListener('paste', () => window.salvarEstado());
 
                 ed.addEventListener('keydown', (e) => {
@@ -258,7 +258,6 @@
     window.desfazer = () => {
         const ed = document.getElementById('editor-principal');
         if(window.historicoUndo.length > 0) {
-            // Se o texto atual é igual ao último do histórico, remove ele primeiro
             if(ed.innerText === window.historicoUndo[window.historicoUndo.length-1]) {
                 window.historicoUndo.pop();
             }
@@ -303,6 +302,7 @@
             window.salvarEstado(); 
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             document.getElementById('universal-modal').style.display='none';
+            if(window.innerWidth < 768) window.toggleFoguete();
         }
     };
 

@@ -9,10 +9,10 @@
         :root {
             --primary: #020617; --gold: #fbbf24; --card: #1e293b;
             --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
-            --sumula: #f97316; --artigo: #10b981;
+            --sumula: #f97316; --artigo: #10b981; --pre: #ef4444;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 110px; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 120px; }
 
         header {
             background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold);
@@ -41,16 +41,23 @@
         .actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
         .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
 
+        /* MENU INFERIOR COM SCROLL HORIZONTAL PARA SUPORTAR TODAS AS CATEGORIAS */
         .nav-tabs {
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
-            display: flex; justify-content: space-around; padding: 10px 2px;
+            display: flex; overflow-x: auto; padding: 10px 5px;
             border-top: 2px solid #334155; z-index: 2000;
+            scrollbar-width: none; /* Firefox */
         }
-        .tab { color: #94a3b8; text-align: center; font-size: 8.5px; text-decoration: none; font-weight: 700; flex: 1; cursor: pointer; letter-spacing: -0.2px; }
-        .tab.active { color: var(--gold); }
-        .tab i { display: block; font-size: 1rem; margin-bottom: 4px; }
+        .nav-tabs::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
 
-        #fab-injetor { position: fixed; bottom: 95px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1001; color: black; cursor: pointer; }
+        .tab { 
+            color: #94a3b8; text-align: center; font-size: 9px; text-decoration: none; 
+            font-weight: 700; min-width: 75px; cursor: pointer; flex-shrink: 0;
+        }
+        .tab.active { color: var(--gold); }
+        .tab i { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+
+        #fab-injetor { position: fixed; bottom: 100px; right: 20px; width: 60px; height: 60px; background: var(--gold); border-radius: 50%; border: none; font-size: 1.5rem; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 1001; color: black; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -63,9 +70,9 @@
 <div class="container">
     <div id="panel-editor" class="panel-input">
         <h4 id="editor-title" style="margin-top:0; color:var(--gold);">Adicionar à Mentoria</h4>
-        <input id="inp-t" placeholder="Título (Ex: Art. 467 CLT)">
-        <textarea id="inp-c" rows="3" placeholder="Conteúdo do Artigo..."></textarea>
-        <textarea id="inp-r" rows="2" style="background:#0f172a; border-color:var(--gold)" placeholder="Rascunho/Dica de Ouro..."></textarea>
+        <input id="inp-t" placeholder="Título (Ex: Inépcia da Inicial)">
+        <textarea id="inp-c" rows="3" placeholder="Conteúdo Jurídico..."></textarea>
+        <textarea id="inp-r" rows="2" style="background:#0f172a; border-color:var(--gold)" placeholder="Rascunho de fundamentação..."></textarea>
         <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px; font-weight: 900;">GRAVAR NA MEMÓRIA IA</button>
     </div>
 
@@ -80,6 +87,7 @@
 <nav class="nav-tabs">
     <a class="tab active" onclick="showTab('qp')"><i class="fas fa-search"></i>PEÇA?</a>
     <a class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
+    <a class="tab" onclick="showTab('pre')"><i class="fas fa-exclamation-triangle"></i>PRELIMINAR</a>
     <a class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
     <a class="tab" onclick="showTab('sumula')"><i class="fas fa-balance-scale"></i>SÚMULAS</a>
     <a class="tab" onclick="showTab('artigo')"><i class="fas fa-book"></i>ARTIGOS</a>
@@ -112,8 +120,8 @@
         if(activeTab) activeTab.classList.add('active');
         
         const titulos = { 
-            qp: 'Qual a Peça?', nc: 'Não Confunda', tese: 'Banco de Teses', 
-            sumula: 'Súmulas TST', artigo: 'Artigos CLT', arsenal: '50 Questões' 
+            qp: 'Qual a Peça?', nc: 'Não Confunda', pre: 'Preliminares/Prejudiciais', 
+            tese: 'Banco de Teses', sumula: 'Súmulas TST', artigo: 'Artigos CLT', arsenal: '50 Questões' 
         };
         
         const header = document.getElementById('intel-head');
@@ -154,7 +162,7 @@
     function render() {
         const f = document.getElementById('feed-v13');
         f.innerHTML = "";
-        const cores = { qp: 'var(--qp)', nc: 'var(--nc)', tese: 'var(--tese)', arsenal: 'var(--arsenal)', sumula: 'var(--sumula)', artigo: 'var(--artigo)' };
+        const cores = { qp: 'var(--qp)', nc: 'var(--nc)', pre: 'var(--pre)', tese: 'var(--tese)', arsenal: 'var(--arsenal)', sumula: 'var(--sumula)', artigo: 'var(--artigo)' };
         
         const itens = Object.keys(cache).reverse();
         let encontrou = false;
@@ -163,7 +171,7 @@
             const it = cache[id];
             if(it.cat === currentTab) {
                 encontrou = true;
-                const rascunhoHtml = it.r ? `<div class="rascunho-box"><strong>Dica de Ouro:</strong><br>${it.r}</div>` : "";
+                const rascunhoHtml = it.r ? `<div class="rascunho-box"><strong>Rascunho:</strong><br>${it.r}</div>` : "";
                 f.innerHTML += `
                     <div class="post-it" style="background:${cores[it.cat]}">
                         <strong>${it.t}</strong>
@@ -191,15 +199,14 @@
     };
 
     window.injetorMestre = () => {
-        if(!confirm("Deseja injetar Artigos, Súmulas e Arsenal?")) return;
+        if(!confirm("Deseja injetar Preliminares e base de dados?")) return;
         const q = [
-            { t: "Art. 467 CLT", c: "Verbas Rescisórias Incontroversas: Devem ser pagas na 1ª audiência, sob pena de acréscimo de 50%.", r: "Sempre peça em Reclamatórias se houver verbas nítidas.", cat: "artigo" },
-            { t: "Art. 477, §8º CLT", c: "Multa por atraso no pagamento das verbas rescisórias: Valor de um salário do empregado.", r: "Prazo: 10 dias após o término do contrato.", cat: "artigo" },
-            { t: "Art. 791-A CLT", c: "Honorários de Sucumbência: Fixados entre 5% e 15% sobre o valor da liquidação.", r: "Lembre-se: Honorários recíprocos são vedados em alguns casos (STF).", cat: "artigo" },
-            { t: "Art. 840, §1º CLT", c: "Requisitos da Petição Inicial: Pedidos devem ser certos, determinados e com indicação de valor.", r: "Essencial para RT. Falta de valor = extinção sem mérito.", cat: "artigo" }
+            { t: "Prescrição Bienal", c: "Art. 7º, XXIX, CF/88 e Art. 11 CLT. Prazo de 2 anos após a extinção do contrato para ajuizar a ação.", r: "Extinção com resolução do mérito (Art. 487, II, CPC).", cat: "pre" },
+            { t: "Prescrição Quinquenal", c: "Art. 7º, XXIX, CF/88 e Art. 11 CLT. Só podem ser pleiteados créditos dos últimos 5 anos contados do ajuizamento.", r: "Sempre arguir em Contestação e RO.", cat: "pre" },
+            { t: "Inépcia da Inicial", c: "Art. 330, §1º CPC e Art. 840, §1º CLT. Pedido sem causa de pedir ou sem indicação de valor.", r: "Extinção sem resolução do mérito (Art. 485, IV, CPC).", cat: "pre" }
         ];
         q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        showTab('artigo');
+        showTab('pre');
     };
 
     window.onload = () => showTab('qp');

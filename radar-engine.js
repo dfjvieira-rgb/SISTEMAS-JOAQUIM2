@@ -5,6 +5,7 @@ export const RadarEngine = {
         { id: "RECURSO ORDINÁRIO", display: "RECURSO ORDINÁRIO", cor: "#3b82f6" },
         { id: "CONTESTAÇÃO", display: "CONTESTAÇÃO TRABALHISTA", cor: "#22c55e" },
         { id: "RECLAMAÇÃO", display: "RECLAMATÓRIA TRABALHISTA", cor: "#a855f7" },
+        { id: "EXCEÇÃO DE PRE EXECUTIVIDADE", display: "EXCEÇÃO DE PRE EXECUTIVIDADE", cor: "#a855f7" },
         { id: "EMBARGOS DE TERCEIRO", display: "EMBARGOS DE TERCEIRO", cor: "#a855f7" },
         { id: "MANDADO DE SEGURANÇA", display: "MANDADO DE SEGURANÇA", cor: "#0ea5e9" }
     ],

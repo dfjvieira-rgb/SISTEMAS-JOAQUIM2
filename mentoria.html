@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MENTORIA ELITE V13 - INTELIGÊNCIA TOTAL</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --primary: #020617; --gold: #fbbf24; --card: #1e293b;
@@ -34,10 +34,13 @@
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        .post-it strong { display: flex; align-items: center; gap: 8px; font-size: 1rem; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 5px; margin-bottom: 8px; }
-        .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 600; white-space: pre-wrap; }
+        /* Título do Card com ícone */
+        .post-it strong { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 8px; margin-bottom: 10px; }
+        .post-it strong i { font-size: 1.2rem; }
         
-        .rascunho-box { background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; border-left: 4px solid rgba(0,0,0,0.3); font-size: 0.85rem; font-style: italic; }
+        .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 700; white-space: pre-wrap; }
+        
+        .rascunho-box { background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; border-left: 4px solid rgba(0,0,0,0.3); font-size: 0.85rem; font-style: italic; font-weight: 500; }
 
         .actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
         .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
@@ -77,7 +80,7 @@
     </div>
 
     <div id="sec-inteligencia">
-        <h3 id="intel-head" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">
+        <h3 id="intel-head" style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-brain"></i> SELECIONE UMA CATEGORIA
         </h3>
         <div id="feed-v13"></div>
@@ -116,10 +119,18 @@
     let editId = null;
     let cache = {};
 
-    const icons = {
-        qp: 'fas fa-search', nc: 'fas fa-brain', pre: 'fas fa-exclamation-triangle',
-        tese: 'fas fa-gavel', tema: 'fas fa-lightbulb', sumula: 'fas fa-balance-scale',
-        oj: 'fas fa-shield-halved', artigo: 'fas fa-book', leis: 'fas fa-scroll', arsenal: 'fas fa-bolt'
+    // MAPA DE ÍCONES PARA CADA CATEGORIA
+    const iconMap = {
+        qp: 'fa-search', 
+        nc: 'fa-brain', 
+        pre: 'fa-exclamation-triangle',
+        tese: 'fa-gavel', 
+        tema: 'fa-lightbulb', 
+        sumula: 'fa-balance-scale',
+        oj: 'fa-shield-halved', 
+        artigo: 'fa-book', 
+        leis: 'fa-scroll', 
+        arsenal: 'fa-bolt'
     };
 
     window.showTab = (tab) => {
@@ -135,7 +146,7 @@
         };
         
         const header = document.getElementById('intel-head');
-        header.innerHTML = `<i class="${icons[tab]}"></i> ${titulos[tab].toUpperCase()}`;
+        header.innerHTML = `<i class="fas ${iconMap[tab]}"></i> ${titulos[tab].toUpperCase()}`;
         header.style.color = `var(--${tab})`;
         
         document.getElementById('btn-salvar').style.background = `var(--${tab})`;
@@ -185,14 +196,16 @@
             const it = cache[id];
             if(it.cat === currentTab) {
                 encontrou = true;
+                const iconeFinal = iconMap[it.cat] || 'fa-info-circle';
                 const rascunhoHtml = it.r ? `<div class="rascunho-box"><strong>Rascunho:</strong><br>${it.r}</div>` : "";
+                
                 f.innerHTML += `
                     <div class="post-it" style="background:${cores[it.cat]}">
-                        <strong><i class="${icons[it.cat]}"></i> ${it.t}</strong>
+                        <strong><i class="fas ${iconeFinal}"></i> ${it.t}</strong>
                         <p>${it.c}</p>
                         ${rascunhoHtml}
                         <div class="actions">
-                            <button class="btn-circle" style="background:rgba(255,255,255,0.3); color:black" onclick="editar('${id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-circle" style="background:rgba(255,255,255,0.4); color:black" onclick="editar('${id}')"><i class="fas fa-edit"></i></button>
                             <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('${id}')"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;

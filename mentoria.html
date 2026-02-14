@@ -70,7 +70,7 @@
 <div class="container">
     <div id="panel-editor" class="panel-input">
         <h4 id="editor-title" style="margin-top:0; color:var(--gold);">Adicionar à Mentoria</h4>
-        <input id="inp-t" placeholder="Título (Ex: Tema 1046 STF ou Lei 6019)">
+        <input id="inp-t" placeholder="Título (Ex: OJ 394 SDI-1)">
         <textarea id="inp-c" rows="3" placeholder="Conteúdo Principal..."></textarea>
         <textarea id="inp-r" rows="2" style="background:#0f172a; border-color:var(--gold)" placeholder="Rascunho/Dica de Ouro..."></textarea>
         <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px; font-weight: 900;">GRAVAR NA MEMÓRIA IA</button>
@@ -207,14 +207,14 @@
     };
 
     window.injetorMestre = () => {
-        if(!confirm("Injetar Leis, Temas, OJs e base de dados completa?")) return;
+        if(!confirm("Injetar OJs, Temas e Leis?")) return;
         const q = [
-            { t: "Lei 6.019/74", c: "Trabalho Temporário: 180 dias + 90 dias de prorrogação.", r: "Tema quente para peças de Contestação.", cat: "leis" },
-            { t: "Tema 1046 STF", c: "Prevalência do negociado sobre o legislado (limite: direitos indisponíveis).", r: "Ouro para teses de mérito.", cat: "tema" },
-            { t: "OJ 394 SDI-1", c: "RSR sobre HE não gera reflexos para evitar bis in idem.", r: "Tese clássica de defesa.", cat: "oj" }
+            { t: "OJ 394 SDI-1", c: "RSR sobre HE não gera reflexos para evitar bis in idem.", r: "Tese clássica de defesa.", cat: "oj" },
+            { t: "Tema 1046 STF", c: "Validade de norma coletiva que limita direito trabalhista.", r: "Respeitados os direitos indisponíveis.", cat: "tema" },
+            { t: "Lei 6.019/74", c: "Regras sobre Trabalho Temporário e Terceirização.", r: "Atenção aos prazos de 180+90 dias.", cat: "leis" }
         ];
         q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        showTab('tema');
+        showTab('oj');
     };
 
     window.onload = () => showTab('qp');

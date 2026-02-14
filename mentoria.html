@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE V13 - INTELIGÊNCIA</title>
+    <title>MENTORIA ELITE V13 - INTELIGÊNCIA TOTAL</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #020617; --gold: #fbbf24; --card: #1e293b;
             --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
             --sumula: #f97316; --artigo: #10b981; --pre: #ef4444;
-            --oj: #06b6d4; 
+            --oj: #06b6d4; --tema: #facc15; --leis: #94a3b8; 
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 120px; }
@@ -70,7 +70,7 @@
 <div class="container">
     <div id="panel-editor" class="panel-input">
         <h4 id="editor-title" style="margin-top:0; color:var(--gold);">Adicionar à Mentoria</h4>
-        <input id="inp-t" placeholder="Título (Ex: OJ 394 SDI-1)">
+        <input id="inp-t" placeholder="Título (Ex: Tema 1046 STF ou Lei 6019)">
         <textarea id="inp-c" rows="3" placeholder="Conteúdo Principal..."></textarea>
         <textarea id="inp-r" rows="2" style="background:#0f172a; border-color:var(--gold)" placeholder="Rascunho/Dica de Ouro..."></textarea>
         <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px; font-weight: 900;">GRAVAR NA MEMÓRIA IA</button>
@@ -89,9 +89,11 @@
     <a class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
     <a class="tab" onclick="showTab('pre')"><i class="fas fa-exclamation-triangle"></i>PRELIMINAR</a>
     <a class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
+    <a class="tab" onclick="showTab('tema')"><i class="fas fa-lightbulb"></i>TEMAS</a>
     <a class="tab" onclick="showTab('sumula')"><i class="fas fa-balance-scale"></i>SÚMULAS</a>
     <a class="tab" onclick="showTab('oj')"><i class="fas fa-shield-halved"></i>OJ's</a>
     <a class="tab" onclick="showTab('artigo')"><i class="fas fa-book"></i>ARTIGOS</a>
+    <a class="tab" onclick="showTab('leis')"><i class="fas fa-scroll"></i>LEIS</a>
     <a class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
 </nav>
 
@@ -122,8 +124,8 @@
         
         const titulos = { 
             qp: 'Qual a Peça?', nc: 'Não Confunda', pre: 'Preliminares/Prejudiciais', 
-            tese: 'Banco de Teses', sumula: 'Súmulas TST', oj: 'Orientações Jurisprudenciais',
-            artigo: 'Artigos CLT', arsenal: '50 Questões' 
+            tese: 'Banco de Teses', tema: 'Temas STF/TST', sumula: 'Súmulas TST', oj: 'Orientações Jurisprudenciais',
+            artigo: 'Artigos CLT', leis: 'Leis Extravagantes/CPC', arsenal: '50 Questões' 
         };
         
         const header = document.getElementById('intel-head');
@@ -166,8 +168,8 @@
         f.innerHTML = "";
         const cores = { 
             qp: 'var(--qp)', nc: 'var(--nc)', pre: 'var(--pre)', 
-            tese: 'var(--tese)', arsenal: 'var(--arsenal)', 
-            sumula: 'var(--sumula)', oj: 'var(--oj)', artigo: 'var(--artigo)' 
+            tese: 'var(--tese)', tema: 'var(--tema)', arsenal: 'var(--arsenal)', 
+            sumula: 'var(--sumula)', oj: 'var(--oj)', artigo: 'var(--artigo)', leis: 'var(--leis)'
         };
         
         const itens = Object.keys(cache).reverse();
@@ -205,14 +207,14 @@
     };
 
     window.injetorMestre = () => {
-        if(!confirm("Deseja injetar OJs e base de dados completa?")) return;
+        if(!confirm("Injetar Leis, Temas, OJs e base de dados completa?")) return;
         const q = [
-            { t: "OJ 394 SDI-1 TST", c: "RSR sobre horas extras: A majoração do RSR não gera reflexos em outras parcelas.", r: "Evita o efeito cascata (bis in idem).", cat: "oj" },
-            { t: "OJ 307 SDI-1 TST", c: "Intervalo Intrajornada: Concessão parcial implica pagamento total com 50%.", r: "Natureza indenizatória pós-reforma.", cat: "oj" },
-            { t: "Prescrição Bienal", c: "Art. 7º, XXIX, CF/88. 2 anos após extinção.", r: "Extinção com mérito (487, II CPC).", cat: "pre" }
+            { t: "Lei 6.019/74", c: "Trabalho Temporário: 180 dias + 90 dias de prorrogação.", r: "Tema quente para peças de Contestação.", cat: "leis" },
+            { t: "Tema 1046 STF", c: "Prevalência do negociado sobre o legislado (limite: direitos indisponíveis).", r: "Ouro para teses de mérito.", cat: "tema" },
+            { t: "OJ 394 SDI-1", c: "RSR sobre HE não gera reflexos para evitar bis in idem.", r: "Tese clássica de defesa.", cat: "oj" }
         ];
         q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        showTab('oj');
+        showTab('tema');
     };
 
     window.onload = () => showTab('qp');

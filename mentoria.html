@@ -9,7 +9,7 @@
         :root {
             --primary: #020617; --gold: #fbbf24; --card: #1e293b;
             --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
-            --sumula: #f97316; --artclt: #10b981; --artcpc: #0ea5e9; --pre: #ef4444;
+            --sumula: #f97316; --artigo: #10b981; --artcpc: #0ea5e9; --pre: #ef4444;
             --oj: #06b6d4; --tema: #facc15; --leis: #94a3b8; 
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -93,7 +93,7 @@
     <a class="tab" onclick="showTab('tema')"><i class="fas fa-lightbulb"></i>TEMAS</a>
     <a class="tab" onclick="showTab('sumula')"><i class="fas fa-balance-scale"></i>SÚMULAS</a>
     <a class="tab" onclick="showTab('oj')"><i class="fas fa-shield-halved"></i>OJ's</a>
-    <a class="tab" onclick="showTab('artclt')"><i class="fas fa-book"></i>ART. CLT</a>
+    <a class="tab" onclick="showTab('artigo')"><i class="fas fa-book"></i>ART. CLT</a>
     <a class="tab" onclick="showTab('artcpc')"><i class="fas fa-file-invoice"></i>ART. CPC</a>
     <a class="tab" onclick="showTab('leis')"><i class="fas fa-scroll"></i>LEIS</a>
     <a class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
@@ -121,7 +121,7 @@
     const iconMap = {
         qp: 'fa-search', nc: 'fa-brain', pre: 'fa-exclamation-triangle',
         tese: 'fa-gavel', tema: 'fa-lightbulb', sumula: 'fa-balance-scale',
-        oj: 'fa-shield-halved', artclt: 'fa-book', artcpc: 'fa-file-invoice', 
+        oj: 'fa-shield-halved', artigo: 'fa-book', artcpc: 'fa-file-invoice', 
         leis: 'fa-scroll', arsenal: 'fa-bolt'
     };
 
@@ -134,7 +134,7 @@
         const titulos = { 
             qp: 'Qual a Peça?', nc: 'Não Confunda', pre: 'Preliminares/Prejudiciais', 
             tese: 'Banco de Teses', tema: 'Temas STF/TST', sumula: 'Súmulas TST', oj: 'Orientações Jurisprudenciais',
-            artclt: 'Artigos CLT', artcpc: 'Artigos CPC', leis: 'Leis Extravagantes', arsenal: '50 Questões' 
+            artigo: 'Artigos CLT', artcpc: 'Artigos CPC', leis: 'Leis Extravagantes', arsenal: '50 Questões' 
         };
         
         const header = document.getElementById('intel-head');
@@ -178,7 +178,7 @@
         const cores = { 
             qp: 'var(--qp)', nc: 'var(--nc)', pre: 'var(--pre)', 
             tese: 'var(--tese)', tema: 'var(--tema)', arsenal: 'var(--arsenal)', 
-            sumula: 'var(--sumula)', oj: 'var(--oj)', artclt: 'var(--artclt)', artcpc: 'var(--artcpc)', leis: 'var(--leis)'
+            sumula: 'var(--sumula)', oj: 'var(--oj)', artigo: 'var(--artigo)', artcpc: 'var(--artcpc)', leis: 'var(--leis)'
         };
         
         const itens = Object.keys(cache).reverse();
@@ -220,11 +220,11 @@
     window.injetorMestre = () => {
         if(!confirm("Injetar Base de Dados CLT e CPC?")) return;
         const q = [
-            { t: "Art. 840, §1º CLT", c: "Petição inicial escrita: pedidos certos, determinados e com valor.", r: "Fundamental para o Rito Sumaríssimo e Ordinário.", cat: "artclt" },
+            { t: "Art. 840, §1º CLT", c: "Petição inicial escrita: pedidos certos, determinados e com valor.", r: "Fundamental para o Rito Sumaríssimo e Ordinário.", cat: "artigo" },
             { t: "Art. 55 CPC", c: "Reputam-se conexas 2 ou mais ações quando lhes for comum o pedido ou a causa de pedir.", r: "Argumento para reunião de processos.", cat: "artcpc" }
         ];
         q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        showTab('artclt');
+        showTab('artigo');
     };
 
     window.onload = () => showTab('qp');

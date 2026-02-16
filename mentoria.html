@@ -24,13 +24,18 @@
 
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* CALCULADORA DE AVISO */
+        /* CALCULADORA DE AVISO COM EXPLICAÇÃO */
         #calc-aviso-box { 
             background: white; color: black; padding: 20px; border-radius: 15px; 
             margin-bottom: 20px; display: none; text-align: center; border: 3px solid var(--gold);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        #calc-aviso-box input { background: #f1f5f9; color: black; border: 2px solid #cbd5e1; text-align: center; font-size: 1.5rem; font-weight: bold; width: 80%; margin: 10px 0; }
-        .res-aviso { font-size: 2.2rem; font-weight: 900; color: #020617; margin: 5px 0; }
+        #calc-aviso-box input { background: #f1f5f9; color: black; border: 2px solid #cbd5e1; text-align: center; font-size: 1.5rem; font-weight: bold; width: 80%; margin: 10px 0; border-radius: 10px; }
+        .res-aviso { font-size: 2.2rem; font-weight: 900; color: #1e293b; margin: 5px 0; }
+        .explicacao-aviso { 
+            background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; 
+            font-size: 0.85rem; text-align: left; color: #334155; line-height: 1.4; margin-top: 10px;
+        }
 
         .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
@@ -81,7 +86,10 @@
         <p style="font-size: 0.8rem; color:#475569;">Anos completos de trabalho:</p>
         <input type="number" id="anos-trabalho" placeholder="0" oninput="calcularAviso()">
         <div class="res-aviso" id="total-dias">30 Dias</div>
-        <p style="font-size: 0.8rem; font-weight: bold; margin:0;">LEI 12.506/2011</p>
+        <div class="explicacao-aviso" id="desc-aviso">
+            <strong>Fundamentação:</strong><br>
+            O empregado tem direito a 30 dias base (Art. 487 CLT). Como não completou 1 ano, não há acréscimo da Lei 12.506/11.
+        </div>
     </div>
 
     <div id="panel-editor" class="panel-input">
@@ -144,7 +152,21 @@
         const anos = parseInt(document.getElementById('anos-trabalho').value) || 0;
         let bonus = anos * 3;
         if (bonus > 60) bonus = 60;
-        document.getElementById('total-dias').innerText = (30 + bonus) + " Dias";
+        const total = 30 + bonus;
+        
+        document.getElementById('total-dias').innerText = total + " Dias";
+        
+        let explicacao = `<strong>Fundamentação (Lei 12.506/11):</strong><br>`;
+        explicacao += `• 30 dias base (mínimo constitucional).<br>`;
+        
+        if (anos > 0) {
+            explicacao += `• + ${bonus} dias (3 dias por cada um dos ${anos} ano(s) completo(s)).<br>`;
+            if (bonus >= 60) explicacao += `• ⚠️ Teto de 90 dias atingido.`;
+        } else {
+            explicacao += `• Sem acréscimo (menos de 1 ano completo).`;
+        }
+        
+        document.getElementById('desc-aviso').innerHTML = explicacao;
     };
 
     window.showTab = (tab) => {

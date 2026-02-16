@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE V13 - INTELIGÊNCIA TOTAL</title>
+    <title>MENTORIA ELITE V13 - 11 INTELIGÊNCIAS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
             --primary: #020617; --gold: #fbbf24; --card: #1e293b;
             --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
             --sumula: #f97316; --artigo: #10b981; --artcpc: #0ea5e9; --pre: #ef4444;
-            --oj: #06b6d4; --tema: #facc15; --leis: #94a3b8; 
+            --oj: #06b6d4; --tema: #facc15; --leis: #94a3b8; --aviso: #ffffff;
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 120px; }
+        body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 130px; }
 
         header {
             background: var(--card); padding: 15px 20px; border-bottom: 2px solid var(--gold);
@@ -23,6 +23,14 @@
         .btn-voltar { background: white; color: black; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 900; font-size: 12px; cursor: pointer; }
 
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
+
+        /* CALCULADORA DE AVISO */
+        #calc-aviso-box { 
+            background: white; color: black; padding: 20px; border-radius: 15px; 
+            margin-bottom: 20px; display: none; text-align: center; border: 3px solid var(--gold);
+        }
+        #calc-aviso-box input { background: #f1f5f9; color: black; border: 2px solid #cbd5e1; text-align: center; font-size: 1.5rem; font-weight: bold; width: 80%; margin: 10px 0; }
+        .res-aviso { font-size: 2.2rem; font-weight: 900; color: #020617; margin: 5px 0; }
 
         .panel-input { background: #0f172a; border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px dashed #334155; }
         input, textarea { width: 100%; padding: 12px; margin: 5px 0; background: #1e293b; border: 1px solid #475569; color: white; border-radius: 8px; font-family: inherit; }
@@ -35,25 +43,24 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
         .post-it strong { display: flex; align-items: center; gap: 10px; font-size: 1.1rem; text-transform: uppercase; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 8px; margin-bottom: 10px; }
-        
         .post-it p { margin: 8px 0; font-size: 0.95rem; line-height: 1.4; font-weight: 700; white-space: pre-wrap; }
-        
         .rascunho-box { background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px; margin-top: 10px; border-left: 4px solid rgba(0,0,0,0.3); font-size: 0.85rem; font-style: italic; font-weight: 500; }
 
         .actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
-        .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; }
+        .btn-circle { width: 38px; height: 38px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; }
 
         .nav-tabs {
             position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
             display: flex; overflow-x: auto; padding: 10px 5px;
             border-top: 2px solid #334155; z-index: 2000;
-            scrollbar-width: none; 
         }
-        .nav-tabs::-webkit-scrollbar { display: none; }
+        .nav-tabs::-webkit-scrollbar { height: 4px; }
+        .nav-tabs::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
 
         .tab { 
             color: #94a3b8; text-align: center; font-size: 9px; text-decoration: none; 
-            font-weight: 700; min-width: 80px; cursor: pointer; flex-shrink: 0;
+            font-weight: 700; min-width: 85px; cursor: pointer; flex-shrink: 0;
+            display: flex; flex-direction: column; align-items: center;
         }
         .tab.active { color: var(--gold); }
         .tab i { display: block; font-size: 1.1rem; margin-bottom: 4px; }
@@ -69,6 +76,14 @@
 </header>
 
 <div class="container">
+    <div id="calc-aviso-box">
+        <h3 style="margin:0;"><i class="fas fa-calculator"></i> CALCULAR AVISO</h3>
+        <p style="font-size: 0.8rem; color:#475569;">Anos completos de trabalho:</p>
+        <input type="number" id="anos-trabalho" placeholder="0" oninput="calcularAviso()">
+        <div class="res-aviso" id="total-dias">30 Dias</div>
+        <p style="font-size: 0.8rem; font-weight: bold; margin:0;">LEI 12.506/2011</p>
+    </div>
+
     <div id="panel-editor" class="panel-input">
         <h4 id="editor-title" style="margin-top:0; color:var(--gold);">Adicionar à Mentoria</h4>
         <input id="inp-t" placeholder="Título (Ex: Art. 467 CLT)">
@@ -90,6 +105,7 @@
     <a class="tab" onclick="showTab('nc')"><i class="fas fa-brain"></i>N.C</a>
     <a class="tab" onclick="showTab('pre')"><i class="fas fa-exclamation-triangle"></i>PRELIMINAR</a>
     <a class="tab" onclick="showTab('tese')"><i class="fas fa-gavel"></i>TESES</a>
+    <a class="tab" onclick="showTab('aviso')"><i class="fas fa-calendar-day"></i>AVISO PRÉVIO</a>
     <a class="tab" onclick="showTab('tema')"><i class="fas fa-lightbulb"></i>TEMAS</a>
     <a class="tab" onclick="showTab('sumula')"><i class="fas fa-balance-scale"></i>SÚMULAS</a>
     <a class="tab" onclick="showTab('oj')"><i class="fas fa-shield-halved"></i>OJ's</a>
@@ -99,7 +115,7 @@
     <a class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
 </nav>
 
-<button id="fab-injetor" onclick="injetorMestre()" title="Carga Rápida Arsenal"><i class="fas fa-rocket"></i></button>
+<button id="fab-injetor" onclick="injetorMestre()" title="Carga Rápida"><i class="fas fa-rocket"></i></button>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -119,10 +135,16 @@
     let cache = {};
 
     const iconMap = {
-        qp: 'fa-search', nc: 'fa-brain', pre: 'fa-exclamation-triangle',
-        tese: 'fa-gavel', tema: 'fa-lightbulb', sumula: 'fa-balance-scale',
-        oj: 'fa-shield-halved', artigo: 'fa-book', artcpc: 'fa-file-invoice', 
-        leis: 'fa-scroll', arsenal: 'fa-bolt'
+        qp: 'fa-search', nc: 'fa-brain', pre: 'fa-exclamation-triangle', tese: 'fa-gavel',
+        aviso: 'fa-calendar-day', tema: 'fa-lightbulb', sumula: 'fa-balance-scale',
+        oj: 'fa-shield-halved', artigo: 'fa-book', artcpc: 'fa-file-invoice', leis: 'fa-scroll', arsenal: 'fa-bolt'
+    };
+
+    window.calcularAviso = () => {
+        const anos = parseInt(document.getElementById('anos-trabalho').value) || 0;
+        let bonus = anos * 3;
+        if (bonus > 60) bonus = 60;
+        document.getElementById('total-dias').innerText = (30 + bonus) + " Dias";
     };
 
     window.showTab = (tab) => {
@@ -132,9 +154,9 @@
         if(activeTab) activeTab.classList.add('active');
         
         const titulos = { 
-            qp: 'Qual a Peça?', nc: 'Não Confunda', pre: 'Preliminares/Prejudiciais', 
-            tese: 'Banco de Teses', tema: 'Temas STF/TST', sumula: 'Súmulas TST', oj: 'Orientações Jurisprudenciais',
-            artigo: 'Artigos CLT', artcpc: 'Artigos CPC', leis: 'Leis Extravagantes', arsenal: '50 Questões' 
+            qp: 'Qual a Peça?', nc: 'Não Confunda', pre: 'Preliminares', tese: 'Banco de Teses',
+            aviso: 'Cálculo Aviso', tema: 'Temas STF/TST', sumula: 'Súmulas', oj: 'OJ\'s TST',
+            artigo: 'Artigos CLT', artcpc: 'Artigos CPC', leis: 'Leis Extravagantes', arsenal: '50 Questões'
         };
         
         const header = document.getElementById('intel-head');
@@ -142,7 +164,7 @@
         header.style.color = `var(--${tab})`;
         
         document.getElementById('btn-salvar').style.background = `var(--${tab})`;
-        document.getElementById('editor-title').innerText = "Adicionar em: " + titulos[tab];
+        document.getElementById('calc-aviso-box').style.display = (tab === 'aviso') ? 'block' : 'none';
         
         render();
     };
@@ -152,50 +174,30 @@
         const c = document.getElementById('inp-c').value;
         const r = document.getElementById('inp-r').value;
         if(!t || !c) return alert("Preencha título e conteúdo.");
-
         const dados = { t, c, r: r || "", cat: currentTab, ts: serverTimestamp() };
-
-        if(editId) {
-            set(ref(db, `v13_master/${editId}`), dados);
-            editId = null;
-            document.getElementById('btn-salvar').innerText = "GRAVAR NA MEMÓRIA IA";
-        } else {
-            push(ref(db, 'v13_master'), dados);
-        }
-        document.getElementById('inp-t').value = "";
-        document.getElementById('inp-c').value = "";
-        document.getElementById('inp-r').value = "";
+        if(editId) { set(ref(db, `v13_master/${editId}`), dados); editId = null; }
+        else { push(ref(db, 'v13_master'), dados); }
+        document.getElementById('inp-t').value = ""; document.getElementById('inp-c').value = ""; document.getElementById('inp-r').value = "";
     };
 
-    onValue(ref(db, 'v13_master'), (snap) => {
-        cache = snap.val() || {};
-        render();
-    });
+    onValue(ref(db, 'v13_master'), (snap) => { cache = snap.val() || {}; render(); });
 
     function render() {
         const f = document.getElementById('feed-v13');
         f.innerHTML = "";
         const cores = { 
-            qp: 'var(--qp)', nc: 'var(--nc)', pre: 'var(--pre)', 
-            tese: 'var(--tese)', tema: 'var(--tema)', arsenal: 'var(--arsenal)', 
-            sumula: 'var(--sumula)', oj: 'var(--oj)', artigo: 'var(--artigo)', artcpc: 'var(--artcpc)', leis: 'var(--leis)'
+            qp:'var(--qp)', nc:'var(--nc)', pre:'var(--pre)', tese:'var(--tese)', 
+            aviso:'var(--aviso)', tema:'var(--tema)', sumula:'var(--sumula)', 
+            oj:'var(--oj)', artigo:'var(--artigo)', artcpc:'var(--artcpc)', leis:'var(--leis)', arsenal:'var(--arsenal)' 
         };
-        
-        const itens = Object.keys(cache).reverse();
-        let encontrou = false;
-
-        itens.forEach(id => {
+        Object.keys(cache).reverse().forEach(id => {
             const it = cache[id];
             if(it.cat === currentTab) {
-                encontrou = true;
-                const iconeFinal = iconMap[it.cat] || 'fa-info-circle';
-                const rascunhoHtml = it.r ? `<div class="rascunho-box"><strong>Rascunho:</strong><br>${it.r}</div>` : "";
-                
                 f.innerHTML += `
                     <div class="post-it" style="background:${cores[it.cat]}">
-                        <strong><i class="fas ${iconeFinal}"></i> ${it.t}</strong>
+                        <strong><i class="fas ${iconMap[it.cat]}"></i> ${it.t}</strong>
                         <p>${it.c}</p>
-                        ${rascunhoHtml}
+                        ${it.r ? `<div class="rascunho-box"><strong>Rascunho:</strong><br>${it.r}</div>` : ""}
                         <div class="actions">
                             <button class="btn-circle" style="background:rgba(255,255,255,0.4); color:black" onclick="editar('${id}')"><i class="fas fa-edit"></i></button>
                             <button class="btn-circle" style="background:rgba(0,0,0,0.2)" onclick="apagar('${id}')"><i class="fas fa-times"></i></button>
@@ -203,28 +205,24 @@
                     </div>`;
             }
         });
-        if(!encontrou) f.innerHTML = `<p style="text-align:center; opacity:0.5; margin-top:40px;">Nenhum card aqui.</p>`;
     }
 
-    window.apagar = (id) => { if(confirm("Deletar este conhecimento?")) remove(ref(db, `v13_master/${id}`)); };
-
+    window.apagar = (id) => { if(confirm("Deletar?")) remove(ref(db, `v13_master/${id}`)); };
     window.editar = (id) => {
         const it = cache[id]; editId = id;
         document.getElementById('inp-t').value = it.t;
         document.getElementById('inp-c').value = it.c;
         document.getElementById('inp-r').value = it.r || "";
-        document.getElementById('btn-salvar').innerText = "ATUALIZAR CONHECIMENTO";
         window.scrollTo({top:0, behavior:'smooth'});
     };
 
     window.injetorMestre = () => {
-        if(!confirm("Injetar Base de Dados CLT e CPC?")) return;
         const q = [
-            { t: "Art. 840, §1º CLT", c: "Petição inicial escrita: pedidos certos, determinados e com valor.", r: "Fundamental para o Rito Sumaríssimo e Ordinário.", cat: "artigo" },
-            { t: "Art. 55 CPC", c: "Reputam-se conexas 2 ou mais ações quando lhes for comum o pedido ou a causa de pedir.", r: "Argumento para reunião de processos.", cat: "artcpc" }
+            { t: "Lei 12.506/11", c: "30 dias base + 3 dias por ano completo.", r: "Teto máximo de 90 dias.", cat: "aviso" },
+            { t: "Art. 487 CLT", c: "A falta de aviso prévio por parte do empregador dá ao empregado o direito aos salários do prazo.", r: "Projeção do contrato.", cat: "aviso" }
         ];
         q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        showTab('artigo');
+        showTab('aviso');
     };
 
     window.onload = () => showTab('qp');

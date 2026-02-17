@@ -199,7 +199,6 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
     
-    // Controle de Peça Ativa
     window.pecaAtualID = localStorage.getItem('pecaAtualID') || null; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
 
@@ -210,6 +209,7 @@
         atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
         
+        // Timeout para garantir que o editor-principal injetado pelo FolhaEngine esteja no DOM
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
@@ -240,11 +240,10 @@
             ident.innerHTML = `TREINO: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--mentoria)"></i>`;
         } else {
             display.innerText = "EXAME " + window.activeEx;
-            ident.onclick = null; // Desabilita clique no título em exames oficiais
+            ident.onclick = null;
         }
     }
 
-    // NOVA FUNÇÃO: RENOMEAR O TITULO DA PEÇA
     window.renomearTreino = () => {
         if(!window.modoTreinoLivre) return;
         const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome);
@@ -260,7 +259,7 @@
         if(nome) {
             window.modoTreinoLivre = true;
             window.pecaAtualNome = nome;
-            window.pecaAtualID = null; // Importante: resetar ID para não sobrescrever a anterior por engano
+            window.pecaAtualID = null;
             localStorage.setItem('modoTreinoLivre', "true");
             localStorage.setItem('pecaAtualNome', nome);
             localStorage.removeItem('pecaAtualID');
@@ -289,28 +288,18 @@
         const ed = document.getElementById('editor-principal');
         if(!ed) return;
 
-        let nomeFinal;
         let idParaSalvar = window.pecaAtualID || Date.now().toString();
-        
-        if(window.modoTreinoLivre) {
-            nomeFinal = window.pecaAtualNome;
-        } else {
-            const iden = document.getElementById('identificador-peca').innerText;
-            nomeFinal = `OAB ${window.activeEx} - ${iden.replace("PEÇA: ", "")}`;
-        }
+        let nomeBase = window.modoTreinoLivre ? window.pecaAtualNome : `OAB ${window.activeEx} - ${document.getElementById('identificador-peca').innerText.replace("PEÇA: ", "")}`;
 
-        if(confirm(`Salvar alterações em "${nomeFinal}"?`)) {
+        if(confirm(`Salvar alterações em "${nomeBase}"?`)) {
             const agora = new Date();
             const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
             
-            // Removemos a data antiga do nome se já existir para não acumular datas no título
-            const nomeSemData = nomeFinal.split(' (')[0];
-
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), {
                 exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, 
-                peca: `${nomeSemData} (${dataFormatada})`,
+                peca: `${nomeBase.split(' (')[0]} (${dataFormatada})`,
                 conteudo: ed.innerText, 
-                timestamp: parseInt(idParaSalvar)
+                timestamp: Number(idParaSalvar)
             });
             
             window.pecaAtualID = idParaSalvar;
@@ -323,27 +312,30 @@
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS";
         const content = document.getElementById('modal-content');
-        content.innerHTML = "Carregando...";
+        content.innerHTML = "<div style='padding:20px; text-align:center;'>Carregando...</div>";
         modal.style.display = 'flex';
         try {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
             content.innerHTML = "";
             if (snap.exists()) {
                 const dados = snap.val();
-                Object.keys(dados).sort((a,b) => b-a).forEach(key => {
-                    const item = dados[key];
+                const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }))
+                              .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                lista.forEach(item => {
                     const div = document.createElement('div');
-                    div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center";
+                    div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
                     div.innerHTML = `
-                        <div onclick="window.carregarPecaPasta('${key}')" style="cursor:pointer; flex:1">
-                            <strong>${item.peca}</strong><br><small>${item.exame}</small>
+                        <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1">
+                            <strong style="color:#0f172a">${item.peca}</strong><br>
+                            <small style="color:#64748b">${item.exame === "TREINO" ? "🛠️ TREINO LIVRE" : "⚖️ EXAME OAB " + item.exame}</small>
                         </div>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${key}')"></i>
+                        <i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}')"></i>
                     `;
                     content.appendChild(div);
                 });
-            } else { content.innerHTML = "Vazio."; }
-        } catch (e) { content.innerHTML = "Erro."; }
+            } else { content.innerHTML = "<div style='padding:20px; text-align:center;'>Vazio.</div>"; }
+        } catch (e) { content.innerHTML = "Erro ao carregar pasta."; }
     };
 
     window.carregarPecaPasta = async (k) => {
@@ -351,10 +343,8 @@
         if(snap.exists()){
             const data = snap.val();
             window.salvarEstado(); 
-            
             window.pecaAtualID = k;
             window.pecaAtualNome = data.peca.split(' (')[0]; 
-            
             localStorage.setItem('pecaAtualID', k);
             localStorage.setItem('pecaAtualNome', window.pecaAtualNome);
 
@@ -374,7 +364,6 @@
         }
     };
 
-    // --- MANTENDO AS DEMAIS FUNÇÕES ORIGINAIS ---
     window.salvarEstado = () => {
         const ed = document.getElementById('editor-principal');
         if(ed) {
@@ -382,6 +371,7 @@
             if(window.historicoUndo.length > 30) window.historicoUndo.shift();
         }
     };
+
     window.desfazer = () => {
         const ed = document.getElementById('editor-principal');
         if(window.historicoUndo.length > 0) {
@@ -389,6 +379,7 @@
             if(estadoAnterior !== undefined) ed.innerText = estadoAnterior;
         }
     };
+
     window.deletarPecaPasta = async (k) => {
         if(confirm("Excluir permanentemente?")) {
             await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
@@ -399,6 +390,7 @@
             window.abrirPastaHistorico();
         }
     };
+
     window.forcarRadar = () => {
         if(window.modoTreinoLivre) return;
         const dna = BANCO_ESPELHOS[window.activeEx];
@@ -409,6 +401,7 @@
             document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase();
         }
     };
+
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "📜 PERGAMINHO";
@@ -426,12 +419,14 @@
         });
         modal.style.display = 'flex';
     };
+
     window.injetarTeses = () => {
         if(window.modoTreinoLivre) { alert("O Martelo só funciona em Exames Oficiais."); return; }
         window.salvarEstado(); 
         const dna = BANCO_ESPELHOS[window.activeEx];
         if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
     };
+
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
@@ -441,7 +436,9 @@
         f.src = url;
         v.classList.add('active');
     };
+
     window.fecharPDF = () => document.getElementById('pdf-viewer').classList.remove('active');
+
     async function salvarAutomatico() {
         const ed = document.getElementById('editor-principal');
         const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
@@ -449,17 +446,35 @@
             await set(ref(db, `producao_v13/${rascunhoKey}`), { conteudo: ed.innerText, timestamp: Date.now() });
         }
     }
+
     async function carregarRascunho() {
         const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
         const snap = await get(ref(db, `producao_v13/${rascunhoKey}`));
+        // Só carrega rascunho se não estivermos com uma peça do histórico aberta (pecaAtualID nulo)
         if(snap.exists() && !window.pecaAtualID) { 
-            document.getElementById('editor-principal').innerText = snap.val().conteudo;
+            const ed = document.getElementById('editor-principal');
+            if(ed) ed.innerText = snap.val().conteudo;
             window.salvarEstado();
         }
     }
+
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    window.limparFolha = () => { if(confirm("Limpar tudo?")) { window.salvarEstado(); document.getElementById('editor-principal').innerText = ""; window.pecaAtualID = null; } };
-    window.visualizarModoFoco = () => { const s = document.querySelector('.sidebar'); s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; };
+    
+    window.limparFolha = () => { 
+        if(confirm("Limpar tudo?")) { 
+            window.salvarEstado(); 
+            const ed = document.getElementById('editor-principal');
+            if(ed) ed.innerText = ""; 
+            window.pecaAtualID = null; 
+            localStorage.removeItem('pecaAtualID');
+        } 
+    };
+
+    window.visualizarModoFoco = () => { 
+        const s = document.querySelector('.sidebar'); 
+        s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; 
+    };
+
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 
 </script>

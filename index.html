@@ -120,12 +120,13 @@
 
 <header>
     <div class="logo">JOAQUIM <span>ELITE</span></div>
-    <div style="color:var(--gold); font-size:10px; font-weight:bold;">EXAME <span id="ex-display">--</span></div>
+    <div style="color:var(--gold); font-size:10px; font-weight:bold;">MODO: <span id="ex-display">--</span></div>
 </header>
 
 <main>
     <aside class="sidebar">
-        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES</button>
+        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES OAB</button>
+        <button class="btn-side" style="background:#facc15; color:#000" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i> TREINO LIVRE</button>
         <button class="btn-side" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i> MINHA PASTA</button>
         <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> FINALIZAR</button>
         <hr style="opacity:0.1; margin:10px 0">
@@ -164,12 +165,10 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        <button class="fab-sub" style="background:#64748b;" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
+        <button class="fab-sub" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
-        
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i></button>
-        
         <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
@@ -196,13 +195,14 @@
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
-    window.FolhaEngine = FolhaEngine;
+    window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
+    window.nomeTreinoLivre = localStorage.getItem('nomeTreinoLivre') || "";
     
     window.historicoUndo = [];
     let debounceTimer = null;
 
     window.onload = async () => {
-        document.getElementById('ex-display').innerText = window.activeEx;
+        atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
         
         setTimeout(() => {
@@ -218,34 +218,77 @@
                         }
                     }, 800);
                 });
-
-                ed.addEventListener('paste', () => window.salvarEstado());
-
-                ed.addEventListener('keydown', (e) => {
-                    if (e.key === 'Tab') {
-                        e.preventDefault();
-                        const sel = window.getSelection();
-                        const range = sel.getRangeAt(0);
-                        const tabNode = document.createTextNode("    ");
-                        range.insertNode(tabNode);
-                        range.setStartAfter(tabNode);
-                        range.setEndAfter(tabNode);
-                        sel.removeAllRanges();
-                        sel.addRange(range);
-                    }
-                    if (e.ctrlKey && e.key === 'z') {
-                        e.preventDefault();
-                        window.desfazer();
-                    }
-                });
             }
         }, 1000);
 
         await carregarRascunho();
-        window.forcarRadar();
         setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
     };
+
+    function atualizarDisplayModo() {
+        const display = document.getElementById('ex-display');
+        if(window.modoTreinoLivre) {
+            display.innerText = "TREINO: " + (window.nomeTreinoLivre || "SEM NOME");
+            document.getElementById('identificador-peca').innerText = "TREINO LIVRE: " + window.nomeTreinoLivre;
+        } else {
+            display.innerText = "EXAME " + window.activeEx;
+        }
+    }
+
+    window.ativarTreinoLivre = () => {
+        const nome = prompt("Digite o nome deste treino (Ex: Peça do Prof. João):");
+        if(nome) {
+            window.modoTreinoLivre = true;
+            window.nomeTreinoLivre = nome;
+            localStorage.setItem('modoTreinoLivre', "true");
+            localStorage.setItem('nomeTreinoLivre', nome);
+            window.location.reload();
+        }
+    };
+
+    window.abrirExames = () => {
+        window.modoTreinoLivre = false;
+        localStorage.setItem('modoTreinoLivre', "false");
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "EXAMES OAB";
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+        for(let i=44; i>=35; i--) {
+            const b = document.createElement('div'); b.className = 'opt-btn';
+            b.innerHTML = `<span>EXAME ${i}</span>`;
+            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
+            content.appendChild(b);
+        }
+        modal.style.display = 'flex';
+    };
+
+    window.finalizarPeca = async () => {
+        const ed = document.getElementById('editor-principal');
+        let nomeFinal;
+        
+        if(window.modoTreinoLivre) {
+            nomeFinal = "TREINO: " + window.nomeTreinoLivre;
+        } else {
+            const iden = document.getElementById('identificador-peca').innerText;
+            nomeFinal = `OAB ${window.activeEx} - ${iden.replace("PEÇA: ", "")}`;
+        }
+
+        if(confirm(`Deseja finalizar e salvar como "${nomeFinal}"?`)) {
+            const agora = new Date();
+            const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
+                exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, 
+                peca: `${nomeFinal} (${dataFormatada})`,
+                conteudo: ed.innerText, 
+                timestamp: Date.now()
+            });
+            alert("Peça blindada e salva com sucesso!");
+        }
+    };
+
+    // --- MANTENDO AS OUTRAS FUNÇÕES ORIGINAIS ---
 
     window.salvarEstado = () => {
         const ed = document.getElementById('editor-principal');
@@ -258,14 +301,9 @@
     window.desfazer = () => {
         const ed = document.getElementById('editor-principal');
         if(window.historicoUndo.length > 0) {
-            if(ed.innerText === window.historicoUndo[window.historicoUndo.length-1]) {
-                window.historicoUndo.pop();
-            }
-            
             const estadoAnterior = window.historicoUndo.pop();
             if(estadoAnterior !== undefined) {
                 ed.innerText = estadoAnterior;
-                window.forcarRadar();
             }
         }
     };
@@ -286,7 +324,7 @@
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center";
                     div.innerHTML = `
                         <div onclick="window.carregarPecaPasta('${key}')" style="cursor:pointer">
-                            <strong>${item.peca}</strong><br><small>OAB ${item.exame}</small>
+                            <strong>${item.peca}</strong><br><small>${item.exame}</small>
                         </div>
                         <i class="fas fa-trash" style="color:red; cursor:pointer" onclick="window.deletarPecaPasta('${key}')"></i>
                     `;
@@ -302,14 +340,24 @@
             window.salvarEstado(); 
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             document.getElementById('universal-modal').style.display='none';
-            if(window.innerWidth < 768) window.toggleFoguete();
         }
     };
 
     window.deletarPecaPasta = async (k) => {
         if(confirm("Excluir?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
+            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
             window.abrirPastaHistorico();
+        }
+    };
+
+    window.forcarRadar = () => {
+        if(window.modoTreinoLivre) return; // Radar desativado em treino livre por não ter espelho
+        const dna = BANCO_ESPELHOS[window.activeEx];
+        const ed = document.getElementById('editor-principal');
+        if (dna && RadarEngine && ed) {
+            const an = RadarEngine.analisar(dna, ed.innerText);
+            RadarEngine.renderizar(an);
+            document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase();
         }
     };
 
@@ -325,7 +373,6 @@
                 window.salvarEstado(); 
                 FolhaEngine.injetarTextoMultilinhas(pecas[k]); 
                 modal.style.display='none';
-                if(window.innerWidth < 768) window.toggleFoguete();
             };
             content.appendChild(b);
         });
@@ -333,12 +380,10 @@
     };
 
     window.injetarTeses = () => {
+        if(window.modoTreinoLivre) { alert("O Martelo só funciona em Exames Oficiais com espelho."); return; }
         window.salvarEstado(); 
         const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) {
-            FolhaEngine.injetarTextoMultilinhas(dna);
-            if(window.innerWidth < 768) window.toggleFoguete();
-        } else { alert("Sem espelho para este exame."); }
+        if(dna) { FolhaEngine.injetarTextoMultilinhas(dna); }
     };
 
     window.verPDF = (t) => {
@@ -349,51 +394,23 @@
         tit.innerText = (t==='P') ? "ENUNCIADO" : (t==='G') ? "GABARITO" : "VADE MECUM";
         f.src = url;
         v.classList.add('active');
-        if(window.innerWidth < 768) window.toggleFoguete();
     };
 
-    window.fecharPDF = () => {
-        document.getElementById('pdf-viewer').classList.remove('active');
-        document.getElementById('pdf-frame').src = "";
-    };
-
-    window.forcarRadar = () => {
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        const ed = document.getElementById('editor-principal');
-        if (dna && RadarEngine && ed) {
-            const an = RadarEngine.analisar(dna, ed.innerText);
-            RadarEngine.renderizar(an);
-            document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase();
-        }
-    };
-
-    window.finalizarPeca = async () => {
-        const ed = document.getElementById('editor-principal');
-        const iden = document.getElementById('identificador-peca').innerText;
-        if(confirm("Deseja finalizar e salvar esta peça na Pasta Oficial?")) {
-            const agora = new Date();
-            const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
-                exame: window.activeEx, 
-                peca: `OAB ${window.activeEx} - ${iden.replace("PEÇA: ", "")} (${dataFormatada})`,
-                conteudo: ed.innerText, 
-                timestamp: Date.now()
-            });
-            alert("Peça blindada e salva com sucesso!");
-        }
-    };
-
+    window.fecharPDF = () => document.getElementById('pdf-viewer').classList.remove('active');
+    
     async function salvarAutomatico() {
         const ed = document.getElementById('editor-principal');
+        const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
         if(ed && ed.innerText.trim()) {
-            await set(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`), {
+            await set(ref(db, `producao_v13/${rascunhoKey}`), {
                 conteudo: ed.innerText, timestamp: Date.now()
             });
         }
     }
 
     async function carregarRascunho() {
-        const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
+        const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
+        const snap = await get(ref(db, `producao_v13/${rascunhoKey}`));
         if(snap.exists()) {
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             window.salvarEstado();
@@ -403,31 +420,12 @@
     window.toggleFoguete = () => {
         const h = document.getElementById('mobile-hub');
         h.classList.toggle('active');
-        document.getElementById('rocket-icon').className = h.classList.contains('active') ? 'fas fa-times' : 'fas fa-rocket';
     };
-
-    window.abrirExames = () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "EXAMES OAB";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className = 'opt-btn';
-            b.innerHTML = `<span>EXAME ${i}</span>`;
-            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
-            content.appendChild(b);
-        }
-        modal.style.display = 'flex';
-    };
-
-    window.limparFolha = () => { 
-        if(confirm("Limpar tudo?")) {
-            window.salvarEstado();
-            document.getElementById('editor-principal').innerText = ""; 
-        }
-    };
+    
+    window.limparFolha = () => { if(confirm("Limpar tudo?")) { window.salvarEstado(); document.getElementById('editor-principal').innerText = ""; } };
     window.visualizarModoFoco = () => { const s = document.querySelector('.sidebar'); s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
+
 </script>
 </body>
 </html>

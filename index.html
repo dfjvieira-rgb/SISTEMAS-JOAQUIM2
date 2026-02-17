@@ -318,11 +318,23 @@
             content.innerHTML = "";
             if (snap.exists()) {
                 const dados = snap.val();
-                // ORDENAÇÃO POR TIMESTAMP (NUMERAÇÃO SALVA) DECRESCENTE
-                const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }))
-                               .sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0));
+                const listaRaw = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
 
-                lista.forEach(item => {
+                // SEPARAÇÃO E ORDENAÇÃO
+                const treinos = listaRaw.filter(i => i.exame === "TREINO").sort((a, b) => {
+                    const numA = parseInt(a.peca.match(/^(\d+)/)?.[1] || "9999");
+                    const numB = parseInt(b.peca.match(/^(\d+)/)?.[1] || "9999");
+                    return numA - numB;
+                });
+
+                const exames = listaRaw.filter(i => i.exame !== "TREINO").sort((a, b) => {
+                    return (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0);
+                });
+
+                // Junta as listas: Treinos no topo ordenados por número, Exames abaixo por data
+                const listaFinal = [...treinos, ...exames];
+
+                listaFinal.forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
                     div.innerHTML = `

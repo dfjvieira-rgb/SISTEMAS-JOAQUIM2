@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MENTORIA ELITE V13 - 11 INTELIGÊNCIAS</title>
+    <title>MENTORIA ELITE V13 - 12 INTELIGÊNCIAS</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root {
@@ -11,6 +11,7 @@
             --nc: #f472b6; --qp: #a855f7; --tese: #3b82f6; --arsenal: #22c55e;
             --sumula: #f97316; --artigo: #10b981; --artcpc: #0ea5e9; --pre: #ef4444;
             --oj: #06b6d4; --tema: #facc15; --leis: #94a3b8; --aviso: #ffffff;
+            --artcc: #6366f1; /* Indigo para Código Civil */
         }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Inter', sans-serif; background: var(--primary); color: white; margin: 0; padding-bottom: 130px; }
@@ -24,7 +25,7 @@
 
         .container { padding: 15px; max-width: 800px; margin: 0 auto; }
 
-        /* CALCULADORA DE AVISO COM EXPLICAÇÃO */
+        /* CALCULADORA DE AVISO */
         #calc-aviso-box { 
             background: white; color: black; padding: 20px; border-radius: 15px; 
             margin-bottom: 20px; display: none; text-align: center; border: 3px solid var(--gold);
@@ -94,7 +95,7 @@
 
     <div id="panel-editor" class="panel-input">
         <h4 id="editor-title" style="margin-top:0; color:var(--gold);">Adicionar à Mentoria</h4>
-        <input id="inp-t" placeholder="Título (Ex: Art. 467 CLT)">
+        <input id="inp-t" placeholder="Título (Ex: Art. 186 CC)">
         <textarea id="inp-c" rows="3" placeholder="Conteúdo Principal..."></textarea>
         <textarea id="inp-r" rows="2" style="background:#0f172a; border-color:var(--gold)" placeholder="Rascunho/Dica de Ouro..."></textarea>
         <button id="btn-salvar" class="btn-voltar" style="width:100%; background:var(--gold); margin-top:10px; font-weight: 900;">GRAVAR NA MEMÓRIA IA</button>
@@ -119,6 +120,7 @@
     <a class="tab" onclick="showTab('oj')"><i class="fas fa-shield-halved"></i>OJ's</a>
     <a class="tab" onclick="showTab('artigo')"><i class="fas fa-book"></i>ART. CLT</a>
     <a class="tab" onclick="showTab('artcpc')"><i class="fas fa-file-invoice"></i>ART. CPC</a>
+    <a class="tab" onclick="showTab('artcc')"><i class="fas fa-scale-balanced"></i>ART. CC</a>
     <a class="tab" onclick="showTab('leis')"><i class="fas fa-scroll"></i>LEIS</a>
     <a class="tab" onclick="showTab('arsenal')"><i class="fas fa-bolt"></i>50Q</a>
 </nav>
@@ -145,7 +147,7 @@
     const iconMap = {
         qp: 'fa-search', nc: 'fa-brain', pre: 'fa-exclamation-triangle', tese: 'fa-gavel',
         aviso: 'fa-calendar-day', tema: 'fa-lightbulb', sumula: 'fa-balance-scale',
-        oj: 'fa-shield-halved', artigo: 'fa-book', artcpc: 'fa-file-invoice', leis: 'fa-scroll', arsenal: 'fa-bolt'
+        oj: 'fa-shield-halved', artigo: 'fa-book', artcpc: 'fa-file-invoice', artcc: 'fa-scale-balanced', leis: 'fa-scroll', arsenal: 'fa-bolt'
     };
 
     window.calcularAviso = () => {
@@ -153,19 +155,12 @@
         let bonus = anos * 3;
         if (bonus > 60) bonus = 60;
         const total = 30 + bonus;
-        
         document.getElementById('total-dias').innerText = total + " Dias";
-        
-        let explicacao = `<strong>Fundamentação (Lei 12.506/11):</strong><br>`;
-        explicacao += `• 30 dias base (mínimo constitucional).<br>`;
-        
+        let explicacao = `<strong>Fundamentação (Lei 12.506/11):</strong><br>• 30 dias base.<br>`;
         if (anos > 0) {
-            explicacao += `• + ${bonus} dias (3 dias por cada um dos ${anos} ano(s) completo(s)).<br>`;
-            if (bonus >= 60) explicacao += `• ⚠️ Teto de 90 dias atingido.`;
-        } else {
-            explicacao += `• Sem acréscimo (menos de 1 ano completo).`;
+            explicacao += `• + ${bonus} dias (${anos} ano(s) x 3 dias).<br>`;
+            if (bonus >= 60) explicacao += `• ⚠️ Teto atingido.`;
         }
-        
         document.getElementById('desc-aviso').innerHTML = explicacao;
     };
 
@@ -178,7 +173,7 @@
         const titulos = { 
             qp: 'Qual a Peça?', nc: 'Não Confunda', pre: 'Preliminares', tese: 'Banco de Teses',
             aviso: 'Cálculo Aviso', tema: 'Temas STF/TST', sumula: 'Súmulas', oj: 'OJ\'s TST',
-            artigo: 'Artigos CLT', artcpc: 'Artigos CPC', leis: 'Leis Extravagantes', arsenal: '50 Questões'
+            artigo: 'Artigos CLT', artcpc: 'Artigos CPC', artcc: 'Artigos Cód. Civil', leis: 'Leis Extravagantes', arsenal: '50 Questões'
         };
         
         const header = document.getElementById('intel-head');
@@ -210,7 +205,7 @@
         const cores = { 
             qp:'var(--qp)', nc:'var(--nc)', pre:'var(--pre)', tese:'var(--tese)', 
             aviso:'var(--aviso)', tema:'var(--tema)', sumula:'var(--sumula)', 
-            oj:'var(--oj)', artigo:'var(--artigo)', artcpc:'var(--artcpc)', leis:'var(--leis)', arsenal:'var(--arsenal)' 
+            oj:'var(--oj)', artigo:'var(--artigo)', artcpc:'var(--artcpc)', artcc:'var(--artcc)', leis:'var(--leis)', arsenal:'var(--arsenal)' 
         };
         Object.keys(cache).reverse().forEach(id => {
             const it = cache[id];
@@ -240,11 +235,11 @@
 
     window.injetorMestre = () => {
         const q = [
-            { t: "Lei 12.506/11", c: "30 dias base + 3 dias por ano completo.", r: "Teto máximo de 90 dias.", cat: "aviso" },
-            { t: "Art. 487 CLT", c: "A falta de aviso prévio por parte do empregador dá ao empregado o direito aos salários do prazo.", r: "Projeção do contrato.", cat: "aviso" }
+            { t: "Art. 186 CC", c: "Aquele que por ação ou omissão causar dano comete ato ilícito.", r: "Base para Danos Morais.", cat: "artcc" },
+            { t: "Art. 927 CC", c: "Dever de indenizar pelo ato ilícito.", r: "Complementa o 186 do CC.", cat: "artcc" }
         ];
         q.forEach(i => push(ref(db, 'v13_master'), { ...i, ts: serverTimestamp() }));
-        showTab('aviso');
+        showTab('artcc');
     };
 
     window.onload = () => showTab('qp');

@@ -197,7 +197,10 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
     window.nomeTreinoLivre = localStorage.getItem('nomeTreinoLivre') || "";
-    
+    // Nova variável para controlar se estamos editando algo da pasta
+    window.pecaAtualID = null; 
+    window.pecaAtualNome = null;
+
     window.historicoUndo = [];
     let debounceTimer = null;
 
@@ -228,19 +231,24 @@
 
     function atualizarDisplayModo() {
         const display = document.getElementById('ex-display');
+        const ident = document.getElementById('identificador-peca');
+        
         if(window.modoTreinoLivre) {
-            display.innerText = "TREINO: " + (window.nomeTreinoLivre || "SEM NOME");
-            document.getElementById('identificador-peca').innerText = "TREINO LIVRE: " + window.nomeTreinoLivre;
+            let nomeLocal = window.pecaAtualNome || window.nomeTreinoLivre || "SEM NOME";
+            display.innerText = "TREINO: " + nomeLocal;
+            ident.innerText = "TREINO LIVRE: " + nomeLocal;
         } else {
             display.innerText = "EXAME " + window.activeEx;
         }
     }
 
     window.ativarTreinoLivre = () => {
-        const nome = prompt("Digite o nome deste treino (Ex: Peça do Prof. João):");
+        const nome = prompt("Digite o nome deste novo treino:");
         if(nome) {
             window.modoTreinoLivre = true;
             window.nomeTreinoLivre = nome;
+            window.pecaAtualID = null; // Reset de ID para novo treino
+            window.pecaAtualNome = nome;
             localStorage.setItem('modoTreinoLivre', "true");
             localStorage.setItem('nomeTreinoLivre', nome);
             window.location.reload();
@@ -249,6 +257,7 @@
 
     window.abrirExames = () => {
         window.modoTreinoLivre = false;
+        window.pecaAtualID = null;
         localStorage.setItem('modoTreinoLivre', "false");
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "EXAMES OAB";
@@ -266,25 +275,29 @@
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
         let nomeFinal;
+        let idParaSalvar = window.pecaAtualID || Date.now().toString();
         
         if(window.modoTreinoLivre) {
-            nomeFinal = "TREINO: " + window.nomeTreinoLivre;
+            nomeFinal = window.pecaAtualNome || window.nomeTreinoLivre || "TREINO SEM NOME";
         } else {
             const iden = document.getElementById('identificador-peca').innerText;
             nomeFinal = `OAB ${window.activeEx} - ${iden.replace("PEÇA: ", "")}`;
         }
 
-        if(confirm(`Deseja finalizar e salvar como "${nomeFinal}"?`)) {
+        if(confirm(`Deseja salvar as alterações em "${nomeFinal}"?`)) {
             const agora = new Date();
             const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
             
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), {
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), {
                 exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, 
-                peca: `${nomeFinal} (${dataFormatada})`,
+                peca: nomeFinal.includes("(") ? nomeFinal : `${nomeFinal} (${dataFormatada})`,
                 conteudo: ed.innerText, 
-                timestamp: Date.now()
+                timestamp: parseInt(idParaSalvar)
             });
-            alert("Peça blindada e salva com sucesso!");
+            
+            // Atualiza o ID atual caso tenha sido uma criação nova
+            window.pecaAtualID = idParaSalvar;
+            alert("Peça blindada e atualizada com sucesso!");
         }
     };
 
@@ -316,15 +329,16 @@
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
             content.innerHTML = "";
             if (snap.exists()) {
-                Object.keys(snap.val()).reverse().forEach(key => {
-                    const item = snap.val()[key];
+                const dados = snap.val();
+                Object.keys(dados).reverse().forEach(key => {
+                    const item = dados[key];
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center";
                     div.innerHTML = `
-                        <div onclick="window.carregarPecaPasta('${key}')" style="cursor:pointer">
+                        <div onclick="window.carregarPecaPasta('${key}')" style="cursor:pointer; flex:1">
                             <strong>${item.peca}</strong><br><small>${item.exame}</small>
                         </div>
-                        <i class="fas fa-trash" style="color:red; cursor:pointer" onclick="window.deletarPecaPasta('${key}')"></i>
+                        <i class="fas fa-trash" style="color:red; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${key}')"></i>
                     `;
                     content.appendChild(div);
                 });
@@ -335,20 +349,38 @@
     window.carregarPecaPasta = async (k) => {
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
         if(snap.exists()){
+            const data = snap.val();
             window.salvarEstado(); 
-            document.getElementById('editor-principal').innerText = snap.val().conteudo;
+            
+            // Inteligência de Carga
+            window.pecaAtualID = k;
+            window.pecaAtualNome = data.peca.split(' (')[0]; // Pega o nome sem a data
+            
+            if(data.exame === "TREINO") {
+                window.modoTreinoLivre = true;
+                localStorage.setItem('modoTreinoLivre', "true");
+                localStorage.setItem('nomeTreinoLivre', window.pecaAtualNome);
+            } else {
+                window.modoTreinoLivre = false;
+                window.activeEx = data.exame;
+                localStorage.setItem('modoTreinoLivre', "false");
+                localStorage.setItem('activeEx', data.exame);
+            }
+
+            document.getElementById('editor-principal').innerText = data.conteudo;
             document.getElementById('universal-modal').style.display='none';
+            atualizarDisplayModo();
+            alert(`Editando: ${window.pecaAtualNome}`);
         }
     };
 
     window.deletarPecaPasta = async (k) => {
-        if(confirm("Deseja realmente excluir esta peça da sua pasta?")) {
+        if(confirm("Deseja realmente excluir esta peça permanentemente?")) {
             try {
                 await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
+                if(window.pecaAtualID === k) window.pecaAtualID = null;
                 window.abrirPastaHistorico();
-            } catch (e) {
-                alert("Erro ao excluir.");
-            }
+            } catch (e) { alert("Erro ao excluir."); }
         }
     };
 
@@ -413,7 +445,7 @@
     async function carregarRascunho() {
         const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
         const snap = await get(ref(db, `producao_v13/${rascunhoKey}`));
-        if(snap.exists()) {
+        if(snap.exists() && !window.pecaAtualID) { // Só carrega rascunho se não estivermos editando uma peça da pasta
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             window.salvarEstado();
         }
@@ -424,7 +456,7 @@
         h.classList.toggle('active');
     };
     
-    window.limparFolha = () => { if(confirm("Limpar tudo?")) { window.salvarEstado(); document.getElementById('editor-principal').innerText = ""; } };
+    window.limparFolha = () => { if(confirm("Limpar tudo? Isso resetará a edição atual.")) { window.salvarEstado(); document.getElementById('editor-principal').innerText = ""; window.pecaAtualID = null; } };
     window.visualizarModoFoco = () => { const s = document.querySelector('.sidebar'); s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 

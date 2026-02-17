@@ -288,8 +288,6 @@
         }
     };
 
-    // --- MANTENDO AS OUTRAS FUNÇÕES ORIGINAIS ---
-
     window.salvarEstado = () => {
         const ed = document.getElementById('editor-principal');
         if(ed) {
@@ -344,14 +342,18 @@
     };
 
     window.deletarPecaPasta = async (k) => {
-        if(confirm("Excluir?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${key}`));
-            window.abrirPastaHistorico();
+        if(confirm("Deseja realmente excluir esta peça da sua pasta?")) {
+            try {
+                await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
+                window.abrirPastaHistorico();
+            } catch (e) {
+                alert("Erro ao excluir.");
+            }
         }
     };
 
     window.forcarRadar = () => {
-        if(window.modoTreinoLivre) return; // Radar desativado em treino livre por não ter espelho
+        if(window.modoTreinoLivre) return;
         const dna = BANCO_ESPELHOS[window.activeEx];
         const ed = document.getElementById('editor-principal');
         if (dna && RadarEngine && ed) {

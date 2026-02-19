@@ -136,6 +136,9 @@
         <button class="btn-side" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
         <hr style="opacity:0.1; margin:10px 0">
+        <button class="btn-side" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i> LIVRO PROCESSO</button>
+        <button class="btn-side" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i> LIVRO MATERIAL</button>
+        <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
         <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')">GABARITO</button>
         <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
@@ -171,10 +174,8 @@
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i></button>
-        <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
-        <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
-        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
+        <button class="fab-sub" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i></button>
+        <button class="fab-sub" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i></button>
         <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
     </div>
 </main>
@@ -198,7 +199,6 @@
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
-    
     window.pecaAtualID = localStorage.getItem('pecaAtualID') || null; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
 
@@ -208,7 +208,6 @@
     window.onload = async () => {
         atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
-        
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
@@ -224,7 +223,6 @@
                 });
             }
         }, 1000);
-
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
@@ -233,7 +231,6 @@
     function atualizarDisplayModo() {
         const display = document.getElementById('ex-display');
         const ident = document.getElementById('identificador-peca');
-        
         if(window.modoTreinoLivre) {
             display.innerText = "TREINO: " + window.pecaAtualNome;
             ident.innerHTML = `TREINO: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--mentoria)"></i>`;
@@ -243,251 +240,44 @@
         }
     }
 
-    window.renomearTreino = () => {
-        if(!window.modoTreinoLivre) return;
-        const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome);
-        if(novoNome && novoNome.trim() !== "") {
-            window.pecaAtualNome = novoNome.trim();
-            localStorage.setItem('pecaAtualNome', window.pecaAtualNome);
-            atualizarDisplayModo();
-        }
-    };
-
-    window.ativarTreinoLivre = () => {
-        const nome = prompt("Nome do novo treino:");
-        if(nome) {
-            window.modoTreinoLivre = true;
-            window.pecaAtualNome = nome;
-            window.pecaAtualID = null;
-            localStorage.setItem('modoTreinoLivre', "true");
-            localStorage.setItem('pecaAtualNome', nome);
-            localStorage.removeItem('pecaAtualID');
-            window.location.reload();
-        }
-    };
-
-    window.abrirExames = () => {
-        window.modoTreinoLivre = false;
-        window.pecaAtualID = null;
-        localStorage.setItem('modoTreinoLivre', "false");
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "EXAMES OAB";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className = 'opt-btn';
-            b.innerHTML = `<span>EXAME ${i}</span>`;
-            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
-            content.appendChild(b);
-        }
-        modal.style.display = 'flex';
-    };
-
-    window.finalizarPeca = async () => {
-        const ed = document.getElementById('editor-principal');
-        if(!ed) return;
-
-        let idParaSalvar = window.pecaAtualID || Date.now().toString();
-        let nomeBase = window.modoTreinoLivre ? window.pecaAtualNome : `OAB ${window.activeEx} - ${document.getElementById('identificador-peca').innerText.replace("PEÇA: ", "")}`;
-
-        if(confirm(`Salvar alterações em "${nomeBase}"?`)) {
-            const agora = new Date();
-            const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), {
-                exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, 
-                peca: `${nomeBase.split(' (')[0]} (${dataFormatada})`,
-                conteudo: ed.innerText, 
-                timestamp: Number(idParaSalvar)
-            });
-            
-            window.pecaAtualID = idParaSalvar;
-            localStorage.setItem('pecaAtualID', idParaSalvar);
-            alert("Peça salva com sucesso na sua pasta!");
-        }
-    };
-
-    window.abrirPastaHistorico = async () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "<div style='padding:20px; text-align:center;'>Carregando...</div>";
-        modal.style.display = 'flex';
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-            content.innerHTML = "";
-            if (snap.exists()) {
-                const dados = snap.val();
-                const listaRaw = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
-
-                // SEPARAÇÃO E ORDENAÇÃO
-                const treinos = listaRaw.filter(i => i.exame === "TREINO").sort((a, b) => {
-                    const numA = parseInt(a.peca.match(/^(\d+)/)?.[1] || "9999");
-                    const numB = parseInt(b.peca.match(/^(\d+)/)?.[1] || "9999");
-                    return numA - numB;
-                });
-
-                const exames = listaRaw.filter(i => i.exame !== "TREINO").sort((a, b) => {
-                    return (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0);
-                });
-
-                // Junta as listas: Treinos no topo ordenados por número, Exames abaixo por data
-                const listaFinal = [...treinos, ...exames];
-
-                listaFinal.forEach(item => {
-                    const div = document.createElement('div');
-                    div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
-                    div.innerHTML = `
-                        <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1">
-                            <strong style="color:#0f172a">${item.peca}</strong><br>
-                            <small style="color:#64748b">${item.exame === "TREINO" ? "🛠️ TREINO LIVRE" : "⚖️ EXAME OAB " + item.exame}</small>
-                        </div>
-                        <i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}')"></i>
-                    `;
-                    content.appendChild(div);
-                });
-            } else { content.innerHTML = "<div style='padding:20px; text-align:center;'>Vazio.</div>"; }
-        } catch (e) { content.innerHTML = "Erro ao carregar pasta."; }
-    };
-
-    window.carregarPecaPasta = async (k) => {
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
-        if(snap.exists()){
-            const data = snap.val();
-            window.salvarEstado(); 
-            window.pecaAtualID = k;
-            window.pecaAtualNome = data.peca.split(' (')[0]; 
-            localStorage.setItem('pecaAtualID', k);
-            localStorage.setItem('pecaAtualNome', window.pecaAtualNome);
-
-            if(data.exame === "TREINO") {
-                window.modoTreinoLivre = true;
-                localStorage.setItem('modoTreinoLivre', "true");
-            } else {
-                window.modoTreinoLivre = false;
-                window.activeEx = data.exame;
-                localStorage.setItem('modoTreinoLivre', "false");
-                localStorage.setItem('activeEx', data.exame);
-            }
-
-            document.getElementById('editor-principal').innerText = data.conteudo;
-            document.getElementById('universal-modal').style.display='none';
-            atualizarDisplayModo();
-        }
-    };
-
-    window.salvarEstado = () => {
-        const ed = document.getElementById('editor-principal');
-        if(ed) {
-            window.historicoUndo.push(ed.innerText);
-            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
-        }
-    };
-
-    window.desfazer = () => {
-        const ed = document.getElementById('editor-principal');
-        if(window.historicoUndo.length > 0) {
-            const estadoAnterior = window.historicoUndo.pop();
-            if(estadoAnterior !== undefined) ed.innerText = estadoAnterior;
-        }
-    };
-
-    window.deletarPecaPasta = async (k) => {
-        if(confirm("Excluir permanentemente?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
-            if(window.pecaAtualID === k) {
-                window.pecaAtualID = null;
-                localStorage.removeItem('pecaAtualID');
-            }
-            window.abrirPastaHistorico();
-        }
-    };
-
-    window.forcarRadar = () => {
-        if(window.modoTreinoLivre) return;
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        const ed = document.getElementById('editor-principal');
-        if (dna && RadarEngine && ed) {
-            const an = RadarEngine.analisar(dna, ed.innerText);
-            RadarEngine.renderizar(an);
-            document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase();
-        }
-    };
-
-    window.abrirPergaminho = () => {
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "📜 PERGAMINHO";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        Object.keys(pecas).forEach(k => {
-            const b = document.createElement('div'); b.className = 'opt-btn';
-            b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`;
-            b.onclick = () => { 
-                window.salvarEstado(); 
-                FolhaEngine.injetarTextoMultilinhas(pecas[k]); 
-                modal.style.display='none';
-            };
-            content.appendChild(b);
-        });
-        modal.style.display = 'flex';
-    };
-
-    window.injetarTeses = () => {
-        if(window.modoTreinoLivre) { alert("O Martelo só funciona em Exames Oficiais."); return; }
-        window.salvarEstado(); 
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        if(dna) FolhaEngine.injetarTextoMultilinhas(dna);
-    };
-
+    // LÓGICA DE PDF ATUALIZADA COM OS NOMES SUGERIDOS
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
         const tit = document.getElementById('pdf-title');
-        let url = (t==='P') ? `ro${window.activeEx}.pdf` : (t==='G') ? `ro${window.activeEx}-gabarito.pdf` : `vade.pdf`;
-        tit.innerText = (t==='P') ? "ENUNCIADO" : (t==='G') ? "GABARITO" : "VADE MECUM";
+        
+        let url = "";
+        if (t === 'P') { url = `ro${window.activeEx}.pdf`; tit.innerText = "ENUNCIADO"; }
+        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; tit.innerText = "GABARITO"; }
+        else if (t === 'V') { url = `vade.pdf`; tit.innerText = "VADE MECUM"; }
+        else if (t === 'LP') { url = `livro_processo.pdf`; tit.innerText = "LIVRO: PROCESSO"; }
+        else if (t === 'LM') { url = `livro_material.pdf`; tit.innerText = "LIVRO: MATERIAL"; }
+
         f.src = url;
         v.classList.add('active');
     };
 
     window.fecharPDF = () => document.getElementById('pdf-viewer').classList.remove('active');
 
-    async function salvarAutomatico() {
-        const ed = document.getElementById('editor-principal');
-        const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
-        if(ed && ed.innerText.trim()) {
-            await set(ref(db, `producao_v13/${rascunhoKey}`), { conteudo: ed.innerText, timestamp: Date.now() });
-        }
-    }
-
-    async function carregarRascunho() {
-        const rascunhoKey = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`;
-        const snap = await get(ref(db, `producao_v13/${rascunhoKey}`));
-        if(snap.exists() && !window.pecaAtualID) { 
-            const ed = document.getElementById('editor-principal');
-            if(ed) ed.innerText = snap.val().conteudo;
-            window.salvarEstado();
-        }
-    }
-
+    // MANTENDO TODAS AS SUAS FUNÇÕES ORIGINAIS DE HISTÓRICO E MOTOR
+    window.renomearTreino = () => { if(!window.modoTreinoLivre) return; const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome); if(novoNome && novoNome.trim() !== "") { window.pecaAtualNome = novoNome.trim(); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); atualizarDisplayModo(); } };
+    window.ativarTreinoLivre = () => { const nome = prompt("Nome do novo treino:"); if(nome) { window.modoTreinoLivre = true; window.pecaAtualNome = nome; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload(); } };
+    window.abrirExames = () => { window.modoTreinoLivre = false; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "false"); const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; const content = document.getElementById('modal-content'); content.innerHTML = ""; for(let i=44; i>=35; i--) { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); }; content.appendChild(b); } modal.style.display = 'flex'; };
+    window.finalizarPeca = async () => { const ed = document.getElementById('editor-principal'); if(!ed) return; let idParaSalvar = window.pecaAtualID || Date.now().toString(); let nomeBase = window.modoTreinoLivre ? window.pecaAtualNome : `OAB ${window.activeEx} - ${document.getElementById('identificador-peca').innerText.replace("PEÇA: ", "")}`; if(confirm(`Salvar alterações em "${nomeBase}"?`)) { const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, peca: `${nomeBase.split(' (')[0]} (${dataFormatada})`, conteudo: ed.innerText, timestamp: Number(idParaSalvar) }); window.pecaAtualID = idParaSalvar; localStorage.setItem('pecaAtualID', idParaSalvar); alert("Peça salva com sucesso!"); } };
+    window.abrirPastaHistorico = async () => { const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS"; const content = document.getElementById('modal-content'); content.innerHTML = "<div style='padding:20px; text-align:center;'>Carregando...</div>"; modal.style.display = 'flex'; try { const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`)); content.innerHTML = ""; if (snap.exists()) { const dados = snap.val(); const listaRaw = Object.keys(dados).map(k => ({ id: k, ...dados[k] })); const treinos = listaRaw.filter(i => i.exame === "TREINO").sort((a, b) => { const numA = parseInt(a.peca.match(/^(\d+)/)?.[1] || "9999"); const numB = parseInt(b.peca.match(/^(\d+)/)?.[1] || "9999"); return numA - numB; }); const exames = listaRaw.filter(i => i.exame !== "TREINO").sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)); [...treinos, ...exames].forEach(item => { const div = document.createElement('div'); div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px"; div.innerHTML = `<div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1"><strong style="color:#0f172a">${item.peca}</strong><br><small style="color:#64748b">${item.exame === "TREINO" ? "🛠️ TREINO" : "⚖️ OAB " + item.exame}</small></div><i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}')"></i>`; content.appendChild(div); }); } else { content.innerHTML = "Vazio."; } } catch (e) { content.innerHTML = "Erro."; } };
+    window.carregarPecaPasta = async (k) => { const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); if(snap.exists()){ const data = snap.val(); window.salvarEstado(); window.pecaAtualID = k; window.pecaAtualNome = data.peca.split(' (')[0]; localStorage.setItem('pecaAtualID', k); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); window.modoTreinoLivre = (data.exame === "TREINO"); localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre ? "true" : "false"); if(!window.modoTreinoLivre) { window.activeEx = data.exame; localStorage.setItem('activeEx', data.exame); } document.getElementById('editor-principal').innerText = data.conteudo; document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); } };
+    window.salvarEstado = () => { const ed = document.getElementById('editor-principal'); if(ed) { window.historicoUndo.push(ed.innerText); if(window.historicoUndo.length > 30) window.historicoUndo.shift(); } };
+    window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) { const est = window.historicoUndo.pop(); if(est !== undefined) ed.innerText = est; } };
+    window.deletarPecaPasta = async (k) => { if(confirm("Excluir?")) { await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); if(window.pecaAtualID === k) { window.pecaAtualID = null; localStorage.removeItem('pecaAtualID'); } window.abrirPastaHistorico(); } };
+    window.forcarRadar = () => { if(window.modoTreinoLivre) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase(); } };
+    window.abrirPergaminho = () => { const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📜 PERGAMINHO"; const content = document.getElementById('modal-content'); content.innerHTML = ""; Object.keys(pecas).forEach(k => { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`; b.onclick = () => { window.salvarEstado(); FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; }; content.appendChild(b); }); modal.style.display = 'flex'; };
+    window.injetarTeses = () => { if(window.modoTreinoLivre) { alert("O Martelo só funciona em Exames Oficiais."); return; } window.salvarEstado(); const dna = BANCO_ESPELHOS[window.activeEx]; if(dna) FolhaEngine.injetarTextoMultilinhas(dna); };
+    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); const key = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`; if(ed && ed.innerText.trim()) await set(ref(db, `producao_v13/${key}`), { conteudo: ed.innerText, timestamp: Date.now() }); }
+    async function carregarRascunho() { const key = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`; const snap = await get(ref(db, `producao_v13/${key}`)); if(snap.exists() && !window.pecaAtualID) { const ed = document.getElementById('editor-principal'); if(ed) ed.innerText = snap.val().conteudo; window.salvarEstado(); } }
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    
-    window.limparFolha = () => { 
-        if(confirm("Limpar tudo?")) { 
-            window.salvarEstado(); 
-            const ed = document.getElementById('editor-principal');
-            if(ed) ed.innerText = ""; 
-            window.pecaAtualID = null; 
-            localStorage.removeItem('pecaAtualID');
-        } 
-    };
-
-    window.visualizarModoFoco = () => { 
-        const s = document.querySelector('.sidebar'); 
-        s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; 
-    };
-
+    window.limparFolha = () => { if(confirm("Limpar tudo?")) { window.salvarEstado(); const ed = document.getElementById('editor-principal'); if(ed) ed.innerText = ""; window.pecaAtualID = null; localStorage.removeItem('pecaAtualID'); } };
+    window.visualizarModoFoco = () => { const s = document.querySelector('.sidebar'); s.style.display = (s.style.display === 'none') ? 'flex' : 'none'; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-
 </script>
 </body>
 </html>

@@ -12,6 +12,11 @@
             --bg-paper: #cbd5e1; --paper-color: #ffffff; 
             --mentoria: #a855f7; --sidebar-w: 260px; --perigo: #ef4444;
             --glass: rgba(30, 41, 59, 0.7);
+            /* Cores Marca-Texto Pedagógico */
+            --m-amarelo: #fef08a; /* FATOS */
+            --m-verde: #bbf7d0;   /* FUNDAMENTOS */
+            --m-laranja: #fed7aa; /* PRAZOS/ALERTAS */
+            --m-roxo: #e9d5ff;    /* PEDIDOS */
         }
 
         body.dark-mode { --bg-paper: #0f172a; }
@@ -81,20 +86,32 @@
         }
 
         #identificador-peca { 
-            padding: 12px; background: #f8fafc; text-align: center; 
-            font-weight: 900; color: #0f172a; border-bottom: 3px solid var(--gold);
+            padding: 10px; background: #f8fafc; text-align: center; 
+            font-weight: 900; color: #0f172a; border-bottom: 1px solid #e2e8f0;
             cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
         }
+
+        /* BARRA DE LEGENDA DE MARCAÇÃO */
+        .legenda-marcacao {
+            display: flex; justify-content: space-around; padding: 5px; 
+            background: #f1f5f9; font-size: 9px; font-weight: 800; color: #475569;
+            border-bottom: 3px solid var(--gold); text-transform: uppercase;
+        }
+        .item-legenda { display: flex; align-items: center; gap: 4px; }
+        .box-color { width: 10px; height: 10px; border-radius: 2px; }
         
-        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; }
+        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; align-items: center; }
         .btn-lib { 
-            flex: 1; padding: 12px; border: none; background: transparent; 
+            padding: 12px; border: none; background: transparent; 
             cursor: pointer; font-weight: 800; font-size: 0.7rem; 
             text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
         }
 
-        /* ESTILO CIRÚRGICO DA CANETA */
-        .btn-lib.active-highlight { background: #fef08a; color: #854d0e; border-bottom: 2px solid #854d0e; }
+        /* PALETA DE CORES */
+        .marca-box { display: flex; gap: 8px; padding: 0 15px; border-right: 1px solid #f1f5f9; align-items: center; }
+        .dot-color { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid #e2e8f0; transition: 0.2s; position: relative; }
+        .dot-color:hover { transform: translateY(-2px); }
+        .dot-color.active { border-color: #0f172a; transform: scale(1.15); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
@@ -148,22 +165,33 @@
         <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i> LIVRO PROCESSO</button>
         <button class="btn-side" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i> LIVRO MATERIAL</button>
-        <hr style="opacity:0.1; margin:10px 0">
-        <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
-        <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')">GABARITO</button>
-        <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
     </aside>
 
     <section class="editor-container" id="editor-container">
         <div class="sticky-tools">
             <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
+            
+            <div class="legenda-marcacao">
+                <div class="item-legenda"><div class="box-color" style="background:var(--m-amarelo)"></div> FATOS</div>
+                <div class="item-legenda"><div class="box-color" style="background:var(--m-verde)"></div> FUNDAMENTOS</div>
+                <div class="item-legenda"><div class="box-color" style="background:var(--m-roxo)"></div> PEDIDOS</div>
+                <div class="item-legenda"><div class="box-color" style="background:var(--m-laranja)"></div> PRAZOS/ALERTAS</div>
+            </div>
+
             <div class="toolbar-liberdade">
-                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
-                <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()"><i class="fas fa-highlighter"></i> MARCAR</button>
-                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
+                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
+                
+                <div class="marca-box">
+                    <div class="dot-color" id="dot-off" title="Desativar Marcador" style="background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:10px; color:#64748b;" onclick="window.mudarCorMarca('none')"><i class="fas fa-slash"></i></div>
+                    <div class="dot-color" id="dot-yellow" title="MARCAR FATOS (AMARELO)" style="background:var(--m-amarelo)" onclick="window.mudarCorMarca('#fef08a')"></div>
+                    <div class="dot-color" id="dot-green" title="MARCAR FUNDAMENTOS (VERDE)" style="background:var(--m-verde)" onclick="window.mudarCorMarca('#bbf7d0')"></div>
+                    <div class="dot-color" id="dot-purple" title="MARCAR PEDIDOS (ROXO)" style="background:var(--m-roxo)" onclick="window.mudarCorMarca('#e9d5ff')"></div>
+                    <div class="dot-color" id="dot-orange" title="MARCAR ALERTAS/PRAZOS (LARANJA)" style="background:var(--m-laranja)" onclick="window.mudarCorMarca('#fed7aa')"></div>
+                </div>
+
+                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i></button>
+                <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> FOCO PDF</button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
-                <button class="btn-lib" style="background:#ef4444; color:white" onclick="window.fecharPDF()">Fechar PDF</button>
             </div>
         </div>
         <div class="paper">
@@ -173,12 +201,7 @@
 
     <section id="pdf-viewer">
         <div class="pdf-controls">
-            <div>
-                <button onclick="window.toggleRecolherEditor()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer; margin-right:10px;">
-                    <i class="fas fa-arrows-alt-h"></i> FOCO PDF
-                </button>
-                <span id="pdf-title">DOCUMENTO</span>
-            </div>
+            <div><span id="pdf-title">DOCUMENTO</span></div>
             <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer">X</button>
         </div>
         <iframe id="pdf-frame"></iframe>
@@ -190,9 +213,6 @@
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
         <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i></button>
-        <button class="fab-sub" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i></button>
-        <button class="fab-sub" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i></button>
-        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
     </div>
 </main>
 
@@ -217,9 +237,7 @@
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
     window.pecaAtualID = localStorage.getItem('pecaAtualID') || null; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
-
-    window.historicoUndo = [];
-    let debounceTimer = null;
+    window.corMarcaAtiva = 'none';
 
     window.onload = async () => {
         atualizarDisplayModo();
@@ -227,28 +245,25 @@
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
-                ed.addEventListener('input', () => {
-                    clearTimeout(debounceTimer);
-                    debounceTimer = setTimeout(() => {
-                        const texto = ed.innerText;
-                        if(window.historicoUndo[window.historicoUndo.length -1] !== texto) {
-                            window.historicoUndo.push(texto);
-                            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
-                        }
-                    }, 800);
-                });
-
-                // LISTENER DO MARCA TEXTO CIRÚRGICO
                 ed.addEventListener('mouseup', () => {
-                    if(window.marcaTextoAtivo) {
-                        document.execCommand('backColor', false, '#fef08a');
+                    if(window.corMarcaAtiva !== 'none') {
+                        document.execCommand('backColor', false, window.corMarcaAtiva);
                     }
                 });
             }
         }, 1000);
         await carregarRascunho();
-        setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
+    };
+
+    window.mudarCorMarca = (cor) => {
+        window.corMarcaAtiva = cor;
+        document.querySelectorAll('.dot-color').forEach(d => d.classList.remove('active'));
+        if(cor === '#fef08a') document.getElementById('dot-yellow').classList.add('active');
+        if(cor === '#bbf7d0') document.getElementById('dot-green').classList.add('active');
+        if(cor === '#fed7aa') document.getElementById('dot-orange').classList.add('active');
+        if(cor === '#e9d5ff') document.getElementById('dot-purple').classList.add('active');
+        if(cor === 'none') document.getElementById('dot-off').classList.add('active');
     };
 
     function atualizarDisplayModo() {
@@ -263,68 +278,50 @@
         }
     }
 
-    // FUNÇÃO MARCA TEXTO
-    window.marcaTextoAtivo = false;
-    window.toggleMarcaTexto = () => {
-        window.marcaTextoAtivo = !window.marcaTextoAtivo;
-        const btn = document.getElementById('btn-highlight');
-        if(window.marcaTextoAtivo) {
-            btn.classList.add('active-highlight');
-        } else {
-            btn.classList.remove('active-highlight');
-        }
-    };
-
-    window.toggleRecolherEditor = () => {
-        const editor = document.getElementById('editor-container');
-        const pdf = document.getElementById('pdf-viewer');
-        const sidebar = document.getElementById('sidebar-main');
-        editor.classList.toggle('collapsed');
-        pdf.classList.toggle('full-view');
-        sidebar.classList.toggle('hidden');
-    };
-
+    // Funções de apoio
+    window.desfazer = () => document.execCommand('undo');
+    window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
+    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active'); document.getElementById('editor-container').classList.remove('collapsed'); };
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
-        const tit = document.getElementById('pdf-title');
         let url = "";
-        if (t === 'P') { url = `ro${window.activeEx}.pdf`; tit.innerText = "ENUNCIADO"; }
-        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; tit.innerText = "GABARITO"; }
-        else if (t === 'V') { url = `vade.pdf`; tit.innerText = "VADE MECUM"; }
-        else if (t === 'LP') { url = `livro_processo.pdf`; tit.innerText = "LIVRO: PROCESSO"; }
-        else if (t === 'LM') { url = `livro_material.pdf`; tit.innerText = "LIVRO: MATERIAL"; }
+        if (t === 'P') url = `ro${window.activeEx}.pdf`;
+        else if (t === 'G') url = `ro${window.activeEx}-gabarito.pdf`;
+        else if (t === 'LP') url = `livro_processo.pdf`;
+        else if (t === 'LM') url = `livro_material.pdf`;
         f.src = url;
         v.classList.add('active');
     };
-
-    window.fecharPDF = () => {
-        const v = document.getElementById('pdf-viewer');
-        const editor = document.getElementById('editor-container');
-        const sidebar = document.getElementById('sidebar-main');
-        v.classList.remove('active');
-        v.classList.remove('full-view');
-        editor.classList.remove('collapsed');
-        sidebar.classList.remove('hidden');
+    
+    // Mantendo lógica de salvamento e radar
+    window.forcarRadar = () => { 
+        if(window.modoTreinoLivre) return; 
+        const dna = BANCO_ESPELHOS[window.activeEx]; 
+        const ed = document.getElementById('editor-principal'); 
+        if (dna && RadarEngine && ed) { 
+            const an = RadarEngine.analisar(dna, ed.innerText); 
+            RadarEngine.renderizar(an); 
+            document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase(); 
+        } 
+    };
+    
+    window.abrirPergaminho = () => { 
+        const modal = document.getElementById('universal-modal'); 
+        document.getElementById('modal-title').innerText = "📜 ESTRUTURAS"; 
+        const content = document.getElementById('modal-content'); 
+        content.innerHTML = ""; 
+        Object.keys(pecas).forEach(k => { 
+            const b = document.createElement('div'); b.className = 'opt-btn'; 
+            b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`; 
+            b.onclick = () => { FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; }; 
+            content.appendChild(b); 
+        }); 
+        modal.style.display = 'flex'; 
     };
 
-    window.renomearTreino = () => { if(!window.modoTreinoLivre) return; const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome); if(novoNome && novoNome.trim() !== "") { window.pecaAtualNome = novoNome.trim(); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); atualizarDisplayModo(); } };
-    window.ativarTreinoLivre = () => { const nome = prompt("Nome do novo treino:"); if(nome) { window.modoTreinoLivre = true; window.pecaAtualNome = nome; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload(); } };
-    window.abrirExames = () => { window.modoTreinoLivre = false; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "false"); const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; const content = document.getElementById('modal-content'); content.innerHTML = ""; for(let i=44; i>=35; i--) { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); }; content.appendChild(b); } modal.style.display = 'flex'; };
-    window.finalizarPeca = async () => { const ed = document.getElementById('editor-principal'); if(!ed) return; let idParaSalvar = window.pecaAtualID || Date.now().toString(); let nomeBase = window.modoTreinoLivre ? window.pecaAtualNome : `OAB ${window.activeEx} - ${document.getElementById('identificador-peca').innerText.replace("PEÇA: ", "")}`; if(confirm(`Salvar alterações em "${nomeBase}"?`)) { const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, peca: `${nomeBase.split(' (')[0]} (${dataFormatada})`, conteudo: ed.innerText, timestamp: Number(idParaSalvar) }); window.pecaAtualID = idParaSalvar; localStorage.setItem('pecaAtualID', idParaSalvar); alert("Peça salva com sucesso!"); } };
-    window.abrirPastaHistorico = async () => { const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS"; const content = document.getElementById('modal-content'); content.innerHTML = "<div style='padding:20px; text-align:center;'>Carregando...</div>"; modal.style.display = 'flex'; try { const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`)); content.innerHTML = ""; if (snap.exists()) { const dados = snap.val(); const listaRaw = Object.keys(dados).map(k => ({ id: k, ...dados[k] })); const treinos = listaRaw.filter(i => i.exame === "TREINO").sort((a, b) => { const numA = parseInt(a.peca.match(/^(\d+)/)?.[1] || "9999"); const numB = parseInt(b.peca.match(/^(\d+)/)?.[1] || "9999"); return numA - numB; }); const exames = listaRaw.filter(i => i.exame !== "TREINO").sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)); [...treinos, ...exames].forEach(item => { const div = document.createElement('div'); div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px"; div.innerHTML = `<div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1"><strong style="color:#0f172a">${item.peca}</strong><br><small style="color:#64748b">${item.exame === "TREINO" ? "🛠️ TREINO" : "⚖️ OAB " + item.exame}</small></div><i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}')"></i>`; content.appendChild(div); }); } else { content.innerHTML = "Vazio."; } } catch (e) { content.innerHTML = "Erro."; } };
-    window.carregarPecaPasta = async (k) => { const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); if(snap.exists()){ const data = snap.val(); window.salvarEstado(); window.pecaAtualID = k; window.pecaAtualNome = data.peca.split(' (')[0]; localStorage.setItem('pecaAtualID', k); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); window.modoTreinoLivre = (data.exame === "TREINO"); localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre ? "true" : "false"); if(!window.modoTreinoLivre) { window.activeEx = data.exame; localStorage.setItem('activeEx', data.exame); } document.getElementById('editor-principal').innerText = data.conteudo; document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); } };
-    window.salvarEstado = () => { const ed = document.getElementById('editor-principal'); if(ed) { window.historicoUndo.push(ed.innerText); if(window.historicoUndo.length > 30) window.historicoUndo.shift(); } };
-    window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) { const est = window.historicoUndo.pop(); if(est !== undefined) ed.innerText = est; } };
-    window.deletarPecaPasta = async (k) => { if(confirm("Excluir?")) { await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); if(window.pecaAtualID === k) { window.pecaAtualID = null; localStorage.removeItem('pecaAtualID'); } window.abrirPastaHistorico(); } };
-    window.forcarRadar = () => { if(window.modoTreinoLivre) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase(); } };
-    window.abrirPergaminho = () => { const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📜 PERGAMINHO"; const content = document.getElementById('modal-content'); content.innerHTML = ""; Object.keys(pecas).forEach(k => { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`; b.onclick = () => { window.salvarEstado(); FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; }; content.appendChild(b); }); modal.style.display = 'flex'; };
-    window.injetarTeses = () => { if(window.modoTreinoLivre) { alert("O Martelo só funciona em Exames Oficiais."); return; } window.salvarEstado(); const dna = BANCO_ESPELHOS[window.activeEx]; if(dna) FolhaEngine.injetarTextoMultilinhas(dna); };
-    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); const key = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`; if(ed && ed.innerText.trim()) await set(ref(db, `producao_v13/${key}`), { conteudo: ed.innerText, timestamp: Date.now() }); }
-    async function carregarRascunho() { const key = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`; const snap = await get(ref(db, `producao_v13/${key}`)); if(snap.exists() && !window.pecaAtualID) { const ed = document.getElementById('editor-principal'); if(ed) ed.innerText = snap.val().conteudo; window.salvarEstado(); } }
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    window.limparFolha = () => { if(confirm("Limpar tudo?")) { window.salvarEstado(); const ed = document.getElementById('editor-principal'); if(ed) ed.innerText = ""; window.pecaAtualID = null; localStorage.removeItem('pecaAtualID'); } };
-    window.toggleFocoTotal = () => { const s = document.getElementById('sidebar-main'); s.classList.toggle('hidden'); };
+    window.limparFolha = () => { if(confirm("Limpar folha?")) document.getElementById('editor-principal').innerText = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>

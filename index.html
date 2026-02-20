@@ -52,10 +52,11 @@
             padding: 15px; 
             border-right: 1px solid rgba(255,255,255,0.1); 
             overflow-y: auto; 
-            transition: 0.3s;
+            transition: all 0.3s ease;
         }
 
-        .sidebar.hidden { width: 0; padding: 0; overflow: hidden; border: none; }
+        /* Classe para esconder a sidebar e zerar o espaço */
+        .sidebar.hidden { width: 0; padding: 0; margin: 0; overflow: hidden; border: none; opacity: 0; }
 
         .btn-side { 
             width: 100%; min-height: 45px; border: none; border-radius: 8px; 
@@ -69,10 +70,10 @@
         .editor-container { 
             flex: 1; display: flex; flex-direction: column; 
             background: var(--bg-paper); overflow-y: auto; align-items: center; padding: 20px 10px;
-            transition: flex 0.4s ease;
+            transition: all 0.4s ease;
         }
 
-        .editor-container.collapsed { flex: 0.2; opacity: 0.3; pointer-events: none; }
+        .editor-container.collapsed { flex: 0.3; opacity: 0.5; }
 
         .sticky-tools { 
             position: sticky; top: -20px; z-index: 1000; background: white; 
@@ -93,15 +94,15 @@
             text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
         }
 
-        .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; }
+        .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; height: 45px; }
         .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .color-dot.active { border-color: #000; transform: scale(1.1); }
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
-        #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); }
+        #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
-        #pdf-viewer.full-view { width: 100% !important; }
+        #pdf-viewer.full-view { width: 100% !important; flex: 1; }
 
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; align-items: center;}
         iframe { width: 100%; flex: 1; border: none; }
@@ -172,7 +173,7 @@
                 </div>
 
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
-                <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
+                <button class="btn-lib" id="btn-foco" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
             </div>
         </div>
@@ -295,14 +296,22 @@
         }
     };
 
-    // FOCO PDF
+    // FOCO PDF (MAXIMIZADO) - CORTE CIRÚRGICO AQUI
     window.toggleRecolherEditor = () => {
         const editor = document.getElementById('editor-container');
         const pdf = document.getElementById('pdf-viewer');
         const sidebar = document.getElementById('sidebar-main');
-        editor.classList.toggle('collapsed');
+        
+        // Inverte os estados
+        const isCollapsed = editor.classList.toggle('collapsed');
         pdf.classList.toggle('full-view');
-        sidebar.classList.toggle('hidden');
+        
+        // Se o editor estiver recolhido (collapsed), escondemos a sidebar. Se não, mostramos.
+        if (isCollapsed) {
+            sidebar.classList.add('hidden');
+        } else {
+            sidebar.classList.remove('hidden');
+        }
     };
 
     window.verPDF = (t) => {
@@ -317,6 +326,8 @@
         else if (t === 'LM') { url = `livro_material.pdf`; tit.innerText = "LIVRO: MATERIAL"; }
         f.src = url;
         v.classList.add('active');
+        // Ao abrir qualquer PDF, garantimos que a sidebar suma para dar espaço total
+        window.toggleRecolherEditor(); 
     };
 
     window.fecharPDF = () => {
@@ -329,7 +340,7 @@
         sidebar.classList.remove('hidden');
     };
 
-    // FUNÇÕES ORIGINAIS
+    // FUNÇÕES ORIGINAIS (MANTIDAS INTACTAS)
     window.renomearTreino = () => { if(!window.modoTreinoLivre) return; const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome); if(novoNome && novoNome.trim() !== "") { window.pecaAtualNome = novoNome.trim(); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); atualizarDisplayModo(); } };
     window.ativarTreinoLivre = () => { const nome = prompt("Nome do novo treino:"); if(nome) { window.modoTreinoLivre = true; window.pecaAtualNome = nome; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload(); } };
     window.abrirExames = () => { window.modoTreinoLivre = false; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "false"); const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; const content = document.getElementById('modal-content'); content.innerHTML = ""; for(let i=44; i>=35; i--) { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); }; content.appendChild(b); } modal.style.display = 'flex'; };

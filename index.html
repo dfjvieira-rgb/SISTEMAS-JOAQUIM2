@@ -8,16 +8,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
-            --primary: #020617; 
-            --gold: #fbbf24; 
-            --gold-dark: #d97706;
-            --bg-paper: #cbd5e1; 
-            --paper-color: #ffffff; 
-            --mentoria: #a855f7; 
-            --sidebar-w: 260px; 
-            --perigo: #ef4444;
-            --sucesso: #10b981;
-            --obs: #3b82f6;
+            --primary: #020617; --gold: #fbbf24; --gold-dark: #d97706;
+            --bg-paper: #cbd5e1; --paper-color: #ffffff; 
+            --mentoria: #a855f7; --sidebar-w: 260px; --perigo: #ef4444;
+            --glass: rgba(30, 41, 59, 0.7);
         }
 
         body.dark-mode { --bg-paper: #0f172a; }
@@ -69,16 +63,16 @@
             font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; 
             text-transform: uppercase; transition: 0.3s; background: rgba(255,255,255,0.05);
         }
-        .btn-side:hover { background: rgba(255,255,255,0.15); border-left: 4px solid var(--gold); }
+        .btn-side:hover { background: rgba(255,255,255,0.15); }
         .btn-side i { width: 20px; font-size: 1rem; color: var(--gold); }
 
         .editor-container { 
             flex: 1; display: flex; flex-direction: column; 
             background: var(--bg-paper); overflow-y: auto; align-items: center; padding: 20px 10px;
-            transition: flex 0.4s ease, opacity 0.3s;
+            transition: flex 0.4s ease;
         }
 
-        .editor-container.collapsed { flex: 0; opacity: 0; pointer-events: none; padding: 0; }
+        .editor-container.collapsed { flex: 0.2; opacity: 0.3; pointer-events: none; }
 
         .sticky-tools { 
             position: sticky; top: -20px; z-index: 1000; background: white; 
@@ -92,16 +86,19 @@
             cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
         }
         
-        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; }
+        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; align-items: stretch; }
         .btn-lib { 
             flex: 1; padding: 12px; border: none; background: transparent; 
             cursor: pointer; font-weight: 800; font-size: 0.7rem; 
             text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
         }
 
-        .btn-lib.active-highlight { background: #fef08a; color: #854d0e; border-bottom: 3px solid #eab308; }
+        /* Container do Seletor de Cores */
+        .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 5px; gap: 5px; }
+        .color-dot { width: 24px; height: 24px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-dot.active { border-color: #000; transform: scale(1.1); }
 
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 2500px; position: relative; }
+        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
         #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
@@ -111,25 +108,25 @@
         iframe { width: 100%; flex: 1; border: none; }
 
         #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: #000; }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
+        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
         #mobile-hub.active .fab-sub { display: flex; }
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
-        .folder-item { 
-            padding: 15px; border-bottom: 1px solid #eee; display: flex; 
-            justify-content: space-between; align-items: center; 
-            background: #fff; margin-bottom: 8px; border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border-left: 5px solid var(--gold);
-        }
-        .folder-item.treino { border-left-color: var(--mentoria); }
+        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
+        }
+
+        @media print {
+            body, main, .editor-container { overflow: visible !important; height: auto !important; display: block !important; background: white !important; }
+            .sidebar, header, .sticky-tools, #mobile-hub, #pdf-viewer, .modal { display: none !important; }
+            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; }
+            .editor-container { padding: 0 !important; }
         }
     </style>
 </head>
@@ -145,11 +142,11 @@
         <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES OAB</button>
         <button class="btn-side" style="background:#facc15; color:#000" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i> NOVO TREINO</button>
         <button class="btn-side" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i> MINHA PASTA</button>
-        <button class="btn-side" style="background:var(--sucesso);" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> SALVAR PEÇA</button>
+        <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> FINALIZAR / SALVAR</button>
         <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA IA</button>
         <button class="btn-side" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
-        <button class="btn-side" style="background:var(--obs);" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
         <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i> LIVRO PROCESSO</button>
         <button class="btn-side" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i> LIVRO MATERIAL</button>
@@ -161,13 +158,22 @@
 
     <section class="editor-container" id="editor-container">
         <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.renomearTreino()">IDENTIFICANDO...</div>
+            <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
             <div class="toolbar-liberdade">
-                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
-                <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()"><i class="fas fa-highlighter"></i> MARCAR</button>
-                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i></button>
-                <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> FOCO PDF</button>
-                <button class="btn-lib" style="background:var(--sucesso); color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
+                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
+                
+                <div class="highlight-box">
+                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none;">
+                        <i class="fas fa-highlighter"></i> MARCAR
+                    </button>
+                    <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
+                    <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
+                    <div class="color-dot" id="dot-pink" style="background:#fbcfe8;" onclick="window.setHighlightColor('#fbcfe8', 'dot-pink')"></div>
+                </div>
+
+                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
+                <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
+                <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
             </div>
         </div>
         <div class="paper">
@@ -177,25 +183,34 @@
 
     <section id="pdf-viewer">
         <div class="pdf-controls">
-            <span id="pdf-title">DOCUMENTO</span>
-            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 12px; border-radius:4px; font-weight:bold; cursor:pointer">X</button>
+            <div>
+                <button onclick="window.toggleRecolherEditor()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer; margin-right:10px;">
+                    <i class="fas fa-arrows-alt-h"></i> VOLTAR EDITOR
+                </button>
+                <span id="pdf-title">DOCUMENTO</span>
+            </div>
+            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer">X</button>
         </div>
         <iframe id="pdf-frame"></iframe>
     </section>
 
     <div id="mobile-hub">
-        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket"></i></button>
-        <button class="fab-sub" style="background:var(--sucesso);" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
+        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
+        <button class="fab-sub" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
         <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i></button>
+        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder-open"></i></button>
+        <button class="fab-sub" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i></button>
+        <button class="fab-sub" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i></button>
+        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
     </div>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:20px; border-bottom:3px solid var(--gold); padding-bottom:10px"></h2>
+        <h2 id="modal-title" style="margin-bottom:20px; border-bottom:2px solid var(--gold)"></h2>
         <div id="modal-content"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">FECHAR</button>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">FECHAR</button>
     </div>
 </div>
 
@@ -207,185 +222,134 @@
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
 
+    window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
     window.pecaAtualID = localStorage.getItem('pecaAtualID') || null; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
+
     window.historicoUndo = [];
-    window.marcaTextoAtivo = false;
+    let debounceTimer = null;
 
     window.onload = async () => {
-        FolhaEngine.montar('folha-total');
         atualizarDisplayModo();
-
+        FolhaEngine.montar('folha-total');
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
+                ed.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const texto = ed.innerText;
+                        if(window.historicoUndo[window.historicoUndo.length -1] !== texto) {
+                            window.historicoUndo.push(texto);
+                            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
+                        }
+                    }, 800);
+                });
+                
                 ed.addEventListener('mouseup', () => {
-                    if(window.marcaTextoAtivo) document.execCommand('backColor', false, '#fef08a');
+                    if(window.marcaTextoAtivo) {
+                        document.execCommand('backColor', false, window.currentColor || '#fef08a');
+                    }
                 });
             }
-        }, 800);
-
+        }, 1000);
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
     };
 
+    function atualizarDisplayModo() {
+        const display = document.getElementById('ex-display');
+        const ident = document.getElementById('identificador-peca');
+        if(window.modoTreinoLivre) {
+            display.innerText = "TREINO: " + window.pecaAtualNome;
+            ident.innerHTML = `TREINO: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--mentoria)"></i>`;
+        } else {
+            display.innerText = "EXAME " + window.activeEx;
+            ident.onclick = null;
+        }
+    }
+
+    // GESTÃO DE MARCA TEXTO CORES
+    window.marcaTextoAtivo = false;
+    window.currentColor = '#fef08a';
+
+    window.setHighlightColor = (color, id) => {
+        window.currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        // Se clicar na cor, já ativa o modo marca texto automaticamente
+        if(!window.marcaTextoAtivo) window.toggleMarcaTexto();
+    };
+
     window.toggleMarcaTexto = () => {
         window.marcaTextoAtivo = !window.marcaTextoAtivo;
-        document.getElementById('btn-highlight').classList.toggle('active-highlight', window.marcaTextoAtivo);
-    };
-
-    window.abrirPastaHistorico = async () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 MINHA PASTA ELITE";
-        content.innerHTML = "<p style='text-align:center'>Acessando cofre...</p>";
-        modal.style.display = 'flex';
-
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-            content.innerHTML = "";
-            if(snap.exists()) {
-                const dados = snap.val();
-                const lista = Object.keys(dados).map(k => ({id: k, ...dados[k]})).sort((a,b) => b.timestamp - a.timestamp);
-                
-                lista.forEach(item => {
-                    const isTreino = item.exame === "TREINO";
-                    const div = document.createElement('div');
-                    div.className = `folder-item ${isTreino ? 'treino' : ''}`;
-                    div.innerHTML = `
-                        <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1">
-                            <strong style="font-size:14px">${item.peca}</strong><br>
-                            <small style="color:#64748b">${isTreino ? '🛠️ TREINO' : '⚖️ EXAME ' + item.exame}</small>
-                        </div>
-                        <i class="fas fa-trash" style="color:var(--perigo); cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}')"></i>
-                    `;
-                    content.appendChild(div);
-                });
-            } else { content.innerHTML = "<p style='text-align:center'>Pasta vazia.</p>"; }
-        } catch(e) { content.innerHTML = "Erro de conexão."; }
-    };
-
-    window.carregarPecaPasta = async (id) => {
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-        if(snap.exists()) {
-            const d = snap.val();
-            window.pecaAtualID = id;
-            window.pecaAtualNome = d.peca.split(' (')[0];
-            window.modoTreinoLivre = (d.exame === "TREINO");
-            if(!window.modoTreinoLivre) window.activeEx = d.exame;
-            
-            localStorage.setItem('pecaAtualID', id);
-            localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre);
-            localStorage.setItem('activeEx', window.activeEx);
-
-            const ed = document.getElementById('editor-principal');
-            if(ed) ed.innerText = d.conteudo;
-            
-            document.getElementById('universal-modal').style.display = 'none';
-            atualizarDisplayModo();
+        const btn = document.getElementById('btn-highlight');
+        if(window.marcaTextoAtivo) {
+            btn.style.background = window.currentColor;
+            btn.style.color = "#000";
+            btn.style.boxShadow = "inset 0 0 10px rgba(0,0,0,0.2)";
+        } else {
+            btn.style.background = "transparent";
+            btn.style.color = "#64748b";
+            btn.style.boxShadow = "none";
         }
     };
 
-    window.finalizarPeca = async () => {
-        const ed = document.getElementById('editor-principal');
-        if(!ed || !ed.innerText.trim()) return alert("Folha vazia!");
-        
-        let id = window.pecaAtualID || Date.now().toString();
-        let nome = window.modoTreinoLivre ? window.pecaAtualNome : `OAB ${window.activeEx} - ${document.getElementById('identificador-peca').innerText}`;
-        
-        const agora = new Date().toLocaleString('pt-BR');
-        await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), {
-            exame: window.modoTreinoLivre ? "TREINO" : window.activeEx,
-            peca: `${nome} (${agora})`,
-            conteudo: ed.innerText,
-            timestamp: Date.now()
-        });
-        window.pecaAtualID = id;
-        localStorage.setItem('pecaAtualID', id);
-        alert("Peça salva na pasta!");
-    };
-
-    window.atualizarDisplayModo = () => {
-        const d = document.getElementById('ex-display');
-        d.innerText = window.modoTreinoLivre ? "TREINO LIVRE" : "EXAME " + window.activeEx;
-        if(window.modoTreinoLivre) document.getElementById('identificador-peca').innerText = window.pecaAtualNome;
-    };
-
+    // FOCO PDF
     window.toggleRecolherEditor = () => {
-        const edCont = document.getElementById('editor-container');
-        const pdfCont = document.getElementById('pdf-viewer');
-        edCont.classList.toggle('collapsed');
-        pdfCont.classList.toggle('full-view');
-        document.getElementById('sidebar-main').classList.toggle('hidden');
+        const editor = document.getElementById('editor-container');
+        const pdf = document.getElementById('pdf-viewer');
+        const sidebar = document.getElementById('sidebar-main');
+        editor.classList.toggle('collapsed');
+        pdf.classList.toggle('full-view');
+        sidebar.classList.toggle('hidden');
     };
 
     window.verPDF = (t) => {
+        const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
         const tit = document.getElementById('pdf-title');
         let url = "";
-        if(t==='P') { url = `ro${window.activeEx}.pdf`; tit.innerText = "PEÇA"; }
-        else if(t==='G') { url = `ro${window.activeEx}-gabarito.pdf`; tit.innerText = "GABARITO"; }
-        else if(t==='V') { url = `vade.pdf`; tit.innerText = "VADE MECUM"; }
-        else if(t==='LP') { url = `livro_processo.pdf`; tit.innerText = "LIVRO PROCESSO"; }
-        else if(t==='LM') { url = `livro_material.pdf`; tit.innerText = "LIVRO MATERIAL"; }
+        if (t === 'P') { url = `ro${window.activeEx}.pdf`; tit.innerText = "ENUNCIADO"; }
+        else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; tit.innerText = "GABARITO"; }
+        else if (t === 'V') { url = `vade.pdf`; tit.innerText = "VADE MECUM"; }
+        else if (t === 'LP') { url = `livro_processo.pdf`; tit.innerText = "LIVRO: PROCESSO"; }
+        else if (t === 'LM') { url = `livro_material.pdf`; tit.innerText = "LIVRO: MATERIAL"; }
         f.src = url;
-        document.getElementById('pdf-viewer').classList.add('active');
+        v.classList.add('active');
     };
 
     window.fecharPDF = () => {
-        document.getElementById('pdf-viewer').classList.remove('active', 'full-view');
-        document.getElementById('editor-container').classList.remove('collapsed');
-        document.getElementById('sidebar-main').classList.remove('hidden');
+        const v = document.getElementById('pdf-viewer');
+        const editor = document.getElementById('editor-container');
+        const sidebar = document.getElementById('sidebar-main');
+        v.classList.remove('active');
+        v.classList.remove('full-view');
+        editor.classList.remove('collapsed');
+        sidebar.classList.remove('hidden');
     };
 
-    window.forcarRadar = () => {
-        if(window.modoTreinoLivre) return;
-        const dna = BANCO_ESPELHOS[window.activeEx];
-        const ed = document.getElementById('editor-principal');
-        if(dna && ed) {
-            const an = RadarEngine.analisar(dna, ed.innerText);
-            RadarEngine.renderizar(an);
-            document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase();
-        }
-    };
-
-    window.abrirExames = () => {
-        window.modoTreinoLivre = false;
-        localStorage.setItem('modoTreinoLivre', "false");
-        const modal = document.getElementById('universal-modal');
-        document.getElementById('modal-title').innerText = "EXAMES OAB";
-        const content = document.getElementById('modal-content');
-        content.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('button');
-            b.className = 'btn-side'; b.style.color = "#000"; b.style.marginBottom = "5px";
-            b.innerText = `EXAME ${i}`;
-            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
-            content.appendChild(b);
-        }
-        modal.style.display = 'flex';
-    };
-
-    window.ativarTreinoLivre = () => {
-        const n = prompt("Nome do Treino:");
-        if(n) {
-            window.modoTreinoLivre = true;
-            window.pecaAtualNome = n;
-            window.pecaAtualID = null;
-            localStorage.setItem('modoTreinoLivre', "true");
-            localStorage.setItem('pecaAtualNome', n);
-            window.location.reload();
-        }
-    };
-
+    // FUNÇÕES DE SISTEMA
+    window.renomearTreino = () => { if(!window.modoTreinoLivre) return; const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome); if(novoNome && novoNome.trim() !== "") { window.pecaAtualNome = novoNome.trim(); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); atualizarDisplayModo(); } };
+    window.ativarTreinoLivre = () => { const nome = prompt("Nome do novo treino:"); if(nome) { window.modoTreinoLivre = true; window.pecaAtualNome = nome; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload(); } };
+    window.abrirExames = () => { window.modoTreinoLivre = false; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "false"); const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; const content = document.getElementById('modal-content'); content.innerHTML = ""; for(let i=44; i>=35; i--) { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); }; content.appendChild(b); } modal.style.display = 'flex'; };
+    window.finalizarPeca = async () => { const ed = document.getElementById('editor-principal'); if(!ed) return; let idParaSalvar = window.pecaAtualID || Date.now().toString(); let nomeBase = window.modoTreinoLivre ? window.pecaAtualNome : `OAB ${window.activeEx} - ${document.getElementById('identificador-peca').innerText.replace("PEÇA: ", "")}`; if(confirm(`Salvar alterações em "${nomeBase}"?`)) { const agora = new Date(); const dataFormatada = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, peca: `${nomeBase.split(' (')[0]} (${dataFormatada})`, conteudo: ed.innerText, timestamp: Number(idParaSalvar) }); window.pecaAtualID = idParaSalvar; localStorage.setItem('pecaAtualID', idParaSalvar); alert("Peça salva com sucesso!"); } };
+    window.abrirPastaHistorico = async () => { const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS"; const content = document.getElementById('modal-content'); content.innerHTML = "<div style='padding:20px; text-align:center;'>Carregando...</div>"; modal.style.display = 'flex'; try { const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`)); content.innerHTML = ""; if (snap.exists()) { const dados = snap.val(); const listaRaw = Object.keys(dados).map(k => ({ id: k, ...dados[k] })); const treinos = listaRaw.filter(i => i.exame === "TREINO").sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)); const exames = listaRaw.filter(i => i.exame !== "TREINO").sort((a, b) => (Number(b.timestamp) || 0) - (Number(a.timestamp) || 0)); [...treinos, ...exames].forEach(item => { const div = document.createElement('div'); div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px"; div.innerHTML = `<div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1"><strong style="color:#0f172a">${item.peca}</strong><br><small style="color:#64748b">${item.exame === "TREINO" ? "🛠️ TREINO" : "⚖️ OAB " + item.exame}</small></div><i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}')"></i>`; content.appendChild(div); }); } else { content.innerHTML = "Vazio."; } } catch (e) { content.innerHTML = "Erro."; } };
+    window.carregarPecaPasta = async (k) => { const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); if(snap.exists()){ const data = snap.val(); window.salvarEstado(); window.pecaAtualID = k; window.pecaAtualNome = data.peca.split(' (')[0]; localStorage.setItem('pecaAtualID', k); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); window.modoTreinoLivre = (data.exame === "TREINO"); localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre ? "true" : "false"); if(!window.modoTreinoLivre) { window.activeEx = data.exame; localStorage.setItem('activeEx', data.exame); } document.getElementById('editor-principal').innerText = data.conteudo; document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); } };
+    window.salvarEstado = () => { const ed = document.getElementById('editor-principal'); if(ed) { window.historicoUndo.push(ed.innerText); if(window.historicoUndo.length > 30) window.historicoUndo.shift(); } };
+    window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) { const est = window.historicoUndo.pop(); if(est !== undefined) ed.innerText = est; } };
+    window.deletarPecaPasta = async (k) => { if(confirm("Excluir?")) { await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); if(window.pecaAtualID === k) { window.pecaAtualID = null; localStorage.removeItem('pecaAtualID'); } window.abrirPastaHistorico(); } };
+    window.forcarRadar = () => { if(window.modoTreinoLivre) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); document.getElementById('identificador-peca').innerText = "PEÇA: " + an.id.toUpperCase(); } };
+    window.abrirPergaminho = () => { const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📜 PERGAMINHO"; const content = document.getElementById('modal-content'); content.innerHTML = ""; Object.keys(pecas).forEach(k => { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>${k}</span> <i class="fas fa-plus"></i>`; b.onclick = () => { window.salvarEstado(); FolhaEngine.injetarTextoMultilinhas(pecas[k]); modal.style.display='none'; }; content.appendChild(b); }); modal.style.display = 'flex'; };
+    window.injetarTeses = () => { if(window.modoTreinoLivre) { alert("O Martelo só funciona em Exames Oficiais."); return; } window.salvarEstado(); const dna = BANCO_ESPELHOS[window.activeEx]; if(dna) FolhaEngine.injetarTextoMultilinhas(dna); };
+    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); const key = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`; if(ed && ed.innerText.trim()) await set(ref(db, `producao_v13/${key}`), { conteudo: ed.innerText, timestamp: Date.now() }); }
+    async function carregarRascunho() { const key = window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`; const snap = await get(ref(db, `producao_v13/${key}`)); if(snap.exists() && !window.pecaAtualID) { const ed = document.getElementById('editor-principal'); if(ed) ed.innerText = snap.val().conteudo; window.salvarEstado(); } }
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    window.limparFolha = () => { if(confirm("Limpar tela?")) document.getElementById('editor-principal').innerText = ""; };
-    window.desfazer = () => document.execCommand('undo');
-    async function salvarAutomatico() { /* rascunho temporário no DB */ }
-    async function carregarRascunho() { /* restaura rascunho se houver */ }
+    window.limparFolha = () => { if(confirm("Limpar tudo?")) { window.salvarEstado(); const ed = document.getElementById('editor-principal'); if(ed) ed.innerText = ""; window.pecaAtualID = null; localStorage.removeItem('pecaAtualID'); } };
+    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
 </script>
 </body>
 </html>

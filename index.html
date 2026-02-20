@@ -86,15 +86,16 @@
             cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
         }
         
-        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; }
+        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; align-items: center; }
         .btn-lib { 
             flex: 1; padding: 12px; border: none; background: transparent; 
             cursor: pointer; font-weight: 800; font-size: 0.7rem; 
             text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
         }
 
-        /* Estilo para quando o marca texto está ativo */
-        .btn-lib.active-highlight { background: #fef08a; color: #854d0e; }
+        .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; }
+        .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-dot.active { border-color: #000; transform: scale(1.1); }
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
@@ -159,7 +160,17 @@
             <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
-                <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()"><i class="fas fa-highlighter"></i> MARCAR</button>
+                
+                <div class="highlight-box">
+                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;">
+                        <i class="fas fa-highlighter"></i>
+                    </button>
+                    <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
+                    <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
+                    <div class="color-dot" id="dot-orange" style="background:#fed7aa;" onclick="window.setHighlightColor('#fed7aa', 'dot-orange')"></div>
+                    <div class="color-dot" id="dot-purple" style="background:#e9d5ff;" onclick="window.setHighlightColor('#e9d5ff', 'dot-purple')"></div>
+                </div>
+
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
@@ -237,10 +248,9 @@
                     }, 800);
                 });
                 
-                // Aplicar marcação se o botão estiver ativo
                 ed.addEventListener('mouseup', () => {
                     if(window.marcaTextoAtivo) {
-                        document.execCommand('backColor', false, '#fef08a');
+                        document.execCommand('backColor', false, window.currentColor || '#fef08a');
                     }
                 });
             }
@@ -262,17 +272,26 @@
         }
     }
 
-    // MARCA TEXTO
+    // MARCA TEXTO MULTICOLOR
     window.marcaTextoAtivo = false;
+    window.currentColor = '#fef08a';
+
+    window.setHighlightColor = (color, id) => {
+        window.currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(!window.marcaTextoAtivo) window.toggleMarcaTexto();
+    };
+
     window.toggleMarcaTexto = () => {
         window.marcaTextoAtivo = !window.marcaTextoAtivo;
         const btn = document.getElementById('btn-highlight');
         if(window.marcaTextoAtivo) {
-            btn.classList.add('active-highlight');
-            btn.style.boxShadow = "inset 0 0 10px rgba(0,0,0,0.1)";
+            btn.style.background = window.currentColor;
+            btn.style.color = "#000";
         } else {
-            btn.classList.remove('active-highlight');
-            btn.style.boxShadow = "none";
+            btn.style.background = "transparent";
+            btn.style.color = "#64748b";
         }
     };
 
@@ -281,7 +300,6 @@
         const editor = document.getElementById('editor-container');
         const pdf = document.getElementById('pdf-viewer');
         const sidebar = document.getElementById('sidebar-main');
-        
         editor.classList.toggle('collapsed');
         pdf.classList.toggle('full-view');
         sidebar.classList.toggle('hidden');
@@ -291,14 +309,12 @@
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
         const tit = document.getElementById('pdf-title');
-        
         let url = "";
         if (t === 'P') { url = `ro${window.activeEx}.pdf`; tit.innerText = "ENUNCIADO"; }
         else if (t === 'G') { url = `ro${window.activeEx}-gabarito.pdf`; tit.innerText = "GABARITO"; }
         else if (t === 'V') { url = `vade.pdf`; tit.innerText = "VADE MECUM"; }
         else if (t === 'LP') { url = `livro_processo.pdf`; tit.innerText = "LIVRO: PROCESSO"; }
         else if (t === 'LM') { url = `livro_material.pdf`; tit.innerText = "LIVRO: MATERIAL"; }
-
         f.src = url;
         v.classList.add('active');
     };

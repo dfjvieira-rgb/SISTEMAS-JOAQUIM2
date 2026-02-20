@@ -94,8 +94,9 @@
         }
 
         .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; height: 45px; }
-        .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .color-dot.active { border-color: #000; transform: scale(1.1); }
+        .color-dot.none { background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 10px; color: red; }
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
@@ -169,6 +170,9 @@
                     <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
                     <div class="color-dot" id="dot-orange" style="background:#fed7aa;" onclick="window.setHighlightColor('#fed7aa', 'dot-orange')"></div>
                     <div class="color-dot" id="dot-purple" style="background:#e9d5ff;" onclick="window.setHighlightColor('#e9d5ff', 'dot-purple')"></div>
+                    <div class="color-dot none" id="dot-none" title="Remover Cor" onclick="window.setHighlightColor('transparent', 'dot-none')">
+                        <i class="fas fa-slash"></i>
+                    </div>
                 </div>
 
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
@@ -240,7 +244,7 @@
                 ed.addEventListener('input', () => {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
-                        const html = ed.innerHTML; // Ajuste Cirúrgico: Salvar HTML
+                        const html = ed.innerHTML;
                         if(window.historicoUndo[window.historicoUndo.length -1] !== html) {
                             window.historicoUndo.push(html);
                             if(window.historicoUndo.length > 30) window.historicoUndo.shift();
@@ -248,9 +252,13 @@
                     }, 800);
                 });
                 
+                // EVENTO DE MOUSEUP REFINADO
                 ed.addEventListener('mouseup', () => {
                     if(window.marcaTextoAtivo) {
-                        document.execCommand('backColor', false, window.currentColor || '#fef08a');
+                        const selection = window.getSelection();
+                        if (selection.toString().length > 0) {
+                            document.execCommand('backColor', false, window.currentColor);
+                        }
                     }
                 });
             }
@@ -272,7 +280,7 @@
         }
     }
 
-    // MARCA TEXTO MULTICOLOR
+    // MARCA TEXTO MULTICOLOR - REFINADO
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
@@ -280,21 +288,38 @@
         window.currentColor = color;
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(!window.marcaTextoAtivo) window.toggleMarcaTexto();
-    };
-
-    window.toggleMarcaTexto = () => {
-        window.marcaTextoAtivo = !window.marcaTextoAtivo;
-        const btn = document.getElementById('btn-highlight');
-        if(window.marcaTextoAtivo) {
-            btn.style.background = window.currentColor;
-            btn.style.color = "#000";
-        } else {
-            btn.style.background = "transparent";
-            btn.style.color = "#64748b";
+        
+        // Se clicar em uma cor, ativa o modo marca-texto automaticamente
+        if(!window.marcaTextoAtivo) {
+            window.toggleMarcaTexto(true);
+        }
+        
+        // Se clicar em "Remover Cor" (transparent), aplica imediatamente se houver seleção
+        if(color === 'transparent') {
+            document.execCommand('removeFormat', false, null); // Limpa formatações
+            document.execCommand('backColor', false, 'transparent');
         }
     };
 
+    window.toggleMarcaTexto = (forcarAtivo = null) => {
+        // Se passar um estado específico (true/false), usa ele. Se não, inverte o atual.
+        window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
+        
+        const btn = document.getElementById('btn-highlight');
+        if(window.marcaTextoAtivo) {
+            btn.style.background = window.currentColor === 'transparent' ? '#eee' : window.currentColor;
+            btn.style.color = "#000";
+            btn.innerHTML = '<i class="fas fa-pen-nib"></i>'; // Muda ícone para indicar "Pintando"
+        } else {
+            btn.style.background = "transparent";
+            btn.style.color = "#64748b";
+            btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+            // Ao desativar, limpa qualquer seleção para evitar pintura acidental
+            window.getSelection().removeAllRanges();
+        }
+    };
+
+    // RESTANTE DAS FUNÇÕES MANTIDAS
     window.toggleRecolherEditor = () => {
         const editor = document.getElementById('editor-container');
         const pdf = document.getElementById('pdf-viewer');
@@ -330,7 +355,6 @@
         sidebar.classList.remove('hidden');
     };
 
-    // FUNÇÕES ORIGINAIS - AJUSTE PARA INNERHTML
     window.renomearTreino = () => { if(!window.modoTreinoLivre) return; const novoNome = prompt("Alterar nome da peça:", window.pecaAtualNome); if(novoNome && novoNome.trim() !== "") { window.pecaAtualNome = novoNome.trim(); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); atualizarDisplayModo(); } };
     window.ativarTreinoLivre = () => { const nome = prompt("Nome do novo treino:"); if(nome) { window.modoTreinoLivre = true; window.pecaAtualNome = nome; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload(); } };
     window.abrirExames = () => { window.modoTreinoLivre = false; window.pecaAtualID = null; localStorage.setItem('modoTreinoLivre', "false"); const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; const content = document.getElementById('modal-content'); content.innerHTML = ""; for(let i=44; i>=35; i--) { const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); }; content.appendChild(b); } modal.style.display = 'flex'; };
@@ -346,7 +370,7 @@
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { 
                 exame: window.modoTreinoLivre ? "TREINO" : window.activeEx, 
                 peca: `${nomeBase.split(' (')[0]} (${dataFormatada})`, 
-                conteudo: ed.innerHTML, // Ajuste Cirúrgico: Salvar HTML
+                conteudo: ed.innerHTML,
                 timestamp: Number(idParaSalvar) 
             }); 
             window.pecaAtualID = idParaSalvar; 
@@ -369,7 +393,7 @@
             window.modoTreinoLivre = (data.exame === "TREINO"); 
             localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre ? "true" : "false"); 
             if(!window.modoTreinoLivre) { window.activeEx = data.exame; localStorage.setItem('activeEx', data.exame); } 
-            document.getElementById('editor-principal').innerHTML = data.conteudo; // Ajuste Cirúrgico: Carregar HTML
+            document.getElementById('editor-principal').innerHTML = data.conteudo;
             document.getElementById('universal-modal').style.display='none'; 
             atualizarDisplayModo(); 
         } 

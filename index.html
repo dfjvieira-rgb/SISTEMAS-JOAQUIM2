@@ -116,7 +116,6 @@
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
         .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
-        .opt-btn i { font-size: 1.2rem; }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -166,7 +165,7 @@
                 <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
                 
                 <div class="highlight-box">
-                    <button class="btn-lib" id="btn-highlight" onclick="window.setHighlightColor(window.currentColor || '#fef08a')" style="border:none; flex:none; padding:12px 5px;">
+                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;">
                         <i class="fas fa-highlighter"></i>
                     </button>
                     <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
@@ -241,12 +240,18 @@
     window.historicoUndo = [];
     let debounceTimer = null;
 
+    // ESTADO DO MARCA TEXTO
+    window.marcaTextoAtivo = false;
+    window.currentColor = '#fef08a';
+
     window.onload = async () => {
         atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
+        
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
+                // LOGICA DE DESFAZER
                 ed.addEventListener('input', () => {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
@@ -257,40 +262,59 @@
                         }
                     }, 800);
                 });
+
+                // RESTABELECIMENTO DA LOGICA DE SELEÇÃO (MOUSEUP)
+                ed.addEventListener('mouseup', () => {
+                    if(window.marcaTextoAtivo) {
+                        const selection = window.getSelection();
+                        if (selection.toString().length > 0) {
+                            document.execCommand('backColor', false, window.currentColor);
+                        }
+                    }
+                });
             }
         }, 1000);
+
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
     };
 
-    function atualizarDisplayModo() {
-        const display = document.getElementById('ex-display');
-        const ident = document.getElementById('identificador-peca');
-        if(window.modoQuestoes) {
-            display.innerText = "TREINO: QUESTÕES";
-            ident.innerHTML = `QUESTÕES: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--questoes)"></i>`;
-            ident.onclick = window.renomearTreino; 
-            return;
+    // --- FUNÇÕES DO MARCA TEXTO (RESTABELECIDAS) ---
+    window.setHighlightColor = (color, id) => {
+        window.currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(!window.marcaTextoAtivo) {
+            window.toggleMarcaTexto(true);
         }
-        if(window.modoTreinoLivre) {
-            display.innerText = "TREINO: " + window.pecaAtualNome;
-            ident.innerHTML = `TREINO: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--mentoria)"></i>`;
-            ident.onclick = window.renomearTreino;
-        } else {
-            display.innerText = "EXAME " + window.activeEx;
-            ident.innerHTML = `EXAME ${window.activeEx} <i class="fas fa-lock" style="font-size:10px; margin-left:10px; opacity:0.3"></i>`;
-            ident.onclick = null;
+        if(color === 'transparent') {
+            document.execCommand('removeFormat', false, null);
+            document.execCommand('backColor', false, 'transparent');
         }
-    }
+    };
 
-    // GESTÃO CENTRALIZADA DA PASTA
+    window.toggleMarcaTexto = (forcarAtivo = null) => {
+        window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
+        const btn = document.getElementById('btn-highlight');
+        if(window.marcaTextoAtivo) {
+            btn.style.background = window.currentColor === 'transparent' ? '#eee' : window.currentColor;
+            btn.style.color = "#000";
+            btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
+        } else {
+            btn.style.background = "transparent";
+            btn.style.color = "#64748b";
+            btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+            window.getSelection().removeAllRanges();
+        }
+    };
+
+    // --- GERENCIADOR DE PASTA (LOGICA DE GAVETAS) ---
     window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
         const title = document.getElementById('modal-title');
         const backBtn = document.getElementById('modal-back-btn');
-        
         backBtn.style.display = "none";
         title.innerText = "📂 MINHA PASTA (GAVETAS)";
         content.innerHTML = `
@@ -323,7 +347,6 @@
         const content = document.getElementById('modal-content');
         const backBtn = document.getElementById('modal-back-btn');
         backBtn.style.display = "block";
-        
         let label = tipoGaveta === 'QUESTÕES' ? "QUESTÕES" : (tipoGaveta === 'TREINO' ? "TREINO PEÇAS" : `EXAME ${tipoGaveta}`);
         document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
         content.innerHTML = "<div style='padding:20px; text-align:center;'>Buscando arquivos...</div>";
@@ -335,12 +358,10 @@
                 const dados = snap.val();
                 const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
                 const filtrados = lista.filter(item => item.exame === tipoGaveta);
-
                 if(filtrados.length === 0) {
                     content.innerHTML = `<div style='padding:40px 20px; text-align:center; color:#64748b'>Vazia.</div>`;
                     return;
                 }
-
                 filtrados.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
@@ -356,6 +377,7 @@
         } catch (e) { content.innerHTML = "Erro ao carregar."; }
     };
 
+    // --- CORE LOGIC (MODOS E SALVAMENTO) ---
     window.carregarPecaPasta = async (k) => { 
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
@@ -364,31 +386,14 @@
             window.pecaAtualID = k; 
             window.pecaAtualNome = data.peca.split(' (')[0].replace("QUESTÕES: ", "").replace("TREINO: ", ""); 
             localStorage.setItem('pecaAtualID', k); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); 
-            
             window.modoQuestoes = (data.exame === "QUESTÕES");
             window.modoTreinoLivre = (data.exame === "TREINO"); 
             localStorage.setItem('modoQuestoes', window.modoQuestoes); localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre); 
             if(!window.modoTreinoLivre && !window.modoQuestoes) { window.activeEx = data.exame; localStorage.setItem('activeEx', data.exame); } 
-            
             document.getElementById('editor-principal').innerHTML = data.conteudo;
             document.getElementById('universal-modal').style.display='none'; 
             atualizarDisplayModo(); 
         } 
-    };
-
-    window.deletarPecaPasta = async (k, tipo) => { if(confirm("Excluir?")) { await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); window.abrirGavetaEspecifica(tipo); } };
-
-    // OUTROS CONTROLES
-    window.setHighlightColor = (color, id) => {
-        window.currentColor = color;
-        if(id) {
-            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-        const ed = document.getElementById('editor-principal');
-        if(ed) ed.focus();
-        if(color === 'transparent') document.execCommand('removeFormat', false, null);
-        else document.execCommand('hiliteColor', false, color);
     };
 
     window.finalizarPeca = async () => { 
@@ -403,6 +408,26 @@
             window.pecaAtualID = idParaSalvar; localStorage.setItem('pecaAtualID', idParaSalvar); 
             alert("Salvo com sucesso!"); 
         } 
+    };
+
+    window.atualizarDisplayModo = () => {
+        const display = document.getElementById('ex-display');
+        const ident = document.getElementById('identificador-peca');
+        if(window.modoQuestoes) {
+            display.innerText = "TREINO: QUESTÕES";
+            ident.innerHTML = `QUESTÕES: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--questoes)"></i>`;
+            ident.onclick = window.renomearTreino; 
+            return;
+        }
+        if(window.modoTreinoLivre) {
+            display.innerText = "TREINO: " + window.pecaAtualNome;
+            ident.innerHTML = `TREINO: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--mentoria)"></i>`;
+            ident.onclick = window.renomearTreino;
+        } else {
+            display.innerText = "EXAME " + window.activeEx;
+            ident.innerHTML = `EXAME ${window.activeEx} <i class="fas fa-lock" style="font-size:10px; margin-left:10px; opacity:0.3"></i>`;
+            ident.onclick = null;
+        }
     };
 
     window.ativarModoQuestoes = () => {
@@ -443,8 +468,10 @@
         modal.style.display = 'flex'; 
     };
 
+    window.renomearTreino = () => { if(!window.modoTreinoLivre && !window.modoQuestoes) return; const novoNome = prompt("Alterar nome:", window.pecaAtualNome); if(novoNome && novoNome.trim() !== "") { window.pecaAtualNome = novoNome.trim(); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); window.atualizarDisplayModo(); } };
     window.salvarEstado = () => { const ed = document.getElementById('editor-principal'); if(ed) { window.historicoUndo.push(ed.innerHTML); if(window.historicoUndo.length > 30) window.historicoUndo.shift(); } };
     window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) { const html = window.historicoUndo.pop(); if(html !== undefined) ed.innerHTML = html; } };
+    window.deletarPecaPasta = async (k, tipo) => { if(confirm("Excluir?")) { await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); window.abrirGavetaEspecifica(tipo); } };
     window.forcarRadar = () => { if(window.modoTreinoLivre || window.modoQuestoes) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); } };
     window.abrirPergaminho = () => { 
         const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "📜 ESTRUTURAS"; 
@@ -456,7 +483,6 @@
         }); 
         modal.style.display = 'flex'; 
     };
-
     window.injetarTeses = () => { if(window.modoTreinoLivre || window.modoQuestoes) return; window.salvarEstado(); const dna = BANCO_ESPELHOS[window.activeEx]; if(dna) FolhaEngine.injetarTextoMultilinhas(dna); };
     async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); let key = window.modoQuestoes ? "QUESTOES_RASCUNHO" : (window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`); if(ed && ed.innerHTML.trim()) await set(ref(db, `producao_v13/${key}`), { conteudo: ed.innerHTML, timestamp: Date.now() }); }
     async function carregarRascunho() { let key = window.modoQuestoes ? "QUESTOES_RASCUNHO" : (window.modoTreinoLivre ? "TREINO_LIVRE_RASCUNHO" : `${window.activeEx}_RASCUNHO_ATUAL`); const snap = await get(ref(db, `producao_v13/${key}`)); if(snap.exists() && !window.pecaAtualID) { const ed = document.getElementById('editor-principal'); if(ed) ed.innerHTML = snap.val().conteudo; } }

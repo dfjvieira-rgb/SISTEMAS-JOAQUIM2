@@ -251,7 +251,6 @@
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
-                // LOGICA DE DESFAZER
                 ed.addEventListener('input', () => {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
@@ -263,7 +262,6 @@
                     }, 800);
                 });
 
-                // RESTABELECIMENTO DA LOGICA DE SELEÇÃO (MOUSEUP)
                 ed.addEventListener('mouseup', () => {
                     if(window.marcaTextoAtivo) {
                         const selection = window.getSelection();
@@ -280,7 +278,7 @@
         setInterval(window.forcarRadar, 5000);
     };
 
-    // --- FUNÇÕES DO MARCA TEXTO (RESTABELECIDAS) ---
+    // --- FUNÇÕES DO MARCA TEXTO ---
     window.setHighlightColor = (color, id) => {
         window.currentColor = color;
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
@@ -309,7 +307,46 @@
         }
     };
 
-    // --- GERENCIADOR DE PASTA (LOGICA DE GAVETAS) ---
+    // --- MECANISMO DE MOVIMENTAÇÃO DE PASTAS ---
+    window.moverArquivoDePasta = async (idArquivo, nomeArquivo) => {
+        const novoDestino = prompt(
+            `Mover "${nomeArquivo}" para onde?\n\n` +
+            `Digite:\n` +
+            `1 - GAVETA DE QUESTÕES\n` +
+            `2 - GAVETA DE TREINO\n` +
+            `3 - EXAME OFICIAL (Digite o número, ex: 44)`
+        );
+
+        if (!novoDestino) return;
+
+        let novoValorExame;
+        if (novoDestino === "1") novoValorExame = "QUESTÕES";
+        else if (novoDestino === "2") novoValorExame = "TREINO";
+        else if (!isNaN(novoDestino)) novoValorExame = novoDestino;
+        else {
+            alert("Opção inválida.");
+            return;
+        }
+
+        try {
+            const dbRef = ref(db, `producao_v13/HISTORICO_OFICIAL/${idArquivo}`);
+            const snap = await get(dbRef);
+            
+            if (snap.exists()) {
+                const dados = snap.val();
+                await set(dbRef, {
+                    ...dados,
+                    exame: novoValorExame
+                });
+                alert(`Sucesso! Movido para: ${novoValorExame}`);
+                window.abrirGavetaEspecifica(dados.exame); // Atualiza gaveta atual
+            }
+        } catch (e) {
+            alert("Erro ao mover arquivo.");
+        }
+    };
+
+    // --- GERENCIADOR DE PASTA ---
     window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
@@ -365,12 +402,18 @@
                 filtrados.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
+                    // HTML Atualizado com botão de mover
                     div.innerHTML = `
                         <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1">
                             <strong style="color:#0f172a">${item.peca}</strong><br>
                             <small style="color:#64748b">${item.exame}</small>
                         </div>
-                        <i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>`;
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <i class="fas fa-exchange-alt" title="Mover de Pasta" style="color:var(--mentoria); cursor:pointer; padding:10px" 
+                               onclick="window.moverArquivoDePasta('${item.id}', '${item.peca}')"></i>
+                            <i class="fas fa-trash" style="color:#ef4444; cursor:pointer; padding:10px" 
+                               onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
+                        </div>`;
                     content.appendChild(div);
                 });
             } else { content.innerHTML = "Gaveta vazia."; }

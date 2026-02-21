@@ -240,7 +240,6 @@
     window.historicoUndo = [];
     let debounceTimer = null;
 
-    // ESTADO DO MARCA TEXTO
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
@@ -278,14 +277,11 @@
         setInterval(window.forcarRadar, 5000);
     };
 
-    // --- FUNÇÕES DO MARCA TEXTO ---
     window.setHighlightColor = (color, id) => {
         window.currentColor = color;
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(!window.marcaTextoAtivo) {
-            window.toggleMarcaTexto(true);
-        }
+        if(!window.marcaTextoAtivo) window.toggleMarcaTexto(true);
         if(color === 'transparent') {
             document.execCommand('removeFormat', false, null);
             document.execCommand('backColor', false, 'transparent');
@@ -297,17 +293,13 @@
         const btn = document.getElementById('btn-highlight');
         if(window.marcaTextoAtivo) {
             btn.style.background = window.currentColor === 'transparent' ? '#eee' : window.currentColor;
-            btn.style.color = "#000";
-            btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
+            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
         } else {
-            btn.style.background = "transparent";
-            btn.style.color = "#64748b";
-            btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
             window.getSelection().removeAllRanges();
         }
     };
 
-    // --- MECANISMO DE MOVIMENTAÇÃO DE PASTAS ---
     window.moverArquivoDePasta = async (idArquivo, nomeArquivo) => {
         const novoDestino = prompt(
             `Mover "${nomeArquivo}" para onde?\n\n` +
@@ -316,54 +308,34 @@
             `2 - GAVETA DE TREINO\n` +
             `3 - EXAME OFICIAL (Digite o número, ex: 44)`
         );
-
         if (!novoDestino) return;
-
         let novoValorExame;
         if (novoDestino === "1") novoValorExame = "QUESTÕES";
         else if (novoDestino === "2") novoValorExame = "TREINO";
         else if (!isNaN(novoDestino)) novoValorExame = novoDestino;
-        else {
-            alert("Opção inválida.");
-            return;
-        }
+        else { alert("Opção inválida."); return; }
 
         try {
             const dbRef = ref(db, `producao_v13/HISTORICO_OFICIAL/${idArquivo}`);
             const snap = await get(dbRef);
-            
             if (snap.exists()) {
                 const dados = snap.val();
-                await set(dbRef, {
-                    ...dados,
-                    exame: novoValorExame
-                });
+                await set(dbRef, { ...dados, exame: novoValorExame });
                 alert(`Sucesso! Movido para: ${novoValorExame}`);
-                window.abrirGavetaEspecifica(dados.exame); // Atualiza gaveta atual
+                window.abrirGavetaEspecifica(dados.exame);
             }
-        } catch (e) {
-            alert("Erro ao mover arquivo.");
-        }
+        } catch (e) { alert("Erro ao mover arquivo."); }
     };
 
-    // --- GERENCIADOR DE PASTA ---
     window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
-        const title = document.getElementById('modal-title');
-        const backBtn = document.getElementById('modal-back-btn');
-        backBtn.style.display = "none";
-        title.innerText = "📂 MINHA PASTA (GAVETAS)";
+        document.getElementById('modal-back-btn').style.display = "none";
+        document.getElementById('modal-title').innerText = "📂 MINHA PASTA (GAVETAS)";
         content.innerHTML = `
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('QUESTÕES')">
-                <span>GAVETA: QUESTÕES</span> <i class="fas fa-question-circle" style="color:var(--questoes)"></i>
-            </div>
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TREINO')">
-                <span>GAVETA: TREINO PEÇAS</span> <i class="fas fa-edit" style="color:#facc15"></i>
-            </div>
-            <div class="opt-btn" onclick="window.abrirListaExamesGaveta()">
-                <span>GAVETAS: EXAMES OFICIAIS</span> <i class="fas fa-archive" style="color:var(--gold)"></i>
-            </div>
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('QUESTÕES')"><span>GAVETA: QUESTÕES</span> <i class="fas fa-question-circle" style="color:var(--questoes)"></i></div>
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TREINO')"><span>GAVETA: TREINO PEÇAS</span> <i class="fas fa-edit" style="color:#facc15"></i></div>
+            <div class="opt-btn" onclick="window.abrirListaExamesGaveta()"><span>GAVETAS: EXAMES OFICIAIS</span> <i class="fas fa-archive" style="color:var(--gold)"></i></div>
         `;
         modal.style.display = 'flex';
     };
@@ -380,10 +352,10 @@
         } 
     };
 
+    // --- AJUSTE CIRÚRGICO: ORDEM NUMÉRICA ---
     window.abrirGavetaEspecifica = async (tipoGaveta) => {
         const content = document.getElementById('modal-content');
-        const backBtn = document.getElementById('modal-back-btn');
-        backBtn.style.display = "block";
+        document.getElementById('modal-back-btn').style.display = "block";
         let label = tipoGaveta === 'QUESTÕES' ? "QUESTÕES" : (tipoGaveta === 'TREINO' ? "TREINO PEÇAS" : `EXAME ${tipoGaveta}`);
         document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
         content.innerHTML = "<div style='padding:20px; text-align:center;'>Buscando arquivos...</div>";
@@ -395,14 +367,18 @@
                 const dados = snap.val();
                 const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
                 const filtrados = lista.filter(item => item.exame === tipoGaveta);
+                
                 if(filtrados.length === 0) {
                     content.innerHTML = `<div style='padding:40px 20px; text-align:center; color:#64748b'>Vazia.</div>`;
                     return;
                 }
-                filtrados.sort((a, b) => b.timestamp - a.timestamp).forEach(item => {
+
+                // ORDENAÇÃO NUMÉRICA (01, 02, 03...) pelo campo 'peca'
+                filtrados.sort((a, b) => a.peca.localeCompare(b.peca, undefined, {numeric: true, sensitivity: 'base'}));
+
+                filtrados.forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
-                    // HTML Atualizado com botão de mover
                     div.innerHTML = `
                         <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1">
                             <strong style="color:#0f172a">${item.peca}</strong><br>
@@ -420,22 +396,17 @@
         } catch (e) { content.innerHTML = "Erro ao carregar."; }
     };
 
-    // --- CORE LOGIC (MODOS E SALVAMENTO) ---
     window.carregarPecaPasta = async (k) => { 
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
-            const data = snap.val(); 
-            window.salvarEstado(); 
-            window.pecaAtualID = k; 
+            const data = snap.val(); window.salvarEstado(); window.pecaAtualID = k; 
             window.pecaAtualNome = data.peca.split(' (')[0].replace("QUESTÕES: ", "").replace("TREINO: ", ""); 
             localStorage.setItem('pecaAtualID', k); localStorage.setItem('pecaAtualNome', window.pecaAtualNome); 
-            window.modoQuestoes = (data.exame === "QUESTÕES");
-            window.modoTreinoLivre = (data.exame === "TREINO"); 
+            window.modoQuestoes = (data.exame === "QUESTÕES"); window.modoTreinoLivre = (data.exame === "TREINO"); 
             localStorage.setItem('modoQuestoes', window.modoQuestoes); localStorage.setItem('modoTreinoLivre', window.modoTreinoLivre); 
             if(!window.modoTreinoLivre && !window.modoQuestoes) { window.activeEx = data.exame; localStorage.setItem('activeEx', data.exame); } 
             document.getElementById('editor-principal').innerHTML = data.conteudo;
-            document.getElementById('universal-modal').style.display='none'; 
-            atualizarDisplayModo(); 
+            document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); 
         } 
     };
 
@@ -459,8 +430,7 @@
         if(window.modoQuestoes) {
             display.innerText = "TREINO: QUESTÕES";
             ident.innerHTML = `QUESTÕES: ${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; margin-left:10px; color:var(--questoes)"></i>`;
-            ident.onclick = window.renomearTreino; 
-            return;
+            ident.onclick = window.renomearTreino; return;
         }
         if(window.modoTreinoLivre) {
             display.innerText = "TREINO: " + window.pecaAtualNome;
@@ -478,8 +448,7 @@
         if(nome) {
             window.modoQuestoes = true; window.modoTreinoLivre = false; window.pecaAtualNome = nome; window.pecaAtualID = null;
             localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('modoTreinoLivre', "false");
-            localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID');
-            window.location.reload();
+            localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload();
         }
     };
 
@@ -488,8 +457,7 @@
         if(nome) { 
             window.modoTreinoLivre = true; window.modoQuestoes = false; window.pecaAtualNome = nome; window.pecaAtualID = null; 
             localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('modoQuestoes', "false");
-            localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); 
-            window.location.reload(); 
+            localStorage.setItem('pecaAtualNome', nome); localStorage.removeItem('pecaAtualID'); window.location.reload(); 
         } 
     };
 
@@ -501,10 +469,8 @@
         for(let i=44; i>=35; i--) { 
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; 
             b.onclick = () => { 
-                localStorage.setItem('activeEx', i); 
-                localStorage.setItem('modoTreinoLivre', "false"); 
-                localStorage.setItem('modoQuestoes', "false"); 
-                window.location.reload(); 
+                localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); 
+                localStorage.setItem('modoQuestoes', "false"); window.location.reload(); 
             }; 
             content.appendChild(b); 
         } 

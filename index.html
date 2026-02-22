@@ -1,310 +1,44 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JOAQUIM ELITE 2026 - MASTER</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #020617; --gold: #fbbf24; --gold-dark: #d97706;
-            --bg-paper: #cbd5e1; --paper-color: #ffffff; 
-            --mentoria: #a855f7; --sidebar-w: 260px; --perigo: #ef4444;
-            --glass: rgba(30, 41, 59, 0.7);
-            --questoes: #3b82f6; --teses: #f97316; --biblioteca: #475569;
-        }
-
-        body.dark-mode { --bg-paper: #0f172a; }
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+<script>
+    // ESTA É A FUNÇÃO QUE FAZ O RECUO
+    window.toggleSidebar = () => {
+        const sb = document.getElementById('sidebar-main');
+        const editor = document.getElementById('editor-container');
         
-        body { 
-            font-family: 'Inter', system-ui, sans-serif; 
-            background: var(--primary); 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            color: white;
-        }
-
-        header { 
-            background: var(--primary); 
-            height: 60px; 
-            padding: 0 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border-bottom: 2px solid var(--gold); 
-            z-index: 5000;
-        }
-
-        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: -1px; }
-        .logo span { color: var(--gold); }
-
-        main { display: flex; flex: 1; overflow: hidden; position: relative; }
+        sb.classList.toggle('collapsed');
         
-        .sidebar { 
-            width: var(--sidebar-w); 
-            background: #1e293b; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 8px; 
-            padding: 15px; 
-            border-right: 1px solid rgba(255,255,255,0.1); 
-            overflow-y: auto; 
-            transition: all 0.3s ease;
-        }
-
-        .btn-side { 
-            width: 100%; min-height: 45px; border: none; border-radius: 8px; 
-            display: flex; align-items: center; padding: 0 15px; color: white; 
-            font-weight: 700; cursor: pointer; gap: 12px; font-size: 0.8rem; 
-            text-transform: uppercase; transition: 0.3s; background: rgba(255,255,255,0.05);
-        }
-        .btn-side:hover { background: rgba(255,255,255,0.15); }
-        .btn-side i { width: 20px; font-size: 1rem; color: var(--gold); }
-
-        .editor-container { 
-            flex: 1; display: flex; flex-direction: column; 
-            background: var(--bg-paper); overflow-y: auto; align-items: center; padding: 20px 10px;
-            transition: all 0.4s ease;
-        }
-
-        .editor-container.collapsed { flex: 0.3; opacity: 0.5; }
-
-        .sticky-tools { 
-            position: sticky; top: -20px; z-index: 1000; background: white; 
-            width: 100%; max-width: 850px; border-radius: 0 0 12px 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); margin-bottom: 10px;
-        }
-
-        #identificador-peca { 
-            padding: 12px; background: #f8fafc; text-align: center; 
-            font-weight: 900; color: #0f172a; border-bottom: 3px solid var(--gold);
-            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px;
+        // Se estiver colapsado, vamos tirar as margens extras da folha para ganhar espaço
+        if(sb.classList.contains('collapsed')) {
+            editor.style.padding = "20px 5px"; // Margem mínima nas laterais
+        } else {
+            editor.style.padding = "20px 10px";
         }
         
-        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; align-items: center; }
-        .btn-lib { 
-            flex: 1; padding: 12px; border: none; background: transparent; 
-            cursor: pointer; font-weight: 800; font-size: 0.7rem; 
-            text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
-        }
-
-        .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; height: 45px; }
-        .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; }
-        .color-dot.active { border-color: #000; transform: scale(1.1); }
-        .color-dot.none { background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 10px; color: red; }
-
-        .paper { 
-            width: 100%; max-width: 850px; background: white; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; 
-            position: relative; padding: 40px;
-            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
-            background-size: 100% 2.4rem;
-        }
-
-        #editor-principal { 
-            width: 100%; height: 100%; outline: none; color: #334155; 
-            font-size: 18px; line-height: 2.4rem; 
-            font-family: 'Courier Prime', monospace;
-            min-height: 5000px;
-        }
-
-        #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); overflow: hidden; }
-        #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
-        #pdf-viewer.full-view { width: 100% !important; flex: 1; }
-
-        .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; align-items: center;}
-        iframe { width: 100%; flex: 1; border: none; background: white; }
-
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
-        #mobile-hub.active .fab-sub { display: flex; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
-        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
-
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            #mobile-hub { display: flex; }
-            #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
-        }
-    </style>
-</head>
-<body class="dark-mode">
-
-<header>
-    <div class="logo">JOAQUIM <span>ELITE</span></div>
-    <div style="color:var(--gold); font-size:10px; font-weight:bold;">MODO: <span id="ex-display">--</span></div>
-</header>
-
-<main>
-    <aside class="sidebar" id="sidebar-main">
-        <button class="btn-side" style="background:var(--gold); color:#000" onclick="window.abrirExames()"><i class="fas fa-list"></i> EXAMES OAB</button>
-        <button class="btn-side" style="background:#facc15; color:#000" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i> NOVO TREINO</button>
-        <button class="btn-side" style="background:var(--questoes); color:#fff" onclick="window.ativarModoQuestoes()"><i class="fas fa-question-circle"></i> QUESTÕES</button>
-        <button class="btn-side" style="background:var(--teses); color:#fff" onclick="window.ativarModoTeses()"><i class="fas fa-gavel"></i> TREINO TESES</button>
-        <button class="btn-side" style="background:var(--biblioteca); color:#fff" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i> PASTA DE PDFS</button>
-        <button class="btn-side" style="background:#334155;" onclick="window.gerenciadorPasta()"><i class="fas fa-folder-open"></i> MINHA PASTA</button>
-        <button class="btn-side" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i> FINALIZAR / SALVAR</button>
-        <hr style="opacity:0.1; margin:10px 0">
-        <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA IA</button>
-        <button class="btn-side" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
-    </aside>
-
-    <section class="editor-container" id="editor-container">
-        <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
-            <div class="toolbar-liberdade">
-                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
-                <div class="highlight-box">
-                    <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
-                    <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
-                    <div class="color-dot none" id="dot-none" title="Limpar" onclick="window.setHighlightColor('transparent', 'dot-none')"><i class="fas fa-slash"></i></div>
-                </div>
-                <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i></button>
-                <button class="btn-lib" id="btn-foco" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> FOCO</button>
-                <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
-            </div>
-        </div>
-        <div class="paper">
-            <div id="editor-principal" contenteditable="true" spellcheck="false"></div>
-        </div>
-    </section>
-
-    <section id="pdf-viewer">
-        <div class="pdf-controls">
-            <div><span id="pdf-title">DOCUMENTO</span></div>
-            <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer">X</button>
-        </div>
-        <iframe id="pdf-frame" src="about:blank"></iframe>
-    </section>
-
-    <div id="mobile-hub">
-        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket"></i></button>
-        <button class="fab-sub" style="background:var(--biblioteca);" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i></button>
-        <button class="fab-sub" style="background:#334155;" onclick="window.gerenciadorPasta()"><i class="fas fa-folder-open"></i></button>
-        <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-    </div>
-</main>
-
-<div class="modal" id="universal-modal">
-    <div class="modal-body">
-        <h2 id="modal-title" style="margin-bottom:20px; border-bottom:2px solid var(--gold)"></h2>
-        <div id="modal-content"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">FECHAR</button>
-    </div>
-</div>
-
-<script type="module">
-    import { db } from './firebase-config.js';
-    import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-
-    window.db = db;
-    window.currentColor = '#fef08a';
-
-    // BIBLIOTECA OFICIAL - CORTE CIRÚRGICO NOS PDFS
-    window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO", url: "Tabela de Identificação de Peças-1.pdf" },
-        { nome: "REVISÃO PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
-        { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
-    ];
-
-    window.onload = async () => {
-        const snap = await get(ref(db, `producao_v13/RASCUNHO`));
-        if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo;
-        setInterval(async () => {
-            const ed = document.getElementById('editor-principal');
-            if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML });
-        }, 30000);
+        localStorage.setItem('sidebarCollapsed', sb.classList.contains('collapsed'));
     };
-
-    // --- LIGAÇÃO DA PASTA DE TREINOS ---
-    window.gerenciadorPasta = async () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 MINHA PASTA (TREINOS)";
-        content.innerHTML = "Carregando...";
-        modal.style.display = 'flex';
-
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-        content.innerHTML = "";
-        if (snap.exists()) {
-            Object.keys(snap.val()).reverse().forEach(id => {
-                const item = snap.val()[id];
-                const d = document.createElement('div');
-                d.className = 'opt-btn';
-                d.innerHTML = `<span>${item.peca}</span> <i class="fas fa-chevron-right"></i>`;
-                d.onclick = () => {
-                    if(confirm("Carregar este treino?")) {
-                        document.getElementById('editor-principal').innerHTML = item.conteudo;
-                        modal.style.display = 'none';
-                    }
-                };
-                content.appendChild(d);
-            });
-        } else { content.innerHTML = "Nenhum treino salvo."; }
-    };
-
-    window.abrirBibliotecaPDF = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
-        content.innerHTML = "";
-        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
-            const btn = document.createElement('div');
-            btn.className = 'opt-btn';
-            btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:red"></i>`;
-            btn.onclick = () => { window.abrirPDF(pdf.url, pdf.nome); modal.style.display = 'none'; };
-            content.appendChild(btn);
-        });
-        modal.style.display = 'flex';
-    };
-
-    window.abrirPDF = (url, nome) => {
-        const v = document.getElementById('pdf-viewer');
-        const f = document.getElementById('pdf-frame');
-        document.getElementById('pdf-title').innerText = nome;
-        v.classList.add('active');
-        f.src = "about:blank";
-        setTimeout(() => { f.src = url; }, 100);
-    };
-
-    window.setHighlightColor = (color, id) => {
-        window.currentColor = color;
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    };
-
-    document.addEventListener('mouseup', () => {
-        const sel = window.getSelection();
-        if(sel.rangeCount > 0 && sel.toString().length > 0) {
-            document.execCommand('backColor', false, window.currentColor);
-        }
-    });
-
-    window.finalizarPeca = async () => {
-        const nome = prompt("Nome do treino:");
-        if(!nome) return;
-        const id = Date.now();
-        await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), {
-            peca: nome,
-            conteudo: document.getElementById('editor-principal').innerHTML
-        });
-        await remove(ref(db, `producao_v13/RASCUNHO`));
-        alert("Salvo na pasta!");
-    };
-
-    window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
-    window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
-    window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
 </script>
-</body>
-</html>
+
+<style>
+    /* Estilo para o menu quando está "recuado" */
+    .sidebar.collapsed { 
+        width: 60px; /* Largura mínima apenas para os ícones */
+        padding: 10px 5px;
+    }
+    
+    .sidebar.collapsed .btn-text { 
+        display: none; /* Esconde o texto dos botões */
+    }
+
+    .sidebar.collapsed .btn-side {
+        justify-content: center;
+        padding: 0;
+        height: 50px;
+    }
+
+    /* Garante que a folha use o máximo de espaço quando dividir tela */
+    .editor-container {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Mantém a folha centralizada no espaço que sobrar */
+    }
+</style>

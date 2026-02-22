@@ -82,14 +82,30 @@
             font-weight: 900; color: #0f172a; border-bottom: 3px solid var(--gold);
         }
         
-        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; }
+        /* TOOLBAR MARCA TEXTO AJUSTADA */
+        .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; align-items: center; }
         .btn-lib { 
             flex: 1; padding: 12px; border: none; background: transparent; 
             cursor: pointer; font-weight: 800; font-size: 0.7rem; color: #64748b; border-right: 1px solid #f1f5f9;
         }
 
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 2500px; padding: 40px; position: relative; }
-        #editor-principal { width: 100%; height: 100%; outline: none; color: #334155; font-size: 16px; line-height: 1.6; }
+        .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; height: 45px; }
+        .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .color-dot.active { border-color: #000; transform: scale(1.1); }
+
+        /* FOLHA ESTILO FGV COM LINHAS */
+        .paper { 
+            width: 100%; max-width: 850px; background: white; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 2500px; 
+            padding: 40px; position: relative; 
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px);
+            background-size: 100% 2.4rem; /* Alinhamento das linhas */
+        }
+        #editor-principal { 
+            width: 100%; height: 100%; outline: none; color: #334155; 
+            font-size: 18px; line-height: 2.4rem; /* Casando com as linhas */
+            font-family: 'Courier Prime', monospace;
+        }
 
         /* MODAL GAVETAS */
         .modal { 
@@ -153,6 +169,13 @@
             <div id="identificador-peca">SCANNER ELITE...</div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" onclick="window.desfazer()"><i class="fas fa-undo"></i></button>
+                
+                <div class="highlight-box">
+                    <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
+                    <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
+                    <div class="color-dot none" id="dot-none" title="Limpar" onclick="window.setHighlightColor('transparent', 'dot-none')" style="background:#fff; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:10px; color:red;"><i class="fas fa-slash"></i></div>
+                </div>
+
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i></button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-file-pdf"></i> PDF</button>
             </div>
@@ -178,23 +201,6 @@
     </div>
 </main>
 
-<div class="modal" id="universal-modal">
-    <div class="modal-body">
-        <div id="modal-back-btn" style="display:none; margin-bottom:15px; cursor:pointer; font-weight:bold; color:var(--gold)" onclick="window.gerenciadorPasta()">← VOLTAR ÀS GAVETAS</div>
-        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold); font-size: 1.1rem;"></h2>
-        <div id="modal-content"></div>
-        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; font-weight:bold; cursor:pointer; margin-top:10px">FECHAR</button>
-    </div>
-</div>
-
-<section id="pdf-viewer">
-    <div style="background:#1e293b; padding:15px; display:flex; justify-content:space-between; align-items:center;">
-        <span id="pdf-title" style="font-weight:bold; color:var(--gold)">DOCUMENTO</span>
-        <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 15px; border-radius:5px; font-weight:bold; cursor:pointer">X</button>
-    </div>
-    <iframe id="pdf-frame"></iframe>
-</section>
-
 <script type="module">
     import { db } from './firebase-config.js';
     import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -203,6 +209,27 @@
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.pecaAtualID = localStorage.getItem('pecaAtualID') || null;
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
+    
+    // VARIÁVEIS DO MARCA TEXTO
+    window.currentColor = '#fef08a';
+
+    window.setHighlightColor = (color, id) => {
+        window.currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    };
+
+    // LÓGICA DE APLICAÇÃO DO MARCA TEXTO
+    document.addEventListener('mouseup', () => {
+        if(window.currentColor !== 'transparent') {
+            const sel = window.getSelection();
+            if(sel.rangeCount > 0 && sel.toString().length > 0) {
+                document.execCommand('backColor', false, window.currentColor);
+            }
+        } else {
+            document.execCommand('removeFormat', false, null);
+        }
+    });
 
     // --- GESTÃO DE GAVETAS (PASTA) ---
     window.gerenciadorPasta = () => {
@@ -271,7 +298,7 @@
         }
     };
 
-    // --- REINTEGRAÇÃO DE FUNÇÕES ---
+    // FUNÇÕES DE EXAMES E SALVAMENTO (Inalteradas)
     window.abrirExames = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
@@ -292,11 +319,9 @@
         if(!ed.innerText.trim()) return alert("Folha vazia!");
         const nome = prompt("Nome do Salvamento:", window.pecaAtualNome);
         if(!nome) return;
-        
         const id = window.pecaAtualID || Date.now().toString();
         const tipo = localStorage.getItem('modo') || window.activeEx;
         const dataF = new Date().toLocaleString('pt-BR');
-
         await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), {
             exame: tipo,
             peca: `${nome} (${dataF})`,
@@ -326,6 +351,23 @@
 
     window.onload = () => window.atualizarDisplayModo();
 </script>
+
+<div class="modal" id="universal-modal">
+    <div class="modal-body">
+        <div id="modal-back-btn" style="display:none; margin-bottom:15px; cursor:pointer; font-weight:bold; color:var(--gold)" onclick="window.gerenciadorPasta()">← VOLTAR ÀS GAVETAS</div>
+        <h2 id="modal-title" style="margin-bottom:15px; border-bottom:2px solid var(--gold); font-size: 1.1rem;"></h2>
+        <div id="modal-content"></div>
+        <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; font-weight:bold; cursor:pointer; margin-top:10px">FECHAR</button>
+    </div>
+</div>
+
+<section id="pdf-viewer">
+    <div style="background:#1e293b; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+        <span id="pdf-title" style="font-weight:bold; color:var(--gold)">DOCUMENTO</span>
+        <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:5px 15px; border-radius:5px; font-weight:bold; cursor:pointer">X</button>
+    </div>
+    <iframe id="pdf-frame"></iframe>
+</section>
 
 </body>
 </html>

@@ -100,6 +100,7 @@
         .color-dot.none { background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 10px; color: red; }
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
+        #editor-principal { outline: none; padding: 60px; color: black; font-family: 'Courier New', monospace; font-size: 13pt; line-height: 1.6; min-height: 100%; }
 
         #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); overflow: hidden; }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
@@ -115,7 +116,7 @@
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
-        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; text-align: left;}
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
@@ -185,7 +186,7 @@
             </div>
         </div>
         <div class="paper">
-            <div id="folha-total"></div>
+            <div id="editor-principal" contenteditable="true"></div>
         </div>
     </section>
 
@@ -243,19 +244,17 @@
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
-    // BIBLIOTECA DE PDFS ATUALIZADA COM OS SEUS DOCUMENTOS
     window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
+        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
         { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
         { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
         { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
+        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
         { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
     ];
 
     window.onload = async () => {
         atualizarDisplayModo();
-        FolhaEngine.montar('folha-total');
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
@@ -280,6 +279,69 @@
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
         setInterval(window.forcarRadar, 5000);
+    };
+
+    // --- MARTELO: INJETAR TESES ---
+    window.injetarTeses = () => {
+        const modal = document.getElementById('universal-modal');
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-title').innerText = "🔨 MARTELO (INJETAR)";
+        document.getElementById('modal-back-btn').style.display = "none";
+        
+        const bancoTeses = [
+            { t: "ADICIONAL DE TRANSFERÊNCIA", c: "Art. 469, §3º, CLT: É devido o adicional de 25% em caso de transferência provisória por necessidade de serviço." },
+            { t: "ADICIONAL NOTURNO", c: "Art. 73, CLT: Adicional de 20% para trabalho urbano (22h às 5h). Hora reduzida de 52min 30s." },
+            { t: "EQUIPARAÇÃO SALARIAL", c: "Art. 461, CLT: Trabalho de igual valor, mesma perfeição técnica, mesma localidade, diferença de tempo não superior a 2 anos na função." },
+            { t: "RESCISÃO INDIRETA", c: "Art. 483, CLT: Falta grave do empregador (ex: não recolher FGTS). O empregado recebe todas as verbas como demissão sem justa causa." },
+            { t: "ESTABILIDADE GESTANTE", c: "Art. 10, II, 'b', ADCT: Proteção desde a confirmação da gravidez até 5 meses após o parto. Súmula 244 do TST." },
+            { t: "JUSTA CAUSA (ART. 482)", c: "Art. 482 da CLT: Hipóteses de falta grave (desídia, insubordinação, incontinência de conduta)." }
+        ];
+
+        content.innerHTML = "";
+        bancoTeses.forEach(tese => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-btn';
+            btn.innerHTML = `<div><strong>${tese.t}</strong><br><small style="font-weight:normal; font-size:10px">${tese.c}</small></div>`;
+            btn.onclick = () => {
+                const ed = document.getElementById('editor-principal');
+                ed.focus();
+                document.execCommand('insertHTML', false, `<p><strong>${tese.t}:</strong> ${tese.c}</p><br>`);
+                modal.style.display = 'none';
+            };
+            content.appendChild(btn);
+        });
+        modal.style.display = 'flex';
+    };
+
+    // --- PERGAMINHO: ESTRUTURAS ---
+    window.abrirPergaminho = () => {
+        const modal = document.getElementById('universal-modal');
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-title').innerText = "📜 PERGAMINHO (ESTRUTURAS)";
+        
+        const listaEstruturas = [
+            { n: "RECLAMAÇÃO TRABALHISTA", id: "RT" },
+            { n: "CONTESTAÇÃO", id: "CONTESTACAO" },
+            { n: "RECURSO ORDINÁRIO", id: "RO" },
+            { n: "CONSIGNAÇÃO EM PAGAMENTO", id: "CONSIGNAÇÃO" }
+        ];
+
+        content.innerHTML = "";
+        listaEstruturas.forEach(est => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-btn';
+            btn.innerHTML = `<span>${est.n}</span> <i class="fas fa-scroll"></i>`;
+            btn.onclick = () => {
+                if(pecas && pecas[est.id]) {
+                    document.getElementById('editor-principal').innerHTML = pecas[est.id];
+                    modal.style.display = 'none';
+                } else {
+                    alert("Estrutura não encontrada no arquivo 'estruturas.js'.");
+                }
+            };
+            content.appendChild(btn);
+        });
+        modal.style.display = 'flex';
     };
 
     window.abrirBibliotecaPDF = () => {
@@ -340,21 +402,14 @@
     window.abrirGavetaEspecifica = async (tipoGaveta) => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "block";
-        let label = tipoGaveta;
-        if(tipoGaveta === 'QUESTÕES') label = "QUESTÕES";
-        else if(tipoGaveta === 'TREINO') label = "TREINO PEÇAS";
-        else if(tipoGaveta === 'TESES') label = "TREINO TESES";
-        else label = `EXAME ${tipoGaveta}`;
-        document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
+        document.getElementById('modal-title').innerText = `📂 GAVETA: ${tipoGaveta}`;
         content.innerHTML = "Buscando...";
         try {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
             content.innerHTML = "";
             if (snap.exists()) {
                 const dados = snap.val();
-                const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
-                const filtrados = lista.filter(item => item.exame === tipoGaveta);
-                filtrados.sort((a, b) => a.peca.localeCompare(b.peca, undefined, {numeric: true, sensitivity: 'base'}));
+                const filtrados = Object.keys(dados).map(k => ({ id: k, ...dados[k] })).filter(item => item.exame === tipoGaveta);
                 filtrados.forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
@@ -369,10 +424,8 @@
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
             const data = snap.val(); window.pecaAtualID = k; 
-            window.pecaAtualNome = data.peca.split(' (')[0].replace("QUESTÕES: ", "").replace("TREINO: ", "").replace("TESES: ", ""); 
-            window.modoQuestoes = (data.exame === "QUESTÕES"); window.modoTreinoLivre = (data.exame === "TREINO"); window.modoTeses = (data.exame === "TESES");
             document.getElementById('editor-principal').innerHTML = data.conteudo;
-            document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); 
+            document.getElementById('universal-modal').style.display='none'; 
         } 
     };
 
@@ -380,12 +433,11 @@
         const ed = document.getElementById('editor-principal'); if(!ed) return; 
         let idParaSalvar = window.pecaAtualID || Date.now().toString(); 
         let tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
-        let prefixo = window.modoQuestoes ? "QUESTÕES: " : (window.modoTreinoLivre ? "TREINO: " : (window.modoTeses ? "TESES: " : `OAB ${window.activeEx} - PEÇA`));
-        let nomeBase = prefixo + window.pecaAtualNome;
+        let nomeBase = window.pecaAtualNome;
         if(confirm(`Salvar "${nomeBase}"?`)) { 
-            const agora = new Date(); const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
+            const agora = new Date(); const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR'); 
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { exame: tipo, peca: `${nomeBase} (${dataF})`, conteudo: ed.innerHTML }); 
-            alert("Salvo!"); 
+            alert("Salvo com sucesso!"); 
         } 
     };
 
@@ -398,9 +450,9 @@
         else { display.innerText = "EXAME " + window.activeEx; ident.innerHTML = `EXAME ${window.activeEx}`; }
     };
 
-    window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); } };
-    window.ativarModoTeses = () => { const n = prompt("Nome:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); } };
-    window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); } };
+    window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarModoTeses = () => { const n = prompt("Nome:"); if(n) { localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     
     window.abrirExames = () => { 
         const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 

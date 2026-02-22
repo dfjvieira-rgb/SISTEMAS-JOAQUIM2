@@ -150,7 +150,7 @@
         <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i> MENTORIA IA</button>
         <button class="btn-side" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
-        <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-hammer"></i> MARTELO</button>
+        <button class="btn-side" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i> MARTELO</button>
         <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i> LIVRO PROCESSO</button>
         <button class="btn-side" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i> LIVRO MATERIAL</button>
@@ -229,7 +229,6 @@
     import { RadarEngine } from './radar-engine.js';
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
-    import { TESES_OBJ } from './teses-data.js';
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
@@ -244,12 +243,13 @@
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
+    // BIBLIOTECA DE PDFS ATUALIZADA COM OS SEUS DOCUMENTOS
     window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
+        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
         { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
         { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
         { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
+        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
         { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
     ];
 
@@ -282,55 +282,47 @@
         setInterval(window.forcarRadar, 5000);
     };
 
-    // --- FUNÇÕES DE TESES E ESTRUTURAS (MARTELO E PERGAMINHO) ---
-    window.injetarTeses = () => {
+    window.abrirBibliotecaPDF = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "🔨 MARTELO: INJETOR DE TESES";
+        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
         document.getElementById('modal-back-btn').style.display = "none";
-        content.innerHTML = `<input type="text" id="search-teses" placeholder="Buscar tese..." style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #ddd;">`;
-        const listDiv = document.createElement('div');
-        content.appendChild(listDiv);
-
-        const renderTeses = (filtro = "") => {
-            listDiv.innerHTML = "";
-            Object.keys(TESES_OBJ).filter(t => t.toLowerCase().includes(filtro.toLowerCase())).forEach(t => {
-                const btn = document.createElement('div');
-                btn.className = 'opt-btn';
-                btn.innerHTML = `<span>${t}</span> <i class="fas fa-plus-circle" style="color:#22c55e"></i>`;
-                btn.onclick = () => {
-                    const ed = document.getElementById('editor-principal');
-                    ed.innerHTML += `<br><strong>${t}</strong><br>${TESES_OBJ[t]}<br>`;
-                    modal.style.display = 'none';
-                };
-                listDiv.appendChild(btn);
-            });
-        };
-        renderTeses();
-        content.querySelector('#search-teses').addEventListener('input', (e) => renderTeses(e.target.value));
-        modal.style.display = 'flex';
-    };
-
-    window.abrirPergaminho = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📜 PERGAMINHO: ESTRUTURAS";
         content.innerHTML = "";
-        Object.keys(pecas).forEach(p => {
+        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
             const btn = document.createElement('div');
             btn.className = 'opt-btn';
-            btn.innerHTML = `<span>${p}</span> <i class="fas fa-file-code" style="color:var(--mentoria)"></i>`;
-            btn.onclick = () => {
-                const ed = document.getElementById('editor-principal');
-                ed.innerHTML = pecas[p];
-                modal.style.display = 'none';
-            };
+            btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:#ef4444"></i>`;
+            btn.onclick = () => { window.abrirPDFDireto(pdf.url, pdf.nome); modal.style.display = 'none'; };
             content.appendChild(btn);
         });
         modal.style.display = 'flex';
     };
 
-    // --- LOGICA DE PASTAS E GAVETAS ---
+    window.abrirPDFDireto = (url, nome) => {
+        const v = document.getElementById('pdf-viewer');
+        const f = document.getElementById('pdf-frame');
+        const tit = document.getElementById('pdf-title');
+        f.src = url; tit.innerText = nome; v.classList.add('active'); window.toggleRecolherEditor();
+    };
+
+    window.setHighlightColor = (color, id) => {
+        window.currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(!window.marcaTextoAtivo) window.toggleMarcaTexto(true);
+    };
+
+    window.toggleMarcaTexto = (forcarAtivo = null) => {
+        window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
+        const btn = document.getElementById('btn-highlight');
+        if(window.marcaTextoAtivo) {
+            btn.style.background = window.currentColor;
+            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
+        } else {
+            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+        }
+    };
+
     window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
@@ -348,14 +340,21 @@
     window.abrirGavetaEspecifica = async (tipoGaveta) => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "block";
-        document.getElementById('modal-title').innerText = `📂 GAVETA: ${tipoGaveta}`;
+        let label = tipoGaveta;
+        if(tipoGaveta === 'QUESTÕES') label = "QUESTÕES";
+        else if(tipoGaveta === 'TREINO') label = "TREINO PEÇAS";
+        else if(tipoGaveta === 'TESES') label = "TREINO TESES";
+        else label = `EXAME ${tipoGaveta}`;
+        document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
         content.innerHTML = "Buscando...";
         try {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
             content.innerHTML = "";
             if (snap.exists()) {
                 const dados = snap.val();
-                const filtrados = Object.keys(dados).map(k => ({ id: k, ...dados[k] })).filter(item => item.exame === tipoGaveta);
+                const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
+                const filtrados = lista.filter(item => item.exame === tipoGaveta);
+                filtrados.sort((a, b) => a.peca.localeCompare(b.peca, undefined, {numeric: true, sensitivity: 'base'}));
                 filtrados.forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
@@ -366,27 +365,15 @@
         } catch (e) { content.innerHTML = "Erro."; }
     };
 
-    // --- UTILITÁRIOS E EDITOR ---
-    window.abrirBibliotecaPDF = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
-        content.innerHTML = "";
-        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
-            const btn = document.createElement('div');
-            btn.className = 'opt-btn';
-            btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:#ef4444"></i>`;
-            btn.onclick = () => { window.abrirPDFDireto(pdf.url, pdf.nome); modal.style.display = 'none'; };
-            content.appendChild(btn);
-        });
-        modal.style.display = 'flex';
-    };
-
-    window.abrirPDFDireto = (url, nome) => {
-        const v = document.getElementById('pdf-viewer');
-        const f = document.getElementById('pdf-frame');
-        const tit = document.getElementById('pdf-title');
-        f.src = url; tit.innerText = nome; v.classList.add('active'); window.toggleRecolherEditor();
+    window.carregarPecaPasta = async (k) => { 
+        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
+        if(snap.exists()){ 
+            const data = snap.val(); window.pecaAtualID = k; 
+            window.pecaAtualNome = data.peca.split(' (')[0].replace("QUESTÕES: ", "").replace("TREINO: ", "").replace("TESES: ", ""); 
+            window.modoQuestoes = (data.exame === "QUESTÕES"); window.modoTreinoLivre = (data.exame === "TREINO"); window.modoTeses = (data.exame === "TESES");
+            document.getElementById('editor-principal').innerHTML = data.conteudo;
+            document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); 
+        } 
     };
 
     window.finalizarPeca = async () => { 
@@ -409,24 +396,6 @@
         else if(window.modoTeses) { display.innerText = "TREINO: TESES"; ident.innerHTML = `TESES: ${window.pecaAtualNome}`; }
         else if(window.modoTreinoLivre) { display.innerText = "TREINO: " + window.pecaAtualNome; ident.innerHTML = `TREINO: ${window.pecaAtualNome}`; }
         else { display.innerText = "EXAME " + window.activeEx; ident.innerHTML = `EXAME ${window.activeEx}`; }
-    };
-
-    window.setHighlightColor = (color, id) => {
-        window.currentColor = color;
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        if(!window.marcaTextoAtivo) window.toggleMarcaTexto(true);
-    };
-
-    window.toggleMarcaTexto = (forcarAtivo = null) => {
-        window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
-        const btn = document.getElementById('btn-highlight');
-        if(window.marcaTextoAtivo) {
-            btn.style.background = window.currentColor;
-            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
-        } else {
-            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
-        }
     };
 
     window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); } };
@@ -458,16 +427,6 @@
         f.src = url; v.classList.add('active'); window.toggleRecolherEditor(); 
     };
     window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
-    window.carregarPecaPasta = async (k) => { 
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
-        if(snap.exists()){ 
-            const data = snap.val(); window.pecaAtualID = k; 
-            window.pecaAtualNome = data.peca.split(' (')[0].replace("QUESTÕES: ", "").replace("TREINO: ", "").replace("TESES: ", ""); 
-            window.modoQuestoes = (data.exame === "QUESTÕES"); window.modoTreinoLivre = (data.exame === "TREINO"); window.modoTeses = (data.exame === "TESES");
-            document.getElementById('editor-principal').innerHTML = data.conteudo;
-            document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); 
-        } 
-    };
 </script>
 </body>
 </html>

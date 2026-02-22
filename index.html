@@ -108,19 +108,42 @@
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; align-items: center;}
         iframe { width: 100%; flex: 1; border: none; }
 
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
-        #mobile-hub.active .fab-sub { display: flex; }
+        /* AJUSTE NO MOBILE HUB: Adicionado overflow e altura máxima para caber todos os botões */
+        #mobile-hub { 
+            display: none; 
+            position: fixed; 
+            bottom: 30px; 
+            right: 25px; 
+            z-index: 99999; 
+            flex-direction: column-reverse; 
+            gap: 10px; 
+            align-items: center;
+        }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
+        
+        /* Container para os sub-botões não cortarem na tela */
+        .fab-container {
+            display: none;
+            flex-direction: column-reverse;
+            gap: 10px;
+            margin-bottom: 10px;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        #mobile-hub.active .fab-container { display: flex; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
-        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+        .fab-sub { 
+            width: 50px; height: 50px; border-radius: 50%; border: none; color: white; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; flex-shrink: 0;
+        }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
+            .sticky-tools { top: 0; }
         }
 
         @media print {
@@ -204,12 +227,23 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        <button class="fab-sub" style="background:var(--biblioteca); color:white" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i></button>
-        <button class="fab-sub" style="background:var(--teses); color:white" onclick="window.ativarModoTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:var(--questoes); color:white" onclick="window.ativarModoQuestoes()"><i class="fas fa-question-circle"></i></button>
-        <button class="fab-sub" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        
+        <div class="fab-container">
+            <button class="fab-sub" style="background:#10b981;" onclick="window.finalizarPeca()"><i class="fas fa-save"></i></button>
+            
+            <button class="fab-sub" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i></button>
+            <button class="fab-sub" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i></button>
+            
+            <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
+            <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
+            <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+            
+            <button class="fab-sub" style="background:var(--biblioteca); color:white" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i></button>
+            <button class="fab-sub" style="background:var(--teses); color:white" onclick="window.ativarModoTeses()"><i class="fas fa-gavel"></i></button>
+            <button class="fab-sub" style="background:var(--questoes); color:white" onclick="window.ativarModoQuestoes()"><i class="fas fa-question-circle"></i></button>
+            <button class="fab-sub" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
+            <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        </div>
     </div>
 </main>
 
@@ -243,13 +277,13 @@
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
-    // BIBLIOTECA DE PDFS ATUALIZADA COM OS SEUS DOCUMENTOS
+    // BIBLIOTECA SINCRONIZADA
     window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
+        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
         { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
-        { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
+        { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
         { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
+        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
         { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
     ];
 
@@ -340,11 +374,7 @@
     window.abrirGavetaEspecifica = async (tipoGaveta) => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "block";
-        let label = tipoGaveta;
-        if(tipoGaveta === 'QUESTÕES') label = "QUESTÕES";
-        else if(tipoGaveta === 'TREINO') label = "TREINO PEÇAS";
-        else if(tipoGaveta === 'TESES') label = "TREINO TESES";
-        else label = `EXAME ${tipoGaveta}`;
+        let label = (tipoGaveta === 'QUESTÕES') ? "QUESTÕES" : (tipoGaveta === 'TREINO' ? "TREINO PEÇAS" : (tipoGaveta === 'TESES' ? "TREINO TESES" : `EXAME ${tipoGaveta}`));
         document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
         content.innerHTML = "Buscando...";
         try {
@@ -398,9 +428,9 @@
         else { display.innerText = "EXAME " + window.activeEx; ident.innerHTML = `EXAME ${window.activeEx}`; }
     };
 
-    window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); } };
-    window.ativarModoTeses = () => { const n = prompt("Nome:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); } };
-    window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); } };
+    window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarModoTeses = () => { const n = prompt("Nome:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     
     window.abrirExames = () => { 
         const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 
@@ -417,16 +447,19 @@
     window.forcarRadar = () => { if(window.modoTreinoLivre || window.modoQuestoes || window.modoTeses) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); } };
     async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
     async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
+    
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
+    
     window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
     window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
+    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
+    
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer'); const f = document.getElementById('pdf-frame');
         let url = t === 'P' ? `ro${window.activeEx}.pdf` : (t === 'G' ? `ro${window.activeEx}-gabarito.pdf` : (t === 'V' ? 'vade.pdf' : (t === 'LP' ? 'livro_processo.pdf' : 'livro_material.pdf')));
         f.src = url; v.classList.add('active'); window.toggleRecolherEditor(); 
     };
-    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
 </script>
 </body>
 </html>

@@ -45,7 +45,7 @@
         .toolbar-liberdade { display: flex; background: #fff; flex-wrap: wrap; align-items: center; }
         .btn-lib { flex: 1; padding: 12px; border: none; background: transparent; cursor: pointer; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9; }
 
-        /* VOLTANDO MARCA TEXTO ORIGINAL */
+        /* MARCA TEXTO */
         .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; height: 45px; }
         .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .color-dot.active { border-color: #000; transform: scale(1.1); }
@@ -60,16 +60,11 @@
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; align-items: center;}
         iframe { width: 100%; flex: 1; border: none; }
 
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
-        #mobile-hub.active .fab-sub { display: flex; }
-
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
         .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
 
-        @media (max-width: 768px) { .sidebar { display: none !important; } #mobile-hub { display: flex; } }
+        @media (max-width: 768px) { .sidebar { display: none !important; } }
     </style>
 </head>
 <body class="dark-mode">
@@ -145,8 +140,9 @@
 </div>
 
 <script type="module">
+    // Importações essenciais mantidas
     import { db } from './firebase-config.js';
-    import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { ref, get, set, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
 
     window.db = db;
@@ -154,32 +150,38 @@
     window.currentColor = '#fef08a';
     window.activeEx = localStorage.getItem('activeEx') || "44";
 
-    // GAVETA DE PDFS
+    // GAVETA DE PDFS OFICIALIZADA
     window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
+        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
         { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
         { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
         { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
+        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
         { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
     ];
 
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
+        
+        // Listener para o Marca-Texto no editor
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
                 ed.addEventListener('mouseup', () => {
                     if(window.marcaTextoAtivo) {
                         const selection = window.getSelection();
-                        if (selection.toString().length > 0) document.execCommand('backColor', false, window.currentColor);
+                        if (selection.toString().length > 0) {
+                            document.execCommand('backColor', false, window.currentColor);
+                        }
                     }
                 });
             }
         }, 1000);
+
         await carregarRascunho();
     };
 
+    // FUNÇÕES DE UI
     window.toggleSidebar = () => {
         const sb = document.getElementById('sidebar-main');
         sb.classList.toggle('collapsed');
@@ -204,6 +206,7 @@
         }
     };
 
+    // BIBLIOTECA
     window.abrirBibliotecaPDF = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
@@ -222,7 +225,9 @@
     window.abrirPDFDireto = (url, nome) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
-        f.src = url; document.getElementById('pdf-title').innerText = nome; v.classList.add('active');
+        f.src = url; 
+        document.getElementById('pdf-title').innerText = nome; 
+        v.classList.add('active');
     };
 
     window.toggleRecolherEditor = () => {
@@ -235,7 +240,13 @@
         document.getElementById('editor-container').classList.remove('collapsed');
     };
 
-    async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
+    // PERSISTÊNCIA (Rascunho)
+    async function carregarRascunho() { 
+        try {
+            const snap = await get(ref(db, `producao_v13/RASCUNHO`)); 
+            if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; 
+        } catch(e) { console.error("Erro ao carregar rascunho:", e); }
+    }
 </script>
 </body>
 </html>

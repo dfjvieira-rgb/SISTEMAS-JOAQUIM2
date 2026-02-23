@@ -108,19 +108,29 @@
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; align-items: center;}
         iframe { width: 100%; flex: 1; border: none; }
 
-        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; }
-        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; }
-        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
-        #mobile-hub.active .fab-sub { display: flex; }
+        /* AJUSTE NO MOBILE HUB PARA GARANTIR VISIBILIDADE */
+        #mobile-hub { 
+            display: none; position: fixed; bottom: 20px; right: 20px; z-index: 99999; 
+            flex-direction: column-reverse; gap: 10px; align-items: center;
+        }
+        .fab-main { width: 60px; height: 60px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.5rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; z-index: 2; }
+        .fab-sub { 
+            width: 48px; height: 48px; border-radius: 50%; border: none; color: white; 
+            display: none; align-items: center; justify-content: center; font-size: 1rem; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; z-index: 1;
+        }
+        #mobile-hub.active .fab-sub { display: flex; animation: fadeUp 0.3s ease forwards; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
-        .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         @media (max-width: 768px) {
             .sidebar { display: none; }
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
+            .sticky-tools { width: 95%; }
         }
 
         @media print {
@@ -204,12 +214,13 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        <button class="fab-sub" style="background:var(--biblioteca); color:white" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i></button>
-        <button class="fab-sub" style="background:var(--teses); color:white" onclick="window.ativarModoTeses()"><i class="fas fa-gavel"></i></button>
-        <button class="fab-sub" style="background:var(--questoes); color:white" onclick="window.ativarModoQuestoes()"><i class="fas fa-question-circle"></i></button>
-        <button class="fab-sub" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+        <button class="fab-sub" title="Minha Pasta" style="background:#334155;" onclick="window.gerenciadorPasta()"><i class="fas fa-folder-open"></i></button>
+        <button class="fab-sub" title="PDFs Mentoria" style="background:var(--biblioteca); color:white" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i></button>
+        <button class="fab-sub" title="Treino Teses" style="background:var(--teses); color:white" onclick="window.ativarModoTeses()"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" title="Questões" style="background:var(--questoes); color:white" onclick="window.ativarModoQuestoes()"><i class="fas fa-question-circle"></i></button>
+        <button class="fab-sub" title="Novo Treino" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
+        <button class="fab-sub" title="Mentoria IA" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-sub" title="Exames OAB" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
     </div>
 </main>
 
@@ -243,13 +254,12 @@
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
-    // BIBLIOTECA DE PDFS ATUALIZADA COM OS SEUS DOCUMENTOS
     window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
+        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
         { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
         { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
         { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
+        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
         { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
     ];
 
@@ -340,11 +350,7 @@
     window.abrirGavetaEspecifica = async (tipoGaveta) => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "block";
-        let label = tipoGaveta;
-        if(tipoGaveta === 'QUESTÕES') label = "QUESTÕES";
-        else if(tipoGaveta === 'TREINO') label = "TREINO PEÇAS";
-        else if(tipoGaveta === 'TESES') label = "TREINO TESES";
-        else label = `EXAME ${tipoGaveta}`;
+        let label = (tipoGaveta === 'QUESTÕES') ? "QUESTÕES" : (tipoGaveta === 'TREINO' ? "TREINO PEÇAS" : (tipoGaveta === 'TESES' ? "TREINO TESES" : `EXAME ${tipoGaveta}`));
         document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
         content.innerHTML = "Buscando...";
         try {
@@ -361,6 +367,7 @@
                     div.innerHTML = `<div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1"><strong style="color:#0f172a">${item.peca}</strong></div><i class="fas fa-trash" style="color:#ef4444; padding:10px" onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>`;
                     content.appendChild(div);
                 });
+                if(filtrados.length === 0) content.innerHTML = "Vazia.";
             } else { content.innerHTML = "Vazia."; }
         } catch (e) { content.innerHTML = "Erro."; }
     };
@@ -398,16 +405,16 @@
         else { display.innerText = "EXAME " + window.activeEx; ident.innerHTML = `EXAME ${window.activeEx}`; }
     };
 
-    window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); } };
-    window.ativarModoTeses = () => { const n = prompt("Nome:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); } };
-    window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; window.location.reload(); localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); } };
+    window.ativarModoQuestoes = () => { const n = prompt("Nome da Questão:"); if(n) { localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('modoTeses', "false"); localStorage.setItem('modoTreinoLivre', "false"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarModoTeses = () => { const n = prompt("Nome da Tese:"); if(n) { localStorage.setItem('modoTeses', "true"); localStorage.setItem('modoQuestoes', "false"); localStorage.setItem('modoTreinoLivre', "false"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarTreinoLivre = () => { const n = prompt("Nome do Treino:"); if(n) { localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('modoQuestoes', "false"); localStorage.setItem('modoTeses', "false"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     
     window.abrirExames = () => { 
         const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 
         const content = document.getElementById('modal-content'); content.innerHTML = ""; 
         for(let i=44; i>=35; i--) { 
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; 
-            b.onclick = () => { localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); window.location.reload(); }; 
+            b.onclick = () => { localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); localStorage.setItem('modoQuestoes', "false"); localStorage.setItem('modoTeses', "false"); window.location.reload(); }; 
             content.appendChild(b); 
         } 
         modal.style.display = 'flex'; 

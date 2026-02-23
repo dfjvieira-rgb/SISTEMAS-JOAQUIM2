@@ -56,6 +56,8 @@
             transition: all 0.3s ease;
         }
 
+        .sidebar.hidden { width: 0; padding: 0; margin: 0; overflow: hidden; border: none; opacity: 0; }
+
         .btn-side { 
             width: 100%; min-height: 45px; border: none; border-radius: 8px; 
             display: flex; align-items: center; padding: 0 15px; color: white; 
@@ -120,6 +122,13 @@
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
         }
+
+        @media print {
+            body, main, .editor-container { overflow: visible !important; height: auto !important; display: block !important; background: white !important; }
+            .sidebar, header, .sticky-tools, #mobile-hub, #pdf-viewer, .modal { display: none !important; }
+            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; }
+            .editor-container { padding: 0 !important; }
+        }
     </style>
 </head>
 <body class="dark-mode">
@@ -143,8 +152,12 @@
         <button class="btn-side" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i> PERGAMINHO</button>
         <button class="btn-side" style="background:#3b82f6;" onclick="window.abrirMartelo()"><i class="fas fa-hammer"></i> MARTELO</button>
         <hr style="opacity:0.1; margin:10px 0">
+        <button class="btn-side" style="background:#8b5cf6;" onclick="window.verPDF('LP')"><i class="fas fa-book"></i> LIVRO PROCESSO</button>
+        <button class="btn-side" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i> LIVRO MATERIAL</button>
+        <hr style="opacity:0.1; margin:10px 0">
         <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
         <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')">GABARITO</button>
+        <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
     </aside>
 
     <section class="editor-container" id="editor-container">
@@ -152,13 +165,22 @@
             <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
+                
                 <div class="highlight-box">
-                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;"><i class="fas fa-highlighter"></i></button>
+                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;">
+                        <i class="fas fa-highlighter"></i>
+                    </button>
                     <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
                     <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
-                    <div class="color-dot none" id="dot-none" title="Remover" onclick="window.setHighlightColor('transparent', 'dot-none')"><i class="fas fa-slash"></i></div>
+                    <div class="color-dot" id="dot-orange" style="background:#fed7aa;" onclick="window.setHighlightColor('#fed7aa', 'dot-orange')"></div>
+                    <div class="color-dot" id="dot-purple" style="background:#e9d5ff;" onclick="window.setHighlightColor('#e9d5ff', 'dot-purple')"></div>
+                    <div class="color-dot none" id="dot-none" title="Remover Cor" onclick="window.setHighlightColor('transparent', 'dot-none')">
+                        <i class="fas fa-slash"></i>
+                    </div>
                 </div>
+
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
+                <button class="btn-lib" id="btn-foco" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
             </div>
         </div>
@@ -169,15 +191,31 @@
 
     <section id="pdf-viewer">
         <div class="pdf-controls">
-            <span id="pdf-title">DOCUMENTO</span>
+            <div>
+                <button onclick="window.toggleRecolherEditor()" style="background:none; border:1px solid var(--gold); color:var(--gold); padding:4px 8px; border-radius:4px; font-size:10px; cursor:pointer; margin-right:10px;">
+                    <i class="fas fa-arrows-alt-h"></i> VOLTAR EDITOR
+                </button>
+                <span id="pdf-title">DOCUMENTO</span>
+            </div>
             <button onclick="window.fecharPDF()" style="background:var(--gold); border:none; padding:4px 10px; border-radius:4px; font-weight:bold; cursor:pointer">X</button>
         </div>
         <iframe id="pdf-frame"></iframe>
     </section>
+
+    <div id="mobile-hub">
+        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
+        <button class="fab-sub" style="background:var(--biblioteca); color:white" onclick="window.abrirBibliotecaPDF()"><i class="fas fa-folder"></i></button>
+        <button class="fab-sub" style="background:var(--teses); color:white" onclick="window.ativarModoTeses()"><i class="fas fa-gavel"></i></button>
+        <button class="fab-sub" style="background:var(--questoes); color:white" onclick="window.ativarModoQuestoes()"><i class="fas fa-question-circle"></i></button>
+        <button class="fab-sub" style="background:#facc15; color:black" onclick="window.ativarTreinoLivre()"><i class="fas fa-edit"></i></button>
+        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
+        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
+    </div>
 </main>
 
 <div class="modal" id="universal-modal">
     <div class="modal-body">
+        <div id="modal-back-btn" style="display:none; margin-bottom:10px; cursor:pointer; font-weight:bold; color:var(--gold)" onclick="window.gerenciadorPasta()">← VOLTAR</div>
         <h2 id="modal-title" style="margin-bottom:20px; border-bottom:2px solid var(--gold)"></h2>
         <div id="modal-content"></div>
         <button onclick="document.getElementById('universal-modal').style.display='none'" style="width:100%; padding:15px; background:#000; color:#fff; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">FECHAR</button>
@@ -186,47 +224,72 @@
 
 <script type="module">
     import { db } from './firebase-config.js';
-    import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
     import { RadarEngine } from './radar-engine.js';
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
     import { pecas } from './estruturas.js';
 
-    // Inicialização do Estado
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
+    window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
+    window.modoQuestoes = localStorage.getItem('modoQuestoes') === "true";
+    window.modoTeses = localStorage.getItem('modoTeses') === "true";
+    window.pecaAtualID = localStorage.getItem('pecaAtualID') || null; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
+
     window.historicoUndo = [];
+    let debounceTimer = null;
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
+    window.LISTA_PDF_BIBLIOTECA = [
+        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "Tabela de Identificação de Peças-1.pdf" },
+        { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
+        { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
+        { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
+        { nome: "REVISÃO DE PEÇAS - RALIN", url: "REVISÃO DE PEÇAS - RALIN 27.08.2023.pdf" },
+        { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
+    ];
+
     window.onload = async () => {
+        atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
-        window.atualizarDisplayModo();
         
-        // Ativação do Editor Principal após montagem
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
+                ed.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const html = ed.innerHTML;
+                        if(window.historicoUndo[window.historicoUndo.length -1] !== html) {
+                            window.historicoUndo.push(html);
+                            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
+                        }
+                    }, 800);
+                });
                 ed.addEventListener('mouseup', () => {
-                    if(window.marcaTextoAtivo && window.getSelection().toString().length > 0) {
-                        document.execCommand('backColor', false, window.currentColor);
+                    if(window.marcaTextoAtivo) {
+                        const selection = window.getSelection();
+                        if (selection.toString().length > 0) document.execCommand('backColor', false, window.currentColor);
                     }
                 });
             }
         }, 1200);
-        
+
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
+        setInterval(window.forcarRadar, 5000);
     };
 
-    // --- FUNÇÕES DE INTERFACE (TUDO NO WINDOW PARA NÃO TRAVAR) ---
+    // --- FUNÇÕES DE INJEÇÃO (BLINDADAS) ---
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
         document.getElementById('modal-title').innerText = "📜 ESTRUTURAS";
         content.innerHTML = "";
-        if(typeof pecas !== 'undefined') {
+        if(pecas) {
             Object.keys(pecas).forEach(key => {
                 const btn = document.createElement('div');
                 btn.className = 'opt-btn';
@@ -239,7 +302,7 @@
     };
 
     window.abrirMartelo = () => {
-        alert("Acesse o Martelo pela Mentoria para carregar as teses atualizadas.");
+        alert("Acesse o Martelo via Mentoria para carregar as teses do exame analisado.");
     };
 
     window.injetarLimpo = (html) => {
@@ -253,68 +316,145 @@
         }
     };
 
+    // --- INTERFACE E PDF ---
+    window.abrirBibliotecaPDF = () => {
+        const modal = document.getElementById('universal-modal');
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
+        document.getElementById('modal-back-btn').style.display = "none";
+        content.innerHTML = "";
+        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-btn';
+            btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:#ef4444"></i>`;
+            btn.onclick = () => { window.abrirPDFDireto(pdf.url, pdf.nome); modal.style.display = 'none'; };
+            content.appendChild(btn);
+        });
+        modal.style.display = 'flex';
+    };
+
+    window.abrirPDFDireto = (url, nome) => {
+        const v = document.getElementById('pdf-viewer');
+        const f = document.getElementById('pdf-frame');
+        const tit = document.getElementById('pdf-title');
+        f.src = url; tit.innerText = nome; v.classList.add('active'); window.toggleRecolherEditor();
+    };
+
     window.setHighlightColor = (color, id) => {
         window.currentColor = color;
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        window.marcaTextoAtivo = true;
+        if(!window.marcaTextoAtivo) window.toggleMarcaTexto(true);
     };
 
-    window.toggleMarcaTexto = () => {
-        window.marcaTextoAtivo = !window.marcaTextoAtivo;
-        document.getElementById('btn-highlight').style.background = window.marcaTextoAtivo ? window.currentColor : 'transparent';
+    window.toggleMarcaTexto = (forcarAtivo = null) => {
+        window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
+        const btn = document.getElementById('btn-highlight');
+        if(window.marcaTextoAtivo) {
+            btn.style.background = window.currentColor;
+            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
+        } else {
+            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+        }
     };
 
-    window.abrirExames = () => {
+    window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "EXAMES OAB";
-        content.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`;
-            b.onclick = () => { localStorage.setItem('activeEx', i); window.location.reload(); };
-            content.appendChild(b);
-        }
+        document.getElementById('modal-back-btn').style.display = "none";
+        document.getElementById('modal-title').innerText = "📂 MINHA PASTA (GAVETAS)";
+        content.innerHTML = `
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('QUESTÕES')"><span>GAVETA: QUESTÕES</span> <i class="fas fa-question-circle" style="color:var(--questoes)"></i></div>
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TREINO')"><span>GAVETA: TREINO PEÇAS</span> <i class="fas fa-edit" style="color:#facc15"></i></div>
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TESES')"><span>GAVETA: TREINO TESES</span> <i class="fas fa-gavel" style="color:var(--teses)"></i></div>
+            <div class="opt-btn" onclick="window.abrirListaExamesGaveta()"><span>GAVETAS: EXAMES OFICIAIS</span> <i class="fas fa-archive" style="color:var(--gold)"></i></div>
+        `;
         modal.style.display = 'flex';
     };
 
+    window.abrirGavetaEspecifica = async (tipoGaveta) => {
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-back-btn').style.display = "block";
+        document.getElementById('modal-title').innerText = `📂 GAVETA: ${tipoGaveta}`;
+        content.innerHTML = "Buscando...";
+        try {
+            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
+            content.innerHTML = "";
+            if (snap.exists()) {
+                const dados = snap.val();
+                const lista = Object.keys(dados).map(k => ({ id: k, ...dados[k] }));
+                const filtrados = lista.filter(item => item.exame === tipoGaveta);
+                filtrados.forEach(item => {
+                    const div = document.createElement('div');
+                    div.style.cssText = "padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center; background:#fff; margin-bottom:5px; border-radius:8px";
+                    div.innerHTML = `<div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1"><strong style="color:#0f172a">${item.peca}</strong></div><i class="fas fa-trash" style="color:#ef4444; padding:10px" onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>`;
+                    content.appendChild(div);
+                });
+            } else { content.innerHTML = "Vazia."; }
+        } catch (e) { content.innerHTML = "Erro."; }
+    };
+
+    window.carregarPecaPasta = async (k) => { 
+        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
+        if(snap.exists()){ 
+            const data = snap.val(); window.pecaAtualID = k; 
+            window.pecaAtualNome = data.peca.split(' (')[0].replace(/QUESTÕES: |TREINO: |TESES: /g, ""); 
+            document.getElementById('editor-principal').innerHTML = data.conteudo;
+            document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); 
+        } 
+    };
+
+    window.finalizarPeca = async () => { 
+        const ed = document.getElementById('editor-principal'); if(!ed) return; 
+        let idParaSalvar = window.pecaAtualID || Date.now().toString(); 
+        let tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
+        let prefixo = window.modoQuestoes ? "QUESTÕES: " : (window.modoTreinoLivre ? "TREINO: " : (window.modoTeses ? "TESES: " : `OAB ${window.activeEx} - PEÇA`));
+        let nomeBase = prefixo + window.pecaAtualNome;
+        if(confirm(`Salvar "${nomeBase}"?`)) { 
+            const agora = new Date(); const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { exame: tipo, peca: `${nomeBase} (${dataF})`, conteudo: ed.innerHTML }); 
+            alert("Salvo!"); 
+        } 
+    };
+
     window.atualizarDisplayModo = () => {
-        document.getElementById('ex-display').innerText = "EXAME " + window.activeEx;
-        document.getElementById('identificador-peca').innerText = "EXAME " + window.activeEx;
+        const display = document.getElementById('ex-display');
+        const ident = document.getElementById('identificador-peca');
+        if(window.modoQuestoes) { display.innerText = "TREINO: QUESTÕES"; ident.innerHTML = `QUESTÕES: ${window.pecaAtualNome}`; }
+        else if(window.modoTeses) { display.innerText = "TREINO: TESES"; ident.innerHTML = `TESES: ${window.pecaAtualNome}`; }
+        else if(window.modoTreinoLivre) { display.innerText = "TREINO: " + window.pecaAtualNome; ident.innerHTML = `TREINO: ${window.pecaAtualNome}`; }
+        else { display.innerText = "EXAME " + window.activeEx; ident.innerHTML = `EXAME ${window.activeEx}`; }
     };
 
-    window.verPDF = (t) => {
-        const v = document.getElementById('pdf-viewer');
-        const f = document.getElementById('pdf-frame');
-        f.src = t === 'P' ? `ro${window.activeEx}.pdf` : `ro${window.activeEx}-gabarito.pdf`;
-        v.classList.add('active');
-    };
-
-    window.fecharPDF = () => document.getElementById('pdf-viewer').classList.remove('active');
-    window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
-    window.desfazer = () => document.execCommand('undo');
-
-    async function salvarAutomatico() { 
-        const ed = document.getElementById('editor-principal'); 
-        if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); 
-    }
+    window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarModoTeses = () => { const n = prompt("Nome:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     
-    async function carregarRascunho() { 
-        const snap = await get(ref(db, `producao_v13/RASCUNHO`)); 
-        if(snap.exists()) {
-            setTimeout(() => {
-                const ed = document.getElementById('editor-principal');
-                if(ed) ed.innerHTML = snap.val().conteudo;
-            }, 1500);
-        }
-    }
+    window.abrirExames = () => { 
+        const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 
+        const content = document.getElementById('modal-content'); content.innerHTML = ""; 
+        for(let i=44; i>=35; i--) { 
+            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; 
+            b.onclick = () => { localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); window.location.reload(); }; 
+            content.appendChild(b); 
+        } 
+        modal.style.display = 'flex'; 
+    };
 
-    // Funções extras para evitar erros de clique
-    window.ativarModoQuestoes = () => { window.location.reload(); };
-    window.ativarModoTeses = () => { window.location.reload(); };
-    window.ativarTreinoLivre = () => { window.location.reload(); };
-    window.gerenciadorPasta = () => { alert("Pasta em sincronização..."); };
+    window.desfazer = () => document.execCommand('undo');
+    window.forcarRadar = () => { if(window.modoTreinoLivre || window.modoQuestoes || window.modoTeses) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); } };
+    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
+    async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
+    window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
+    window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
+    window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
+    window.verPDF = (t) => {
+        const v = document.getElementById('pdf-viewer'); const f = document.getElementById('pdf-frame');
+        let url = t === 'P' ? `ro${window.activeEx}.pdf` : (t === 'G' ? `ro${window.activeEx}-gabarito.pdf` : (t === 'V' ? 'vade.pdf' : (t === 'LP' ? 'livro_processo.pdf' : 'livro_material.pdf')));
+        f.src = url; v.classList.add('active'); window.toggleRecolherEditor(); 
+    };
+    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
 </script>
 </body>
 </html>

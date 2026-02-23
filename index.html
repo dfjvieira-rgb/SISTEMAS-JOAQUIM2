@@ -43,7 +43,6 @@
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
         
-        /* Sidebar Desktop */
         .sidebar { 
             width: var(--sidebar-w); 
             background: #1e293b; 
@@ -64,7 +63,6 @@
         .btn-side:hover { background: rgba(255,255,255,0.15); }
         .btn-side i { width: 20px; font-size: 1rem; color: var(--gold); }
 
-        /* Container do Editor */
         .editor-container { 
             flex: 1; display: flex; flex-direction: column; 
             background: var(--bg-paper); overflow-y: auto; align-items: center; padding: 20px 10px;
@@ -88,41 +86,24 @@
             text-transform: uppercase; color: #64748b; border-right: 1px solid #f1f5f9;
         }
 
-        .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
+        /* AJUSTE NA FOLHA PARA EVITAR DIVS */
+        .paper { 
+            width: 100%; max-width: 850px; background: white; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; 
+            position: relative; 
+            white-space: pre-wrap; /* Mantém quebras de linha puras */
+        }
 
-        /* Viewer PDF */
         #pdf-viewer { width: 0; background: #334155; transition: 0.4s; display: flex; flex-direction: column; border-left: 0 solid var(--gold); }
         #pdf-viewer.active { width: 50%; border-left: 4px solid var(--gold); }
         .pdf-controls { background: #1e293b; padding: 12px; display: flex; justify-content: space-between; color: white; font-weight: 900; font-size: 12px; }
         iframe { width: 100%; flex: 1; border: none; }
 
-        /* --- MOBILE HUB (FOGUETE) --- */
-        #mobile-hub { 
-            display: none; 
-            position: fixed; 
-            bottom: 30px; 
-            right: 25px; 
-            z-index: 99999; 
-            flex-direction: column-reverse; 
-            gap: 12px; 
-            align-items: center;
-        }
-        .fab-main { 
-            width: 65px; height: 65px; border-radius: 50%; 
-            background: var(--gold); border: none; font-size: 1.8rem; 
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; 
-            display: flex; align-items: center; justify-content: center;
-        }
-        .fab-sub { 
-            width: 50px; height: 50px; border-radius: 50%; border: none; 
-            color: white; display: none; align-items: center; justify-content: center; 
-            font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; 
-        }
-        
-        /* Quando ativo, mostra todos os botões do hub */
+        #mobile-hub { display: none; position: fixed; bottom: 30px; right: 25px; z-index: 99999; flex-direction: column-reverse; gap: 12px; align-items: center; }
+        .fab-main { width: 65px; height: 65px; border-radius: 50%; background: var(--gold); border: none; font-size: 1.8rem; box-shadow: 0 8px 25px rgba(0,0,0,0.4); cursor: pointer; color: black; display: flex; align-items: center; justify-content: center; }
+        .fab-sub { width: 50px; height: 50px; border-radius: 50%; border: none; color: white; display: none; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
         #mobile-hub.active .fab-sub { display: flex; }
 
-        /* Modais */
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 110000; align-items: center; justify-content: center; }
         .modal-body { background: white; width: 95%; max-width: 500px; padding: 25px; border-radius: 20px; color: #0f172a; max-height: 85vh; overflow-y: auto; }
         .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; }
@@ -188,10 +169,9 @@
 
     <div id="mobile-hub">
         <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket" id="rocket-icon"></i></button>
-        
-        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')" title="Vade Mecum">V</button>
-        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')" title="Gabarito">G</button>
-        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')" title="Enunciado">P</button>
+        <button class="fab-sub" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">V</button>
+        <button class="fab-sub" style="background:#eab308;" onclick="window.verPDF('G')">G</button>
+        <button class="fab-sub" style="background:#f97316;" onclick="window.verPDF('P')">P</button>
         <button class="fab-sub" style="background:#3b82f6;" onclick="window.injetarTeses()"><i class="fas fa-gavel"></i></button>
         <button class="fab-sub" style="background:#475569;" onclick="window.abrirPergaminho()"><i class="fas fa-scroll"></i></button>
         <button class="fab-sub" style="background:#334155;" onclick="window.abrirPastaHistorico()"><i class="fas fa-folder"></i></button>
@@ -227,6 +207,13 @@
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
+                // CORREÇÃO: Impedir injeção de tags HTML ao colar
+                ed.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const text = e.clipboardData.getData('text/plain');
+                    document.execCommand('insertText', false, text);
+                });
+
                 ed.addEventListener('keydown', (e) => {
                     if (e.key === 'Tab') {
                         e.preventDefault();
@@ -249,7 +236,6 @@
         setInterval(window.forcarRadar, 5000);
     };
 
-    // FUNÇÕES DE HISTÓRICO
     window.abrirPastaHistorico = async () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "📂 MINHAS PEÇAS";
@@ -279,6 +265,7 @@
     window.carregarPecaPasta = async (k) => {
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`));
         if(snap.exists()){
+            // CORREÇÃO: Usar innerText para limpar tags ao carregar
             document.getElementById('editor-principal').innerText = snap.val().conteudo;
             document.getElementById('universal-modal').style.display='none';
         }
@@ -291,7 +278,6 @@
         }
     };
 
-    // INTELIGÊNCIAS: PERGAMINHO E MARTELO
     window.abrirPergaminho = () => {
         const modal = document.getElementById('universal-modal');
         document.getElementById('modal-title').innerText = "📜 PERGAMINHO";
@@ -318,7 +304,6 @@
         } else { alert("Sem espelho para este exame."); }
     };
 
-    // VISUALIZAÇÃO DE PDF
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
@@ -335,7 +320,6 @@
         document.getElementById('pdf-frame').src = "";
     };
 
-    // ENGINE DE RADAR
     window.forcarRadar = () => {
         const dna = BANCO_ESPELHOS[window.activeEx];
         const ed = document.getElementById('editor-principal');
@@ -346,7 +330,6 @@
         }
     };
 
-    // SALVAMENTO E FINALIZAÇÃO
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
         const iden = document.getElementById('identificador-peca').innerText;
@@ -375,10 +358,10 @@
 
     async function carregarRascunho() {
         const snap = await get(ref(db, `producao_v13/${window.activeEx}_RASCUNHO_ATUAL`));
+        // CORREÇÃO: Usar innerText para garantir que o rascunho venha limpo
         if(snap.exists()) document.getElementById('editor-principal').innerText = snap.val().conteudo;
     }
 
-    // CONTROLES DE INTERFACE
     window.toggleFoguete = () => {
         const h = document.getElementById('mobile-hub');
         h.classList.toggle('active');

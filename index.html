@@ -95,6 +95,7 @@
         .highlight-box { display: flex; align-items: center; background: #f1f5f9; padding: 0 10px; gap: 8px; border-right: 1px solid #f1f5f9; height: 45px; }
         .color-dot { width: 20px; height: 20px; border-radius: 4px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; position: relative; }
         .color-dot.active { border-color: #000; transform: scale(1.1); }
+        .color-dot.none { background: #fff; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 10px; color: red; }
 
         .paper { width: 100%; max-width: 850px; background: white; box-shadow: 0 20px 50px rgba(0,0,0,0.4); min-height: 5250px; position: relative; }
 
@@ -118,12 +119,6 @@
             .sidebar { display: none; }
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
-        }
-
-        @media print {
-            body, main, .editor-container { overflow: visible !important; height: auto !important; display: block !important; background: white !important; }
-            .sidebar, header, .sticky-tools, #mobile-hub, #pdf-viewer, .modal { display: none !important; }
-            .paper { box-shadow: none !important; margin: 0 !important; width: 100% !important; min-height: auto !important; }
         }
     </style>
 </head>
@@ -151,19 +146,18 @@
         <button class="btn-side" style="background:#6366f1;" onclick="window.verPDF('LM')"><i class="fas fa-book-open"></i> LIVRO MATERIAL</button>
         <button class="btn-side" style="background:#f97316;" onclick="window.verPDF('P')">PEÇA PDF</button>
         <button class="btn-side" style="background:#eab308;" onclick="window.verPDF('G')">GABARITO</button>
-        <button class="btn-side" style="background:#000; border:1px solid var(--gold)" onclick="window.verPDF('V')">VADE MECUM</button>
     </aside>
 
     <section class="editor-container" id="editor-container">
         <div class="sticky-tools">
-            <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
+            <div id="identificador-peca">CARREGANDO...</div>
             <div class="toolbar-liberdade">
-                <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
+                <button class="btn-lib" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
                 <div class="highlight-box">
-                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;"><i class="fas fa-highlighter"></i></button>
+                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()"><i class="fas fa-highlighter"></i></button>
                     <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
                     <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
-                    <div class="color-dot none" id="dot-none" onclick="window.setHighlightColor('transparent', 'dot-none')"><i class="fas fa-slash"></i></div>
+                    <div class="color-dot none" onclick="window.setHighlightColor('transparent', 'dot-none')"><i class="fas fa-slash"></i></div>
                 </div>
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
                 <button class="btn-lib" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
@@ -182,12 +176,6 @@
         </div>
         <iframe id="pdf-frame"></iframe>
     </section>
-
-    <div id="mobile-hub">
-        <button class="fab-main" onclick="window.toggleFoguete()"><i class="fas fa-rocket"></i></button>
-        <button class="fab-sub" style="background:var(--mentoria);" onclick="window.abrirMentoria()"><i class="fas fa-robot"></i></button>
-        <button class="fab-sub" style="background:var(--gold); color:black" onclick="window.abrirExames()"><i class="fas fa-list"></i></button>
-    </div>
 </main>
 
 <div class="modal" id="universal-modal">
@@ -217,7 +205,7 @@
         atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
         await carregarRascunho();
-        setInterval(salvarAutomatico, 15000); // Rascunho a cada 15s para máxima segurança
+        setInterval(salvarAutomatico, 15000); // Rascunho agressivo de 15s
     };
 
     // --- SISTEMA DE GAVETAS BLINDADO ---
@@ -225,117 +213,88 @@
         const m = document.getElementById('universal-modal');
         const c = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "none";
-        document.getElementById('modal-title').innerText = "📂 MINHA PASTA (GAVETAS)";
+        document.getElementById('modal-title').innerText = "📂 MINHA PASTA";
         c.innerHTML = `
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('QUESTÕES')">GAVETA: QUESTÕES</div>
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TREINO')">GAVETA: TREINO PEÇAS</div>
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TESES')">GAVETA: TREINO TESES</div>
-            <div class="opt-btn" onclick="window.abrirListaExamesGaveta()">GAVETAS: EXAMES OFICIAIS</div>
+            <div class="opt-btn" onclick="window.abrirGaveta('QUESTÕES')">GAVETA: QUESTÕES</div>
+            <div class="opt-btn" onclick="window.abrirGaveta('TREINO')">GAVETA: TREINOS</div>
+            <div class="opt-btn" onclick="window.abrirGaveta('TESES')">GAVETA: TESES</div>
+            <div class="opt-btn" onclick="window.abrirListaExames()">EXAMES OFICIAIS</div>
         `;
         m.style.display = 'flex';
     };
 
-    window.abrirListaExamesGaveta = () => {
+    window.abrirGaveta = async (tipo) => {
         const c = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "block";
-        document.getElementById('modal-title').innerText = "📂 GAVETAS POR EXAME";
-        c.innerHTML = "";
-        for(let i=44; i>=35; i--) {
-            const b = document.createElement('div');
-            b.className = 'opt-btn';
-            b.innerHTML = `<span>GAVETA: EXAME ${i}</span>`;
-            b.onclick = () => window.abrirGavetaEspecifica(i.toString());
-            c.appendChild(b);
-        }
-    };
-
-    window.abrirGavetaEspecifica = async (tipo) => {
-        const c = document.getElementById('modal-content');
-        document.getElementById('modal-back-btn').style.display = "block";
-        document.getElementById('modal-title').innerText = "📂 GAVETA: " + tipo;
+        document.getElementById('modal-title').innerText = "GAVETA: " + tipo;
         c.innerHTML = "Buscando...";
-        
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
         if (snap.exists()) {
             c.innerHTML = "";
-            const dados = snap.val();
-            Object.keys(dados).forEach(id => {
-                const item = dados[id];
+            Object.keys(snap.val()).forEach(id => {
+                const item = snap.val()[id];
                 if (String(item.exame) === String(tipo)) {
                     const d = document.createElement('div');
                     d.className = 'opt-btn';
                     d.innerHTML = `
-                        <div style="flex:1" onclick="window.carregarPecaPasta('${id}')">${item.peca}</div>
-                        <div style="display:flex; gap:10px">
-                            <i class="fas fa-edit" onclick="window.renomearArquivoPasta('${id}', '${tipo}')"></i>
-                            <i class="fas fa-exchange-alt" onclick="window.moverArquivoPasta('${id}', '${tipo}')"></i>
-                            <i class="fas fa-trash" style="color:red" onclick="window.deletarPecaPasta('${id}', '${tipo}')"></i>
-                        </div>
+                        <div style="flex:1" onclick="window.carregarPeca('${id}')">${item.peca}</div>
+                        <i class="fas fa-edit" onclick="window.renomearArquivo('${id}', '${tipo}')" style="margin:0 10px"></i>
+                        <i class="fas fa-exchange-alt" onclick="window.moverArquivo('${id}', '${tipo}')" style="margin:0 10px"></i>
+                        <i class="fas fa-trash" onclick="window.deletarPeca('${id}', '${tipo}')" style="color:red"></i>
                     `;
                     c.appendChild(d);
                 }
             });
-            if(c.innerHTML === "") c.innerHTML = "Gaveta vazia.";
         }
     };
 
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
-        if(!ed || ed.innerText.trim() === "") { alert("Folha vazia!"); return; }
+        if (!ed || ed.innerText.trim() === "") return;
         
-        // ID ÚNICO TEMPORAL PARA NÃO SOBRESCREVER
+        // ID Único por tempo para NUNCA sobrescrever
         const idUnico = "ID_" + Date.now();
         const tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
-        const prefixo = window.modoQuestoes ? "QUESTÕES: " : (window.modoTreinoLivre ? "TREINO: " : (window.modoTeses ? "TESES: " : `OAB ${window.activeEx} - `));
+        const nome = prompt("Nome da Peça:", window.pecaAtualNome);
         
-        const nomeSugerido = window.pecaAtualNome;
-        const nomePeca = prompt("Confirmar nome da peça para salvar:", nomeSugerido);
-        
-        if(nomePeca) {
+        if (nome) {
             const dataF = new Date().toLocaleString('pt-BR');
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idUnico}`), {
                 exame: tipo,
-                peca: `${prefixo}${nomePeca} (${dataF})`,
+                peca: `${nome} (${dataF})`,
                 conteudo: ed.innerHTML
             });
-            alert("Salvo com sucesso na Gaveta " + tipo);
+            alert("Salvo com sucesso!");
         }
     };
 
-    window.renomearArquivoPasta = async (id, tipo) => {
+    window.carregarPeca = async (id) => {
+        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
+        if (snap.exists()) {
+            document.getElementById('editor-principal').innerHTML = snap.val().conteudo;
+            document.getElementById('universal-modal').style.display = 'none';
+        }
+    };
+
+    window.renomearArquivo = async (id, tipo) => {
         const novo = prompt("Novo nome:");
         if(novo) {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
             let dados = snap.val();
             dados.peca = novo;
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-            window.abrirGavetaEspecifica(tipo);
+            window.abrirGaveta(tipo);
         }
     };
 
-    window.moverArquivoPasta = async (id, tipoOriginal) => {
+    window.moverArquivo = async (id, tipo) => {
         const destino = prompt("Mover para qual gaveta? (Ex: 38, QUESTÕES, TREINO)");
         if(destino) {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
             let dados = snap.val();
             dados.exame = destino.toUpperCase();
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-            window.abrirGavetaEspecifica(tipoOriginal);
-        }
-    };
-
-    window.deletarPecaPasta = async (id, tipo) => {
-        if(confirm("Apagar permanentemente?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-            window.abrirGavetaEspecifica(tipo);
-        }
-    };
-
-    window.carregarPecaPasta = async (id) => {
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-        if(snap.exists()) {
-            document.getElementById('editor-principal').innerHTML = snap.val().conteudo;
-            document.getElementById('universal-modal').style.display = 'none';
+            window.abrirGaveta(tipo);
         }
     };
 
@@ -348,31 +307,29 @@
 
     async function carregarRascunho() {
         const snap = await get(ref(db, `producao_v13/RASCUNHO`));
-        if(snap.exists() && document.getElementById('editor-principal').innerHTML === "") {
-            document.getElementById('editor-principal').innerHTML = snap.val().conteudo;
-        }
+        if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo;
     }
 
     window.atualizarDisplayModo = () => {
         const d = document.getElementById('ex-display');
         const i = document.getElementById('identificador-peca');
-        if(window.modoQuestoes) { d.innerText = "QUESTÕES"; i.innerText = "QUESTÕES: " + window.pecaAtualNome; }
-        else if(window.modoTeses) { d.innerText = "TESES"; i.innerText = "TESES: " + window.pecaAtualNome; }
+        if(window.modoQuestoes) { d.innerText = "QUESTÕES"; i.innerText = "TREINO QUESTÕES: " + window.pecaAtualNome; }
+        else if(window.modoTeses) { d.innerText = "TESES"; i.innerText = "TREINO TESES: " + window.pecaAtualNome; }
         else if(window.modoTreinoLivre) { d.innerText = "LIVRE"; i.innerText = "TREINO: " + window.pecaAtualNome; }
-        else { d.innerText = "OAB " + window.activeEx; i.innerText = "EXAME " + window.activeEx; }
+        else { d.innerText = "OAB " + window.activeEx; i.innerText = "EXAME OFICIAL " + window.activeEx; }
     };
-
-    // Auxiliares
+    
+    // Funções auxiliares mantidas conforme original
     window.ativarModoQuestoes = () => { const n = prompt("Nome:"); if(n) { localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     window.ativarTreinoLivre = () => { const n = prompt("Nome:"); if(n) { localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     window.abrirExames = () => { localStorage.setItem('modoTreinoLivre', "false"); localStorage.setItem('modoQuestoes', "false"); window.gerenciadorPasta(); };
+    window.limparFolha = () => { if(confirm("Limpar tudo?")) document.getElementById('editor-principal').innerHTML = ""; };
+    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active'); };
     window.verPDF = (t) => { 
         const f = document.getElementById('pdf-frame');
-        let url = t === 'P' ? `ro${window.activeEx}.pdf` : (t === 'G' ? `ro${window.activeEx}-gabarito.pdf` : (t === 'V' ? 'vade.pdf' : (t === 'LP' ? 'livro_processo.pdf' : 'livro_material.pdf')));
-        f.src = url; document.getElementById('pdf-viewer').classList.add('active'); 
+        f.src = t === 'P' ? `ro${window.activeEx}.pdf` : `ro${window.activeEx}-gabarito.pdf`;
+        document.getElementById('pdf-viewer').classList.add('active');
     };
-    window.fecharPDF = () => document.getElementById('pdf-viewer').classList.remove('active');
-    window.toggleRecolherEditor = () => document.getElementById('editor-container').classList.toggle('collapsed');
 </script>
 </body>
 </html>

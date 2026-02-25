@@ -26,10 +26,10 @@
             flex-direction: column; 
             overflow: hidden; 
             color: white;
-            transition: all 0.3s ease; /* Suavidade no recuo */
+            transition: all 0.3s ease;
         }
 
-        /* --- CIRURGIA: RECUO SUPERIOR --- */
+        /* --- SISTEMA DE RECUO (MODO FOCO) --- */
         header { 
             background: var(--primary); 
             height: 60px; 
@@ -42,23 +42,18 @@
             transition: transform 0.3s ease, margin-top 0.3s ease;
         }
 
-        body.recuo-ativo header {
-            transform: translateY(-100%);
-            margin-top: -60px;
-        }
+        body.recuo-ativo header { transform: translateY(-100%); margin-top: -60px; }
 
-        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 15px; }
+        .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 12px; }
         .logo span { color: var(--gold); }
 
-        /* Botão Hamburguer */
         .btn-hamburguer {
             background: none; border: 1px solid var(--gold); color: var(--gold);
-            padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 1rem;
+            padding: 5px 10px; border-radius: 6px; cursor: pointer;
         }
 
         main { display: flex; flex: 1; overflow: hidden; position: relative; }
         
-        /* --- CIRURGIA: RECUO LATERAL --- */
         .sidebar { 
             width: var(--sidebar-w); 
             background: #1e293b; 
@@ -71,10 +66,7 @@
             transition: margin-left 0.3s ease, opacity 0.3s ease;
         }
 
-        body.recuo-ativo .sidebar {
-            margin-left: calc(var(--sidebar-w) * -1);
-            opacity: 0;
-        }
+        body.recuo-ativo .sidebar { margin-left: calc(var(--sidebar-w) * -1); opacity: 0; }
 
         .btn-side { 
             width: 100%; min-height: 45px; border: none; border-radius: 8px; 
@@ -153,7 +145,7 @@
 
 <header>
     <div class="logo">
-        <button class="btn-hamburguer" onclick="window.toggleRecuoMaster()"><i class="fas fa-bars"></i></button>
+        <button class="btn-hamburguer" onclick="window.toggleFocoRecuo()"><i class="fas fa-bars"></i></button>
         JOAQUIM <span>ELITE</span>
     </div>
     <div style="color:var(--gold); font-size:10px; font-weight:bold;">MODO: <span id="ex-display">--</span></div>
@@ -248,25 +240,55 @@
     import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
 
+    // Globais Restauradas
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
-    window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
     window.modoQuestoes = localStorage.getItem('modoQuestoes') === "true";
     window.modoTeses = localStorage.getItem('modoTeses') === "true";
+    window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
+    window.historicoUndo = [];
+    window.marcaTextoAtivo = false;
+    window.currentColor = '#fef08a';
+    let debounceTimer = null;
 
-    // FUNÇÃO DE RECUO CIRÚRGICA
-    window.toggleRecuoMaster = () => {
+    // --- FUNÇÃO DO HAMBURGUER (RECUO) ---
+    window.toggleFocoRecuo = () => {
         document.body.classList.toggle('recuo-ativo');
     };
 
     window.onload = async () => {
         atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
+        
+        // Timer para ligar eventos do editor após montagem
+        setTimeout(() => {
+            const ed = document.getElementById('editor-principal');
+            if(ed) {
+                ed.addEventListener('input', () => {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        const html = ed.innerHTML;
+                        if(window.historicoUndo[window.historicoUndo.length -1] !== html) {
+                            window.historicoUndo.push(html);
+                            if(window.historicoUndo.length > 30) window.historicoUndo.shift();
+                        }
+                    }, 800);
+                });
+                ed.addEventListener('mouseup', () => {
+                    if(window.marcaTextoAtivo) {
+                        const selection = window.getSelection();
+                        if (selection.toString().length > 0) document.execCommand('backColor', false, window.currentColor);
+                    }
+                });
+            }
+        }, 1000);
+        
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
     };
 
+    // Funções de Interface
     window.atualizarDisplayModo = () => {
         const display = document.getElementById('ex-display');
         const ident = document.getElementById('identificador-peca');
@@ -274,42 +296,111 @@
         ident.innerHTML = `${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i>`;
     };
 
-    window.finalizarPeca = async () => {
-        // ... sua lógica de finalizar peça (mantida) ...
-        alert("Salvando peça...");
+    window.renomearTreino = () => {
+        const n = prompt("Nome do documento:", window.pecaAtualNome);
+        if(n) { window.pecaAtualNome = n; atualizarDisplayModo(); }
     };
 
-    window.gerenciadorPasta = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-back-btn').style.display = "none";
-        document.getElementById('modal-title').innerText = "📂 MINHA PASTA (GAVETAS)";
-        content.innerHTML = `
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('QUESTÕES')"><span>GAVETA: QUESTÕES</span> <i class="fas fa-question-circle" style="color:var(--questoes)"></i></div>
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TREINO')"><span>GAVETA: TREINO PEÇAS</span> <i class="fas fa-edit" style="color:#facc15"></i></div>
-            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TESES')"><span>GAVETA: TREINO TESES</span> <i class="fas fa-gavel" style="color:var(--teses)"></i></div>
-            <div class="opt-btn" onclick="window.abrirListaExamesGaveta()"><span>GAVETAS: EXAMES OFICIAIS</span> <i class="fas fa-archive" style="color:var(--gold)"></i></div>
-        `;
-        modal.style.display = 'flex';
+    // Sistema de Marca-Texto
+    window.setHighlightColor = (color, id) => {
+        window.currentColor = color;
+        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(!window.marcaTextoAtivo) window.toggleMarcaTexto(true);
     };
 
-    // ... TODAS AS OUTRAS FUNÇÕES ORIGINAIS (abrirGaveta, verPDF, carregarRascunho, etc.) ...
-    // Para encurtar e focar na entrega, mantive as assinaturas. Insira o resto do seu JS aqui.
+    window.toggleMarcaTexto = (forcarAtivo = null) => {
+        window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
+        const btn = document.getElementById('btn-highlight');
+        if(window.marcaTextoAtivo) {
+            btn.style.background = window.currentColor;
+            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
+        } else {
+            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+        }
+    };
 
+    // PDF e Foco
     window.verPDF = (t) => {
         const v = document.getElementById('pdf-viewer');
         const f = document.getElementById('pdf-frame');
         let url = t === 'P' ? `ro${window.activeEx}.pdf` : (t === 'G' ? `ro${window.activeEx}-gabarito.pdf` : (t === 'V' ? 'vade.pdf' : (t === 'LP' ? 'livro_processo.pdf' : 'livro_material.pdf')));
         f.src = url; v.classList.add('active'); window.toggleRecolherEditor(); 
     };
-    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
-    window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
+
+    window.fecharPDF = () => {
+        document.getElementById('pdf-viewer').classList.remove('active', 'full-view');
+        document.getElementById('editor-container').classList.remove('collapsed');
+    };
+
+    window.toggleRecolherEditor = () => {
+        document.getElementById('editor-container').classList.toggle('collapsed');
+        document.getElementById('pdf-viewer').classList.toggle('full-view');
+    };
+
+    // Firebase Core (Salvar/Finalizar)
+    window.finalizarPeca = async () => {
+        const ed = document.getElementById('editor-principal');
+        if(!ed) return;
+        const tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
+        const nomeAlvo = window.pecaAtualNome;
+        
+        try {
+            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
+            let idFinal = Date.now().toString();
+            if (snap.exists()) {
+                const dados = snap.val();
+                const encontrado = Object.keys(dados).find(k => (dados[k].peca.split(' (')[0] === nomeAlvo && dados[k].exame === tipo));
+                if (encontrado && !confirm("Arquivo já existe. Sobrescrever?")) return;
+                if (encontrado) idFinal = encontrado;
+            }
+            const agora = new Date();
+            const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), {
+                exame: tipo, peca: `${nomeAlvo} (${dataF})`, conteudo: ed.innerHTML
+            });
+            alert("Salvo com sucesso!");
+        } catch (e) { alert("Erro ao salvar."); }
+    };
+
+    // Restaurando o resto das funções (Exames, Gavetas, Rascunho)
+    window.abrirExames = () => { 
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "EXAMES OAB";
+        const content = document.getElementById('modal-content'); content.innerHTML = "";
+        for(let i=44; i>=35; i--) {
+            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`;
+            b.onclick = () => { localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); window.location.reload(); };
+            content.appendChild(b);
+        }
+        modal.style.display = 'flex';
+    };
+
+    window.gerenciadorPasta = () => {
+        const modal = document.getElementById('universal-modal');
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-back-btn').style.display = "none";
+        document.getElementById('modal-title').innerText = "📂 MINHA PASTA";
+        content.innerHTML = `
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('QUESTÕES')"><span>GAVETA: QUESTÕES</span> <i class="fas fa-question-circle"></i></div>
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TREINO')"><span>GAVETA: TREINO</span> <i class="fas fa-edit"></i></div>
+            <div class="opt-btn" onclick="window.abrirGavetaEspecifica('TESES')"><span>GAVETA: TESES</span> <i class="fas fa-gavel"></i></div>
+        `;
+        modal.style.display = 'flex';
+    };
+
+    window.desfazer = () => { if(window.historicoUndo.length > 0) document.getElementById('editor-principal').innerHTML = window.historicoUndo.pop(); };
+    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
+    async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
     window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.desfazer = () => { /* sua lógica de undo */ };
-    async function salvarAutomatico() { /* sua lógica de save */ }
-    async function carregarRascunho() { /* sua lógica de load */ }
+
+    // Funções extras necessárias
+    window.ativarModoQuestoes = () => { const n = prompt("Nome da Questão:"); if(n) { localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); }};
+    window.ativarModoTeses = () => { const n = prompt("Assunto:"); if(n) { localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); }};
+    window.ativarTreinoLivre = () => { const n = prompt("Treino:"); if(n) { localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); }};
+
 </script>
 </body>
 </html>

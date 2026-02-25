@@ -382,8 +382,8 @@
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
             const data = snap.val(); 
-            // Carrega o nome sem as datas e prefixos para não poluir
-            window.pecaAtualNome = data.peca.split(' (')[0]; 
+            // Limpa o nome removendo a data (que está entre parênteses no final)
+            window.pecaAtualNome = data.peca.includes(' (') ? data.peca.split(' (')[0] : data.peca; 
             window.modoQuestoes = (data.exame === "QUESTÕES"); 
             window.modoTreinoLivre = (data.exame === "TREINO"); 
             window.modoTeses = (data.exame === "TESES");
@@ -393,26 +393,59 @@
         } 
     };
 
+    // FUNÇÃO RECONSTRUÍDA: IDENTIFICA NOME E DECIDE SE CRIA OU ATUALIZA
     window.finalizarPeca = async () => { 
-        const ed = document.getElementById('editor-principal'); if(!ed) return; 
+        const ed = document.getElementById('editor-principal'); 
+        if(!ed) return; 
         
-        // CORREÇÃO: Sempre gera um NOVO ID (Baseado em milissegundos) para criar um novo arquivo
-        let novoID = Date.now().toString(); 
+        const tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
+        const nomeAlvo = window.pecaAtualNome;
         
-        let tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
-        let nomeParaSalvar = window.pecaAtualNome;
+        try {
+            // 1. Pega todo o histórico para verificar nomes
+            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
+            let idFinal = Date.now().toString(); // ID padrão para novo arquivo
+            let jaExiste = false;
 
-        if(confirm(`Deseja salvar o arquivo "${nomeParaSalvar}" como uma NOVA versão na gaveta ${tipo}?`)) { 
+            if (snap.exists()) {
+                const dados = snap.val();
+                // 2. Procura se existe algum arquivo com o mesmo nome na MESMA gaveta
+                const encontrado = Object.keys(dados).find(k => {
+                    const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
+                    return nomeLimpo === nomeAlvo && dados[k].exame === tipo;
+                });
+
+                if (encontrado) {
+                    jaExiste = true;
+                    if (confirm(`Já existe um arquivo chamado "${nomeAlvo}" na gaveta ${tipo}.\n\nDeseja ATUALIZAR (sobrepor) o arquivo existente?`)) {
+                        idFinal = encontrado; // Usa o ID antigo para sobrepor
+                    } else {
+                        return; // Cancela a operação
+                    }
+                }
+            }
+
+            // 3. Se não existe, pergunta se quer criar novo
+            if (!jaExiste) {
+                if (!confirm(`Deseja criar um NOVO arquivo chamado "${nomeAlvo}" na gaveta ${tipo}?`)) return;
+            }
+
+            // 4. Salva (seja novo ou sobreposição)
             const agora = new Date(); 
             const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
             
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${novoID}`), { 
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), { 
                 exame: tipo, 
-                peca: `${nomeParaSalvar} (${dataF})`, 
+                peca: `${nomeAlvo} (${dataF})`, 
                 conteudo: ed.innerHTML 
             }); 
-            alert("Salvo como novo documento na Gaveta!"); 
-        } 
+            
+            alert(jaExiste ? "Arquivo ATUALIZADO com sucesso!" : "Novo arquivo CRIADO com sucesso!");
+
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao processar salvamento.");
+        }
     };
 
     window.atualizarDisplayModo = () => {
@@ -423,7 +456,7 @@
     };
 
     window.renomearTreino = () => {
-        const n = prompt("Novo nome para este documento:", window.pecaAtualNome);
+        const n = prompt("Defina o nome deste documento (isso define se ele será um novo arquivo ou atualizará um existente):", window.pecaAtualNome);
         if(n) { window.pecaAtualNome = n; atualizarDisplayModo(); }
     };
 

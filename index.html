@@ -56,8 +56,6 @@
             transition: all 0.3s ease;
         }
 
-        .sidebar.hidden { width: 0; padding: 0; margin: 0; overflow: hidden; border: none; opacity: 0; }
-
         .btn-side { 
             width: 100%; min-height: 45px; border: none; border-radius: 8px; 
             display: flex; align-items: center; padding: 0 15px; color: white; 
@@ -228,14 +226,12 @@
     import { FolhaEngine } from './folha-engine.js';
     import { RadarEngine } from './radar-engine.js';
     import { BANCO_ESPELHOS } from './banco-espelhos.js';
-    import { pecas } from './estruturas.js';
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
     window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
     window.modoQuestoes = localStorage.getItem('modoQuestoes') === "true";
     window.modoTeses = localStorage.getItem('modoTeses') === "true";
-    window.pecaAtualID = localStorage.getItem('pecaAtualID') || null; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
 
     window.historicoUndo = [];
@@ -278,7 +274,6 @@
         }, 1000);
         await carregarRascunho();
         setInterval(salvarAutomatico, 30000);
-        setInterval(window.forcarRadar, 5000);
     };
 
     window.gerenciadorPasta = () => {
@@ -329,7 +324,6 @@
                 filtrados.reverse().forEach(item => {
                     const div = document.createElement('div');
                     div.style.cssText = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; background:#fff; margin-bottom:8px; border-radius:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05)";
-                    
                     div.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
                             <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1; padding-right:10px;">
@@ -348,7 +342,6 @@
         } catch (e) { content.innerHTML = "Erro de conexão."; }
     };
 
-    // FUNÇÕES CIRÚRGICAS: RENOMEAR E MOVER
     window.renomearArquivoPasta = async (id, tipoOriginal) => {
         const novoNome = prompt("Digite o novo nome para o arquivo:");
         if (!novoNome) return;
@@ -364,7 +357,7 @@
     };
 
     window.moverArquivoPasta = async (id, tipoOriginal) => {
-        const destino = prompt("Para qual gaveta deseja mover? \n(QUESTÕES, TREINO, TESES ou o número do EXAME)");
+        const destino = prompt("Mover para qual gaveta? (QUESTÕES, TREINO, TESES ou o número do EXAME)");
         if (!destino) return;
         const destinoLimpo = destino.toUpperCase().trim();
         try {
@@ -373,7 +366,6 @@
                 let dados = snap.val();
                 dados.exame = destinoLimpo;
                 await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-                alert(`Movido para ${destinoLimpo}!`);
                 window.abrirGavetaEspecifica(tipoOriginal);
             }
         } catch (e) { alert("Erro ao mover."); }
@@ -389,34 +381,50 @@
     window.carregarPecaPasta = async (k) => { 
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
-            const data = snap.val(); window.pecaAtualID = k; 
-            window.pecaAtualNome = data.peca.split(' (')[0].replace("QUESTÕES: ", "").replace("TREINO: ", "").replace("TESES: ", ""); 
-            window.modoQuestoes = (data.exame === "QUESTÕES"); window.modoTreinoLivre = (data.exame === "TREINO"); window.modoTeses = (data.exame === "TESES");
+            const data = snap.val(); 
+            // Carrega o nome sem as datas e prefixos para não poluir
+            window.pecaAtualNome = data.peca.split(' (')[0]; 
+            window.modoQuestoes = (data.exame === "QUESTÕES"); 
+            window.modoTreinoLivre = (data.exame === "TREINO"); 
+            window.modoTeses = (data.exame === "TESES");
             document.getElementById('editor-principal').innerHTML = data.conteudo;
-            document.getElementById('universal-modal').style.display='none'; atualizarDisplayModo(); 
+            document.getElementById('universal-modal').style.display='none'; 
+            atualizarDisplayModo(); 
         } 
     };
 
     window.finalizarPeca = async () => { 
         const ed = document.getElementById('editor-principal'); if(!ed) return; 
-        let idParaSalvar = window.pecaAtualID || Date.now().toString(); 
+        
+        // CORREÇÃO: Sempre gera um NOVO ID (Baseado em milissegundos) para criar um novo arquivo
+        let novoID = Date.now().toString(); 
+        
         let tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
-        let prefixo = window.modoQuestoes ? "QUESTÕES: " : (window.modoTreinoLivre ? "TREINO: " : (window.modoTeses ? "TESES: " : `OAB ${window.activeEx} - PEÇA`));
-        let nomeBase = prefixo + window.pecaAtualNome;
-        if(confirm(`Salvar "${nomeBase}"?`)) { 
-            const agora = new Date(); const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idParaSalvar}`), { exame: tipo, peca: `${nomeBase} (${dataF})`, conteudo: ed.innerHTML }); 
-            alert("Salvo na Gaveta!"); 
+        let nomeParaSalvar = window.pecaAtualNome;
+
+        if(confirm(`Deseja salvar o arquivo "${nomeParaSalvar}" como uma NOVA versão na gaveta ${tipo}?`)) { 
+            const agora = new Date(); 
+            const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
+            
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${novoID}`), { 
+                exame: tipo, 
+                peca: `${nomeParaSalvar} (${dataF})`, 
+                conteudo: ed.innerHTML 
+            }); 
+            alert("Salvo como novo documento na Gaveta!"); 
         } 
     };
 
     window.atualizarDisplayModo = () => {
         const display = document.getElementById('ex-display');
         const ident = document.getElementById('identificador-peca');
-        if(window.modoQuestoes) { display.innerText = "TREINO: QUESTÕES"; ident.innerHTML = `QUESTÕES: ${window.pecaAtualNome}`; }
-        else if(window.modoTeses) { display.innerText = "TREINO: TESES"; ident.innerHTML = `TESES: ${window.pecaAtualNome}`; }
-        else if(window.modoTreinoLivre) { display.innerText = "TREINO: " + window.pecaAtualNome; ident.innerHTML = `TREINO: ${window.pecaAtualNome}`; }
-        else { display.innerText = "EXAME " + window.activeEx; ident.innerHTML = `EXAME ${window.activeEx}`; }
+        display.innerText = window.modoQuestoes ? "QUESTÕES" : (window.modoTeses ? "TESES" : (window.modoTreinoLivre ? "TREINO" : "EXAME " + window.activeEx));
+        ident.innerHTML = `${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i>`;
+    };
+
+    window.renomearTreino = () => {
+        const n = prompt("Novo nome para este documento:", window.pecaAtualNome);
+        if(n) { window.pecaAtualNome = n; atualizarDisplayModo(); }
     };
 
     window.abrirBibliotecaPDF = () => {
@@ -460,9 +468,9 @@
         }
     };
 
-    window.ativarModoQuestoes = () => { const n = prompt("Nome da Questão:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('modoQuestoes', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    window.ativarModoTeses = () => { const n = prompt("Assunto da Tese:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('modoTeses', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    window.ativarTreinoLivre = () => { const n = prompt("Nome do Treino:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; localStorage.setItem('modoTreinoLivre', "true"); localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarModoQuestoes = () => { const n = prompt("Nome da Questão:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarModoTeses = () => { const n = prompt("Assunto da Tese:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
+    window.ativarTreinoLivre = () => { const n = prompt("Nome do Treino:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
     
     window.abrirExames = () => { 
         const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 
@@ -476,7 +484,6 @@
     };
 
     window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) ed.innerHTML = window.historicoUndo.pop(); };
-    window.forcarRadar = () => { if(window.modoTreinoLivre || window.modoQuestoes || window.modoTeses) return; const dna = BANCO_ESPELHOS[window.activeEx]; const ed = document.getElementById('editor-principal'); if (dna && RadarEngine && ed) { const an = RadarEngine.analisar(dna, ed.innerText); RadarEngine.renderizar(an); } };
     async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
     async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
@@ -492,5 +499,3 @@
 </script>
 </body>
 </html>
-
-

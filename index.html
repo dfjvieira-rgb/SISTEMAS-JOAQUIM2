@@ -33,10 +33,20 @@
             height: 60px; 
             padding: 0 20px; 
             display: flex; 
-            justify-content: space-between; 
+            justify-content: flex-start; /* Ajustado para alinhar o sanduíche */
             align-items: center; 
             border-bottom: 2px solid var(--gold); 
             z-index: 5000;
+            gap: 15px;
+        }
+
+        /* ESTILO DO BOTÃO SANDUÍCHE */
+        #menu-toggle {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
         }
 
         .logo { font-size: 1.2rem; font-weight: 900; letter-spacing: -1px; }
@@ -54,6 +64,11 @@
             border-right: 1px solid rgba(255,255,255,0.1); 
             overflow-y: auto; 
             transition: all 0.3s ease;
+        }
+
+        /* LÓGICA DE RECUO DA SIDEBAR */
+        .sidebar.collapsed {
+            margin-left: calc(-1 * var(--sidebar-w));
         }
 
         .btn-side { 
@@ -116,7 +131,14 @@
         .opt-btn { width: 100%; padding: 18px; margin-bottom: 10px; border-radius: 12px; border: 1px solid #eee; background: #f8fafc; font-weight: 800; display: flex; justify-content: space-between; cursor: pointer; align-items: center; }
 
         @media (max-width: 768px) {
-            .sidebar { display: none; }
+            .sidebar { 
+                position: fixed;
+                left: 0;
+                top: 60px;
+                height: calc(100vh - 60px);
+                z-index: 4000;
+            }
+            .sidebar.collapsed { margin-left: calc(-1 * var(--sidebar-w)); }
             #mobile-hub { display: flex; }
             #pdf-viewer.active { width: 100%; position: absolute; right: 0; top: 0; height: 100%; z-index: 8000; }
         }
@@ -132,8 +154,11 @@
 <body class="dark-mode">
 
 <header>
+    <div id="menu-toggle" onclick="window.toggleSidebar()" style="cursor:pointer; padding-right:10px;">
+        <i class="fas fa-bars"></i>
+    </div>
     <div class="logo">JOAQUIM <span>ELITE</span></div>
-    <div style="color:var(--gold); font-size:10px; font-weight:bold;">MODO: <span id="ex-display">--</span></div>
+    <div style="color:var(--gold); font-size:10px; font-weight:bold; margin-left:auto;">MODO: <span id="ex-display">--</span></div>
 </header>
 
 <main>
@@ -163,27 +188,19 @@
             <div id="identificador-peca" onclick="window.renomearTreino()">SCANNER ELITE... <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i></div>
             <div class="toolbar-liberdade">
                 <button class="btn-lib" style="background:#64748b; color:white" onclick="window.desfazer()"><i class="fas fa-undo"></i> Desfazer</button>
-                
                 <div class="highlight-box">
-                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;">
-                        <i class="fas fa-highlighter"></i>
-                    </button>
+                    <button class="btn-lib" id="btn-highlight" onclick="window.toggleMarcaTexto()" style="border:none; flex:none; padding:12px 5px;"><i class="fas fa-highlighter"></i></button>
                     <div class="color-dot active" id="dot-yellow" style="background:#fef08a;" onclick="window.setHighlightColor('#fef08a', 'dot-yellow')"></div>
                     <div class="color-dot" id="dot-green" style="background:#bbf7d0;" onclick="window.setHighlightColor('#bbf7d0', 'dot-green')"></div>
-                    <div class="color-dot" id="dot-orange" style="background:#fed7aa;" onclick="window.setHighlightColor('#fed7aa', 'dot-orange')"></div>
-                    <div class="color-dot" id="dot-purple" style="background:#e9d5ff;" onclick="window.setHighlightColor('#e9d5ff', 'dot-purple')"></div>
-                    <div class="color-dot none" id="dot-none" title="Remover Cor" onclick="window.setHighlightColor('transparent', 'dot-none')">
-                        <i class="fas fa-slash"></i>
-                    </div>
+                    <div class="color-dot none" id="dot-none" title="Remover Cor" onclick="window.setHighlightColor('transparent', 'dot-none')"><i class="fas fa-slash"></i></div>
                 </div>
-
                 <button class="btn-lib" onclick="window.limparFolha()"><i class="fas fa-trash"></i> Limpar</button>
                 <button class="btn-lib" id="btn-foco" onclick="window.toggleRecolherEditor()"><i class="fas fa-expand"></i> Foco PDF</button>
                 <button class="btn-lib" style="background:#22c55e; color:white" onclick="window.print()"><i class="fas fa-print"></i> PDF</button>
             </div>
         </div>
         <div class="paper">
-            <div id="folha-total"></div>
+            <div id="folha-total" contenteditable="true" style="outline:none; min-height:100%; padding:20px;"></div>
         </div>
     </section>
 
@@ -224,8 +241,6 @@
     import { db } from './firebase-config.js';
     import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
-    import { RadarEngine } from './radar-engine.js';
-    import { BANCO_ESPELHOS } from './banco-espelhos.js';
 
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
@@ -239,20 +254,18 @@
     window.marcaTextoAtivo = false;
     window.currentColor = '#fef08a';
 
-    window.LISTA_PDF_BIBLIOTECA = [
-        { nome: "TABELA IDENTIFICAÇÃO DE PEÇAS", url: "identificacaopecas.pdf" },
-        { nome: "RESUMINHO APOSTAS!", url: "RESUMINHO APOSTAS!.pdf" },
-        { nome: "LINHA DO TEMPO - PEÇAS", url: "LINHA DO TEMPO - Identificação de Peças_231123_182636.pdf" },
-        { nome: "TESES OAB 2ª FASE", url: "TESES-----OAB--SEGUNDA--FASE--TRABALHO.pdf" },
-        { nome: "REVISÃO DE PEÇAS - RALIN", url: "raulin.pdf" },
-        { nome: "100 ARTIGOS PARA GRIFAR", url: "100 ARTIGOS.PDF" }
-    ];
+    // FUNÇÃO PARA O MENU SANDUÍCHE
+    window.toggleSidebar = () => {
+        document.getElementById('sidebar-main').classList.toggle('collapsed');
+    };
 
     window.onload = async () => {
+        if(window.innerWidth <= 768) document.getElementById('sidebar-main').classList.add('collapsed');
         atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
+        
         setTimeout(() => {
-            const ed = document.getElementById('editor-principal');
+            const ed = document.getElementById('folha-total');
             if(ed) {
                 ed.addEventListener('input', () => {
                     clearTimeout(debounceTimer);
@@ -318,21 +331,17 @@
                 const filtrados = Object.keys(dados)
                     .map(k => ({ id: k, ...dados[k] }))
                     .filter(item => String(item.exame) === String(tipoGaveta));
-                
                 if(filtrados.length === 0) { content.innerHTML = "Gaveta vazia."; return; }
-
                 filtrados.reverse().forEach(item => {
                     const div = document.createElement('div');
-                    div.style.cssText = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; background:#fff; margin-bottom:8px; border-radius:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05)";
+                    div.style.cssText = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; background:#fff; margin-bottom:8px; border-radius:8px;";
                     div.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-                            <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1; padding-right:10px;">
-                                <strong style="color:#0f172a; font-size:14px; display:block;">${item.peca}</strong>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1;">
+                                <strong style="color:#0f172a; font-size:14px;">${item.peca}</strong>
                             </div>
                             <div style="display:flex; gap:12px;">
-                                <i class="fas fa-edit" title="Renomear" style="color:var(--gold-dark); cursor:pointer" onclick="window.renomearArquivoPasta('${item.id}', '${tipoGaveta}')"></i>
-                                <i class="fas fa-exchange-alt" title="Mover" style="color:var(--mentoria); cursor:pointer" onclick="window.moverArquivoPasta('${item.id}', '${tipoGaveta}')"></i>
-                                <i class="fas fa-trash" title="Excluir" style="color:var(--perigo); cursor:pointer" onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
+                                <i class="fas fa-trash" style="color:var(--perigo); cursor:pointer" onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
                             </div>
                         </div>
                     `;
@@ -342,110 +351,29 @@
         } catch (e) { content.innerHTML = "Erro de conexão."; }
     };
 
-    window.renomearArquivoPasta = async (id, tipoOriginal) => {
-        const novoNome = prompt("Digite o novo nome para o arquivo:");
-        if (!novoNome) return;
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-            if (snap.exists()) {
-                let dados = snap.val();
-                dados.peca = novoNome;
-                await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-                window.abrirGavetaEspecifica(tipoOriginal);
-            }
-        } catch (e) { alert("Erro ao renomear."); }
-    };
-
-    window.moverArquivoPasta = async (id, tipoOriginal) => {
-        const destino = prompt("Mover para qual gaveta? (QUESTÕES, TREINO, TESES ou o número do EXAME)");
-        if (!destino) return;
-        const destinoLimpo = destino.toUpperCase().trim();
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-            if (snap.exists()) {
-                let dados = snap.val();
-                dados.exame = destinoLimpo;
-                await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-                window.abrirGavetaEspecifica(tipoOriginal);
-            }
-        } catch (e) { alert("Erro ao mover."); }
-    };
-
-    window.deletarPecaPasta = async (id, tipo) => {
-        if(confirm("Apagar permanentemente?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-            window.abrirGavetaEspecifica(tipo);
-        }
-    };
-
     window.carregarPecaPasta = async (k) => { 
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
             const data = snap.val(); 
-            // Limpa o nome removendo a data (que está entre parênteses no final)
             window.pecaAtualNome = data.peca.includes(' (') ? data.peca.split(' (')[0] : data.peca; 
-            window.modoQuestoes = (data.exame === "QUESTÕES"); 
-            window.modoTreinoLivre = (data.exame === "TREINO"); 
-            window.modoTeses = (data.exame === "TESES");
-            document.getElementById('editor-principal').innerHTML = data.conteudo;
+            document.getElementById('folha-total').innerHTML = data.conteudo;
             document.getElementById('universal-modal').style.display='none'; 
             atualizarDisplayModo(); 
         } 
     };
 
-    // FUNÇÃO RECONSTRUÍDA: IDENTIFICA NOME E DECIDE SE CRIA OU ATUALIZA
     window.finalizarPeca = async () => { 
-        const ed = document.getElementById('editor-principal'); 
+        const ed = document.getElementById('folha-total'); 
         if(!ed) return; 
-        
         const tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
-        const nomeAlvo = window.pecaAtualNome;
-        
-        try {
-            // 1. Pega todo o histórico para verificar nomes
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-            let idFinal = Date.now().toString(); // ID padrão para novo arquivo
-            let jaExiste = false;
-
-            if (snap.exists()) {
-                const dados = snap.val();
-                // 2. Procura se existe algum arquivo com o mesmo nome na MESMA gaveta
-                const encontrado = Object.keys(dados).find(k => {
-                    const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
-                    return nomeLimpo === nomeAlvo && dados[k].exame === tipo;
-                });
-
-                if (encontrado) {
-                    jaExiste = true;
-                    if (confirm(`Já existe um arquivo chamado "${nomeAlvo}" na gaveta ${tipo}.\n\nDeseja ATUALIZAR (sobrepor) o arquivo existente?`)) {
-                        idFinal = encontrado; // Usa o ID antigo para sobrepor
-                    } else {
-                        return; // Cancela a operação
-                    }
-                }
-            }
-
-            // 3. Se não existe, pergunta se quer criar novo
-            if (!jaExiste) {
-                if (!confirm(`Deseja criar um NOVO arquivo chamado "${nomeAlvo}" na gaveta ${tipo}?`)) return;
-            }
-
-            // 4. Salva (seja novo ou sobreposição)
-            const agora = new Date(); 
-            const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
-            
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), { 
-                exame: tipo, 
-                peca: `${nomeAlvo} (${dataF})`, 
-                conteudo: ed.innerHTML 
-            }); 
-            
-            alert(jaExiste ? "Arquivo ATUALIZADO com sucesso!" : "Novo arquivo CRIADO com sucesso!");
-
-        } catch (e) {
-            console.error(e);
-            alert("Erro ao processar salvamento.");
-        }
+        const agora = new Date(); 
+        const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
+        await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${Date.now()}`), { 
+            exame: tipo, 
+            peca: `${window.pecaAtualNome} (${dataF})`, 
+            conteudo: ed.innerHTML 
+        }); 
+        alert("Salvo com sucesso na sua pasta!");
     };
 
     window.atualizarDisplayModo = () => {
@@ -456,31 +384,8 @@
     };
 
     window.renomearTreino = () => {
-        const n = prompt("Defina o nome deste documento (isso define se ele será um novo arquivo ou atualizará um existente):", window.pecaAtualNome);
+        const n = prompt("Nome do documento:", window.pecaAtualNome);
         if(n) { window.pecaAtualNome = n; atualizarDisplayModo(); }
-    };
-
-    window.abrirBibliotecaPDF = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
-        document.getElementById('modal-back-btn').style.display = "none";
-        content.innerHTML = "";
-        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
-            const btn = document.createElement('div');
-            btn.className = 'opt-btn';
-            btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:#ef4444"></i>`;
-            btn.onclick = () => { window.abrirPDFDireto(pdf.url, pdf.nome); modal.style.display = 'none'; };
-            content.appendChild(btn);
-        });
-        modal.style.display = 'flex';
-    };
-
-    window.abrirPDFDireto = (url, nome) => {
-        const v = document.getElementById('pdf-viewer');
-        const f = document.getElementById('pdf-frame');
-        const tit = document.getElementById('pdf-title');
-        f.src = url; tit.innerText = nome; v.classList.add('active'); window.toggleRecolherEditor();
     };
 
     window.setHighlightColor = (color, id) => {
@@ -493,34 +398,14 @@
     window.toggleMarcaTexto = (forcarAtivo = null) => {
         window.marcaTextoAtivo = (forcarAtivo !== null) ? forcarAtivo : !window.marcaTextoAtivo;
         const btn = document.getElementById('btn-highlight');
-        if(window.marcaTextoAtivo) {
-            btn.style.background = window.currentColor;
-            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
-        } else {
-            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
-        }
+        btn.style.background = window.marcaTextoAtivo ? window.currentColor : "transparent";
     };
 
-    window.ativarModoQuestoes = () => { const n = prompt("Nome da Questão:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    window.ativarModoTeses = () => { const n = prompt("Assunto da Tese:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    window.ativarTreinoLivre = () => { const n = prompt("Nome do Treino:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    
-    window.abrirExames = () => { 
-        const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 
-        const content = document.getElementById('modal-content'); content.innerHTML = ""; 
-        for(let i=44; i>=35; i--) { 
-            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; 
-            b.onclick = () => { localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); localStorage.setItem('modoQuestoes', "false"); localStorage.setItem('modoTeses', "false"); window.location.reload(); }; 
-            content.appendChild(b); 
-        } 
-        modal.style.display = 'flex'; 
-    };
-
-    window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) ed.innerHTML = window.historicoUndo.pop(); };
-    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
-    async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
+    window.desfazer = () => { const ed = document.getElementById('folha-total'); if(window.historicoUndo.length > 0) ed.innerHTML = window.historicoUndo.pop(); };
+    async function salvarAutomatico() { const ed = document.getElementById('folha-total'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
+    async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('folha-total').innerHTML = snap.val().conteudo; }
     window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
+    window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('folha-total').innerHTML = ""; };
     window.abrirMentoria = () => window.open('mentoria.html', '_blank');
     window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
     window.verPDF = (t) => {
@@ -532,5 +417,3 @@
 </script>
 </body>
 </html>
-
-

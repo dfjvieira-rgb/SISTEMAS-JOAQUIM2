@@ -234,14 +234,13 @@
     import { db } from './firebase-config.js';
     import { ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { FolhaEngine } from './folha-engine.js';
-    import { RadarEngine } from './radar-engine.js';
-    import { BANCO_ESPELHOS } from './banco-espelhos.js';
 
+    // CONFIGURAÇÃO DE ESTADO (FONTE ÚNICA DE VERDADE)
     window.db = db;
     window.activeEx = localStorage.getItem('activeEx') || "44";
-    window.modoTreinoLivre = localStorage.getItem('modoTreinoLivre') === "true";
-    window.modoQuestoes = localStorage.getItem('modoQuestoes') === "true";
-    window.modoTeses = localStorage.getItem('modoTeses') === "true";
+    
+    // Recupera o último modo salvo ou define TREINO como padrão inicial
+    window.modoAtual = localStorage.getItem('modoAtual') || "TREINO"; 
     window.pecaAtualNome = localStorage.getItem('pecaAtualNome') || "NOVO TREINO";
 
     window.historicoUndo = [];
@@ -259,8 +258,9 @@
     ];
 
     window.onload = async () => {
-        atualizarDisplayModo();
         FolhaEngine.montar('folha-total');
+        atualizarDisplayModo(); // Garante que o cabeçalho mostre a gaveta certa ao abrir
+        
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
             if(ed) {
@@ -286,6 +286,7 @@
         setInterval(salvarAutomatico, 30000);
     };
 
+    // --- LÓGICA DE GAVETAS (PASTA) ---
     window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
@@ -317,9 +318,9 @@
     window.abrirGavetaEspecifica = async (tipoGaveta) => {
         const content = document.getElementById('modal-content');
         document.getElementById('modal-back-btn').style.display = "block";
-        let label = (tipoGaveta === 'QUESTÕES' || tipoGaveta === 'TREINO' || tipoGaveta === 'TESES') ? tipoGaveta : `EXAME ${tipoGaveta}`;
+        let label = (['QUESTÕES', 'TREINO', 'TESES'].includes(tipoGaveta)) ? tipoGaveta : `EXAME ${tipoGaveta}`;
         document.getElementById('modal-title').innerText = `📂 GAVETA: ${label}`;
-        content.innerHTML = "<div style='text-align:center; padding:20px;'><i class='fas fa-spinner fa-spin'></i> Buscando...</div>";
+        content.innerHTML = "<div style='text-align:center; padding:20px;'><i class='fas fa-spinner fa-spin'></i> Abrindo...</div>";
         try {
             const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
             content.innerHTML = "";
@@ -330,167 +331,145 @@
                     .filter(item => String(item.exame) === String(tipoGaveta));
                 
                 if(filtrados.length === 0) { content.innerHTML = "Gaveta vazia."; return; }
-
                 filtrados.reverse().forEach(item => {
                     const div = document.createElement('div');
-                    div.style.cssText = "padding:12px; border-bottom:1px solid #eee; display:flex; flex-direction:column; background:#fff; margin-bottom:8px; border-radius:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05)";
+                    div.className = 'opt-btn';
+                    div.style.flexDirection = 'column'; div.style.alignItems = 'flex-start';
                     div.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-                            <div onclick="window.carregarPecaPasta('${item.id}')" style="cursor:pointer; flex:1; padding-right:10px;">
-                                <strong style="color:#0f172a; font-size:14px; display:block;">${item.peca}</strong>
+                        <div style="display:flex; justify-content:space-between; width:100%">
+                            <strong onclick="window.carregarPecaPasta('${item.id}')" style="flex:1">${item.peca}</strong>
+                            <div style="display:flex; gap:15px">
+                                <i class="fas fa-trash" style="color:red" onclick="event.stopPropagation(); window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
                             </div>
-                            <div style="display:flex; gap:12px;">
-                                <i class="fas fa-edit" title="Renomear" style="color:var(--gold-dark); cursor:pointer" onclick="window.renomearArquivoPasta('${item.id}', '${tipoGaveta}')"></i>
-                                <i class="fas fa-exchange-alt" title="Mover" style="color:var(--mentoria); cursor:pointer" onclick="window.moverArquivoPasta('${item.id}', '${tipoGaveta}')"></i>
-                                <i class="fas fa-trash" title="Excluir" style="color:var(--perigo); cursor:pointer" onclick="window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
-                            </div>
-                        </div>
-                    `;
+                        </div>`;
                     content.appendChild(div);
                 });
             } else { content.innerHTML = "Vazia."; }
-        } catch (e) { content.innerHTML = "Erro de conexão."; }
+        } catch (e) { content.innerHTML = "Erro ao ler banco."; }
     };
 
-    window.renomearArquivoPasta = async (id, tipoOriginal) => {
-        const novoNome = prompt("Digite o novo nome para o arquivo:");
-        if (!novoNome) return;
+    // --- FUNÇÃO DE SALVAMENTO CORRIGIDA (O CORAÇÃO DO AJUSTE) ---
+    window.finalizarPeca = async () => {
+        const ed = document.getElementById('editor-principal');
+        if(!ed) return;
+
+        // TIRA A DÚVIDA: Usa o modoAtual setado pelos botões da sidebar
+        const tipo = window.modoAtual; 
+        const nomeAlvo = window.pecaAtualNome;
+
         try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
+            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
+            let idFinal = Date.now().toString();
+            let jaExiste = false;
+
             if (snap.exists()) {
-                let dados = snap.val();
-                dados.peca = novoNome;
-                await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-                window.abrirGavetaEspecifica(tipoOriginal);
+                const dados = snap.val();
+                const encontrado = Object.keys(dados).find(k => {
+                    const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
+                    return nomeLimpo === nomeAlvo && String(dados[k].exame) === String(tipo);
+                });
+
+                if (encontrado) {
+                    jaExiste = true;
+                    if (!confirm(`Já existe "${nomeAlvo}" na gaveta [${tipo}]. Deseja ATUALIZAR?`)) return;
+                    idFinal = encontrado;
+                }
             }
-        } catch (e) { alert("Erro ao renomear."); }
+
+            if (!jaExiste && !confirm(`Criar NOVO arquivo "${nomeAlvo}" na gaveta [${tipo}]?`)) return;
+
+            const agora = new Date();
+            const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+
+            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), {
+                exame: tipo,
+                peca: `${nomeAlvo} (${dataF})`,
+                conteudo: ed.innerHTML
+            });
+            alert("✅ Blindado na gaveta: " + tipo);
+        } catch (e) { alert("Erro ao salvar."); }
     };
 
-    window.moverArquivoPasta = async (id, tipoOriginal) => {
-        const destino = prompt("Mover para qual gaveta? (QUESTÕES, TREINO, TESES ou o número do EXAME)");
-        if (!destino) return;
-        const destinoLimpo = destino.toUpperCase().trim();
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-            if (snap.exists()) {
-                let dados = snap.val();
-                dados.exame = destinoLimpo;
-                await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`), dados);
-                window.abrirGavetaEspecifica(tipoOriginal);
-            }
-        } catch (e) { alert("Erro ao mover."); }
-    };
-
-    window.deletarPecaPasta = async (id, tipo) => {
-        if(confirm("Apagar permanentemente?")) {
-            await remove(ref(db, `producao_v13/HISTORICO_OFICIAL/${id}`));
-            window.abrirGavetaEspecifica(tipo);
-        }
-    };
-
-    window.carregarPecaPasta = async (k) => { 
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
-        if(snap.exists()){ 
-            const data = snap.val(); 
-            window.pecaAtualNome = data.peca.includes(' (') ? data.peca.split(' (')[0] : data.peca; 
-            window.modoQuestoes = (data.exame === "QUESTÕES"); 
-            window.modoTreinoLivre = (data.exame === "TREINO"); 
-            window.modoTeses = (data.exame === "TESES");
-            document.getElementById('editor-principal').innerHTML = data.conteudo;
-            document.getElementById('universal-modal').style.display='none'; 
-            atualizarDisplayModo(); 
+    // --- GATILHOS DE MODO (SEM RELOAD PARA NÃO PERDER VARIAVEL) ---
+    window.ativarModoQuestoes = () => { 
+        const n = prompt("Nome da Questão:"); 
+        if(n) { 
+            window.modoAtual = "QUESTÕES"; 
+            window.pecaAtualNome = n; 
+            persistirERefrescar();
         } 
     };
 
-   window.finalizarPeca = async () => { 
-    const ed = document.getElementById('editor-principal'); 
-    if(!ed) return; 
-    
-    // BLINDAGEM: O tipo agora vem de uma única variável de controle
-    // Se não for Questão, Treino ou Tese, ele assume o número do Exame Ativo
-    const tipo = window.modoAtual || window.activeEx; 
-    const nomeAlvo = window.pecaAtualNome;
-    
-    try {
-        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-        let idFinal = Date.now().toString();
-        let jaExiste = false;
+    window.ativarModoTeses = () => { 
+        const n = prompt("Assunto da Tese:"); 
+        if(n) { 
+            window.modoAtual = "TESES"; 
+            window.pecaAtualNome = n; 
+            persistirERefrescar();
+        } 
+    };
 
-        if (snap.exists()) {
-            const dados = snap.val();
-            const encontrado = Object.keys(dados).find(k => {
-                // Limpa a data do nome para comparar apenas o título da peça
-                const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
-                return nomeLimpo === nomeAlvo && String(dados[k].exame) === String(tipo);
-            });
+    window.ativarTreinoLivre = () => { 
+        const n = prompt("Nome do Treino:"); 
+        if(n) { 
+            window.modoAtual = "TREINO"; 
+            window.pecaAtualNome = n; 
+            persistirERefrescar();
+        } 
+    };
 
-            if (encontrado) {
-                jaExiste = true;
-                if (!confirm(`Já existe "${nomeAlvo}" na gaveta [${tipo}].\n\nDeseja ATUALIZAR este arquivo?`)) return;
-                idFinal = encontrado;
-            }
+    window.abrirExames = () => {
+        const modal = document.getElementById('universal-modal');
+        document.getElementById('modal-title').innerText = "EXAMES OAB";
+        const content = document.getElementById('modal-content');
+        content.innerHTML = "";
+        for(let i=44; i>=35; i--) {
+            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`;
+            b.onclick = () => { 
+                window.activeEx = i.toString();
+                window.modoAtual = i.toString(); 
+                window.pecaAtualNome = "PEÇA OFICIAL";
+                persistirERefrescar();
+                modal.style.display = 'none';
+            };
+            content.appendChild(b);
         }
+        modal.style.display = 'flex';
+    };
 
-        if (!jaExiste) {
-            if (!confirm(`Deseja criar um NOVO arquivo "${nomeAlvo}" na gaveta [${tipo}]?`)) return;
-        }
-
-        const agora = new Date(); 
-        const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
-        
-        await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), { 
-            exame: tipo, 
-            peca: `${nomeAlvo} (${dataF})`, 
-            conteudo: ed.innerHTML 
-        }); 
-        
-        alert(jaExiste ? "✅ Gaveta Atualizada!" : "✅ Novo arquivo guardado na gaveta " + tipo);
-    } catch (e) { 
-        console.error(e);
-        alert("Erro ao processar salvamento."); 
+    function persistirERefrescar() {
+        localStorage.setItem('modoAtual', window.modoAtual);
+        localStorage.setItem('pecaAtualNome', window.pecaAtualNome);
+        localStorage.setItem('activeEx', window.activeEx);
+        atualizarDisplayModo();
     }
-};
 
     window.atualizarDisplayModo = () => {
         const display = document.getElementById('ex-display');
         const ident = document.getElementById('identificador-peca');
-        display.innerText = window.modoQuestoes ? "QUESTÕES" : (window.modoTeses ? "TESES" : (window.modoTreinoLivre ? "TREINO" : "EXAME " + window.activeEx));
+        const rotulo = isNaN(window.modoAtual) ? window.modoAtual : "EXAME " + window.modoAtual;
+        display.innerText = rotulo;
         ident.innerHTML = `${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i>`;
     };
 
-    window.renomearTreino = () => {
-        const n = prompt("Defina o nome deste documento:", window.pecaAtualNome);
-        if(n) { window.pecaAtualNome = n; atualizarDisplayModo(); }
-    };
-
-    window.abrirBibliotecaPDF = () => {
-        const modal = document.getElementById('universal-modal');
-        const content = document.getElementById('modal-content');
-        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
-        document.getElementById('modal-back-btn').style.display = "none";
-        content.innerHTML = "";
-        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
-            const btn = document.createElement('div');
-            btn.className = 'opt-btn';
-            btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:#ef4444"></i>`;
-            btn.onclick = () => { window.abrirPDFDireto(pdf.url, pdf.nome); modal.style.display = 'none'; };
-            content.appendChild(btn);
-        });
-        modal.style.display = 'flex';
-    };
-
-    window.abrirPDFDireto = (url, nome) => {
-        const v = document.getElementById('pdf-viewer');
-        const f = document.getElementById('pdf-frame');
-        const tit = document.getElementById('pdf-title');
-        f.src = url; tit.innerText = nome; v.classList.add('active'); window.toggleRecolherEditor();
+    // --- RESTANTE DAS FUNÇÕES (MARCA TEXTO, PDF, ETC) ---
+    window.carregarPecaPasta = async (k) => { 
+        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
+        if(snap.exists()){ 
+            const data = snap.val(); 
+            window.pecaAtualNome = data.peca.split(' (')[0]; 
+            window.modoAtual = data.exame;
+            document.getElementById('editor-principal').innerHTML = data.conteudo;
+            document.getElementById('universal-modal').style.display='none'; 
+            persistirERefrescar();
+        } 
     };
 
     window.setHighlightColor = (color, id) => {
         window.currentColor = color;
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        if(!window.marcaTextoAtivo) window.toggleMarcaTexto(true);
+        window.toggleMarcaTexto(true);
     };
 
     window.toggleMarcaTexto = (forcarAtivo = null) => {
@@ -498,41 +477,61 @@
         const btn = document.getElementById('btn-highlight');
         if(window.marcaTextoAtivo) {
             btn.style.background = window.currentColor;
-            btn.style.color = "#000"; btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
+            btn.innerHTML = '<i class="fas fa-pen-nib"></i>';
         } else {
-            btn.style.background = "transparent"; btn.style.color = "#64748b"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
+            btn.style.background = "transparent"; btn.innerHTML = '<i class="fas fa-highlighter"></i>';
         }
     };
 
-    window.ativarModoQuestoes = () => { const n = prompt("Nome da Questão:"); if(n) { window.modoQuestoes=true; window.modoTeses=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    window.ativarModoTeses = () => { const n = prompt("Assunto da Tese:"); if(n) { window.modoTeses=true; window.modoQuestoes=false; window.modoTreinoLivre=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    window.ativarTreinoLivre = () => { const n = prompt("Nome do Treino:"); if(n) { window.modoTreinoLivre=true; window.modoQuestoes=false; window.modoTeses=false; window.pecaAtualNome=n; localStorage.setItem('pecaAtualNome', n); window.location.reload(); } };
-    
-    window.abrirExames = () => { 
-        const modal = document.getElementById('universal-modal'); document.getElementById('modal-title').innerText = "EXAMES OAB"; 
-        const content = document.getElementById('modal-content'); content.innerHTML = ""; 
-        for(let i=44; i>=35; i--) { 
-            const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`; 
-            b.onclick = () => { localStorage.setItem('activeEx', i); localStorage.setItem('modoTreinoLivre', "false"); localStorage.setItem('modoQuestoes', "false"); localStorage.setItem('modoTeses', "false"); window.location.reload(); }; 
-            content.appendChild(b); 
-        } 
-        modal.style.display = 'flex'; 
+    window.abrirBibliotecaPDF = () => {
+        const modal = document.getElementById('universal-modal');
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-title').innerText = "📂 PASTA DE PDFS";
+        content.innerHTML = "";
+        window.LISTA_PDF_BIBLIOTECA.forEach(pdf => {
+            const btn = document.createElement('div');
+            btn.className = 'opt-btn'; btn.innerHTML = `<span>${pdf.nome}</span> <i class="fas fa-file-pdf" style="color:red"></i>`;
+            btn.onclick = () => { window.abrirPDFDireto(pdf.url, pdf.nome); modal.style.display = 'none'; };
+            content.appendChild(btn);
+        });
+        modal.style.display = 'flex';
     };
 
-    window.desfazer = () => { const ed = document.getElementById('editor-principal'); if(window.historicoUndo.length > 0) ed.innerHTML = window.historicoUndo.pop(); };
-    async function salvarAutomatico() { const ed = document.getElementById('editor-principal'); if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); }
-    async function carregarRascunho() { const snap = await get(ref(db, `producao_v13/RASCUNHO`)); if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; }
-    window.toggleFoguete = () => document.getElementById('mobile-hub').classList.toggle('active');
-    window.limparFolha = () => { if(confirm("Limpar?")) document.getElementById('editor-principal').innerHTML = ""; };
-    window.abrirMentoria = () => window.open('mentoria.html', '_blank');
-    window.toggleRecolherEditor = () => { document.getElementById('editor-container').classList.toggle('collapsed'); document.getElementById('pdf-viewer').classList.toggle('full-view'); };
-    window.verPDF = (t) => {
-        const v = document.getElementById('pdf-viewer'); const f = document.getElementById('pdf-frame');
-        let url = t === 'P' ? `ro${window.activeEx}.pdf` : (t === 'G' ? `ro${window.activeEx}-gabarito.pdf` : (t === 'V' ? 'vade.pdf' : (t === 'LP' ? 'livro_processo.pdf' : 'livro_material.pdf')));
-        f.src = url; v.classList.add('active'); window.toggleRecolherEditor(); 
+    window.abrirPDFDireto = (url, nome) => {
+        document.getElementById('pdf-frame').src = url;
+        document.getElementById('pdf-title').innerText = nome;
+        document.getElementById('pdf-viewer').classList.add('active');
+        window.toggleRecolherEditor();
     };
-    window.fecharPDF = () => { document.getElementById('pdf-viewer').classList.remove('active', 'full-view'); document.getElementById('editor-container').classList.remove('collapsed'); };
+
+    window.verPDF = (t) => {
+        const f = document.getElementById('pdf-frame');
+        let url = t === 'P' ? `ro${window.activeEx}.pdf` : (t === 'G' ? `ro${window.activeEx}-gabarito.pdf` : (t === 'V' ? 'vade.pdf' : (t === 'LP' ? 'livro_processo.pdf' : 'livro_material.pdf')));
+        f.src = url;
+        document.getElementById('pdf-viewer').classList.add('active');
+        window.toggleRecolherEditor(); 
+    };
+
+    window.fecharPDF = () => {
+        document.getElementById('pdf-viewer').classList.remove('active', 'full-view');
+        document.getElementById('editor-container').classList.remove('collapsed');
+    };
+
+    window.toggleRecolherEditor = () => {
+        document.getElementById('editor-container').classList.toggle('collapsed');
+        document.getElementById('pdf-viewer').classList.toggle('full-view');
+    };
+
+    async function salvarAutomatico() { 
+        const ed = document.getElementById('editor-principal'); 
+        if(ed) await set(ref(db, `producao_v13/RASCUNHO`), { conteudo: ed.innerHTML }); 
+    }
+
+    async function carregarRascunho() { 
+        const snap = await get(ref(db, `producao_v13/RASCUNHO`)); 
+        if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; 
+    }
 </script>
-</body>
 </html>
+
 

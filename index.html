@@ -259,7 +259,7 @@
 
     window.onload = async () => {
         FolhaEngine.montar('folha-total');
-        atualizarDisplayModo(); // Garante que o cabeçalho mostre a gaveta certa ao abrir
+        atualizarDisplayModo(); 
         
         setTimeout(() => {
             const ed = document.getElementById('editor-principal');
@@ -286,7 +286,16 @@
         setInterval(salvarAutomatico, 30000);
     };
 
-    // --- LÓGICA DE GAVETAS (PASTA) ---
+    // --- FUNÇÃO PARA ALTERAR NOME (SOLICITADA) ---
+    window.renomearTreino = () => {
+        const n = prompt("Defina o novo nome deste documento:", window.pecaAtualNome);
+        if (n && n.trim() !== "") { 
+            window.pecaAtualNome = n.trim(); 
+            persistirERefrescar(); // Atualiza display e localStorage
+        }
+    };
+
+    // --- LÓGICA DE GAVETAS ---
     window.gerenciadorPasta = () => {
         const modal = document.getElementById('universal-modal');
         const content = document.getElementById('modal-content');
@@ -338,9 +347,7 @@
                     div.innerHTML = `
                         <div style="display:flex; justify-content:space-between; width:100%">
                             <strong onclick="window.carregarPecaPasta('${item.id}')" style="flex:1">${item.peca}</strong>
-                            <div style="display:flex; gap:15px">
-                                <i class="fas fa-trash" style="color:red" onclick="event.stopPropagation(); window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
-                            </div>
+                            <i class="fas fa-trash" style="color:red" onclick="event.stopPropagation(); window.deletarPecaPasta('${item.id}', '${tipoGaveta}')"></i>
                         </div>`;
                     content.appendChild(div);
                 });
@@ -348,12 +355,9 @@
         } catch (e) { content.innerHTML = "Erro ao ler banco."; }
     };
 
-    // --- FUNÇÃO DE SALVAMENTO CORRIGIDA (O CORAÇÃO DO AJUSTE) ---
     window.finalizarPeca = async () => {
         const ed = document.getElementById('editor-principal');
         if(!ed) return;
-
-        // TIRA A DÚVIDA: Usa o modoAtual setado pelos botões da sidebar
         const tipo = window.modoAtual; 
         const nomeAlvo = window.pecaAtualNome;
 
@@ -368,54 +372,35 @@
                     const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
                     return nomeLimpo === nomeAlvo && String(dados[k].exame) === String(tipo);
                 });
-
                 if (encontrado) {
                     jaExiste = true;
-                    if (!confirm(`Já existe "${nomeAlvo}" na gaveta [${tipo}]. Deseja ATUALIZAR?`)) return;
+                    if (!confirm(`Já existe "${nomeAlvo}" na gaveta [${tipo}]. Atualizar?`)) return;
                     idFinal = encontrado;
                 }
             }
-
             if (!jaExiste && !confirm(`Criar NOVO arquivo "${nomeAlvo}" na gaveta [${tipo}]?`)) return;
 
             const agora = new Date();
             const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-
             await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), {
-                exame: tipo,
-                peca: `${nomeAlvo} (${dataF})`,
-                conteudo: ed.innerHTML
+                exame: tipo, peca: `${nomeAlvo} (${dataF})`, conteudo: ed.innerHTML
             });
-            alert("✅ Blindado na gaveta: " + tipo);
+            alert("✅ Guardado na gaveta: " + tipo);
         } catch (e) { alert("Erro ao salvar."); }
     };
 
-    // --- GATILHOS DE MODO (SEM RELOAD PARA NÃO PERDER VARIAVEL) ---
+    // --- CONTROLE DE MODOS ---
     window.ativarModoQuestoes = () => { 
         const n = prompt("Nome da Questão:"); 
-        if(n) { 
-            window.modoAtual = "QUESTÕES"; 
-            window.pecaAtualNome = n; 
-            persistirERefrescar();
-        } 
+        if(n) { window.modoAtual = "QUESTÕES"; window.pecaAtualNome = n; persistirERefrescar(); } 
     };
-
     window.ativarModoTeses = () => { 
         const n = prompt("Assunto da Tese:"); 
-        if(n) { 
-            window.modoAtual = "TESES"; 
-            window.pecaAtualNome = n; 
-            persistirERefrescar();
-        } 
+        if(n) { window.modoAtual = "TESES"; window.pecaAtualNome = n; persistirERefrescar(); } 
     };
-
     window.ativarTreinoLivre = () => { 
         const n = prompt("Nome do Treino:"); 
-        if(n) { 
-            window.modoAtual = "TREINO"; 
-            window.pecaAtualNome = n; 
-            persistirERefrescar();
-        } 
+        if(n) { window.modoAtual = "TREINO"; window.pecaAtualNome = n; persistirERefrescar(); } 
     };
 
     window.abrirExames = () => {
@@ -426,15 +411,39 @@
         for(let i=44; i>=35; i--) {
             const b = document.createElement('div'); b.className = 'opt-btn'; b.innerHTML = `<span>EXAME ${i}</span>`;
             b.onclick = () => { 
-                window.activeEx = i.toString();
-                window.modoAtual = i.toString(); 
-                window.pecaAtualNome = "PEÇA OFICIAL";
-                persistirERefrescar();
+                window.activeEx = i.toString(); window.modoAtual = i.toString(); 
+                window.pecaAtualNome = "PEÇA OFICIAL"; persistirERefrescar();
                 modal.style.display = 'none';
             };
             content.appendChild(b);
         }
         modal.style.display = 'flex';
+    };
+
+    // --- ESTRUTURA PERGAMINHO (MODELOS) ---
+    window.abrirPergaminho = () => {
+        const modal = document.getElementById('universal-modal');
+        const content = document.getElementById('modal-content');
+        document.getElementById('modal-title').innerText = "📜 ESTRUTURAS DE PEÇAS";
+        content.innerHTML = `
+            <div class="opt-btn" onclick="window.injetarEstrutura('RT')"><span>RECLAMAÇÃO TRABALHISTA</span> <i class="fas fa-file-invoice"></i></div>
+            <div class="opt-btn" onclick="window.injetarEstrutura('CONTESTACAO')"><span>CONTESTAÇÃO</span> <i class="fas fa-shield-alt"></i></div>
+            <div class="opt-btn" onclick="window.injetarEstrutura('RO')"><span>RECURSO ORDINÁRIO</span> <i class="fas fa-gavel"></i></div>
+        `;
+        modal.style.display = 'flex';
+    };
+
+    window.injetarEstrutura = (tipo) => {
+        const ed = document.getElementById('editor-principal');
+        const modelos = {
+            'RT': '<b>EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DA ... VARA DO TRABALHO DE ...</b><br><br><b>RECLAMANTE:</b> ..., nacionalidade..., estado civil..., profissão..., CPF..., RG..., CTPS..., PIS..., nome da mãe..., residente e domiciliado na rua...<br><br><b>RECLAMADA:</b> ..., pessoa jurídica de direito privado, inscrita no CNPJ..., com sede na rua...<br><br>Vem, por intermédio de seu advogado, propor <b>RECLAMAÇÃO TRABALHISTA</b> pelo rito...',
+            'CONTESTACAO': '<b>EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DA ... VARA DO TRABALHO DE ...</b><br><br>Processo nº: ...<br><br><b>RECLAMADA:</b> ..., já qualificada nos autos, vem propor <b>CONTESTAÇÃO</b>...',
+            'RO': '<b>EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DA ... VARA DO TRABALHO DE ...</b><br><br>Processo nº: ...<br><br>Vem interpor <b>RECURSO ORDINÁRIO</b> para o Egrégio Tribunal Regional do Trabalho da ... Região...'
+        };
+        if(confirm("Isso substituirá o texto atual. Continuar?")) {
+            ed.innerHTML = modelos[tipo];
+            document.getElementById('universal-modal').style.display = 'none';
+        }
     };
 
     function persistirERefrescar() {
@@ -452,7 +461,6 @@
         ident.innerHTML = `${window.pecaAtualNome} <i class="fas fa-pen" style="font-size:10px; opacity:0.5"></i>`;
     };
 
-    // --- RESTANTE DAS FUNÇÕES (MARCA TEXTO, PDF, ETC) ---
     window.carregarPecaPasta = async (k) => { 
         const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL/${k}`)); 
         if(snap.exists()){ 
@@ -532,6 +540,4 @@
         if(snap.exists()) document.getElementById('editor-principal').innerHTML = snap.val().conteudo; 
     }
 </script>
-</html>
-
 

@@ -402,49 +402,54 @@
         } 
     };
 
-    window.finalizarPeca = async () => { 
-        const ed = document.getElementById('editor-principal'); 
-        if(!ed) return; 
-        
-        const tipo = window.modoQuestoes ? "QUESTÕES" : (window.modoTreinoLivre ? "TREINO" : (window.modoTeses ? "TESES" : window.activeEx));
-        const nomeAlvo = window.pecaAtualNome;
-        
-        try {
-            const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
-            let idFinal = Date.now().toString();
-            let jaExiste = false;
+   window.finalizarPeca = async () => { 
+    const ed = document.getElementById('editor-principal'); 
+    if(!ed) return; 
+    
+    // BLINDAGEM: O tipo agora vem de uma única variável de controle
+    // Se não for Questão, Treino ou Tese, ele assume o número do Exame Ativo
+    const tipo = window.modoAtual || window.activeEx; 
+    const nomeAlvo = window.pecaAtualNome;
+    
+    try {
+        const snap = await get(ref(db, `producao_v13/HISTORICO_OFICIAL`));
+        let idFinal = Date.now().toString();
+        let jaExiste = false;
 
-            if (snap.exists()) {
-                const dados = snap.val();
-                const encontrado = Object.keys(dados).find(k => {
-                    const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
-                    return nomeLimpo === nomeAlvo && dados[k].exame === tipo;
-                });
+        if (snap.exists()) {
+            const dados = snap.val();
+            const encontrado = Object.keys(dados).find(k => {
+                // Limpa a data do nome para comparar apenas o título da peça
+                const nomeLimpo = dados[k].peca.includes(' (') ? dados[k].peca.split(' (')[0] : dados[k].peca;
+                return nomeLimpo === nomeAlvo && String(dados[k].exame) === String(tipo);
+            });
 
-                if (encontrado) {
-                    jaExiste = true;
-                    if (confirm(`Já existe um arquivo chamado "${nomeAlvo}" na gaveta ${tipo}.\n\nDeseja ATUALIZAR (sobrepor) o arquivo existente?`)) {
-                        idFinal = encontrado;
-                    } else { return; }
-                }
+            if (encontrado) {
+                jaExiste = true;
+                if (!confirm(`Já existe "${nomeAlvo}" na gaveta [${tipo}].\n\nDeseja ATUALIZAR este arquivo?`)) return;
+                idFinal = encontrado;
             }
+        }
 
-            if (!jaExiste) {
-                if (!confirm(`Deseja criar um NOVO arquivo chamado "${nomeAlvo}" na gaveta ${tipo}?`)) return;
-            }
+        if (!jaExiste) {
+            if (!confirm(`Deseja criar um NOVO arquivo "${nomeAlvo}" na gaveta [${tipo}]?`)) return;
+        }
 
-            const agora = new Date(); 
-            const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
-            
-            await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), { 
-                exame: tipo, 
-                peca: `${nomeAlvo} (${dataF})`, 
-                conteudo: ed.innerHTML 
-            }); 
-            
-            alert(jaExiste ? "Arquivo ATUALIZADO com sucesso!" : "Novo arquivo CRIADO com sucesso!");
-        } catch (e) { alert("Erro ao processar salvamento."); }
-    };
+        const agora = new Date(); 
+        const dataF = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}); 
+        
+        await set(ref(db, `producao_v13/HISTORICO_OFICIAL/${idFinal}`), { 
+            exame: tipo, 
+            peca: `${nomeAlvo} (${dataF})`, 
+            conteudo: ed.innerHTML 
+        }); 
+        
+        alert(jaExiste ? "✅ Gaveta Atualizada!" : "✅ Novo arquivo guardado na gaveta " + tipo);
+    } catch (e) { 
+        console.error(e);
+        alert("Erro ao processar salvamento."); 
+    }
+};
 
     window.atualizarDisplayModo = () => {
         const display = document.getElementById('ex-display');
@@ -530,3 +535,4 @@
 </script>
 </body>
 </html>
+
